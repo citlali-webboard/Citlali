@@ -1,0 +1,23 @@
+﻿* {
+  font-family: "IBM Plex Sans Thai Looped", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+*,
+::after,
+::before,
+::backdrop,
+::file-selector-button {
+  margin: 0;
+  padding: 0;
+}
+
+*,
+::after,
+::before,
+::backdrop,
+::file-selector-button {
+  box-sizing: border-box;
+  border: 0 solid;
+}
