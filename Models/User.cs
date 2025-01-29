@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
 
@@ -16,7 +17,7 @@ public class User : BaseModel
         public string Email { get; set; } = "";
 
         [Column("profileImageURL")]
-        public string ProfileImageUrl { get; set; } = "";
+        public string ProfileImageUrl { get; set; } = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
 
         [Column("displayName")]
         public string DisplayName { get; set; } = "";
@@ -30,5 +31,10 @@ public class User : BaseModel
         [Column("deleted")]
         public bool Deleted { get; set; } = false;
 
-        // public IFormFile? ProfileImage { get; set; } // Used for handling file upload in form
+}
+
+public class UserRegisterDTO : User 
+{
+        public string Password { get; set; } = "";
+        public IFormFile? ProfileImage { get; set; } // Used for handling file upload in form
 }

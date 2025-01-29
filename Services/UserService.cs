@@ -18,7 +18,7 @@ public class UserService
         _configuration = configuration;
     }
 
-    public async Task<User> CreateUser(User user, string password)
+    public async Task<User> CreateUser(UserRegisterDTO user, string password)
     {
 
         // Step 1: Create the user with Supabase Auth
@@ -28,17 +28,15 @@ public class UserService
             // Handle errors during user creation (e.g., email already exists)
             throw new Exception($"Error during user creation.");
         }
-        Console.WriteLine($"User created with email: {user.Email}");
         var supabaseUser = signUpResult.User;
+
 
         if (supabaseUser.Id == null)
         {
             // Handle errors during user creation (e.g., email already exists)
             throw new Exception($"Error during user creation.");
         }
-        Console.WriteLine($"User returned from auth system: {supabaseUser}");
-        Console.WriteLine($"Id returned from auth system: {supabaseUser.Id}");
-
+        
         var dbUser = new User
         {
             UserId = Guid.Parse(supabaseUser.Id),

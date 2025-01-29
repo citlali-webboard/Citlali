@@ -39,9 +39,9 @@ public class UserController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(User user)
+    public async Task<IActionResult> Create(UserRegisterDTO user)
     {
-        var userCreated = await _userService.CreateUser(user, "password");
+        var userCreated = await _userService.CreateUser(user, user.Password);
 
         return RedirectToAction("Profile", userCreated);
     }
