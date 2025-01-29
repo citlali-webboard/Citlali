@@ -9,7 +9,13 @@ An event webboard designed for alpha-generation.
 git clone https://github.com/citlali-webboard/Citlali
 ```
 
-2. Run in watch mode. It will automatically open your browser.
+2. Install dependencies.
+
+```bash
+dotnet restore
+```
+
+3. Run in watch mode. It will automatically open your browser.
 
 ```bash
 dotnet watch
