@@ -2,6 +2,7 @@ using Citlali.Models;
 using Supabase;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
+using DotNetEnv;
 
 namespace Citlali.Services;
 
@@ -9,8 +10,6 @@ public class UserService
 {
     private readonly Supabase.Client _supabaseClient;
     private readonly IConfiguration _configuration;
-
-    private List<User> users = new List<User>();
 
     public UserService(Supabase.Client supabaseClient, IConfiguration configuration)
     {
@@ -20,21 +19,23 @@ public class UserService
 
     public async Task<User> CreateUser(UserRegisterDTO user, string password)
     {
-
-        // Step 1: Create the user with Supabase Auth
         var signUpResult = await _supabaseClient.Auth.SignUp(user.Email, password);
         if (signUpResult == null || signUpResult.User == null)
         {
-            // Handle errors during user creation (e.g., email already exists)
             throw new Exception($"Error during user creation.");
         }
+
         var supabaseUser = signUpResult.User;
-
-
+        string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+        
         if (supabaseUser.Id == null)
         {
-            // Handle errors during user creation (e.g., email already exists)
             throw new Exception($"Error during user creation.");
+        }
+
+        if (user.ProfileImage != null)
+        {
+            profileImageUrl = await UploadProfileImage(user.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
         }
         
         var dbUser = new User
@@ -42,17 +43,14 @@ public class UserService
             UserId = Guid.Parse(supabaseUser.Id),
             Email = user.Email,
             DisplayName = user.DisplayName,
-            ProfileImageUrl = user.ProfileImageUrl,
+            ProfileImageUrl = profileImageUrl,
             UserBio = user.UserBio
         };
-
-        users.Add(dbUser);
 
         await _supabaseClient
             .From<User>()
             .Insert(dbUser);
 
-        // Return the created user with additional database fields
         return dbUser;
     }
 
@@ -65,4 +63,45 @@ public class UserService
 
         return response;
     }
+
+    public async Task<string?> UploadProfileImage(IFormFile file, string userId)
+    {
+        try
+        {
+            string bucketName = Environment.GetEnvironmentVariable("SUPABASE_BUCKET_NAME") ?? "";
+
+            string tempFolder = Path.GetTempPath(); // System temp folder
+            string tempFilePath = Path.Combine(tempFolder, $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}");
+
+            using (var fileStream = new FileStream(tempFilePath, FileMode.Create))
+            {
+                await file.CopyToAsync(fileStream);
+            }
+
+            string targetFilePath = $"{userId}{Path.GetExtension(file.FileName)}";
+            await _supabaseClient.Storage
+                .From(bucketName)
+                .Upload(tempFilePath, targetFilePath, new Supabase.Storage.FileOptions
+                {
+                    Upsert = true // Overwrite if file exists
+                });
+
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
+
+            string publicUrl = _supabaseClient.Storage
+                .From(bucketName)
+                .GetPublicUrl(targetFilePath);
+
+            return publicUrl;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error uploading profile image: {ex.Message}");
+            return null;
+        }
+    }
+
 }

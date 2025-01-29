@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
 
@@ -36,5 +37,5 @@ public class User : BaseModel
 public class UserRegisterDTO : User 
 {
         public string Password { get; set; } = "";
-        public IFormFile? ProfileImage { get; set; } // Used for handling file upload in form
+        public IFormFile? ProfileImage { get; set; }
 }
