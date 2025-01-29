@@ -36,6 +36,8 @@ public class UserService
             // Handle errors during user creation (e.g., email already exists)
             throw new Exception($"Error during user creation.");
         }
+        Console.WriteLine($"User returned from auth system: {supabaseUser}");
+        Console.WriteLine($"Id returned from auth system: {supabaseUser.Id}");
 
         var dbUser = new User
         {

@@ -8,6 +8,7 @@ namespace Citlali.Models;
 [Table("USERS")]
 public class User : BaseModel
 {
+        [PrimaryKey]
         [Column("userId")]
         public Guid UserId { get; set; } // Linked to Supabase Auth
 
@@ -29,5 +30,5 @@ public class User : BaseModel
         [Column("deleted")]
         public bool Deleted { get; set; } = false;
 
-        public IFormFile? ProfileImage { get; set; } // Used for handling file upload in form
+        // public IFormFile? ProfileImage { get; set; } // Used for handling file upload in form
 }
