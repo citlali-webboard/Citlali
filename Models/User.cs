@@ -11,25 +11,25 @@ namespace Citlali.Models;
 public class User : BaseModel
 {
         [PrimaryKey]
-        [Column("userId")]
+        [Column("UserId")]
         public Guid UserId { get; set; } // Linked to Supabase Auth
 
-        [Column("email")]
+        [Column("Email")]
         public string Email { get; set; } = "";
 
-        [Column("profileImageURL")]
+        [Column("ProfileImageURL")]
         public string ProfileImageUrl { get; set; } = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
 
-        [Column("displayName")]
+        [Column("DisplayName")]
         public string DisplayName { get; set; } = "";
 
-        [Column("userBio")]
+        [Column("UserBio")]
         public string UserBio { get; set; } = "";
 
-        [Column("created_at")]
+        [Column("CreatedAt")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        [Column("deleted")]
+        [Column("Deleted")]
         public bool Deleted { get; set; } = false;
 
 }
