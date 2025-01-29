@@ -20,48 +20,49 @@ public class UserService
 
     public async Task<User> CreateUser(User user, string password)
     {
-        
-        // // Step 1: Create the user with Supabase Auth
-        // var signUpResult = await _supabaseClient.Auth.SignUp(user.Email, password);
-        // if (signUpResult == null || signUpResult.User == null)
-        // {
-        //     // Handle errors during user creation (e.g., email already exists)
-        //     throw new Exception($"Error during user creation.");
-        // }
-        // Console.WriteLine($"User created with email: {user.Email}");
-        // var supabaseUser = signUpResult.User;
 
+        // Step 1: Create the user with Supabase Auth
+        var signUpResult = await _supabaseClient.Auth.SignUp(user.Email, password);
+        if (signUpResult == null || signUpResult.User == null)
+        {
+            // Handle errors during user creation (e.g., email already exists)
+            throw new Exception($"Error during user creation.");
+        }
+        Console.WriteLine($"User created with email: {user.Email}");
+        var supabaseUser = signUpResult.User;
+
+        if (supabaseUser.Id == null)
+        {
+            // Handle errors during user creation (e.g., email already exists)
+            throw new Exception($"Error during user creation.");
+        }
 
         var dbUser = new User
         {
-            // UserId = Guid.Parse(supabaseUser.Id),
+            UserId = Guid.Parse(supabaseUser.Id),
             Email = user.Email,
             DisplayName = user.DisplayName,
             ProfileImageUrl = user.ProfileImageUrl,
-            UserBio = user.UserBio,
-            CreatedAt = DateTime.UtcNow
+            UserBio = user.UserBio
         };
 
         users.Add(dbUser);
 
-        // var response = await _supabaseClient
-        //     .From<User>()
-        //     .Insert(dbUser);
+        await _supabaseClient
+            .From<User>()
+            .Insert(dbUser);
 
         // Return the created user with additional database fields
         return dbUser;
     }
 
-    public User? GetUserByEmail(string email)
+    public async Task<User?> GetUserByEmail(string email)
     {
-        // var response = await _supabaseClient
-        //     .From<User>()
-        //     .Select("*")
-        //     .Eq("email", email)
-        //     .Single();
+        var response = await _supabaseClient
+            .From<User>()
+            .Where(row => row.Email == email)
+            .Single();
 
-        // return response.Data;
-        return users.FirstOrDefault(u => u.Email == email);
+        return response;
     }
 }
-

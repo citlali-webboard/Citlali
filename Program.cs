@@ -14,7 +14,7 @@ if (string.IsNullOrEmpty(supabaseUrl) || string.IsNullOrEmpty(supabaseKey))
     throw new Exception("SUPABASE_URL and SUPABASE_KEY must be set in the environment variables.");
 }
 
-var supabaseClient = new Supabase.Client(supabaseUrl, supabaseKey);
+var supabaseClient = new Client(supabaseUrl, supabaseKey);
 await supabaseClient.InitializeAsync();
 
 // Add services to the container.

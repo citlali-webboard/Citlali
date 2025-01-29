@@ -29,7 +29,7 @@ public class UserController : Controller
         return View();
     }
 
-    public IActionResult Profile(User user)
+    public IActionResult Profile(User? user)
     {
         if (user == null)
         {
@@ -39,10 +39,10 @@ public class UserController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(User user) 
+    public async Task<IActionResult> Create(User user)
     {
         var userCreated = await _userService.CreateUser(user, "password");
-        
+
         return RedirectToAction("Profile", userCreated);
     }
 
