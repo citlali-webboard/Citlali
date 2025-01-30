@@ -1,6 +1,8 @@
 using DotNetEnv;
 using Supabase;
 using Citlali.Services;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,16 @@ await supabaseClient.InitializeAsync();
 builder.Services.AddSingleton(supabaseClient);
 builder.Services.AddScoped<UserService>();
 builder.Services.AddControllersWithViews();
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication().AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET") ?? "")),
+        ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+    };
+});
 
 var app = builder.Build();
 

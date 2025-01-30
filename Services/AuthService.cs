@@ -18,6 +18,16 @@ public class AuthService
         _configuration = configuration;
     }
 
+    public async Task<Supabase.Gotrue.Session?> Login(string email, string password) {
+        var response = await _supabaseClient.Auth.SignIn(email, password);
+        return response;
+    }
+
+    public async Task<Supabase.Gotrue.Session?> Register(string email, string password) {
+        var response = await _supabaseClient.Auth.SignUp(email, password);
+        return response;
+    }
+
     public async Task<bool> VerifyEmailOtp(string email, string token, Supabase.Gotrue.Constants.EmailOtpType type) {
         try {
             var result = await _supabaseClient.Auth.VerifyOTP(email, token, type);

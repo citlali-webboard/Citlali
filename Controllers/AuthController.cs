@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 
 using Citlali.Models;
 using Citlali.Services;
+using Citlali.Controllers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Net;
 
-namespace MvcMovie.Controllers;
+namespace Citlali.Controllers;
 
 public class AuthController : Controller
 {
@@ -24,6 +25,39 @@ public class AuthController : Controller
     public IActionResult AuthCodeError() {
         return View();
     }
+
+    public IActionResult Login() {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Login(AuthLoginDto authLoginDto) {
+        var token = await _authService.Login(authLoginDto.Email, authLoginDto.Password);
+        if (token != null && token.AccessToken != null && token.RefreshToken != null) {
+            Response.Cookies.Append("AccessToken", token.AccessToken);
+            Response.Cookies.Append("RefreshToken", token.RefreshToken);
+            return RedirectToAction("UserController.Profile");
+        } else {
+            return StatusCode(StatusCodes.Status400BadRequest, "Wrong credentials.");
+        }
+    }
+
+    public IActionResult Register() {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Register(AuthRegisterDto authRegister) {
+        var token = await _authService.Register(authRegister.Email, authRegister.Password);
+        if (token != null && token.AccessToken != null && token.RefreshToken != null) {
+            Response.Cookies.Append("AccessToken", token.AccessToken);
+            Response.Cookies.Append("RefreshToken", token.RefreshToken);
+            return RedirectToAction("UserController.Profile");
+        } else {
+            return StatusCode(StatusCodes.Status400BadRequest, "Wrong credentials.");
+        }
+    }
+
     public IActionResult Confirm() {
         return View();
     }
