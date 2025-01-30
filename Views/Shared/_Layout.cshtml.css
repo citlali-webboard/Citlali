@@ -21,3 +21,10 @@
   box-sizing: border-box;
   border: 0 solid;
 }
+
+*{
+  --white-color: #FFFFFF;
+  --text-gray-color: #A1A1A1;
+  --margin-container: 2% 3% 2% 3%;
+  --auth-background-color : #F5C2E7;
+}
