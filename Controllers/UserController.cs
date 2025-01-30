@@ -6,6 +6,7 @@ using Citlali.Services;
 
 namespace Citlali.Controllers;
 
+[Route("user")]
 public class UserController : Controller
 {
     private readonly ILogger<UserController> _logger;
@@ -19,36 +20,35 @@ public class UserController : Controller
         _userService = userService;
     }
 
+    [HttpGet("")]
     public IActionResult Index()
     {
         return RedirectToAction("Register");
     }
 
+    [HttpGet("register")]
     public IActionResult Register()
     {
         return View();
     }
 
-    public IActionResult Profile(User? user)
+    [HttpGet("profile/{userId}")]
+    public async Task<IActionResult> Profile(string userId)
     {
-        if (user == null)
+        if (string.IsNullOrEmpty(userId))
         {
             return RedirectToAction("Register");
         }
+
+        var user = await _userService.GetUserByUserId(Guid.Parse(userId));
         return View(user);
     }
 
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> Create(UserRegisterDTO user)
     {
         var userCreated = await _userService.CreateUser(user, user.Password);
-
-        return RedirectToAction("Profile", userCreated);
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        return RedirectToAction("Profile", new { userId = userCreated.UserId });
     }
 }
+
