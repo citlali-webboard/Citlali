@@ -20,6 +20,7 @@ await supabaseClient.InitializeAsync();
 // Add services to the container.
 builder.Services.AddSingleton(supabaseClient);
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
