@@ -37,7 +37,7 @@
 
                 <div class="form-group">
                     <label for="ConfirmPassword">Confirm Password</label>
-                    <input asp-for="Password" class="form-control" type="password"ConfirmPassword" />
+                    <input asp-for="Password" class="form-control" type="password" id="ConfirmPassword" />
                     <span class="text-danger"></span>
                 </div>
             
@@ -55,14 +55,13 @@
                 <label for="ProfileImageInput" class="upload-file-button" id="text-upload-file" >Upload file...</label>
                 <span asp-validation-for="ProfileImage"></span>
             </div>
-
-        </div>
-
-        <div class="tags-container">
-            <div> 
-                Choose category that best applicable to your event
-            </div>
-            <div class="tags" id="tags">
+        
+            <div class="tags-container">
+                <div> 
+                    Choose category that best applicable to your event
+                </div>
+                <div class="tags" id="tags">
+                </div>
             </div>
         </div>
 
