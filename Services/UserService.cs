@@ -61,9 +61,19 @@ public class UserService
             .Where(row => row.Email == email)
             .Single();
 
-        return response;
+        return response ?? null;
     }
 
+    public async Task<User?> GetUserByUserId(Guid userId)
+    {
+        var response = await _supabaseClient
+            .From<User>()
+            .Where(row => row.UserId == userId)
+            .Single();
+
+        return response ?? null;
+    }
+    
     public async Task<string?> UploadProfileImage(IFormFile file, string userId)
     {
         try
