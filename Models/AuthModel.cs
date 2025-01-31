@@ -4,6 +4,8 @@ namespace Citlali.Models
     {
         public string Email { get; set; } = "";
         public string Otp { get; set; } = "";
+        public string Next { get; set; } = "";
+        public Supabase.Gotrue.Constants.EmailOtpType Type { get; set; } = Supabase.Gotrue.Constants.EmailOtpType.Signup;
     }
 
     public class AuthLoginDto

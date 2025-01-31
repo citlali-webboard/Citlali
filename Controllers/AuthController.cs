@@ -65,7 +65,12 @@ public class AuthController : Controller
         }
         else
         {
-            return RedirectToAction("Confirm", new { next = "/user/onboarding", email = authRegisterDto.Email });
+            var authConfirmDto = new AuthConfirmDto
+            {
+                Email = authRegisterDto.Email,
+                Next = "/user/onboarding"
+            };
+            return RedirectToAction("Confirm", authConfirmDto);
         }
     }
 
@@ -74,24 +79,26 @@ public class AuthController : Controller
         return View();
     }
 
-    public IActionResult Confirm(string email)
+    [HttpGet("auth/confirm")]
+    public IActionResult Confirm(AuthConfirmDto authConfirmDto)
     {
-        var prefills = new AuthConfirmDto
-        {
-            Email = email
-        };
-        return View(prefills);
+        return View(authConfirmDto);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Confirm(AuthConfirmDto authConfirmDto, Supabase.Gotrue.Constants.EmailOtpType type, string next)
+    [HttpPost("auth/confirm")]
+    public async Task<IActionResult> ConfirmPost(AuthConfirmDto authConfirmDto)
     {
-        var session = await _authService.VerifyEmailOtp(authConfirmDto.Email, authConfirmDto.Otp, type);
+        if (!ModelState.IsValid)
+        {
+            Console.WriteLine(ModelState);
+            return View(authConfirmDto);
+        }
+        var session = await _authService.VerifyEmailOtp(authConfirmDto.Email, authConfirmDto.Otp, authConfirmDto.Type);
         if (session != null && session.AccessToken != null && session.RefreshToken != null)
         {
             Response.Cookies.Append("AccessToken", session.AccessToken);
             Response.Cookies.Append("RefreshToken", session.RefreshToken);
-            return RedirectToRoute(next);
+            return RedirectToRoute(authConfirmDto.Next ?? "");
         }
         else
         {
