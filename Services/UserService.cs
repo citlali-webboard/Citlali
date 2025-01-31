@@ -17,9 +17,9 @@ public class UserService
         _configuration = configuration;
     }
 
-    public async Task<User> CreateUser(UserRegisterDTO user, string password)
+    public async Task<User> CreateUser(UserOnboardingDto userOnboardingDto)
     {
-        var signUpResult = await _supabaseClient.Auth.SignUp(user.Email, password);
+        var signUpResult = await _supabaseClient.Auth.SignUp(userOnboardingDto.Email, userOnboardingDto.Email);
         if (signUpResult == null || signUpResult.User == null)
         {
             throw new Exception($"Error during user creation.");
@@ -27,24 +27,24 @@ public class UserService
 
         var supabaseUser = signUpResult.User;
         string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
-        
+
         if (supabaseUser.Id == null)
         {
             throw new Exception($"Error during user creation.");
         }
 
-        if (user.ProfileImage != null)
+        if (userOnboardingDto.ProfileImage != null)
         {
-            profileImageUrl = await UploadProfileImage(user.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+            profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
         }
-        
+
         var dbUser = new User
         {
             UserId = Guid.Parse(supabaseUser.Id),
-            Email = user.Email,
-            DisplayName = user.DisplayName,
+            Email = userOnboardingDto.Email,
+            DisplayName = userOnboardingDto.DisplayName,
             ProfileImageUrl = profileImageUrl,
-            UserBio = user.UserBio
+            UserBio = userOnboardingDto.UserBio
         };
 
         await _supabaseClient
@@ -73,7 +73,7 @@ public class UserService
 
         return response ?? null;
     }
-    
+
     public async Task<string?> UploadProfileImage(IFormFile file, string userId)
     {
         try

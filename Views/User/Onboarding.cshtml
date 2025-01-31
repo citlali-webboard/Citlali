@@ -1,4 +1,4 @@
-@model Citlali.Models.UserRegisterDTO
+@model Citlali.Models.UserOnboardingDto
 @{
     @* string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
      *@
@@ -6,48 +6,48 @@
 }
 <!DOCTYPE html>
 <html lang="en">
-    
+
 <head>
     <link rel="stylesheet" href="~/css/Register.css" asp-append-version="true" />
 </head>
 
 <body>
 
-    <form class="form-container" asp-action="Create" method="post" enctype="multipart/form-data">
+    <form class="form-container" asp-action="onboarding" method="post" enctype="multipart/form-data">
         <h2>Sign up</h2>
         <div class="form-content">
             <div class="form-data">
-                <div class="form-group">
+                @* <div class="form-group">
                     <label for="Email">Email</label>
                     <input asp-for="Email" id="Email" type="email" />
                     <span asp-validation-for="Email" ></span>
-                </div>
-            
+                </div> *@
+
                 <div class="form-group">
                     <label for="DisplayName">Display Name</label>
                     <input asp-for="DisplayName" class="form-control" id="DisplayName" />
                     <span asp-validation-for="DisplayName" class="text-danger"></span>
                 </div>
 
-                <div class="form-group">
+                @* <div class="form-group">
                     <label for="Password">Password</label>
                     <input asp-for="Password" class="form-control" type="password" id="Password" />
                     <span asp-validation-for="Password" class="text-danger"></span>
-                </div>
+                </div> *@
 
-                <div class="form-group">
+                @* <div class="form-group">
                     <label for="ConfirmPassword">Confirm Password</label>
                     <input asp-for="Password" class="form-control" type="password"ConfirmPassword" />
                     <span class="text-danger"></span>
-                </div>
-            
+                </div> *@
+
                 <div class="form-group" id="bio">
                     <label for="UserBio">User Bio</label>
                     <textarea asp-for="UserBio" id="UserBio" rows="3"></textarea>
                     <span asp-validation-for="UserBio" class="text-danger"></span>
                 </div>
             </div>
-        
+
             <div class="form-img">
                 <div id="text-your-profile">My profile</div>
                 <img id="profileImage" src="@profileImageUrl" alt="ProfileImage">

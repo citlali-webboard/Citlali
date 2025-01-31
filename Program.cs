@@ -24,16 +24,23 @@ builder.Services.AddSingleton(supabaseClient);
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddControllersWithViews();
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication().AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET") ?? "")),
-        ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
-    };
-});
+// builder.Services.AddAuthorization();
+builder.Services.AddAuthentication()
+            .AddJwtBearer(options =>
+            {
+                // Define token validation parameters to ensure tokens are valid and trustworthy
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    // ValidateIssuer = true, // Ensure the token was issued by a trusted issuer
+                    // ValidIssuer = builder.Configuration["Jwt:Issuer"], // The expected issuer value from configuration
+                    ValidateAudience = true, // Disable audience validation (can be enabled as needed)
+                    ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+                    ValidateLifetime = true, // Ensure the token has not expired
+                    ValidateIssuerSigningKey = true, // Ensure the token's signing key is valid
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET") ?? "")),
+                };
+            });
+
 
 var app = builder.Build();
 
@@ -45,9 +52,12 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+app.UseMiddleware<JWTInHeaderMiddleware>();
+
+// app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();

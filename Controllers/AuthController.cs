@@ -14,12 +14,16 @@ public class AuthController : Controller
     private readonly ILogger<AuthController> _logger;
     private readonly Supabase.Client _supabaseClient;
     private readonly AuthService _authService;
+    private readonly string _accessCookieName;
+    private readonly string _refreshCookieName;
 
     public AuthController(ILogger<AuthController> logger, Supabase.Client supabaseClient, AuthService authService)
     {
         _logger = logger;
         _supabaseClient = supabaseClient;
         _authService = authService;
+        _accessCookieName = Environment.GetEnvironmentVariable("JWT_ACCESS_COOKIE") ?? throw new Exception("JWT_ACCESS_COOKIE must be set in the environment variables.");
+        _refreshCookieName = Environment.GetEnvironmentVariable("JWT_REFRESH_COOKIE") ?? throw new Exception("JWT_REFRESH_COOKIE must be set in the environment variables.");
     }
 
     public IActionResult AuthCodeError()
@@ -38,8 +42,8 @@ public class AuthController : Controller
         var session = await _authService.Login(authLoginDto.Email, authLoginDto.Password);
         if (session != null && session.AccessToken != null && session.RefreshToken != null)
         {
-            Response.Cookies.Append("AccessToken", session.AccessToken);
-            Response.Cookies.Append("RefreshToken", session.RefreshToken);
+            Response.Cookies.Append(_accessCookieName, session.AccessToken);
+            Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
             return RedirectToAction("UserController.Profile");
         }
         else
@@ -59,8 +63,8 @@ public class AuthController : Controller
         var session = await _authService.Register(authRegisterDto.Email, authRegisterDto.Password);
         if (session != null && session.AccessToken != null && session.RefreshToken != null)
         {
-            Response.Cookies.Append("AccessToken", session.AccessToken);
-            Response.Cookies.Append("RefreshToken", session.RefreshToken);
+            Response.Cookies.Append(_accessCookieName, session.AccessToken);
+            Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
             return RedirectToAction("UserController.Profile");
         }
         else
@@ -95,8 +99,8 @@ public class AuthController : Controller
         var session = await _authService.VerifyEmailOtp(authConfirmDto.Email, authConfirmDto.Otp, authConfirmDto.Type);
         if (session != null && session.AccessToken != null && session.RefreshToken != null)
         {
-            Response.Cookies.Append("AccessToken", session.AccessToken);
-            Response.Cookies.Append("RefreshToken", session.RefreshToken);
+            Response.Cookies.Append(_accessCookieName, session.AccessToken);
+            Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
             return RedirectToRoute(Next ?? "");
         }
         else
