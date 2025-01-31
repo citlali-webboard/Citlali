@@ -22,52 +22,79 @@ public class AuthController : Controller
         _authService = authService;
     }
 
-    public IActionResult AuthCodeError() {
+    public IActionResult AuthCodeError()
+    {
         return View();
     }
 
-    public IActionResult Login() {
+    public IActionResult Login()
+    {
         return View();
     }
 
     [HttpPost]
-    public async Task<IActionResult> Login(AuthLoginDto authLoginDto) {
-        var token = await _authService.Login(authLoginDto.Email, authLoginDto.Password);
-        if (token != null && token.AccessToken != null && token.RefreshToken != null) {
-            Response.Cookies.Append("AccessToken", token.AccessToken);
-            Response.Cookies.Append("RefreshToken", token.RefreshToken);
+    public async Task<IActionResult> Login(AuthLoginDto authLoginDto)
+    {
+        var session = await _authService.Login(authLoginDto.Email, authLoginDto.Password);
+        if (session != null && session.AccessToken != null && session.RefreshToken != null)
+        {
+            Response.Cookies.Append("AccessToken", session.AccessToken);
+            Response.Cookies.Append("RefreshToken", session.RefreshToken);
             return RedirectToAction("UserController.Profile");
-        } else {
+        }
+        else
+        {
             return StatusCode(StatusCodes.Status400BadRequest, "Wrong credentials.");
         }
     }
 
-    public IActionResult Register() {
+    public IActionResult Register()
+    {
         return View();
     }
 
     [HttpPost]
-    public async Task<IActionResult> Register(AuthRegisterDto authRegister) {
-        var token = await _authService.Register(authRegister.Email, authRegister.Password);
-        if (token != null && token.AccessToken != null && token.RefreshToken != null) {
-            Response.Cookies.Append("AccessToken", token.AccessToken);
-            Response.Cookies.Append("RefreshToken", token.RefreshToken);
+    public async Task<IActionResult> Register(AuthRegisterDto authRegisterDto)
+    {
+        var session = await _authService.Register(authRegisterDto.Email, authRegisterDto.Password);
+        if (session != null && session.AccessToken != null && session.RefreshToken != null)
+        {
+            Response.Cookies.Append("AccessToken", session.AccessToken);
+            Response.Cookies.Append("RefreshToken", session.RefreshToken);
             return RedirectToAction("UserController.Profile");
-        } else {
-            return StatusCode(StatusCodes.Status400BadRequest, "Wrong credentials.");
+        }
+        else
+        {
+            return RedirectToAction("Confirm", new { next = "/user/onboarding", email = authRegisterDto.Email });
         }
     }
 
-    public IActionResult Confirm() {
+    public IActionResult RegisterPending()
+    {
         return View();
     }
 
+    public IActionResult Confirm(string email)
+    {
+        var prefills = new AuthConfirmDto
+        {
+            Email = email
+        };
+        return View(prefills);
+    }
+
     [HttpPost]
-    public async Task<IActionResult> Confirm(AuthConfirmDto authConfirmDto, Supabase.Gotrue.Constants.EmailOtpType type, string next) {
-        var success = await _authService.VerifyEmailOtp(authConfirmDto.Email, authConfirmDto.Otp, type);
-        if (success) {
+    public async Task<IActionResult> Confirm(AuthConfirmDto authConfirmDto, Supabase.Gotrue.Constants.EmailOtpType type, string next)
+    {
+        var session = await _authService.VerifyEmailOtp(authConfirmDto.Email, authConfirmDto.Otp, type);
+        if (session != null && session.AccessToken != null && session.RefreshToken != null)
+        {
+            Response.Cookies.Append("AccessToken", session.AccessToken);
+            Response.Cookies.Append("RefreshToken", session.RefreshToken);
             return RedirectToRoute(next);
-        } else {
+        }
+        else
+        {
             return RedirectToAction("AuthCodeError");
         }
     }
