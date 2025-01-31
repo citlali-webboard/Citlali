@@ -26,8 +26,8 @@ public class UserController : Controller
         return RedirectToAction("Register");
     }
 
-    [HttpGet("register")]
-    public IActionResult Register()
+    [HttpGet("onboarding")]
+    public IActionResult Onboarding()
     {
         return View();
     }
@@ -51,4 +51,3 @@ public class UserController : Controller
         return RedirectToAction("Profile", new { userId = userCreated.UserId });
     }
 }
-
