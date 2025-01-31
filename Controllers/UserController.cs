@@ -31,6 +31,9 @@ public class UserController : Controller
     [Authorize]
     public IActionResult Onboarding()
     {
+        if (_userService.RedirectToOnboarding()) {
+            RedirectToAction("Onboarding");
+        }
         return View();
     }
 
@@ -38,6 +41,9 @@ public class UserController : Controller
     [Authorize]
     public async Task<IActionResult> Create(UserOnboardingDto user)
     {
+        if (!_userService.RedirectToOnboarding()) {
+            RedirectToAction("Profile");
+        }
         var userCreated = await _userService.CreateUser(user);
         return RedirectToAction("Profile", new { userId = userCreated.UserId });
     }

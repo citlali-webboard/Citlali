@@ -44,7 +44,7 @@ public class AuthController : Controller
         {
             Response.Cookies.Append(_accessCookieName, session.AccessToken);
             Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
-            return RedirectToAction("UserController.Profile");
+            return RedirectToRoute(new { controller = "User", action = "Onboarding" });
         }
         else
         {

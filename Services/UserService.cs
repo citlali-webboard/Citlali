@@ -17,18 +17,23 @@ public class UserService
         _configuration = configuration;
     }
 
+    public bool RedirectToOnboarding() {
+        var id = _supabaseClient.Auth.CurrentUser?.Id;
+        if (string.IsNullOrEmpty(id)) {
+            return false;
+        }
+        if (GetUserByUserId(Guid.Parse(id)) == null) {
+            return true;
+        }
+        return false;
+    }
+
     public async Task<User> CreateUser(UserOnboardingDto userOnboardingDto)
     {
-        var signUpResult = await _supabaseClient.Auth.SignUp(userOnboardingDto.Email, userOnboardingDto.Email);
-        if (signUpResult == null || signUpResult.User == null)
-        {
-            throw new Exception($"Error during user creation.");
-        }
-
-        var supabaseUser = signUpResult.User;
+        var supabaseUser = _supabaseClient.Auth.CurrentUser;
         string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
 
-        if (supabaseUser.Id == null)
+        if (supabaseUser?.Id == null)
         {
             throw new Exception($"Error during user creation.");
         }
