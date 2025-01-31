@@ -68,7 +68,7 @@ public class AuthController : Controller
             var authConfirmDto = new AuthConfirmDto
             {
                 Email = authRegisterDto.Email,
-                Next = "/user/onboarding"
+                Next = "user/onboarding"
             };
             return RedirectToAction("Confirm", authConfirmDto);
         }
@@ -86,11 +86,10 @@ public class AuthController : Controller
     }
 
     [HttpPost("auth/confirm")]
-    public async Task<IActionResult> ConfirmPost(AuthConfirmDto authConfirmDto)
+    public async Task<IActionResult> ConfirmPost(AuthConfirmDto authConfirmDto, string? Next)
     {
         if (!ModelState.IsValid)
         {
-            Console.WriteLine(ModelState);
             return View(authConfirmDto);
         }
         var session = await _authService.VerifyEmailOtp(authConfirmDto.Email, authConfirmDto.Otp, authConfirmDto.Type);
@@ -98,7 +97,7 @@ public class AuthController : Controller
         {
             Response.Cookies.Append("AccessToken", session.AccessToken);
             Response.Cookies.Append("RefreshToken", session.RefreshToken);
-            return RedirectToRoute(authConfirmDto.Next ?? "");
+            return RedirectToRoute(Next ?? "");
         }
         else
         {

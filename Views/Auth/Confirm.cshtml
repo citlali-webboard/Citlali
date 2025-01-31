@@ -15,5 +15,11 @@
         <span asp-validation-for="Otp"></span>
     </div>
 
+    @* query string doesnt work *@
+    <div class="form-group">
+        <input asp-for="Next" id="Next" type="text" hidden />
+        <span asp-validation-for="Next"></span>
+    </div>
+
     <button type="submit">Submit</button>
 </form>
