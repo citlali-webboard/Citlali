@@ -2,22 +2,22 @@ using DotNetEnv;
 using Supabase;
 using Citlali.Services;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 Env.Load();
 
-string? supabaseUrl = Environment.GetEnvironmentVariable("SUPABASE_URL");
-string? supabaseKey = Environment.GetEnvironmentVariable("SUPABASE_KEY");
-
-if (string.IsNullOrEmpty(supabaseUrl) || string.IsNullOrEmpty(supabaseKey))
-{
-    throw new Exception("SUPABASE_URL and SUPABASE_KEY must be set in the environment variables.");
-}
+string? supabaseUrl = Environment.GetEnvironmentVariable("SUPABASE_URL") ?? throw new Exception("SUPABASE_URL must be set in the environment variables.");
+string? supabaseKey = Environment.GetEnvironmentVariable("SUPABASE_KEY") ?? throw new Exception("SUPABASE_KEY must be set in the environment variables.");
+string? jwtAccessCookieName = Environment.GetEnvironmentVariable("JWT_ACCESS_COOKIE") ?? throw new Exception("JWT_ACCESS_COOKIE must be set in the environment variables.");
 
 var supabaseClient = new Client(supabaseUrl, supabaseKey);
 await supabaseClient.InitializeAsync();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 // Add services to the container.
 builder.Services.AddSingleton(supabaseClient);
@@ -26,25 +26,37 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddControllersWithViews();
 // builder.Services.AddAuthorization();
 builder.Services.AddAuthentication()
-            .AddJwtBearer(options =>
-            {
-                // Define token validation parameters to ensure tokens are valid and trustworthy
-                options.TokenValidationParameters = new TokenValidationParameters
+                .AddJwtBearer(options =>
                 {
-                    // ValidateIssuer = true, // Ensure the token was issued by a trusted issuer
-                    // ValidIssuer = builder.Configuration["Jwt:Issuer"], // The expected issuer value from configuration
-                    ValidateAudience = true, // Disable audience validation (can be enabled as needed)
-                    ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
-                    ValidateLifetime = true, // Ensure the token has not expired
-                    ValidateIssuerSigningKey = true, // Ensure the token's signing key is valid
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET") ?? "")),
-                };
-            });
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = false, // Supabase auth have no issuer
+                        ValidateAudience = true,
+                        ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET") ?? "")),
+                    };
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Cookies[jwtAccessCookieName];
+                            context.Token = accessToken;
+                            return Task.CompletedTask;
+                        },
+                        OnAuthenticationFailed = context =>
+                        {
+                            // var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                            // logger.LogError("Authentication failed: {ExceptionMessage}", context.Exception.Message);
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
 
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -52,9 +64,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseMiddleware<JWTInHeaderMiddleware>();
-
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthentication();
