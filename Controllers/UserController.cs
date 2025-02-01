@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Citlali.Models;
 using Citlali.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Citlali.Controllers;
 
@@ -20,35 +21,82 @@ public class UserController : Controller
         _userService = userService;
     }
 
-    [HttpGet("")]
     public IActionResult Index()
     {
-        return RedirectToAction("Register");
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return RedirectToAction("Login", "Auth");
+        }
+        return RedirectToAction("Onboarding");
     }
 
-    [HttpGet("register")]
-    public IActionResult Register()
+    [HttpGet("onboarding")]
+    [Authorize]
+    public async Task<IActionResult> Onboarding()
     {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return RedirectToAction("Login", "Auth");
+        }
+
+        if (!await _userService.RedirectToOnboarding()) {
+            return RedirectToAction("Profile");
+        }
+
         return View();
     }
 
-    [HttpGet("profile/{userId}")]
-    public async Task<IActionResult> Profile(string userId)
+    [HttpPost("onboarding")]
+    [Authorize]
+    public async Task<IActionResult> Create(UserOnboardingDto user)
     {
-        if (string.IsNullOrEmpty(userId))
-        {
-            return RedirectToAction("Register");
+        if (!await _userService.RedirectToOnboarding()) {
+            RedirectToAction("Profile");
         }
-
-        var user = await _userService.GetUserByUserId(Guid.Parse(userId));
-        return View(user);
+        var userCreated = await _userService.CreateUser(user);
+        if (userCreated == null) {
+            return RedirectToAction("Onboarding");
+        }
+        return RedirectToAction("Profile");
     }
 
-    [HttpPost("create")]
-    public async Task<IActionResult> Create(UserRegisterDTO user)
+    [HttpGet("profile")]
+    [Authorize]
+    public async Task<IActionResult> Profile()
     {
-        var userCreated = await _userService.CreateUser(user, user.Password);
-        return RedirectToAction("Profile", new { userId = userCreated.UserId });
+        try
+        {
+            var currentUser = _supabaseClient.Auth.CurrentUser;
+
+            if (currentUser == null)
+            {
+                Console.WriteLine("User is not authenticated.");
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var userId = currentUser.Id;
+            if (string.IsNullOrEmpty(userId))
+            {
+                Console.WriteLine("User ID is null");
+                return RedirectToAction("Onboarding");
+            }
+
+            var user = await _userService.GetUserByUserId(Guid.Parse(userId));
+
+            if (user == null)
+            {
+                Console.WriteLine("User not found in DB");
+                return RedirectToAction("Onboarding");
+            }
+
+            return View(user);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return RedirectToAction("Login", "Auth");
+        }
     }
 }
-

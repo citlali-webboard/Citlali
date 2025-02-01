@@ -1,0 +1,19 @@
+@model Citlali.Models.AuthRegisterDto;
+
+<h2>Register</h2>
+<form asp-action="Register" method="post" enctype="multipart/form-data">
+
+    <div class="form-group">
+        <label for="Email">Email</label>
+        <input asp-for="Email" id="Email" type="email" />
+        <span asp-validation-for="Email"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Password">Password</label>
+        <input asp-for="Password" id="Password" type="password" />
+        <span asp-validation-for="Password"></span>
+    </div>
+
+    <button type="submit">Send email confirmation</button>
+</form>

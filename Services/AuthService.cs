@@ -7,24 +7,23 @@ using Citlali.Models;
 
 namespace Citlali.Services;
 
-public class AuthService
+public class AuthService(Client supabaseClient, IConfiguration configuration)
 {
-    private readonly Supabase.Client _supabaseClient;
-    private readonly IConfiguration _configuration;
+    private readonly Client _supabaseClient = supabaseClient;
+    private readonly IConfiguration _configuration = configuration;
 
-    public AuthService(Supabase.Client supabaseClient, IConfiguration configuration)
-    {
-        _supabaseClient = supabaseClient;
-        _configuration = configuration;
+    public async Task<Supabase.Gotrue.Session?> Login(string email, string password) {
+        var response = await _supabaseClient.Auth.SignIn(email, password);
+        return response;
     }
 
-    public async Task<bool> VerifyEmailOtp(string email, string token, Supabase.Gotrue.Constants.EmailOtpType type) {
-        try {
-            var result = await _supabaseClient.Auth.VerifyOTP(email, token, type);
-        }
-        catch (Exception) {
-            return false;
-        }
-        return true;
+    public async Task<Supabase.Gotrue.Session?> Register(string email, string password) {
+        var response = await _supabaseClient.Auth.SignUp(email, password);
+        return response;
+    }
+
+    public async Task<Supabase.Gotrue.Session?> VerifyEmailOtp(string email, string token, Supabase.Gotrue.Constants.EmailOtpType type) {
+        var response = await _supabaseClient.Auth.VerifyOTP(email, token, type);
+        return response;
     }
 }

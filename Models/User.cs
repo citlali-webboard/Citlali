@@ -34,8 +34,7 @@ public class User : BaseModel
 
 }
 
-public class UserRegisterDTO : User 
+public class UserOnboardingDto : User
 {
-        public string Password { get; set; } = "";
         public IFormFile? ProfileImage { get; set; }
 }

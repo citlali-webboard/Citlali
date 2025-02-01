@@ -1,18 +1,24 @@
-@model Citlali.Models.AuthConfirmDto;
+@model Citlali.Models.AuthConfirmDto
 
-<h2>Register</h2>
-<form asp-action="Create" method="post" enctype="multipart/form-data">
+<h2>Confirm</h2>
+<form asp-action="Confirm" method="post" enctype="multipart/form-data">
 
     <div class="form-group">
         <label for="Email">Email</label>
-        <input asp-for="Email" id="Email" />
+        <input asp-for="Email" id="Email" type="email" />
         <span asp-validation-for="Email"></span>
     </div>
 
     <div class="form-group">
         <label for="Otp">OTP</label>
-        <input asp-for="Otp" id="Otp" />
+        <input asp-for="Otp" id="Otp" type="number" />
         <span asp-validation-for="Otp"></span>
+    </div>
+
+    @* query string doesnt work *@
+    <div class="form-group">
+        <input asp-for="Next" id="Next" type="text" hidden />
+        <span asp-validation-for="Next"></span>
     </div>
 
     <button type="submit">Submit</button>

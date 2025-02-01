@@ -17,34 +17,55 @@ public class UserService
         _configuration = configuration;
     }
 
-    public async Task<User> CreateUser(UserRegisterDTO user, string password)
+    /// <summary>
+    /// Check if the user is already onboarded (Entered their profile information).
+    /// After the user logs in, they should be redirected to the onboarding page if they haven't entered their profile information.
+    /// <returns>
+    /// Return <c>true</c> if the user is not onboarded, <c>false</c> otherwise
+    /// </returns>
+    /// </summary>
+    public async Task<bool> RedirectToOnboarding() {
+        var id = _supabaseClient.Auth.CurrentUser?.Id;
+        if (string.IsNullOrEmpty(id)) {
+            return false;
+        }
+        if (await GetUserByUserId(Guid.Parse(id)) is null) {
+            return true;
+        }
+        return false;
+    }
+
+    public async Task<User> CreateUser(UserOnboardingDto userOnboardingDto)
     {
-        var signUpResult = await _supabaseClient.Auth.SignUp(user.Email, password);
-        if (signUpResult == null || signUpResult.User == null)
-        {
-            throw new Exception($"Error during user creation.");
-        }
-
-        var supabaseUser = signUpResult.User;
+        var supabaseUser = _supabaseClient.Auth.CurrentUser;
         string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
-        
-        if (supabaseUser.Id == null)
+
+        if (supabaseUser?.Id == null)
         {
             throw new Exception($"Error during user creation.");
         }
 
-        if (user.ProfileImage != null)
+        if (supabaseUser?.Email == null) 
         {
-            profileImageUrl = await UploadProfileImage(user.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+            throw new Exception($"Error during user creation.");
         }
-        
+
+        Console.WriteLine($"Profile Image: {userOnboardingDto.ProfileImage}");
+
+        if (userOnboardingDto.ProfileImage != null)
+        {
+            profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+        }
+
+
+
         var dbUser = new User
         {
             UserId = Guid.Parse(supabaseUser.Id),
-            Email = user.Email,
-            DisplayName = user.DisplayName,
+            Email = supabaseUser.Email,
+            DisplayName = userOnboardingDto.DisplayName,
             ProfileImageUrl = profileImageUrl,
-            UserBio = user.UserBio
+            UserBio = userOnboardingDto.UserBio
         };
 
         await _supabaseClient
@@ -73,7 +94,7 @@ public class UserService
 
         return response ?? null;
     }
-    
+
     public async Task<string?> UploadProfileImage(IFormFile file, string userId)
     {
         try
@@ -88,7 +109,7 @@ public class UserService
                 await file.CopyToAsync(fileStream);
             }
 
-            string targetFilePath = $"{userId}{Path.GetExtension(file.FileName)}";
+            string targetFilePath = $"{userId}/{userId}{Path.GetExtension(file.FileName)}";
             await _supabaseClient.Storage
                 .From(bucketName)
                 .Upload(tempFilePath, targetFilePath, new Supabase.Storage.FileOptions
