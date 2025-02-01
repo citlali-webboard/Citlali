@@ -113,6 +113,7 @@ public class AuthController : Controller
         var session = await _authService.VerifyEmailOtp(authConfirmDto.Email, authConfirmDto.Otp, authConfirmDto.Type);
         if (session != null && session.AccessToken != null && session.RefreshToken != null)
         {
+            await _supabaseClient.Auth.SetSession(session.AccessToken, session.RefreshToken);
             Response.Cookies.Append(_accessCookieName, session.AccessToken);
             Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
             if (!string.IsNullOrEmpty(Next))

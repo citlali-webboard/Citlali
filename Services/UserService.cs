@@ -24,12 +24,12 @@ public class UserService
     /// Return <c>true</c> if the user is not onboarded, <c>false</c> otherwise
     /// </returns>
     /// </summary>
-    public bool RedirectToOnboarding() {
+    public async Task<bool> RedirectToOnboarding() {
         var id = _supabaseClient.Auth.CurrentUser?.Id;
         if (string.IsNullOrEmpty(id)) {
             return false;
         }
-        if (GetUserByUserId(Guid.Parse(id)) == null) {
+        if (await GetUserByUserId(Guid.Parse(id)) is null) {
             return true;
         }
         return false;

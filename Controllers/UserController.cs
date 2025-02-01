@@ -24,7 +24,6 @@ public class UserController : Controller
     public IActionResult Index()
     {
         var currentUser = _supabaseClient.Auth.CurrentUser;
-        Console.WriteLine(currentUser);
         if (currentUser == null)
         {
             return RedirectToAction("Login", "Auth");
@@ -34,7 +33,7 @@ public class UserController : Controller
 
     [HttpGet("onboarding")]
     [Authorize]
-    public IActionResult Onboarding()
+    public async Task<IActionResult> Onboarding()
     {
         var currentUser = _supabaseClient.Auth.CurrentUser;
         if (currentUser == null)
@@ -42,7 +41,7 @@ public class UserController : Controller
             return RedirectToAction("Login", "Auth");
         }
 
-        if (!_userService.RedirectToOnboarding()) {
+        if (!await _userService.RedirectToOnboarding()) {
             return RedirectToAction("Profile");
         }
 
@@ -53,7 +52,7 @@ public class UserController : Controller
     [Authorize]
     public async Task<IActionResult> Create(UserOnboardingDto user)
     {
-        if (!_userService.RedirectToOnboarding()) {
+        if (!await _userService.RedirectToOnboarding()) {
             RedirectToAction("Profile");
         }
         var userCreated = await _userService.CreateUser(user);
