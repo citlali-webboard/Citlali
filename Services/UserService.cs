@@ -17,6 +17,13 @@ public class UserService
         _configuration = configuration;
     }
 
+    /// <summary>
+    /// Check if the user is already onboarded (Entered their profile information).
+    /// After the user logs in, they should be redirected to the onboarding page if they haven't entered their profile information.
+    /// <returns>
+    /// Return <c>true</c> if the user is not onboarded, <c>false</c> otherwise
+    /// </returns>
+    /// </summary>
     public bool RedirectToOnboarding() {
         var id = _supabaseClient.Auth.CurrentUser?.Id;
         if (string.IsNullOrEmpty(id)) {
