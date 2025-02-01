@@ -21,9 +21,14 @@ public class UserController : Controller
         _userService = userService;
     }
 
-    [HttpGet("")]
     public IActionResult Index()
     {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        Console.WriteLine(currentUser);
+        if (currentUser == null)
+        {
+            return RedirectToAction("Login", "Auth");
+        }
         return RedirectToAction("Onboarding");
     }
 
@@ -31,9 +36,16 @@ public class UserController : Controller
     [Authorize]
     public IActionResult Onboarding()
     {
-        if (_userService.RedirectToOnboarding()) {
-            RedirectToAction("Onboarding");
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return RedirectToAction("Login", "Auth");
         }
+
+        if (!_userService.RedirectToOnboarding()) {
+            return RedirectToAction("Profile");
+        }
+
         return View();
     }
 
@@ -45,18 +57,47 @@ public class UserController : Controller
             RedirectToAction("Profile");
         }
         var userCreated = await _userService.CreateUser(user);
-        return RedirectToAction("Profile", new { userId = userCreated.UserId });
-    }
-
-    [HttpGet("profile/{userId}")]
-    public async Task<IActionResult> Profile(string userId)
-    {
-        if (string.IsNullOrEmpty(userId))
-        {
+        if (userCreated == null) {
             return RedirectToAction("Onboarding");
         }
+        return RedirectToAction("Profile");
+    }
 
-        var user = await _userService.GetUserByUserId(Guid.Parse(userId));
-        return View(user);
+    [HttpGet("profile")]
+    [Authorize]
+    public async Task<IActionResult> Profile()
+    {
+        try
+        {
+            var currentUser = _supabaseClient.Auth.CurrentUser;
+
+            if (currentUser == null)
+            {
+                Console.WriteLine("User is not authenticated.");
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var userId = currentUser.Id;
+            if (string.IsNullOrEmpty(userId))
+            {
+                Console.WriteLine("User ID is null");
+                return RedirectToAction("Onboarding");
+            }
+
+            var user = await _userService.GetUserByUserId(Guid.Parse(userId));
+
+            if (user == null)
+            {
+                Console.WriteLine("User not found in DB");
+                return RedirectToAction("Onboarding");
+            }
+
+            return View(user);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return RedirectToAction("Login", "Auth");
+        }
     }
 }

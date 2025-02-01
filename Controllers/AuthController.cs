@@ -33,6 +33,11 @@ public class AuthController : Controller
 
     public IActionResult Login()
     {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser != null)
+        {
+            return RedirectToAction("Profile", "User");
+        }
         return View();
     }
 
@@ -44,12 +49,21 @@ public class AuthController : Controller
         {
             Response.Cookies.Append(_accessCookieName, session.AccessToken);
             Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
-            return RedirectToRoute(new { controller = "User", action = "Onboarding" });
+            return RedirectToAction("Profile", "User");
         }
         else
         {
             return StatusCode(StatusCodes.Status400BadRequest, "Wrong credentials.");
         }
+    }
+
+    [HttpPost("auth/logout")]
+    public async Task<IActionResult> Logout()
+    {
+        Response.Cookies.Delete(_accessCookieName);
+        Response.Cookies.Delete(_refreshCookieName);
+        await _supabaseClient.Auth.SignOut();
+        return RedirectToAction("Login");
     }
 
     public IActionResult Register()
@@ -101,7 +115,15 @@ public class AuthController : Controller
         {
             Response.Cookies.Append(_accessCookieName, session.AccessToken);
             Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
-            return RedirectToRoute(Next ?? "");
+            if (!string.IsNullOrEmpty(Next))
+            {
+                var parts = Next.Split('/');
+                if (parts.Length == 2)
+                {
+                    return RedirectToAction(parts[1], parts[0]); // RedirectToAction(Action, Controller)
+                }
+            }
+            return RedirectToAction("Profile", "User");
         }
         else
         {
