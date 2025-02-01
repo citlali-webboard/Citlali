@@ -38,15 +38,24 @@ public class UserService
             throw new Exception($"Error during user creation.");
         }
 
+        if (supabaseUser?.Email == null) 
+        {
+            throw new Exception($"Error during user creation.");
+        }
+
+        Console.WriteLine($"Profile Image: {userOnboardingDto.ProfileImage}");
+
         if (userOnboardingDto.ProfileImage != null)
         {
             profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
         }
 
+
+
         var dbUser = new User
         {
             UserId = Guid.Parse(supabaseUser.Id),
-            Email = userOnboardingDto.Email,
+            Email = supabaseUser.Email,
             DisplayName = userOnboardingDto.DisplayName,
             ProfileImageUrl = profileImageUrl,
             UserBio = userOnboardingDto.UserBio
@@ -93,7 +102,7 @@ public class UserService
                 await file.CopyToAsync(fileStream);
             }
 
-            string targetFilePath = $"{userId}{Path.GetExtension(file.FileName)}";
+            string targetFilePath = $"{userId}/{userId}{Path.GetExtension(file.FileName)}";
             await _supabaseClient.Storage
                 .From(bucketName)
                 .Upload(tempFilePath, targetFilePath, new Supabase.Storage.FileOptions
