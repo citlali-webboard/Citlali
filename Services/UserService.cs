@@ -45,12 +45,10 @@ public class UserService
             throw new Exception($"Error during user creation.");
         }
 
-        if (supabaseUser?.Email == null) 
+        if (supabaseUser?.Email == null)
         {
             throw new Exception($"Error during user creation.");
         }
-
-        Console.WriteLine($"Profile Image: {userOnboardingDto.ProfileImage}");
 
         if (userOnboardingDto.ProfileImage != null)
         {
@@ -73,6 +71,36 @@ public class UserService
             .Insert(dbUser);
 
         return dbUser;
+    }
+
+    public async Task<User> EditUser(UserOnboardingDto userOnboardingDto)
+    {
+        var supabaseUser = _supabaseClient.Auth.CurrentUser;
+        string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+
+        if (supabaseUser?.Id == null || supabaseUser?.Email == null)
+        {
+            throw new Exception($"Error during user editing.");
+        }
+
+        var model = await GetUserByUserId(Guid.Parse(supabaseUser.Id));
+        if (model == null)
+        {
+            throw new Exception($"Error during user editing.");
+        }
+
+        if (userOnboardingDto.ProfileImage != null)
+        {
+            profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+        }
+
+        model.DisplayName = userOnboardingDto.DisplayName;
+        model.ProfileImageUrl = profileImageUrl;
+        model.UserBio = userOnboardingDto.UserBio;
+
+        await model.Update<User>();
+
+        return model;
     }
 
     public async Task<User?> GetUserByEmail(string email)
