@@ -54,8 +54,22 @@ builder.Services.AddAuthentication()
                         },
                         OnAuthenticationFailed = context =>
                         {
-                            // var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
-                            // logger.LogError("Authentication failed: {ExceptionMessage}", context.Exception.Message);
+                            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                            logger.LogError("Authentication failed: {ExceptionMessage}", context.Exception.Message);
+
+                            // Clear cookies to prevent infinite loops due to expired/invalid tokens
+                            context.Response.Cookies.Delete("yourAccessTokenCookie");
+                            context.Response.Cookies.Delete("yourRefreshTokenCookie");
+
+                            // Redirect to login page
+                            context.Response.Redirect("/auth/login");
+
+                            return Task.CompletedTask;
+                        },
+                        OnChallenge = context =>
+                        {
+                            context.HandleResponse();
+                            context.Response.Redirect("/auth/login");
                             return Task.CompletedTask;
                         }
                     };
