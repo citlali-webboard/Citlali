@@ -4,6 +4,7 @@ using Citlali.Services;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,12 @@ string jwtRefreshCookieName = Environment.GetEnvironmentVariable("JWT_REFRESH_CO
 
 var supabaseClient = new Client(supabaseUrl, supabaseKey);
 await supabaseClient.InitializeAsync();
+
+var cultureInfo = new CultureInfo("en-US");
+cultureInfo.DateTimeFormat.Calendar = new GregorianCalendar();
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
