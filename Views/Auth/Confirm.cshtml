@@ -1,25 +1,46 @@
 @model Citlali.Models.AuthConfirmDto
 
-<h2>Confirm</h2>
-<form asp-action="Confirm" method="post" enctype="multipart/form-data">
 
-    <div class="form-group">
-        <label for="Email">Email</label>
-        <input asp-for="Email" id="Email" type="email" />
-        <span asp-validation-for="Email"></span>
+<head>
+    <title>Verify OTP</title>
+    <link rel="stylesheet" href="~/css/Confirm.css" asp-append-version="true" />
+    <script src="~/js/Confirm.js" defer></script>
+</head>
+
+
+<div class="form-container">
+    <div class="form-content">
+        <svg viewBox="0 0 20 20" class="logo" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path fill-rule="evenodd" d="M9.131.233c-2.37 1.383-5.37 2.33-7.634 2.646-.822.115-1.495.79-1.494 1.62l.002.497c-.03 6.043.477 11.332 9.462 14.903a1.45 1.45 0 001.062 0C19.52 16.328 20.032 11.04 20 4.996v-.501c0-.828-.673-1.51-1.491-1.638-2.149-.337-5.282-1.274-7.65-2.628A1.733 1.733 0 009.13.233zm4.577 8.478a1 1 0 00-1.414-1.415L9.001 10.59 7.708 9.297a1 1 0 10-1.414 1.414l2 2.001a1 1 0 001.414 0l4-4.001z" fill="#ffffff"></path></g></svg>
+        <h2>Verify OTP</h2>
+        <h3>your OTP was sent to @Model.Email</h3>
+        <form asp-action="Confirm" method="post" enctype="multipart/form-data">
+            <div class="form-group" style="display: none;">
+                <label for="Email">Email</label>
+                <input asp-for="Email" id="Email" type="email" />
+                <span asp-validation-for="Email"></span>
+            </div>
+
+            <div class="input-field">
+                <label for="Otp"></label>
+                <input id="Otp1" type="number"  />
+                <input id="Otp2" type="number" disabled />
+                <input id="Otp3" type="number" disabled />
+                <input id="Otp4" type="number" disabled />
+                <input id="Otp5" type="number" disabled />
+                <input id="Otp6" type="number" disabled />
+                
+            </div>
+
+            <input asp-for="Otp" id="Otp" type="number" style="display: none;"/>
+            <span asp-validation-for="Otp"></span>
+            
+            @* query string doesnt work *@
+            <div class="form-group">
+                <input asp-for="Next" id="Next" type="text" hidden />
+                <span asp-validation-for="Next"></span>
+            </div>
+        
+            <button type="submit" class="">Verify</button>
+        </form>
     </div>
-
-    <div class="form-group">
-        <label for="Otp">OTP</label>
-        <input asp-for="Otp" id="Otp" type="number" />
-        <span asp-validation-for="Otp"></span>
-    </div>
-
-    @* query string doesnt work *@
-    <div class="form-group">
-        <input asp-for="Next" id="Next" type="text" hidden />
-        <span asp-validation-for="Next"></span>
-    </div>
-
-    <button type="submit">Submit</button>
-</form>
+</div>
