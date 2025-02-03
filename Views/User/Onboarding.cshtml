@@ -1,71 +1,366 @@
 @model Citlali.Models.UserOnboardingDto
+
 @{
+    string UserEmail = Model?.Email ?? "No email provided";
     string profileImageUrl = "http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.jpeg";
 }
 <!DOCTYPE html>
+
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+    position: relative;
+}
+
+.form-container{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 90vw;
+    height: 90vh;
+    background: white;
+    border-radius: 10px;
+}
+
+.content{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border-radius: 5%;
+    box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.3);
+    width: 70%;
+    height: 100%;
+
+    justify-content: center;
+    align-items: center;
+}
+
+.form-content{
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    margin-top: 3%;
+    margin-bottom: -7%;
+}
+
+.form-data{
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.form-img{
+    width: 50%;
+    height: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-img img{
+    width: 70%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 50%;
+    aspect-ratio: 1 / 1;
+}
+
+.form-group{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+h2{
+    display: flex;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0;
+    padding: 0;
+    margin-bottom: -10%;
+    width: 100%;
+}
+
+#text-upload-file {
+    color: var(--white-color);
+    font-size: 16px;
+}
+
+.upload-file-button {
+    margin-top: 4%;
+    background-color: var(--text-gray-color);
+    display: inline-block;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 15px;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.upload-file-button:hover{
+    background-color: #F5C2E7;
+}
+
+.form-img input[type="file"] {
+    display: none;
+}
+
+.sign-up-button{
+    width: 40%;
+    padding: 10px;
+    background-color: #7fdb7f;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.sign-up-button:hover{
+    background-color: #72c572;
+}
+
+.form-group input{
+    width: 70%;
+    padding: 10px;
+    border: 1px solid var(--text-gray-color);
+    border-radius: 5px;
+    font-size: 16px;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+}
+
+.form-group textarea{
+    width: 70%;
+    padding: 10px;
+    border: 1px solid var(--text-gray-color);
+    border-radius: 5px;
+    font-size: 16px;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+}
+
+textarea{
+    resize: none;
+}
+
+.tags-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 80%;
+}
+
+.tags-container .tags{
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.tags-container .tags .tag{
+    display: inline-block;
+    margin: 3px;
+    padding: 4px 8px 4px 8px ;
+    border: 2px solid var(--text-gray-color);
+    border-radius: 30px;
+    cursor: pointer;
+}
+
+.tags-container .tags .tag:hover{
+    background-color: var(--pink-color);
+    border: 2px solid var(--pink-color);
+}
+
+</style>
 <html lang="en">
 
-<head>
-    <link rel="stylesheet" href="~/css/Register.css" asp-append-version="true" />
-</head>
+@* <head>
+    <link rel="stylesheet" href="~/css/Register.css?v=1.0" asp-append-version="true" />
+</head> *@
 
 <body>
-
     <form class="form-container" asp-action="onboarding" method="post" enctype="multipart/form-data">
-        <h2>Sign up</h2>
-        <div class="form-content">
-            <div class="form-data">
-                @* <div class="form-group">
-                    <label for="Email">Email</label>
-                    <input asp-for="Email" id="Email" type="email" />
-                    <span asp-validation-for="Email" ></span>
-                </div> *@
+        <div class="content">
+            <h2>🩷 Citlali Account 🩷</h2>
+            <div class="form-content">
+                <div class="form-data">
+                    <div class="form-group">
+                        <label for="Email">Email</label>
+                        <input asp-for="Email" class="form-control" value=@UserEmail id="Email" disabled/>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
 
-                <div class="form-group">
-                    <label for="DisplayName">Display Name</label>
-                    <input asp-for="DisplayName" class="form-control" id="DisplayName" />
-                    <span asp-validation-for="DisplayName" class="text-danger"></span>
+                    <div class="form-group">
+                        <label for="DisplayName">Display Name</label>
+                        <input asp-for="DisplayName" class="form-control" id="DisplayName" />
+                        <span asp-validation-for="DisplayName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group" id="bio">
+                        <label for="UserBio">User Bio</label>
+                        <textarea asp-for="UserBio" id="UserBio" rows="3"></textarea>
+                        <span asp-validation-for="UserBio" class="text-danger"></span>
+                    </div>
+
+                    <div class="tags-container">
+                        <div>
+                            Choose category that best applicable to your event
+                        </div>
+                        <div class="tags" id="tags">
+                        </div>
+                    </div>
                 </div>
 
-                @* <div class="form-group">
-                    <label for="Password">Password</label>
-                    <input asp-for="Password" class="form-control" type="password" id="Password" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                </div> *@
-
-                @* <div class="form-group">
-                    <label for="ConfirmPassword">Confirm Password</label>
-                    <input asp-for="Password" class="form-control" type="password" id="ConfirmPassword" />
-                    <span class="text-danger"></span>
-                </div> *@
-
-                <div class="form-group" id="bio">
-                    <label for="UserBio">User Bio</label>
-                    <textarea asp-for="UserBio" id="UserBio" rows="3"></textarea>
-                    <span asp-validation-for="UserBio" class="text-danger"></span>
+                <div class="form-img">
+                    <img id="profileImage" src=@profileImageUrl alt="ProfileImage">
+                    <input type="file" asp-for="ProfileImage" id="ProfileImageInput"/>
+                    <label for="ProfileImageInput" class="upload-file-button" id="text-upload-file" >Upload file...</label>
+                    <span asp-validation-for="ProfileImage"></span>
                 </div>
+
             </div>
-
-            <div class="form-img">
-                <div id="text-your-profile">My profile</div>
-                <img id="profileImage" src="@profileImageUrl" alt="ProfileImage">
-                <input type="file" asp-for="ProfileImage" id="ProfileImageInput"/>
-                <label for="ProfileImageInput" class="upload-file-button" id="text-upload-file" >Upload file...</label>
-                <span asp-validation-for="ProfileImage"></span>
-            </div>
-
-            <div class="tags-container">
-                <div>
-                    Choose category that best applicable to your event
-                </div>
-                <div class="tags" id="tags">
-                </div>
-            </div>
+            <button class="sign-up-button" type="submit">Sign up</button>
         </div>
-
-        <button class="sign-up-button" type="submit">Sign up</button>
     </form>
 
-    <script src="~/js/Register.js"> </script>
+    <script>
+        const image = document.getElementById('profileImage');
+        const input = document.querySelector('input[type="file"]');
+        const div_tags = document.getElementById('tags');
+        localStorage.setItem('tags_selected', '[]');
+
+        const tags = [
+            {
+                emoji: '🐶',
+                name: 'dog'
+            }
+            , {
+                emoji: '🐱',
+                name: 'cat'
+            }
+            , {
+                emoji: '🐭',
+                name: 'mouse'
+            }
+            , {
+                emoji: '🐹',
+                name: 'hamster'
+            }
+            , {
+                emoji: '🐰',
+                name: 'rabbit'
+            }
+            , {
+                emoji: '🦊',
+                name: 'fox'
+            }
+            , {
+                emoji: '🐻',
+                name: 'bear'
+            }
+            , {
+                emoji: '🐼',
+                name: 'panda'
+            }
+            , {
+                emoji: '🐨',
+                name: 'koala'
+            }
+            , {
+                emoji: '🐯',
+                name: 'tiger'
+            }
+            , {
+                emoji: '🦁',
+                name: 'lion'
+            }
+            , {
+                emoji: '🐷',
+                name: 'pig'
+            }
+            , {
+                emoji: '🐸',
+                name: 'frog'
+            }
+            , {
+                emoji: '🐵',
+                name: 'monkey'
+            }
+            , {
+                emoji: '🐔',
+                name: 'chicken'
+            }
+            , {
+                emoji: '🦆',
+                name: 'duck'
+            }
+            , {
+                emoji: '🦅',
+                name: 'eagle'
+            }
+            , {
+                emoji: '🦉',
+                name: 'owl'
+            }
+            , {
+                emoji: '🦇',
+                name: 'bat'
+            }
+            , {
+                emoji: '🐺',
+                name: 'wolf'
+            }
+        ]
+
+        input.addEventListener('change', (e) => {
+            console.log('input changed');
+            image.src = URL.createObjectURL(e.target.files[0]);
+        });
+
+        tags.forEach(tag => {
+            const div = document.createElement('div');
+            div.className = 'tag';
+            div.style = 'display: inline-block; margin: 3px; padding: 4px 8px 4px 8px ; border: 2px solid var(--text-gray-color); border-radius: 30px; cursor: pointer;';
+            div.onclick = () =>{
+                if (div.name === 'selected'){
+                    div.style.backgroundColor = 'transparent';
+                    div.style.border = '2px solid var(--text-gray-color)';
+                    div.name = '';
+                    localStorage.setItem('tags_selected', JSON.stringify(JSON.parse(localStorage.getItem('tags_selected')).filter(t => t !== tag.name)));
+                    return;
+                }
+                else{
+                    div.style.backgroundColor = 'var(--pink-color)';
+                    div.style.border = '2px solid var(--pink-color)';
+                    div.name = 'selected';
+                    localStorage.setItem('tags_selected', JSON.stringify([...JSON.parse(localStorage.getItem('tags_selected')), tag.name]));
+                }
+            }
+
+            div.innerHTML = tag.emoji + ' ' + tag.name;
+            div_tags.appendChild(div);
+        });
+    </script>
 </body>
 </html>

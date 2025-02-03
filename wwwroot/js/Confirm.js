@@ -26,6 +26,12 @@ inputs.forEach((input, index) => {
             inputs[5].focus(); 
             OtpValue = value;
             Otp.value = OtpValue;
+            
+            if (OtpValue.length === 6) {
+                button.classList.add("active");
+                button.click();
+            }
+            
             return;
         }
 
