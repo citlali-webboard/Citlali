@@ -1,4 +1,3 @@
-console.log('Register.js loaded');
 const image = document.getElementById('profileImage');
 const input = document.querySelector('input[type="file"]');
 const div_tags = document.getElementById('tags');
@@ -50,10 +49,6 @@ const tags = [
         name: 'lion'
     }
     , {
-        emoji: '🐮',
-        name: 'cow'
-    }
-    , {
         emoji: '🐷',
         name: 'pig'
     }
@@ -70,12 +65,24 @@ const tags = [
         name: 'chicken'
     }
     , {
-        emoji: '🐧',
-        name: 'penguin'
+        emoji: '🦆',
+        name: 'duck'
     }
     , {
-        emoji: '🐦',
-        name: 'bird'
+        emoji: '🦅',
+        name: 'eagle'
+    }
+    , {
+        emoji: '🦉',
+        name: 'owl'
+    }
+    , {
+        emoji: '🦇',
+        name: 'bat'
+    }
+    , {
+        emoji: '🐺',
+        name: 'wolf'
     }
 ]
 
@@ -87,7 +94,7 @@ input.addEventListener('change', (e) => {
 tags.forEach(tag => {
     const div = document.createElement('div');
     div.className = 'tag';
-    div.style = 'display: inline-block; margin: 3px; padding: 5px; border: 2px solid var(--text-gray-color); border-radius: 30px; cursor: pointer;';
+    div.style = 'display: inline-block; margin: 3px; padding: 4px 8px 4px 8px ; border: 2px solid var(--text-gray-color); border-radius: 30px; cursor: pointer;';
     div.onclick = () =>{
         if (div.name === 'selected'){
             div.style.backgroundColor = 'transparent';
@@ -107,4 +114,3 @@ tags.forEach(tag => {
     div.innerHTML = tag.emoji + ' ' + tag.name;
     div_tags.appendChild(div);
 });
-
