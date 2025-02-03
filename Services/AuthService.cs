@@ -1,7 +1,4 @@
 using Supabase;
-using DotNetEnv;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 
 using Citlali.Models;
 

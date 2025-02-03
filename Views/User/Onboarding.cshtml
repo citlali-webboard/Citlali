@@ -1,8 +1,6 @@
 @model Citlali.Models.UserOnboardingDto
 @{
-    @* string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
-     *@
-     string profileImageUrl = "http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.jpeg";
+    string profileImageUrl = "http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.jpeg";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -55,9 +53,9 @@
                 <label for="ProfileImageInput" class="upload-file-button" id="text-upload-file" >Upload file...</label>
                 <span asp-validation-for="ProfileImage"></span>
             </div>
-        
+
             <div class="tags-container">
-                <div> 
+                <div>
                     Choose category that best applicable to your event
                 </div>
                 <div class="tags" id="tags">
