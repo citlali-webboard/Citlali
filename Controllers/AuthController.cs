@@ -25,7 +25,7 @@ public class AuthController : Controller
         return View();
     }
 
-    public IActionResult Login()
+    public IActionResult SignIn()
     {
         var currentUser = _supabaseClient.Auth.CurrentUser;
         if (currentUser != null)
@@ -36,9 +36,9 @@ public class AuthController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Login(AuthLoginDto authLoginDto)
+    public async Task<IActionResult> SignIn(AuthLoginDto authLoginDto)
     {
-        var session = await _authService.Login(authLoginDto.Email, authLoginDto.Password);
+        var session = await _authService.SignIn(authLoginDto.Email, authLoginDto.Password);
         if (session != null && session.AccessToken != null && session.RefreshToken != null)
         {
             Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
@@ -51,24 +51,24 @@ public class AuthController : Controller
         }
     }
 
-    [HttpPost("auth/logout")]
-    public async Task<IActionResult> Logout()
+    [HttpPost("auth/signout")]
+    public new async Task<IActionResult> SignOut()
     {
         Response.Cookies.Delete(_configuration.Jwt.AccessCookie);
         Response.Cookies.Delete(_configuration.Jwt.RefreshCookie);
         await _supabaseClient.Auth.SignOut();
-        return RedirectToAction("Login");
+        return RedirectToAction("SignIn");
     }
 
-    public IActionResult Register()
+    public IActionResult SignUp()
     {
         return View();
     }
 
     [HttpPost]
-    public async Task<IActionResult> Register(AuthRegisterDto authRegisterDto)
+    public async Task<IActionResult> SignUp(AuthRegisterDto authRegisterDto)
     {
-        var session = await _authService.Register(authRegisterDto.Email, authRegisterDto.Password);
+        var session = await _authService.SignUp(authRegisterDto.Email, authRegisterDto.Password);
         if (session != null && session.AccessToken != null && session.RefreshToken != null)
         {
             Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
@@ -86,7 +86,7 @@ public class AuthController : Controller
         }
     }
 
-    public IActionResult RegisterPending()
+    public IActionResult SignUpPending()
     {
         return View();
     }

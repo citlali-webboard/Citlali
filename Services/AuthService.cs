@@ -9,12 +9,12 @@ public class AuthService(Client supabaseClient, IConfiguration configuration)
     private readonly Client _supabaseClient = supabaseClient;
     private readonly IConfiguration _configuration = configuration;
 
-    public async Task<Supabase.Gotrue.Session?> Login(string email, string password) {
+    public async Task<Supabase.Gotrue.Session?> SignIn(string email, string password) {
         var response = await _supabaseClient.Auth.SignIn(email, password);
         return response;
     }
 
-    public async Task<Supabase.Gotrue.Session?> Register(string email, string password) {
+    public async Task<Supabase.Gotrue.Session?> SignUp(string email, string password) {
         var response = await _supabaseClient.Auth.SignUp(email, password);
         return response;
     }
