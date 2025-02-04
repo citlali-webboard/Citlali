@@ -26,7 +26,7 @@ public class UserController : Controller
         var currentUser = _supabaseClient.Auth.CurrentUser;
         if (currentUser == null)
         {
-            return RedirectToAction("Login", "Auth");
+            return RedirectToAction("SignIn", "Auth");
         }
         return RedirectToAction("Onboarding");
     }
@@ -38,7 +38,7 @@ public class UserController : Controller
         var currentUser = _supabaseClient.Auth.CurrentUser;
         if (currentUser == null)
         {
-            return RedirectToAction("Login", "Auth");
+            return RedirectToAction("SignIn", "Auth");
         }
 
         if (!await _userService.RedirectToOnboarding()) {
@@ -73,7 +73,7 @@ public class UserController : Controller
             if (currentUser == null)
             {
                 Console.WriteLine("User is not authenticated.");
-                return RedirectToAction("Login", "Auth");
+                return RedirectToAction("SignIn", "Auth");
             }
 
             var userId = currentUser.Id;
@@ -96,7 +96,7 @@ public class UserController : Controller
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
-            return RedirectToAction("Login", "Auth");
+            return RedirectToAction("SignIn", "Auth");
         }
     }
 
@@ -107,13 +107,13 @@ public class UserController : Controller
         var currentUser = _supabaseClient.Auth.CurrentUser;
         if (currentUser == null || currentUser.Id == null)
         {
-            return RedirectToAction("Login", "Auth");
+            return RedirectToAction("SignIn", "Auth");
         }
 
         var user = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id));
         if (user == null)
         {
-            return RedirectToAction("Login", "Auth");
+            return RedirectToAction("SignIn", "Auth");
         }
 
         var dto = new UserOnboardingDto
