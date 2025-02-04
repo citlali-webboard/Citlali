@@ -87,8 +87,8 @@ public class UserController : Controller
 
             if (user == null)
             {
-                Console.WriteLine("User not found in DB");
-                return RedirectToAction("Onboarding");
+                Console.WriteLine("User not found in DB. Redirecting to SignIn.");
+                return RedirectToAction("SignIn", "Auth");
             }
 
             return View(user);

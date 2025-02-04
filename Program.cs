@@ -69,14 +69,16 @@ builder.Services.AddAuthentication()
                             context.Response.Cookies.Delete("yourRefreshTokenCookie");
 
                             // Redirect to login page
-                            context.Response.Redirect("/auth/login");
+                            supabaseClient.Auth.SignOut();
+                            context.Response.Redirect("/auth/SignIn");
 
                             return Task.CompletedTask;
                         },
                         OnChallenge = context =>
                         {
                             context.HandleResponse();
-                            context.Response.Redirect("/auth/login");
+                            supabaseClient.Auth.SignOut();
+                            context.Response.Redirect("/auth/SignIn");
                             return Task.CompletedTask;
                         }
                     };
