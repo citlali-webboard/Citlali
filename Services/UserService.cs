@@ -93,6 +93,10 @@ public class UserService
         {
             profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
         }
+        else 
+        {
+            profileImageUrl = model.ProfileImageUrl;
+        }
 
         model.DisplayName = userOnboardingDto.DisplayName;
         model.ProfileImageUrl = profileImageUrl;
@@ -128,6 +132,26 @@ public class UserService
         try
         {
             string bucketName = Environment.GetEnvironmentVariable("SUPABASE_BUCKET_NAME") ?? "";
+            string userFolder = $"{userId}/";
+
+            // List all files in the user's folder
+            var existingFiles = await _supabaseClient.Storage
+                .From(bucketName)
+                .List(userFolder);
+            
+            // Delete all existing profile images (assuming one per user, different extensions possible)
+            if (existingFiles != null)
+            {
+                foreach (var existingFile in existingFiles)
+                {
+                    if (existingFile != null && existingFile.Name != null && existingFile.Name.StartsWith(userId))
+                    {
+                        _ = await _supabaseClient.Storage
+                            .From(bucketName)
+                            .Remove(new List<string> { $"{userFolder}{existingFile.Name}" ?? string.Empty });
+                    }
+                }
+            }
 
             string tempFolder = Path.GetTempPath(); // System temp folder
             string tempFilePath = Path.Combine(tempFolder, $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}");
@@ -137,7 +161,7 @@ public class UserService
                 await file.CopyToAsync(fileStream);
             }
 
-            string targetFilePath = $"{userId}/{userId}{Path.GetExtension(file.FileName)}";
+            string targetFilePath = $"{userId}/{userId}-{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
             await _supabaseClient.Storage
                 .From(bucketName)
                 .Upload(tempFilePath, targetFilePath, new Supabase.Storage.FileOptions
