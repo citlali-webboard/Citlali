@@ -13,12 +13,18 @@ public class UserController : Controller
     private readonly ILogger<UserController> _logger;
     private readonly Supabase.Client _supabaseClient;
     private readonly UserService _userService;
+    private readonly string _accessCookieName;
+    private readonly string _refreshCookieName;
 
     public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService)
     {
         _logger = logger;
         _supabaseClient = supabaseClient;
         _userService = userService;
+        
+        _accessCookieName = Environment.GetEnvironmentVariable("JWT_ACCESS_COOKIE") ?? throw new Exception("JWT_ACCESS_COOKIE must be set in the environment variables.");
+        _refreshCookieName = Environment.GetEnvironmentVariable("JWT_REFRESH_COOKIE") ?? throw new Exception("JWT_REFRESH_COOKIE must be set in the environment variables.");
+
     }
 
     public IActionResult Index()
@@ -68,6 +74,17 @@ public class UserController : Controller
     {
         try
         {
+            var accessToken = Request.Cookies[_accessCookieName];
+            var refreshToken = Request.Cookies[_refreshCookieName];
+
+            if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken)) 
+            {
+                Response.Cookies.Delete(_accessCookieName);
+                Response.Cookies.Delete(_refreshCookieName);
+                await _supabaseClient.Auth.SignOut();
+                return RedirectToAction("SignIn", "Auth");
+            }
+
             var currentUser = _supabaseClient.Auth.CurrentUser;
 
             if (currentUser == null)

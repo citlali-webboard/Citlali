@@ -65,10 +65,11 @@ builder.Services.AddAuthentication()
                             logger.LogError("Authentication failed: {ExceptionMessage}", context.Exception.Message);
 
                             // Clear cookies to prevent infinite loops due to expired/invalid tokens
-                            context.Response.Cookies.Delete("yourAccessTokenCookie");
-                            context.Response.Cookies.Delete("yourRefreshTokenCookie");
+                            context.Response.Cookies.Delete(jwtAccessCookieName);
+                            context.Response.Cookies.Delete(jwtRefreshCookieName);
 
                             // Redirect to login page
+                            supabaseClient.Auth.SignOut();
                             context.Response.Redirect("/auth/SignIn");
 
                             return Task.CompletedTask;
@@ -76,6 +77,7 @@ builder.Services.AddAuthentication()
                         OnChallenge = context =>
                         {
                             context.HandleResponse();
+                            supabaseClient.Auth.SignOut();
                             context.Response.Redirect("/auth/SignIn");
                             return Task.CompletedTask;
                         }

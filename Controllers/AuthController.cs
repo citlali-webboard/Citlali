@@ -34,12 +34,31 @@ public class AuthController : Controller
     public async Task<IActionResult> SignIn()
     {
         var currentUser = _supabaseClient.Auth.CurrentUser;
-        if (currentUser != null)
+
+        var accessToken = Request.Cookies[_accessCookieName];
+        var refreshToken = Request.Cookies[_refreshCookieName];
+
+        if (currentUser != null && (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken)))
         {
-            await _supabaseClient.Auth.SignOut();
             return RedirectToAction("Profile", "User");
+            // if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken)) 
+            // {
+            //     Response.Cookies.Delete(_accessCookieName);
+            //     Response.Cookies.Delete(_refreshCookieName);    
+            //     await _supabaseClient.Auth.SignOut();
+            //     return RedirectToAction("SignIn"); 
+            // }
+            // else
+            // {
+            //     return RedirectToAction("Profile", "User");
+            // }
+
         }
-        return View();
+        else
+        {
+            return View();
+        }
+        // return View();
     }
 
     [HttpPost]
