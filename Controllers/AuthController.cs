@@ -31,11 +31,12 @@ public class AuthController : Controller
         return View();
     }
 
-    public IActionResult SignIn()
+    public async Task<IActionResult> SignIn()
     {
         var currentUser = _supabaseClient.Auth.CurrentUser;
         if (currentUser != null)
         {
+            await _supabaseClient.Auth.SignOut();
             return RedirectToAction("Profile", "User");
         }
         return View();
