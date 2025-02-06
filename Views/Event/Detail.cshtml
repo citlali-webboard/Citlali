@@ -1,0 +1,22 @@
+@model Citlali.Models.EventDetail;
+
+<head>
+    <link rel="stylesheet" href="~/css/Event/Detail.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="main-container">
+        <div class="detail-column">
+
+        </div>
+        <div class="form-column">
+            @foreach (var question in Model.EventQuestions)
+            {
+                <div class="form-group">
+                    <label for=@question.EventQuestionId>@question.Question</label>
+                    <input asp-for=@question.EventQuestionId class="form-control" value="" id=@question.EventQuestionId/>
+                    <span asp-validation-for=@question.EventQuestionId class="text-danger"></span>
+                </div>
+            }
+        </div>
+    </div>
+</body>
