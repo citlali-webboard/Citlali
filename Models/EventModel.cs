@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Supabase.Postgrest.Models;
 
 namespace Citlali.Models;
@@ -13,6 +14,7 @@ public class Event : BaseModel {
     public int Cost = 64;
     public DateTime EventDate = new DateTime();
     public DateTime PostExpiryDate = new DateTime();
+    public DateTime CreatedAt = new DateTime();
 }
 
 public class EventQuestion : BaseModel {
@@ -26,11 +28,15 @@ public class EventDetail {
     public EventQuestion[] EventQuestions = [new(), new()];
 }
 
-public class EventAnswerDto {
-    public Guid EventQuestionId = new Guid();
-    public string Answer = "";
+public class EventResponseViewModel
+{
+    public List<QuestionResponse> Responses { get; set; } = [];
 }
 
-public class EventJoinDto {
-    public EventAnswerDto[] EventAnswerDtos = [];
+public class QuestionResponse
+{
+    public Guid EventQuestionId { get; set; }
+
+    [Required(ErrorMessage = "This field is required")]
+    public string Answer { get; set; } = "";
 }
