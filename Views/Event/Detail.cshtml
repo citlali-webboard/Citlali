@@ -1,22 +1,43 @@
 @model Citlali.Models.EventDetail;
 
-<head>
-    <link rel="stylesheet" href="~/css/Event/Detail.css" asp-append-version="true" />
-</head>
-<body>
-    <div class="main-container">
-        <div class="detail-column">
-
-        </div>
-        <div class="form-column">
-            @foreach (var question in Model.EventQuestions)
+@{
+    var responseVM = new EventResponseViewModel
             {
-                <div class="form-group">
-                    <label for=@question.EventQuestionId>@question.Question</label>
-                    <input asp-for=@question.EventQuestionId class="form-control" value="" id=@question.EventQuestionId/>
-                    <span asp-validation-for=@question.EventQuestionId class="text-danger"></span>
+                Responses = Model.EventQuestions.Select(q => new QuestionResponse
+                {
+                    EventQuestionId = q.EventQuestionId
+                }).ToList()
+            };
+}
+
+<div class="center-wrapper">
+    <div class="detail-main-container">
+        <div class="event-detail detail-column space-y-4">
+            <div class="space-between">
+                <h1>@Model.Event.EventTitle</h1>
+                <p>@Model.Event.MaxParticipant/@Model.Event.MaxParticipant</p>
+            </div>
+            <div>
+                <p>Posted by @Model.Event.CreatorUserId</p>
+                <p>@Model.Event.CreatedAt</p>
+            </div>
+            <p>@Model.Event.EventDescription</p>
+        </div>
+        <div class="pad"></div>
+        <div class="event-form detail-column">
+            <form class="form-form" asp-action="onboarding" style="width: 100%;" method="post"
+                enctype="multipart/form-data">
+                <div class="form-data">
+                    @for (var i = 0; i < Model.EventQuestions.Length; i++)
+                    {
+                        <div class="form-group">
+                            <label>@Model.EventQuestions[i].Question</label>
+                            <input class="form-control" />
+                            <span asp-validation-for="@responseVM.Responses[i].Answer" class="text-danger"></span>
+                        </div>
+                    }
                 </div>
-            }
+            </form>
         </div>
     </div>
-</body>
+</div>
