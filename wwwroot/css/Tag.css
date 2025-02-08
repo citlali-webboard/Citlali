@@ -1,0 +1,31 @@
+.tags-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 80%;
+}
+
+.tags-container > .tags{
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.tags-container > .tags > .tag{
+    display: inline-block;
+    margin: 3px;
+    padding: 4px 8px 4px 8px ;
+    border: 2px solid var(--text-gray-color);
+    border-radius: 30px;
+    cursor: pointer;
+    width: fit-content;
+}
+
+.tags-container > .tags > .tag:hover{
+    background-color: var(--pink-color);
+    border: 2px solid var(--pink-color);
+}

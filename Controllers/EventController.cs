@@ -20,8 +20,8 @@ public class EventController : Controller
 
     public IActionResult Detail(string id)
     {
-        EventDetail eventDetail = new();
-        return View(eventDetail);
+        EventDetailViewModel eventDetailViewModel = new();
+        return View(eventDetailViewModel);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

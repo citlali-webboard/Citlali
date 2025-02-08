@@ -54,7 +54,7 @@ builder.Services.AddAuthentication()
                             if (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken)) {
                                 context.Token = accessToken;
                                 await supabaseClient.Auth.SetSession(accessToken, refreshToken);
-                                await supabaseClient.Auth.RefreshSession();
+                                // await supabaseClient.Auth.RefreshSession();
                                 // return Task.CompletedTask;
                             }
                             // return Task.CompletedTask;
@@ -65,8 +65,8 @@ builder.Services.AddAuthentication()
                             logger.LogError("Authentication failed: {ExceptionMessage}", context.Exception.Message);
 
                             // Clear cookies to prevent infinite loops due to expired/invalid tokens
-                            context.Response.Cookies.Delete("yourAccessTokenCookie");
-                            context.Response.Cookies.Delete("yourRefreshTokenCookie");
+                            context.Response.Cookies.Delete(jwtAccessCookieName);
+                            context.Response.Cookies.Delete(jwtRefreshCookieName);
 
                             // Redirect to login page
                             context.Response.Redirect("/auth/login");
