@@ -6,25 +6,7 @@
 
 <div class="center-wrapper">
     <div class="detail-main-container">
-        <div class="event-detail detail-column space-y-4">
-            <div class="justify-between">
-                <h1>@Model.EventTitle</h1>
-                <p>@Model.CurrentParticipant/@Model.MaxParticipant</p>
-            </div>
-            <div class="justify-between">
-                <span>Posted by @Model.CreatorDisplayName</span>
-                <span>@Model.CreatedAt.ToString("t") @Model.CreatedAt.ToString("d")</span>
-            </div>
-            <div class="tags-container">
-                <div class="tags" id="tags">
-                    <div class="tag">
-                        <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
-                        <span>@Model.EventCategoryTag.EventCategoryTagName</span>
-                    </div>
-                </div>
-            </div>
-            <p>@Model.EventDescription</p>
-        </div>
+        <partial name="_EventDetailCard" model=@Model.EventDetailCardData />
         <div class="pad"></div>
         <div class="event-form detail-column">
             <form class="form-form" asp-action="onboarding" style="width: 100%;" method="post"
@@ -39,6 +21,7 @@
                         </div>
                     }
                 </div>
+                <button class="form-submit" type="submit">Submit</button>
             </form>
         </div>
     </div>

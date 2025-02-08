@@ -42,3 +42,16 @@
   border-color: #a6e3a1;
   outline: none;
 }
+
+.form-submit{
+  width: 40%;
+  padding: 10px;
+  background-color: #7fdb7f;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
