@@ -1,6 +1,6 @@
-using DotNetEnv;
 using Supabase;
 using Citlali.Services;
+using Citlali.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
@@ -8,14 +8,10 @@ using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Env.Load();
+builder.Services.Configure<Configuration>(builder.Configuration);
+var configuration = builder.Configuration.Get<Configuration>() ?? throw new Exception("Configuration must be set in the app's configuration.");
 
-string supabaseUrl = Environment.GetEnvironmentVariable("SUPABASE_URL") ?? throw new Exception("SUPABASE_URL must be set in the environment variables.");
-string supabaseKey = Environment.GetEnvironmentVariable("SUPABASE_KEY") ?? throw new Exception("SUPABASE_KEY must be set in the environment variables.");
-string jwtAccessCookieName = Environment.GetEnvironmentVariable("JWT_ACCESS_COOKIE") ?? throw new Exception("JWT_ACCESS_COOKIE must be set in the environment variables.");
-string jwtRefreshCookieName = Environment.GetEnvironmentVariable("JWT_REFRESH_COOKIE") ?? throw new Exception("JWT_REFRESH_COOKIE must be set in the environment variables.");
-
-var supabaseClient = new Client(supabaseUrl, supabaseKey);
+var supabaseClient = new Client(configuration.Supabase.Url, configuration.Supabase.ServiceRoleKey);
 await supabaseClient.InitializeAsync();
 
 var cultureInfo = new CultureInfo("en-US");
@@ -23,16 +19,15 @@ cultureInfo.DateTimeFormat.Calendar = new GregorianCalendar();
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
-
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
 // Add services to the container.
 builder.Services.AddSingleton(supabaseClient);
+builder.Services.AddSingleton(configuration);
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddControllersWithViews();
-// builder.Services.AddAuthorization();
 builder.Services.AddAuthentication()
                 .AddJwtBearer(options =>
                 {
@@ -40,24 +35,22 @@ builder.Services.AddAuthentication()
                     {
                         ValidateIssuer = false, // Supabase auth have no issuer
                         ValidateAudience = true,
-                        ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+                        ValidAudience = configuration.Jwt.Audience,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET") ?? "")),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.Jwt.Secret)),
                     };
                     options.Events = new JwtBearerEvents
                     {
                         OnMessageReceived = async context =>
                         {
-                            var accessToken = context.Request.Cookies[jwtAccessCookieName];
-                            var refreshToken = context.Request.Cookies[jwtRefreshCookieName];
+                            var accessToken = context.Request.Cookies[configuration.Jwt.AccessCookie];
+                            var refreshToken = context.Request.Cookies[configuration.Jwt.RefreshCookie];
                             if (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken)) {
                                 context.Token = accessToken;
                                 await supabaseClient.Auth.SetSession(accessToken, refreshToken);
                                 // await supabaseClient.Auth.RefreshSession();
-                                // return Task.CompletedTask;
                             }
-                            // return Task.CompletedTask;
                         },
                         OnAuthenticationFailed = context =>
                         {
@@ -65,30 +58,28 @@ builder.Services.AddAuthentication()
                             logger.LogError("Authentication failed: {ExceptionMessage}", context.Exception.Message);
 
                             // Clear cookies to prevent infinite loops due to expired/invalid tokens
-                            context.Response.Cookies.Delete(jwtAccessCookieName);
-                            context.Response.Cookies.Delete(jwtRefreshCookieName);
+                            context.Response.Cookies.Delete(configuration.Jwt.AccessCookie);
+                            context.Response.Cookies.Delete(configuration.Jwt.RefreshCookie);
 
                             // Redirect to login page
-                            context.Response.Redirect("/auth/login");
+                            context.Response.Redirect("/auth/signin");
 
                             return Task.CompletedTask;
                         },
                         OnChallenge = context =>
                         {
                             context.HandleResponse();
-                            context.Response.Redirect("/auth/login");
+                            context.Response.Redirect("/auth/signin");
                             return Task.CompletedTask;
                         }
                     };
                 });
-
 
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -104,6 +95,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();
