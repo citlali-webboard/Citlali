@@ -2,10 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 
 using Citlali.Models;
 using Citlali.Services;
-using Citlali.Controllers;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Net;
 
 namespace Citlali.Controllers;
 
@@ -15,17 +11,15 @@ public class AuthController : Controller
     private readonly Supabase.Client _supabaseClient;
     private readonly AuthService _authService;
     private readonly UserService _userService;
-    private readonly string _accessCookieName;
-    private readonly string _refreshCookieName;
+    private readonly Configuration _configuration;
 
-    public AuthController(ILogger<AuthController> logger, Supabase.Client supabaseClient, AuthService authService, UserService userService)
+    public AuthController(ILogger<AuthController> logger, Supabase.Client supabaseClient, AuthService authService, Configuration configuration, UserService userService)
     {
         _logger = logger;
         _supabaseClient = supabaseClient;
         _authService = authService;
-        _accessCookieName = Environment.GetEnvironmentVariable("JWT_ACCESS_COOKIE") ?? throw new Exception("JWT_ACCESS_COOKIE must be set in the environment variables.");
-        _refreshCookieName = Environment.GetEnvironmentVariable("JWT_REFRESH_COOKIE") ?? throw new Exception("JWT_REFRESH_COOKIE must be set in the environment variables.");
         _userService = userService;
+        _configuration = configuration;
     }
 
     public IActionResult AuthCodeError()
@@ -51,8 +45,8 @@ public class AuthController : Controller
         var session = await _authService.SignIn(authLoginDto.Email, authLoginDto.Password);
         if (session != null && session.AccessToken != null && session.RefreshToken != null)
         {
-            Response.Cookies.Append(_accessCookieName, session.AccessToken);
-            Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
+            Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
+            Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
             return RedirectToAction("Profile", "User");
         }
 
@@ -69,8 +63,8 @@ public class AuthController : Controller
     [HttpPost("auth/signout")]
     public new async Task<IActionResult> SignOut()
     {
-        Response.Cookies.Delete(_accessCookieName);
-        Response.Cookies.Delete(_refreshCookieName);
+        Response.Cookies.Delete(_configuration.Jwt.AccessCookie);
+        Response.Cookies.Delete(_configuration.Jwt.RefreshCookie);
         await _supabaseClient.Auth.SignOut();
         return RedirectToAction("SignIn");
     }
@@ -94,8 +88,8 @@ public class AuthController : Controller
             var session = await _authService.SignUp(authRegisterDto.Email, authRegisterDto.Password);
             if (session != null && session.AccessToken != null && session.RefreshToken != null)
             {
-                Response.Cookies.Append(_accessCookieName, session.AccessToken);
-                Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
+                Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
+                Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
                 return RedirectToAction("UserController.Profile");
             }
             else
@@ -138,8 +132,8 @@ public class AuthController : Controller
             if (session != null && session.AccessToken != null && session.RefreshToken != null)
             {
                 await _supabaseClient.Auth.SetSession(session.AccessToken, session.RefreshToken);
-                Response.Cookies.Append(_accessCookieName, session.AccessToken);
-                Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
+                Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
+                Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
                 if (!string.IsNullOrEmpty(Next))
                 {
                     var parts = Next.Split('/');
@@ -160,6 +154,6 @@ public class AuthController : Controller
 
             return RedirectToAction("Confirm", authConfirmDto);
         }
-        
+
     }
 }

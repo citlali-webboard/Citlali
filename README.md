@@ -28,10 +28,16 @@ cd Citlali
 dotnet restore
 ```
 
-### 3️⃣ Create `secrets.json` and add the secrets.
+### 3️⃣ Use dotnet user-secrets to add secrets
+you need to set
+- `Supabase:ServiceRoleKey` : a service role key to access supabase
+- `Jwt:Secret` : your jwt signing key, should be the same on supabase
+by running
 ```bash
-touch secrets.json
+dotnet user-secrets set "Supabase:ServiceRoleKey" "replace_with_your_own_secret"
+
 ```
+
 
 ### 4️⃣ Run in Watch Mode
 Running in watch mode will automatically recompile the source code when it is modified.

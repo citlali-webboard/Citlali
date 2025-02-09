@@ -1,18 +1,15 @@
 using Citlali.Models;
 using Supabase;
-using Microsoft.Extensions.Configuration;
-using System.Threading.Tasks;
-using DotNetEnv;
 using System.Text.Json;
 
 namespace Citlali.Services;
 
 public class UserService
 {
-    private readonly Supabase.Client _supabaseClient;
-    private readonly IConfiguration _configuration;
+    private readonly Client _supabaseClient;
+    private readonly Configuration _configuration;
 
-    public UserService(Supabase.Client supabaseClient, IConfiguration configuration)
+    public UserService(Client supabaseClient, Configuration configuration)
     {
         _supabaseClient = supabaseClient;
         _configuration = configuration;
@@ -38,9 +35,9 @@ public class UserService
 
     public async Task<User> CreateUser(UserOnboardingDto userOnboardingDto)
     {
-        try{
+        try {
             var supabaseUser = _supabaseClient.Auth.CurrentUser;
-            string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+            string profileImageUrl = _configuration.User.DefaultProfileImage;
 
             if (supabaseUser?.Id == null)
             {
@@ -73,7 +70,7 @@ public class UserService
                 .Insert(dbUser);
 
             return dbUser;
-        }catch(Exception e){
+        } catch(Exception e) {
            var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
             string msgError = errorJson.GetProperty("msg").GetString()??"";
             Console.WriteLine(msgError);
@@ -84,7 +81,7 @@ public class UserService
     public async Task<User> EditUser(UserOnboardingDto userOnboardingDto)
     {
         var supabaseUser = _supabaseClient.Auth.CurrentUser;
-        string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+        string profileImageUrl = _configuration.User.DefaultProfileImage;
 
         if (supabaseUser?.Id == null || supabaseUser?.Email == null)
         {
@@ -99,7 +96,11 @@ public class UserService
 
         if (userOnboardingDto.ProfileImage != null)
         {
-            profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+            profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? _configuration.User.DefaultProfileImage;
+        }
+        else
+        {
+            profileImageUrl = model.ProfileImageUrl;
         }
 
         model.DisplayName = userOnboardingDto.DisplayName;
@@ -135,7 +136,27 @@ public class UserService
     {
         try
         {
-            string bucketName = Environment.GetEnvironmentVariable("SUPABASE_BUCKET_NAME") ?? "";
+            string bucketName = _configuration.User.ProfileImageBucket ?? "";
+            string userFolder = $"{userId}/";
+
+            // List all files in the user's folder
+            var existingFiles = await _supabaseClient.Storage
+                .From(bucketName)
+                .List(userFolder);
+
+            // Delete all existing profile images (assuming one per user, different extensions possible)
+            if (existingFiles != null)
+            {
+                foreach (var existingFile in existingFiles)
+                {
+                    if (existingFile != null && existingFile.Name != null && existingFile.Name.StartsWith(userId))
+                    {
+                        _ = await _supabaseClient.Storage
+                            .From(bucketName)
+                            .Remove(new List<string> { $"{userFolder}{existingFile.Name}" ?? string.Empty });
+                    }
+                }
+            }
 
             string tempFolder = Path.GetTempPath(); // System temp folder
             string tempFilePath = Path.Combine(tempFolder, $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}");
@@ -145,7 +166,7 @@ public class UserService
                 await file.CopyToAsync(fileStream);
             }
 
-            string targetFilePath = $"{userId}/{userId}{Path.GetExtension(file.FileName)}";
+            string targetFilePath = $"{userId}/{userId}-{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
             await _supabaseClient.Storage
                 .From(bucketName)
                 .Upload(tempFilePath, targetFilePath, new Supabase.Storage.FileOptions
