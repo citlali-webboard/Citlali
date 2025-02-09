@@ -49,7 +49,7 @@ builder.Services.AddAuthentication()
                             if (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken)) {
                                 context.Token = accessToken;
                                 await supabaseClient.Auth.SetSession(accessToken, refreshToken);
-                                await supabaseClient.Auth.RefreshSession();
+                                // await supabaseClient.Auth.RefreshSession();
                             }
                         },
                         OnAuthenticationFailed = context =>
@@ -62,14 +62,14 @@ builder.Services.AddAuthentication()
                             context.Response.Cookies.Delete(configuration.Jwt.RefreshCookie);
 
                             // Redirect to login page
-                            context.Response.Redirect("/auth/login");
+                            context.Response.Redirect("/auth/signin");
 
                             return Task.CompletedTask;
                         },
                         OnChallenge = context =>
                         {
                             context.HandleResponse();
-                            context.Response.Redirect("/auth/login");
+                            context.Response.Redirect("/auth/signin");
                             return Task.CompletedTask;
                         }
                     };

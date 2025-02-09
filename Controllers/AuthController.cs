@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-
 using Citlali.Models;
 using Citlali.Services;
 
@@ -11,7 +10,8 @@ public class AuthController : Controller
     private readonly Supabase.Client _supabaseClient;
     private readonly AuthService _authService;
     private readonly UserService _userService;
-    private readonly List<(string Controller, string Action)> _validRedirects = new List<(string, string)>
+    private readonly Configuration _configuration;
+    private readonly List<(string Controller, string Action)> _validRedirects = new()
     {
         ("User", "Profile"),
         ("Auth", "SignIn"),
@@ -19,9 +19,13 @@ public class AuthController : Controller
         ("Auth", "Confirm"),
         ("Auth", "AuthCodeError")
     };
-    private readonly Configuration _configuration;
 
-    public AuthController(ILogger<AuthController> logger, Supabase.Client supabaseClient, AuthService authService, Configuration configuration, UserService userService)
+    public AuthController(
+        ILogger<AuthController> logger,
+        Supabase.Client supabaseClient,
+        AuthService authService,
+        Configuration configuration,
+        UserService userService)
     {
         _logger = logger;
         _supabaseClient = supabaseClient;
@@ -48,25 +52,24 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> SignIn(AuthLoginDto authLoginDto)
     {
-
-    try{
-        var session = await _authService.SignIn(authLoginDto.Email, authLoginDto.Password);
-        if (session != null && session.AccessToken != null && session.RefreshToken != null)
+        try
         {
-            Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
-            Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
-            return RedirectToAction("Profile", "User");
+            var session = await _authService.SignIn(authLoginDto.Email, authLoginDto.Password);
+            if (session != null && session.AccessToken != null && session.RefreshToken != null)
+            {
+                Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
+                Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
+                return RedirectToAction("Profile", "User");
+            }
+            throw new Exception("Wrong credentials.");
         }
-
-        throw new Exception("Wrong credentials.");
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            TempData["Error"] = ex.Message;
+            return RedirectToAction("SignIn");
+        }
     }
-    catch (Exception ex){
-        Console.WriteLine(ex.Message);
-        TempData["Error"] = ex.Message;
-        return RedirectToAction("SignIn");
-    }
-}
-
 
     [HttpPost("auth/signout")]
     public new async Task<IActionResult> SignOut()
@@ -85,20 +88,20 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> SignUp(AuthRegisterDto authRegisterDto)
     {
-        // Check if user already exists by their email
         if (await _userService.GetUserByEmail(authRegisterDto.Email) != null)
         {
             TempData["Error"] = "User with this email already exists.";
             return RedirectToAction("SignUp");
         }
 
-        try {
+        try
+        {
             var session = await _authService.SignUp(authRegisterDto.Email, authRegisterDto.Password);
             if (session != null && session.AccessToken != null && session.RefreshToken != null)
             {
                 Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
                 Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
-                return RedirectToAction("UserController.Profile");
+                return RedirectToAction("Profile", "User");
             }
             else
             {
@@ -109,8 +112,9 @@ public class AuthController : Controller
                 };
                 return RedirectToAction("Confirm", authConfirmDto);
             }
-            
-        } catch(Exception ex) {
+        }
+        catch (Exception ex)
+        {
             Console.WriteLine(ex.Message);
             TempData["Error"] = ex.Message;
             return RedirectToAction("SignUp");
@@ -131,7 +135,8 @@ public class AuthController : Controller
     [HttpPost("auth/confirm")]
     public async Task<IActionResult> ConfirmPost(AuthConfirmDto authConfirmDto, string? Next)
     {
-        try{
+        try
+        {
             if (!ModelState.IsValid)
             {
                 return View(authConfirmDto);
@@ -147,7 +152,7 @@ public class AuthController : Controller
                     var parts = Next.Split('/');
                     if (parts.Length == 2 && IsValidRedirect(parts[0], parts[1]))
                     {
-                        return RedirectToAction(parts[1], parts[0]); // RedirectToAction(Action, Controller)
+                        return RedirectToAction(parts[1], parts[0]);
                     }
                 }
                 return RedirectToAction("Profile", "User");
@@ -156,16 +161,17 @@ public class AuthController : Controller
             {
                 return RedirectToAction("AuthCodeError");
             }
-        }catch(Exception ex) {
+        }
+        catch (Exception ex)
+        {
             Console.WriteLine(ex.Message);
             TempData["Error"] = "Token is invalid or expired.";
-
             return RedirectToAction("Confirm", authConfirmDto);
         }
+    }
 
-        private bool IsValidRedirect(string controller, string action)
-        {
-            return _validRedirects.Contains((controller, action));
-        }
+    private bool IsValidRedirect(string controller, string action)
+    {
+        return _validRedirects.Contains((controller, action));
     }
 }
