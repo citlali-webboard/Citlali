@@ -44,7 +44,7 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> SignIn(AuthLoginDto authLoginDto)
     {
-
+        
     try{
         var session = await _authService.SignIn(authLoginDto.Email, authLoginDto.Password);
         if (session != null && session.AccessToken != null && session.RefreshToken != null)

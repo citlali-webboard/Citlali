@@ -55,8 +55,6 @@ public class UserService
             profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
         }
 
-
-
         var dbUser = new User
         {
             UserId = Guid.Parse(supabaseUser.Id),

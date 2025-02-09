@@ -1,16 +1,24 @@
+using Supabase;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Citlali.Models;
+using Citlali.Services;
+using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 namespace Citlali.Controllers;
 
 public class EventController : Controller
 {
     private readonly ILogger<EventController> _logger;
-
-    public EventController(ILogger<EventController> logger)
+    private readonly Supabase.Client _supabaseClient;
+    private readonly UserService _userService;
+    private readonly EventService _eventService;
+    
+    public EventController(ILogger<EventController> logger, EventService eventService)
     {
         _logger = logger;
+        _eventService = eventService;
     }
 
     public IActionResult Index()
@@ -18,6 +26,24 @@ public class EventController : Controller
         return View();
     }
 
+    [HttpGet("event/create")]
+    public async Task<IActionResult> Create()
+    {
+        CreateEventViewModel createEventViewModel = new();
+
+        createEventViewModel.Tags = await _eventService.GetTags();
+        
+        return View(createEventViewModel);
+    }
+
+    [HttpPost("createEvent")]
+    public async Task<IActionResult> Create(CreateEventViewModel createEventViewModel)
+    {
+        await _eventService.CreateEvent(createEventViewModel);
+        return RedirectToAction("detail", 2);
+    }
+
+    
     public IActionResult Detail(string id)
     {
         EventDetailViewModel eventDetailViewModel = new();
