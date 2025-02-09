@@ -11,6 +11,14 @@ public class AuthController : Controller
     private readonly Supabase.Client _supabaseClient;
     private readonly AuthService _authService;
     private readonly UserService _userService;
+    private readonly List<(string Controller, string Action)> _validRedirects = new List<(string, string)>
+    {
+        ("User", "Profile"),
+        ("Auth", "SignIn"),
+        ("Auth", "SignUp"),
+        ("Auth", "Confirm"),
+        ("Auth", "AuthCodeError")
+    };
     private readonly Configuration _configuration;
 
     public AuthController(ILogger<AuthController> logger, Supabase.Client supabaseClient, AuthService authService, Configuration configuration, UserService userService)
@@ -137,7 +145,7 @@ public class AuthController : Controller
                 if (!string.IsNullOrEmpty(Next))
                 {
                     var parts = Next.Split('/');
-                    if (parts.Length == 2)
+                    if (parts.Length == 2 && IsValidRedirect(parts[0], parts[1]))
                     {
                         return RedirectToAction(parts[1], parts[0]); // RedirectToAction(Action, Controller)
                     }
@@ -155,5 +163,9 @@ public class AuthController : Controller
             return RedirectToAction("Confirm", authConfirmDto);
         }
 
+        private bool IsValidRedirect(string controller, string action)
+        {
+            return _validRedirects.Contains((controller, action));
+        }
     }
 }
