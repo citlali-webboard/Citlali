@@ -1,0 +1,46 @@
+@model Citlali.Models.UserOnboardingDto
+@{
+    string profileImageUrl = "http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.jpeg";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="~/css/Register.css" asp-append-version="true" />
+</head>
+
+<body>
+
+    <form class="form-container" asp-action="edit" method="post" enctype="multipart/form-data">
+        <h2>EDIT USER</h2>
+        <h2>EDIT USER</h2>
+        <h2>EDIT USER</h2>
+        <div class="form-content">
+            <div class="form-data">
+                <div class="form-group">
+                    <label for="DisplayName">Display Name</label>
+                    <input asp-for="DisplayName" class="form-control" id="DisplayName" />
+                    <span asp-validation-for="DisplayName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" id="bio">
+                    <label for="UserBio">User Bio</label>
+                    <textarea asp-for="UserBio" id="UserBio" rows="3"></textarea>
+                    <span asp-validation-for="UserBio" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-img">
+                <div id="text-your-profile">My profile</div>
+                <img id="profileImage" src="@profileImageUrl" alt="ProfileImage">
+                <input type="file" asp-for="ProfileImage" id="ProfileImageInput"/>
+                <label for="ProfileImageInput" class="upload-file-button" id="text-upload-file" >Upload file...</label>
+                <span asp-validation-for="ProfileImage"></span>
+            </div>
+        </div>
+
+        <button class="sign-up-button" type="submit">Edit</button>
+    </form>
+</body>
+</html>
