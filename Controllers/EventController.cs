@@ -24,6 +24,12 @@ public class EventController : Controller
         return View(eventDetailViewModel);
     }
 
+    public IActionResult Explore()
+    {
+        EventExploreViewModel eventExploreViewModel = new();
+        return View(eventExploreViewModel);
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
