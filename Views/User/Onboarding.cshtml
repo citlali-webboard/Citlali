@@ -1,8 +1,6 @@
 @model Citlali.Models.UserOnboardingDto
 
 @{
-    @* string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
-     *@
     string UserEmail = Model?.Email ?? "No email provided";
     string profileImageUrl = "http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.jpeg";
 }
@@ -17,18 +15,21 @@ body {
 }
 
 .form-container{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 
-    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    
-    width: 100vw;
+
+    width: 90vw;
     height: 90vh;
     transform: translateY(6%);
 
-    
+
     background-color: #ffffff;
     border-radius: 10px;
 }
@@ -42,7 +43,7 @@ body {
     box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.3);
     width: 70%;
     height: 100%;
-    padding: 1% 0% 1% 0% ;
+
     justify-content: center;
     align-items: center;
 }
@@ -79,7 +80,7 @@ body {
     height: auto;
     object-fit: cover;
     border-radius: 50%;
-    aspect-ratio: 1 / 1; 
+    aspect-ratio: 1 / 1;
 }
 
 .form-group{
@@ -107,7 +108,7 @@ h2{
     margin-top: 4%;
     background-color: var(--text-gray-color);
     display: inline-block;
-    padding: 8px 16px;  
+    padding: 8px 16px;
     cursor: pointer;
     border-radius: 15px;
     text-align: center;
@@ -224,7 +225,7 @@ textarea{
                     </div>
 
                     <div class="tags-container">
-                        <div> 
+                        <div>
                             Choose category that best applicable to your event
                         </div>
                         <div class="tags" id="tags">
@@ -238,13 +239,13 @@ textarea{
                     <label for="ProfileImageInput" class="upload-file-button" id="text-upload-file" >Upload file...</label>
                     <span asp-validation-for="ProfileImage"></span>
                 </div>
-            
+
             </div>
             <button class="sign-up-button" type="submit">Sign up</button>
         </div>
     </form>
 
-    <script> 
+    <script>
         const image = document.getElementById('profileImage');
         const input = document.querySelector('input[type="file"]');
         const div_tags = document.getElementById('tags');
