@@ -8,10 +8,9 @@
   align-items: center;
 }
 
-.detail-main-container {
-  display: grid;
-  grid-template-columns: 3fr 16px 2fr;
-  width: var(--max-screen-width);
+.main-container {
+  width: 100%;
+  max-width: var(--max-screen-width);
 }
 
 .detail-column {

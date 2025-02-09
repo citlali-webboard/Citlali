@@ -11,6 +11,7 @@
   --auth-background-color : #F5C2E7;
   --pink-color: #FFC0CB;
   --color-primary: var(--pink-color);
+  --color-muted: #6C7086;
 
   --max-text-width: 65ch;
   --max-screen-width: 960px;
