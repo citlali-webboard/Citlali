@@ -5,7 +5,7 @@ using Supabase.Postgrest.Models;
 
 
 namespace Citlali.Models;
-[Table("EVENTS")]
+
 public class Event : BaseModel {
     public Guid EventId = new();
     public Guid CreatorUserId = new();

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace Citlali.Controllers;
 
-[Route("event")]
 public class EventController : Controller
 {
     private readonly ILogger<EventController> _logger;
@@ -27,7 +26,7 @@ public class EventController : Controller
         return View();
     }
 
-    [HttpGet("create")]
+    [HttpGet("event/create")]
     public async Task<IActionResult> Create()
     {
         CreateEventViewModel createEventViewModel = new();
@@ -40,9 +39,7 @@ public class EventController : Controller
     [HttpPost("createEvent")]
     public async Task<IActionResult> Create(CreateEventViewModel createEventViewModel)
     {
-        Console.WriteLine("Event created");
         await _eventService.CreateEvent(createEventViewModel);
-
         return RedirectToAction("detail", 2);
     }
 
