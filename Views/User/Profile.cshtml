@@ -4,6 +4,11 @@
     <button type="submit" class="btn btn-danger">Sign Out</button>
 </form>
 
+@* <img src=@Model.ProfileImageUrl alt="">
+<p>Name: @Model.DisplayName</p>
+<p>Email: @Model.Email</p>
+<p>Bio: @Model.UserBio</p> *@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -245,7 +250,7 @@
         
       </div>
         <!-- Profile Edit Pop-up (Hidden by Default) -->
-        <div id="editProfilePopup" class="popup" style="display: none;">
+        <div id="editProfilePopup" class="popup">
           <form class="edit_form" asp-controller="User" asp-action="edit" method="post" enctype="multipart/form-data">
 
               <h2>Edit Profile</h2>

@@ -1,35 +1,4 @@
-﻿.error-popup {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: #ff4d4d;
-  color: white;
-  padding: 15px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  
-  z-index: 99999;
-  width: max-content; 
-  min-width: 200px;
-  height: auto; 
-  white-space: nowrap; 
-}
-
-.error-popup button {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  margin-left: 5px;
-}
-
-
-* {
+﻿* {
   font-family: "IBM Plex Sans Thai Looped", serif;
   font-weight: 400;
   font-style: normal;

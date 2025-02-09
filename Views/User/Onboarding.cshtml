@@ -1,202 +1,201 @@
 @model Citlali.Models.UserOnboardingDto
 
 @{
-@* string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
-*@
-string UserEmail = Model?.Email ?? "No email provided";
-string profileImageUrl =
-"http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.jpeg";
+    @* string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+     *@
+    string UserEmail = Model?.Email ?? "No email provided";
+    string profileImageUrl = "http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.jpeg";
 }
 <!DOCTYPE html>
 
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        background-color: #ffffff;
-        position: relative;
-    }
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+    position: relative;
+}
 
-    .form-container {
+.form-container{
 
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    width: 100vw;
+    height: 90vh;
+    transform: translateY(6%);
 
-        width: 100vw;
-        height: 90vh;
-        transform: translateY(6%);
+    
+    background-color: #ffffff;
+    border-radius: 10px;
+}
 
-        background-color: #ffffff;
-        border-radius: 10px;
-    }
+.content{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border-radius: 5%;
+    box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.3);
+    width: 70%;
+    height: 100%;
+    padding: 1% 0% 1% 0% ;
+    justify-content: center;
+    align-items: center;
+}
 
-    .content {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        background-color: #ffffff;
-        border-radius: 5%;
-        box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.3);
-        width: 70%;
-        height: 100%;
-        padding: 1% 0% 1% 0%;
-        justify-content: center;
-        align-items: center;
-    }
+.form-content{
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
 
-    .form-content {
-        display: flex;
-        flex-direction: row-reverse;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        height: 100%;
+}
 
-    }
+.form-data{
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
 
-    .form-data {
-        width: 50%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: flex-start;
-    }
+.form-img{
+    width: 50%;
+    height: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
-    .form-img {
-        width: 50%;
-        height: 60%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
+.form-img img{
+    width: 70%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 50%;
+    aspect-ratio: 1 / 1; 
+}
 
-    .form-img img {
-        width: 70%;
-        height: auto;
-        object-fit: cover;
-        border-radius: 50%;
-        aspect-ratio: 1 / 1;
-    }
+.form-group{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    width: 100%;
+}
 
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 10px;
-        width: 100%;
-    }
+h2{
+    display: flex;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
 
-    h2 {
-        display: flex;
-        justify-content: center;
-        font-size: 2rem;
-        margin: 0;
-        padding: 0;
-        width: 100%;
-    }
+#text-upload-file {
+    color: var(--white-color);
+    font-size: 16px;
+}
 
-    #text-upload-file {
-        color: var(--white-color);
-        font-size: 16px;
-    }
+.upload-file-button {
+    margin-top: 4%;
+    background-color: var(--text-gray-color);
+    display: inline-block;
+    padding: 8px 16px;  
+    cursor: pointer;
+    border-radius: 15px;
+    text-align: center;
+    transition: 0.2s;
+}
 
-    .upload-file-button {
-        margin-top: 4%;
-        background-color: var(--text-gray-color);
-        display: inline-block;
-        padding: 8px 16px;
-        cursor: pointer;
-        border-radius: 15px;
-        text-align: center;
-        transition: 0.2s;
-    }
+.upload-file-button:hover{
+    background-color: #F5C2E7;
+}
 
-    .upload-file-button:hover {
-        background-color: #F5C2E7;
-    }
+.form-img input[type="file"] {
+    display: none;
+}
 
-    .form-img input[type="file"] {
-        display: none;
-    }
+.sign-up-button{
+    width: 40%;
+    padding: 10px;
+    background-color: #7fdb7f;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
 
-    .sign-up-button {
-        width: 40%;
-        padding: 10px;
-        background-color: #7fdb7f;
-        color: #ffffff;
-        font-size: 18px;
-        font-weight: bold;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: 0.3s;
-    }
+.sign-up-button:hover{
+    background-color: #72c572;
+}
 
-    .sign-up-button:hover {
-        background-color: #72c572;
-    }
+.form-group input{
+    width: 70%;
+    padding: 10px;
+    border: 1px solid var(--text-gray-color);
+    border-radius: 5px;
+    font-size: 16px;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+}
 
-    .form-group input {
-        width: 70%;
-        padding: 10px;
-        border: 1px solid var(--text-gray-color);
-        border-radius: 5px;
-        font-size: 16px;
-        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
-    }
+.form-group textarea{
+    width: 70%;
+    padding: 10px;
+    border: 1px solid var(--text-gray-color);
+    border-radius: 5px;
+    font-size: 16px;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+}
 
-    .form-group textarea {
-        width: 70%;
-        padding: 10px;
-        border: 1px solid var(--text-gray-color);
-        border-radius: 5px;
-        font-size: 16px;
-        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
-    }
+textarea{
+    resize: none;
+}
 
-    textarea {
-        resize: none;
-    }
+.tags-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 80%;
+}
 
-    .tags-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: flex-start;
-        width: 80%;
-    }
+.tags-container .tags{
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
 
-    .tags-container .tags {
-        width: 100%;
-        height: auto;
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-    }
+.tags-container .tags .tag{
+    display: inline-block;
+    margin: 3px;
+    padding: 4px 8px 4px 8px ;
+    border: 2px solid var(--text-gray-color);
+    border-radius: 30px;
+    cursor: pointer;
+}
 
-    .tags-container .tags .tag {
-        display: inline-block;
-        margin: 3px;
-        padding: 4px 8px 4px 8px;
-        border: 2px solid var(--text-gray-color);
-        border-radius: 30px;
-        cursor: pointer;
-    }
+.tags-container .tags .tag:hover{
+    background-color: var(--pink-color);
+    border: 2px solid var(--pink-color);
+}
 
-    .tags-container .tags .tag:hover {
-        background-color: var(--pink-color);
-        border: 2px solid var(--pink-color);
-    }
 </style>
 <html lang="en">
 
-@*
-
-<head>
+@* <head>
     <link rel="stylesheet" href="~/css/Register.css?v=1.0" asp-append-version="true" />
 </head> *@
 
@@ -208,7 +207,7 @@ string profileImageUrl =
                 <div class="form-data">
                     <div class="form-group">
                         <label for="Email">Email</label>
-                        <input asp-for="Email" class="form-control" value=@UserEmail id="Email" disabled />
+                        <input asp-for="Email" class="form-control" value=@UserEmail id="Email" disabled/>
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
 
@@ -225,7 +224,7 @@ string profileImageUrl =
                     </div>
 
                     <div class="tags-container">
-                        <div>
+                        <div> 
                             Choose category that best applicable to your event
                         </div>
                         <div class="tags" id="tags">
@@ -235,63 +234,76 @@ string profileImageUrl =
 
                 <div class="form-img">
                     <img id="profileImage" src=@profileImageUrl alt="ProfileImage">
-                    <input type="file" asp-for="ProfileImage" id="ProfileImageInput" />
-                    <label for="ProfileImageInput" class="upload-file-button" id="text-upload-file">Upload
-                        file...</label>
+                    <input type="file" asp-for="ProfileImage" id="ProfileImageInput"/>
+                    <label for="ProfileImageInput" class="upload-file-button" id="text-upload-file" >Upload file...</label>
                     <span asp-validation-for="ProfileImage"></span>
                 </div>
-
+            
             </div>
             <button class="sign-up-button" type="submit">Sign up</button>
         </div>
     </form>
 
-    <script>
+    <script> 
         const image = document.getElementById('profileImage');
         const input = document.querySelector('input[type="file"]');
         const div_tags = document.getElementById('tags');
         localStorage.setItem('tags_selected', '[]');
 
-        const tags = [{
-            emoji: '🐶',
-            name: 'dog'
-        }, {
-            emoji: '🐱',
-            name: 'cat'
-        }, {
-            emoji: '🐭',
-            name: 'mouse'
-        }, {
-            emoji: '🐹',
-            name: 'hamster'
-        }, {
-            emoji: '🐰',
-            name: 'rabbit'
-        }, {
-            emoji: '🦊',
-            name: 'fox'
-        }, {
-            emoji: '🐻',
-            name: 'bear'
-        }, {
-            emoji: '🐼',
-            name: 'panda'
-        }, {
-            emoji: '🐨',
-            name: 'koala'
-        }, {
-            emoji: '🐯',
-            name: 'tiger'
-        }, {
-            emoji: '🦁',
-            name: 'lion'
-        }, {
-            emoji: '🐷',
-            name: 'pig'
-        }, {
-            emoji: '🐸',
-            name: 'frog'
-        }]
+        const tags = [
+            {
+                emoji: '🐶',
+                name: 'dog'
+            }
+            , {
+                emoji: '🐱',
+                name: 'cat'
+            }
+            , {
+                emoji: '🐭',
+                name: 'mouse'
+            }
+            , {
+                emoji: '🐹',
+                name: 'hamster'
+            }
+            , {
+                emoji: '🐰',
+                name: 'rabbit'
+            }
+            , {
+                emoji: '🦊',
+                name: 'fox'
+            }
+            , {
+                emoji: '🐻',
+                name: 'bear'
+            }
+            , {
+                emoji: '🐼',
+                name: 'panda'
+            }
+            , {
+                emoji: '🐨',
+                name: 'koala'
+            }
+            , {
+                emoji: '🐯',
+                name: 'tiger'
+            }
+            , {
+                emoji: '🦁',
+                name: 'lion'
+            }
+            , {
+                emoji: '🐷',
+                name: 'pig'
+            }
+            , {
+                emoji: '🐸',
+                name: 'frog'
+            }
+        ]
 
         input.addEventListener('change', (e) => {
             console.log('input changed');
@@ -301,22 +313,20 @@ string profileImageUrl =
         tags.forEach(tag => {
             const div = document.createElement('div');
             div.className = 'tag';
-            div.style =
-                'display: inline-block; margin: 3px; padding: 4px 8px 4px 8px ; border: 2px solid var(--text-gray-color); border-radius: 30px; cursor: pointer;';
-            div.onclick = () => {
-                if (div.name === 'selected') {
+            div.style = 'display: inline-block; margin: 3px; padding: 4px 8px 4px 8px ; border: 2px solid var(--text-gray-color); border-radius: 30px; cursor: pointer;';
+            div.onclick = () =>{
+                if (div.name === 'selected'){
                     div.style.backgroundColor = 'transparent';
                     div.style.border = '2px solid var(--text-gray-color)';
                     div.name = '';
-                    localStorage.setItem('tags_selected', JSON.stringify(JSON.parse(localStorage.getItem(
-                        'tags_selected')).filter(t => t !== tag.name)));
+                    localStorage.setItem('tags_selected', JSON.stringify(JSON.parse(localStorage.getItem('tags_selected')).filter(t => t !== tag.name)));
                     return;
-                } else {
+                }
+                else{
                     div.style.backgroundColor = 'var(--pink-color)';
                     div.style.border = '2px solid var(--pink-color)';
                     div.name = 'selected';
-                    localStorage.setItem('tags_selected', JSON.stringify([...JSON.parse(localStorage
-                        .getItem('tags_selected')), tag.name]));
+                    localStorage.setItem('tags_selected', JSON.stringify([...JSON.parse(localStorage.getItem('tags_selected')), tag.name]));
                 }
             }
 
@@ -325,5 +335,4 @@ string profileImageUrl =
         });
     </script>
 </body>
-
 </html>

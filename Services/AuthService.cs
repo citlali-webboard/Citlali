@@ -1,6 +1,10 @@
 using Supabase;
-
+using DotNetEnv;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using System.Text.Json;
+using Citlali.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Citlali.Services;
 
@@ -15,7 +19,7 @@ public class AuthService(Client supabaseClient, IConfiguration configuration)
             return response;
 
         }catch(Exception e){
-
+            
             var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
             string msgError = errorJson.GetProperty("msg").GetString()??"";
             Console.WriteLine(msgError);
