@@ -51,6 +51,7 @@ body {
 h2{
     font-size: 40px;
     font-weight: bold;
+    text-align: center;
     margin: 5% 0 0 0;
 }
 
@@ -77,6 +78,7 @@ form input{
     box-shadow: 0px 0px 2px 1.2px rgba(0, 0, 0, 0.10);
     border: 1px solid var(--text-gray-color);
 }
+
 
 form input::-webkit-inner-spin-button,
 form input::-webkit-outer-spin-button {
@@ -129,8 +131,30 @@ button:hover{
     .form-content {
         background-color: var(--white-color);
         border-radius: 0;
-        height: 100%;
+        height: 100vh;
+        width: 90vw;
+    }
+
+    form .input-field {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        column-gap: 5px;
         width: 100%;
+        max-width: 100%;
+    }
+    
+    form .input-field input {
+        flex: 1; 
+        min-width: 30px; 
+        height: auto;
+        aspect-ratio: 1/1;
+        border-radius: 10px;
+        outline: none;
+        text-align: center;
+        font-size: 1.125rem;
+        box-shadow: 0px 0px 2px 1.2px rgba(0, 0, 0, 0.10);
+        border: 1px solid var(--text-gray-color);
     }
     
 }
