@@ -15,16 +15,15 @@
     @RenderSection("head", required: false)
 </head>
 
-@if (TempData["Error"] != null)
-{
-    <div id="error-popup" class="error-popup">
-        <span >@TempData["Error"]</span>
-        <button onclick="closePopup()">✖</button>
-    </div>
-}
 
 <body>
-
+    @if (TempData["Error"] != null)
+    {
+        <div id="error-popup" class="error-popup">
+            <span >@TempData["Error"]</span>
+            <button onclick="closePopup()">✖</button>
+        </div>
+    }
     <div class="main-container">
         <main role="main" class="pb-3">
             @RenderBody()
