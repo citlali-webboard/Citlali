@@ -180,4 +180,42 @@ h2 {
     text-decoration: underline;
 }
 
+@media screen and (max-width: 1150px) {
+    .form-img {
+        display: none;
+    }
+    
+    .form-container {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .form-content {
+        height: 90%;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-container {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-img {
+        display: none;
+    }
+
+    .form-content {
+        background-color: var(--white-color);
+        border-radius: 0;
+        height: 100%;
+        width: 100%;
+    }
+}
 

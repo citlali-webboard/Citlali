@@ -56,8 +56,9 @@ h2{
 
 h3{
     font-size: 16px;
+    text-align: center;
     color: var(--text-gray-color);
-    font-weight: bold;
+    font-weight: 600;
     margin: 5% 0 5% 0;
 }
 
@@ -82,6 +83,7 @@ form input::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+
 input[type=number] {
     -moz-appearance:textfield;
 }
@@ -110,8 +112,25 @@ button:hover{
     cursor: pointer;
 }
 
-
 .logo:hover{
     background-color: #fd9ae3;
     transition: .2s;
+}
+
+@media screen and (max-width: 768px){
+    .form-container {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-content {
+        background-color: var(--white-color);
+        border-radius: 0;
+        height: 100%;
+        width: 100%;
+    }
+    
 }

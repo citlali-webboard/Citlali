@@ -10,6 +10,9 @@
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Citlali.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/ErrorHandle.css">
+    <script src="~/js/ErrorHandle.js"></script>
+    @RenderSection("head", required: false)
 </head>
 
 @if (TempData["Error"] != null)
