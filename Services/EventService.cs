@@ -41,14 +41,15 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
 
     public async Task<Event> CreateEvent(CreateEventViewModel createEventViewModel)
     {
-        var supabaseUser = _supabaseClient.Auth.CurrentUser;
-        if (supabaseUser == null)
-        {
-            throw new Exception("User not authenticated");
-        }
+        // var supabaseUser = _supabaseClient.Auth.CurrentUser;
+        // if (supabaseUser == null)
+        // {
+        //     throw new Exception("User not authenticated");
+        // }
 
-        Guid userId = Guid.Parse(supabaseUser.Id ?? "");
-
+        // Guid userId = Guid.Parse(supabaseUser.Id ?? "");
+        Guid userId = new();
+        
         var model = new Event
         {
             EventId =  Guid.NewGuid(),
