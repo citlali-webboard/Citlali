@@ -38,6 +38,8 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> SignIn(AuthLoginDto authLoginDto)
     {
+
+    try{
         var session = await _authService.SignIn(authLoginDto.Email, authLoginDto.Password);
         if (session != null && session.AccessToken != null && session.RefreshToken != null)
         {
@@ -45,11 +47,16 @@ public class AuthController : Controller
             Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
             return RedirectToAction("Profile", "User");
         }
-        else
-        {
-            return StatusCode(StatusCodes.Status400BadRequest, "Wrong credentials.");
-        }
+
+        throw new Exception("Wrong credentials.");
     }
+    catch (Exception ex){
+        Console.WriteLine(ex.Message);
+        TempData["Error"] = ex.Message;
+        return RedirectToAction("SignIn");
+    }
+}
+
 
     [HttpPost("auth/signout")]
     public new async Task<IActionResult> SignOut()
@@ -68,21 +75,29 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> SignUp(AuthRegisterDto authRegisterDto)
     {
-        var session = await _authService.SignUp(authRegisterDto.Email, authRegisterDto.Password);
-        if (session != null && session.AccessToken != null && session.RefreshToken != null)
-        {
-            Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
-            Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
-            return RedirectToAction("UserController.Profile");
-        }
-        else
-        {
-            var authConfirmDto = new AuthConfirmDto
+        try{
+            var session = await _authService.SignUp(authRegisterDto.Email, authRegisterDto.Password);
+            if (session != null && session.AccessToken != null && session.RefreshToken != null)
+
             {
-                Email = authRegisterDto.Email,
-                Next = "user/onboarding"
-            };
-            return RedirectToAction("Confirm", authConfirmDto);
+                Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
+                Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
+                return RedirectToAction("UserController.Profile");
+            }
+            else
+            {
+                var authConfirmDto = new AuthConfirmDto
+                {
+                    Email = authRegisterDto.Email,
+                    Next = "user/onboarding"
+                };
+                return RedirectToAction("Confirm", authConfirmDto);
+            }
+
+        }catch(Exception ex){
+            Console.WriteLine(ex.Message);
+            TempData["Error"] = ex.Message;
+            return RedirectToAction("SignUp");
         }
     }
 
@@ -100,29 +115,37 @@ public class AuthController : Controller
     [HttpPost("auth/confirm")]
     public async Task<IActionResult> ConfirmPost(AuthConfirmDto authConfirmDto, string? Next)
     {
-        if (!ModelState.IsValid)
-        {
-            return View(authConfirmDto);
-        }
-        var session = await _authService.VerifyEmailOtp(authConfirmDto.Email, authConfirmDto.Otp, authConfirmDto.Type);
-        if (session != null && session.AccessToken != null && session.RefreshToken != null)
-        {
-            await _supabaseClient.Auth.SetSession(session.AccessToken, session.RefreshToken);
-            Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
-            Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
-            if (!string.IsNullOrEmpty(Next))
+        try{
+            if (!ModelState.IsValid)
             {
-                var parts = Next.Split('/');
-                if (parts.Length == 2)
-                {
-                    return RedirectToAction(parts[1], parts[0]); // RedirectToAction(Action, Controller)
-                }
+                return View(authConfirmDto);
             }
-            return RedirectToAction("Profile", "User");
+            var session = await _authService.VerifyEmailOtp(authConfirmDto.Email, authConfirmDto.Otp, authConfirmDto.Type);
+            if (session != null && session.AccessToken != null && session.RefreshToken != null)
+            {
+                await _supabaseClient.Auth.SetSession(session.AccessToken, session.RefreshToken);
+                Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
+                Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
+                if (!string.IsNullOrEmpty(Next))
+                {
+                    var parts = Next.Split('/');
+                    if (parts.Length == 2)
+                    {
+                        return RedirectToAction(parts[1], parts[0]); // RedirectToAction(Action, Controller)
+                    }
+                }
+                return RedirectToAction("Profile", "User");
+            }
+            else
+            {
+                return RedirectToAction("AuthCodeError");
+            }
+        }catch(Exception ex){
+            Console.WriteLine(ex.Message);
+            TempData["Error"] = "Invalid OTP";
+            return RedirectToAction("Confirm", authConfirmDto);
+
         }
-        else
-        {
-            return RedirectToAction("AuthCodeError");
-        }
+
     }
 }

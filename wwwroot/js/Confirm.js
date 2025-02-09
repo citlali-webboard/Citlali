@@ -4,6 +4,20 @@ const Otp = document.getElementById("Otp");
 
 let OtpValue = "";
 
+function reset() { 
+    OtpValue = "";  
+    Otp.value = "";  
+    button.classList.remove("active");
+
+    inputs.forEach((input, index) => {
+        input.value = "";
+        input.disabled = index !== 0; 
+    });
+
+    inputs[0].focus();
+}
+
+
 inputs.forEach((input, index) => {
     input.addEventListener("keydown", (e) => {
         if (e.key === "Enter" && OtpValue.length !== 6) {
@@ -30,6 +44,10 @@ inputs.forEach((input, index) => {
             if (OtpValue.length === 6) {
                 button.classList.add("active");
                 button.click();
+                //wait for 1 second
+                setTimeout(() => {
+                    reset();
+                }, 1000);
             }
             
             return;
@@ -63,6 +81,15 @@ inputs.forEach((input, index) => {
             button.classList.add("active");
         } else {
             button.classList.remove("active");
+        }
+
+        if (OtpValue.length === 6) {
+            button.classList.add("active");
+            button.click();
+            //wait for 1 second
+            setTimeout(() => {
+                reset();
+            }, 1000);
         }
 
     });
