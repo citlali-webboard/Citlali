@@ -13,12 +13,14 @@ public class UserController : Controller
     private readonly ILogger<UserController> _logger;
     private readonly Supabase.Client _supabaseClient;
     private readonly UserService _userService;
+    private readonly Configuration _configuration;
 
-    public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService)
+    public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService, Configuration configuration)
     {
         _logger = logger;
         _supabaseClient = supabaseClient;
         _userService = userService;
+        _configuration = configuration;
     }
 
     public IActionResult Index()
@@ -28,6 +30,7 @@ public class UserController : Controller
         {
             return RedirectToAction("SignIn", "Auth");
         }
+
         return RedirectToAction("Onboarding");
     }
 
@@ -44,6 +47,9 @@ public class UserController : Controller
         if (!await _userService.RedirectToOnboarding()) {
             return RedirectToAction("Profile");
         }
+
+        ViewBag.Email = currentUser.Email;
+        ViewBag.ProfileImageUrl = _configuration.User.DefaultProfileImage;
 
         return View();
     }

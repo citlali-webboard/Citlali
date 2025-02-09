@@ -1,8 +1,8 @@
 @model Citlali.Models.UserOnboardingDto
 
 @{
-    string UserEmail = Model?.Email ?? "No email provided";
-    string profileImageUrl = "http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.jpeg";
+    string userEmail = ViewBag.Email ?? "No email provided";
+    string profileImageUrl = ViewBag.ProfileImageUrl ?? "";
 }
 
 @section head{
@@ -37,7 +37,7 @@
                 <div class="profile-info">
                     <div class="form-group">
                         <label for="Email">Email</label>
-                        <input asp-for="Email" class="form-control disabled-input" value=@UserEmail id="Email" disabled />
+                        <input asp-for="Email" class="form-control disabled-input" value=@userEmail id="Email" disabled />
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
 
