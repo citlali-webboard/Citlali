@@ -14,16 +14,18 @@ public class AuthController : Controller
     private readonly ILogger<AuthController> _logger;
     private readonly Supabase.Client _supabaseClient;
     private readonly AuthService _authService;
+    private readonly UserService _userService;
     private readonly string _accessCookieName;
     private readonly string _refreshCookieName;
 
-    public AuthController(ILogger<AuthController> logger, Supabase.Client supabaseClient, AuthService authService)
+    public AuthController(ILogger<AuthController> logger, Supabase.Client supabaseClient, AuthService authService, UserService userService)
     {
         _logger = logger;
         _supabaseClient = supabaseClient;
         _authService = authService;
         _accessCookieName = Environment.GetEnvironmentVariable("JWT_ACCESS_COOKIE") ?? throw new Exception("JWT_ACCESS_COOKIE must be set in the environment variables.");
         _refreshCookieName = Environment.GetEnvironmentVariable("JWT_REFRESH_COOKIE") ?? throw new Exception("JWT_REFRESH_COOKIE must be set in the environment variables.");
+        _userService = userService;
     }
 
     public IActionResult AuthCodeError()
@@ -81,10 +83,16 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> SignUp(AuthRegisterDto authRegisterDto)
     {
-        try{
+        // Check if user already exists by their email
+        if (await _userService.GetUserByEmail(authRegisterDto.Email) != null)
+        {
+            TempData["Error"] = "User with this email already exists.";
+            return RedirectToAction("SignUp");
+        }
+
+        try {
             var session = await _authService.SignUp(authRegisterDto.Email, authRegisterDto.Password);
             if (session != null && session.AccessToken != null && session.RefreshToken != null)
-
             {
                 Response.Cookies.Append(_accessCookieName, session.AccessToken);
                 Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
@@ -100,7 +108,7 @@ public class AuthController : Controller
                 return RedirectToAction("Confirm", authConfirmDto);
             }
             
-        }catch(Exception ex){
+        } catch(Exception ex) {
             Console.WriteLine(ex.Message);
             TempData["Error"] = ex.Message;
             return RedirectToAction("SignUp");
@@ -146,11 +154,11 @@ public class AuthController : Controller
             {
                 return RedirectToAction("AuthCodeError");
             }
-        }catch(Exception ex){
+        }catch(Exception ex) {
             Console.WriteLine(ex.Message);
-            TempData["Error"] = "Invalid OTP";
-            return RedirectToAction("Confirm", authConfirmDto);
+            TempData["Error"] = "Token is invalid or expired.";
 
+            return RedirectToAction("Confirm", authConfirmDto);
         }
         
     }

@@ -52,7 +52,12 @@ public class UserController : Controller
     [Authorize]
     public async Task<IActionResult> Create(UserOnboardingDto user)
     {
-        try{
+        try {
+            if (string.IsNullOrEmpty(user.DisplayName)) {
+                TempData["Error"] = "Display name is required.";
+                return RedirectToAction("Onboarding");
+            }
+
             if (!await _userService.RedirectToOnboarding()) {
                 RedirectToAction("Profile");
             }
@@ -61,9 +66,9 @@ public class UserController : Controller
                 return RedirectToAction("Onboarding");
             }
             return RedirectToAction("Profile");
-        }catch (Exception ex){
+        } catch (Exception ex){
             Console.WriteLine(ex.Message);
-            TempData["Error"] = "You have to have a display name.";
+            TempData["Error"] = "Something went wrong. Please try again.";
             return RedirectToAction("Onboarding");
         }
 
