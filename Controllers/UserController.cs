@@ -52,14 +52,26 @@ public class UserController : Controller
     [Authorize]
     public async Task<IActionResult> Create(UserOnboardingDto user)
     {
-        if (!await _userService.RedirectToOnboarding()) {
-            RedirectToAction("Profile");
-        }
-        var userCreated = await _userService.CreateUser(user);
-        if (userCreated == null) {
+        try {
+            if (string.IsNullOrEmpty(user.DisplayName)) {
+                TempData["Error"] = "Display name is required.";
+                return RedirectToAction("Onboarding");
+            }
+
+            if (!await _userService.RedirectToOnboarding()) {
+                RedirectToAction("Profile");
+            }
+            var userCreated = await _userService.CreateUser(user);
+            if (userCreated == null) {
+                return RedirectToAction("Onboarding");
+            }
+            return RedirectToAction("Profile");
+        } catch (Exception ex){
+            Console.WriteLine(ex.Message);
+            TempData["Error"] = "Something went wrong. Please try again.";
             return RedirectToAction("Onboarding");
         }
-        return RedirectToAction("Profile");
+
     }
 
     [HttpGet("profile")]

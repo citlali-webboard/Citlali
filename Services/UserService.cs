@@ -1,17 +1,15 @@
 using Citlali.Models;
 using Supabase;
-using Microsoft.Extensions.Configuration;
-using System.Threading.Tasks;
-using DotNetEnv;
+using System.Text.Json;
 
 namespace Citlali.Services;
 
 public class UserService
 {
-    private readonly Supabase.Client _supabaseClient;
-    private readonly IConfiguration _configuration;
+    private readonly Client _supabaseClient;
+    private readonly Configuration _configuration;
 
-    public UserService(Supabase.Client supabaseClient, IConfiguration configuration)
+    public UserService(Client supabaseClient, Configuration configuration)
     {
         _supabaseClient = supabaseClient;
         _configuration = configuration;
@@ -37,44 +35,51 @@ public class UserService
 
     public async Task<User> CreateUser(UserOnboardingDto userOnboardingDto)
     {
-        var supabaseUser = _supabaseClient.Auth.CurrentUser;
-        string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+        try {
+            var supabaseUser = _supabaseClient.Auth.CurrentUser;
+            string profileImageUrl = _configuration.User.DefaultProfileImage;
 
-        if (supabaseUser?.Id == null)
-        {
-            throw new Exception($"Error during user creation.");
+            if (supabaseUser?.Id == null)
+            {
+                throw new Exception($"Error during user creation.");
+            }
+
+            if (supabaseUser?.Email == null)
+            {
+                throw new Exception($"Error during user creation.");
+            }
+
+            if (userOnboardingDto.ProfileImage != null)
+            {
+                profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+            }
+
+            var dbUser = new User
+            {
+                UserId = Guid.Parse(supabaseUser.Id),
+                Email = supabaseUser.Email,
+                DisplayName = userOnboardingDto.DisplayName,
+                ProfileImageUrl = profileImageUrl,
+                UserBio = userOnboardingDto.UserBio
+            };
+
+            await _supabaseClient
+                .From<User>()
+                .Insert(dbUser);
+
+            return dbUser;
+        } catch(Exception e) {
+           var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
+            string msgError = errorJson.GetProperty("msg").GetString()??"";
+            Console.WriteLine(msgError);
+            throw new Exception(msgError); 
         }
-
-        if (supabaseUser?.Email == null)
-        {
-            throw new Exception($"Error during user creation.");
-        }
-
-        if (userOnboardingDto.ProfileImage != null)
-        {
-            profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
-        }
-
-        var dbUser = new User
-        {
-            UserId = Guid.Parse(supabaseUser.Id),
-            Email = supabaseUser.Email,
-            DisplayName = userOnboardingDto.DisplayName,
-            ProfileImageUrl = profileImageUrl,
-            UserBio = userOnboardingDto.UserBio
-        };
-
-        await _supabaseClient
-            .From<User>()
-            .Insert(dbUser);
-
-        return dbUser;
     }
 
     public async Task<User> EditUser(UserOnboardingDto userOnboardingDto)
     {
         var supabaseUser = _supabaseClient.Auth.CurrentUser;
-        string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+        string profileImageUrl = _configuration.User.DefaultProfileImage;
 
         if (supabaseUser?.Id == null || supabaseUser?.Email == null)
         {
@@ -89,9 +94,9 @@ public class UserService
 
         if (userOnboardingDto.ProfileImage != null)
         {
-            profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+            profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? _configuration.User.DefaultProfileImage;
         }
-        else 
+        else
         {
             profileImageUrl = model.ProfileImageUrl;
         }
@@ -129,14 +134,14 @@ public class UserService
     {
         try
         {
-            string bucketName = Environment.GetEnvironmentVariable("SUPABASE_BUCKET_NAME") ?? "";
+            string bucketName = _configuration.User.ProfileImageBucket ?? "";
             string userFolder = $"{userId}/";
 
             // List all files in the user's folder
             var existingFiles = await _supabaseClient.Storage
                 .From(bucketName)
                 .List(userFolder);
-            
+
             // Delete all existing profile images (assuming one per user, different extensions possible)
             if (existingFiles != null)
             {
