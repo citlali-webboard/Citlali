@@ -41,3 +41,8 @@
   cursor: default;
   width: fit-content;
 }
+
+.text-level-1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
