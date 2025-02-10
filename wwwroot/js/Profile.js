@@ -1,16 +1,17 @@
 
 function openPopup() {
-    document.getElementById('editProfilePopup').style.display = 'flex';
+    document.getElementById('edit-popup').style.display = 'flex';
 }
 
 function closePopup() {
-    document.getElementById('editProfilePopup').style.display = 'none';
+    console.log('close');
+    document.getElementById('edit-popup').style.display = 'none';
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById('editProfilePopup').style.display = 'none';
     let fileInput = document.getElementById("profileImage");
     let imgPreview = document.getElementById("profilePreview");
+
 
     imgPreview.addEventListener("click", function () {
         fileInput.click();
