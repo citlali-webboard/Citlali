@@ -54,7 +54,7 @@ public class EventDetailCardData : EventBriefCardData
 
 public class EventFormDto
 {
-    public List<QuestionViewModel> Questions { get; set; } = [new()];
+    public List<QuestionViewModel> Questions { get; set; } = [new(), new(), new(), new(), new(), new(), new()];
 }
 
 public class EventDetailViewModel
