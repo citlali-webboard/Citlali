@@ -19,13 +19,15 @@
     width: 90%;
     margin: 2.5% 5% 2.5% 5%;
     display: flex;
-    height: 70%;
+    /* height: 70%; */
+    height: fit-content;
     flex-direction: row;
     column-gap: 5%;
 }
 
-.profile-header .profile-image {
+.profile-image {
     flex: 0 0 25%;
+    height: fit-content;
 
     margin-top: 2rem;
     display: flex;
@@ -35,8 +37,8 @@
 
     height: 100%;
 }
-.profile-header .profile-image img {
-    max-height: 50%;
+.profile-image img {
+    max-height: 30%;
     width: auto;
     aspect-ratio: 1/1;
     border-radius: 50%;
@@ -47,6 +49,10 @@
 
 .user-info {
     flex: 1;
+    width: 100%;
+    height: fit-content;
+
+
     display: flex;
     flex-direction: column;
     justify-self: center;
@@ -60,7 +66,7 @@
     column-gap: 2rem;
 }
 
-.email {
+.username {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -70,7 +76,7 @@
     color: #666;
 }
 
-.email svg {
+.username svg {
     height: 1rem;
     flex-shrink: 0;
 }
