@@ -1,16 +1,24 @@
+using Supabase;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Citlali.Models;
+using Citlali.Services;
+using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 namespace Citlali.Controllers;
+
+[Route("event")]
 
 public class EventController : Controller
 {
     private readonly ILogger<EventController> _logger;
+    private readonly EventService _eventService;
 
-    public EventController(ILogger<EventController> logger)
+    public EventController(ILogger<EventController> logger, EventService eventService)
     {
         _logger = logger;
+        _eventService = eventService;
     }
 
     public IActionResult Index()
@@ -18,16 +26,30 @@ public class EventController : Controller
         return View();
     }
 
+    [HttpGet("create")]
+    [Authorize]
+    public async Task<IActionResult> Create()
+    {
+        CreateEventViewModel createEventViewModel = new();
+        createEventViewModel.Tags = await _eventService.GetTags();
+
+        return View(createEventViewModel);
+    }
+
+    [HttpPost("createEvent")]
+    public async Task<IActionResult> Create(CreateEventViewModel createEventViewModel)
+    {
+        Console.WriteLine("Create Event");
+        var newEvent = await _eventService.CreateEvent(createEventViewModel);
+        return RedirectToAction("detail", new { id = newEvent.EventId });
+    }
+
+
+    [HttpGet("detail/{id}")]
     public IActionResult Detail(string id)
     {
         EventDetailViewModel eventDetailViewModel = new();
         return View(eventDetailViewModel);
-    }
-
-    public IActionResult Explore()
-    {
-        EventExploreViewModel eventExploreViewModel = new();
-        return View(eventExploreViewModel);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

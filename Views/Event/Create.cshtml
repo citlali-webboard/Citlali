@@ -1,0 +1,100 @@
+@model Citlali.Models.CreateEventViewModel
+
+
+<style>
+    input{
+        border: 1px solid red;
+    }
+</style>
+
+@{ 
+    var testTagId = @Model.Tags[0].TagId; //test
+}
+
+
+<form asp-action="createEvent" method="post" enctype="multipart/form-data">
+    <div class="form-container">
+        <div class="content">
+            <div class="form-content">
+                <div class="form-data">
+                    <div class="form-group">
+                        <label for="EventTitle">Event Title</label>
+                        <input asp-for="EventTitle" class="form-control" />
+                        <span asp-validation-for="EventTitle" class="text-danger"></span>
+                    </div>
+                    <div class="form-group
+                    ">
+                        <label for="EventDescription">Event Description</label>
+                        <input asp-for="EventDescription" class="form-control" />
+                        <span asp-validation-for="EventDescription" class="text-danger"></span>
+                    </div>
+                    <div class="form-group
+                    ">
+                        <label for="EventCategoryTagId">Event Category</label>
+                        <input asp-for="EventCategoryTagId" class="form-control" value="@testTagId"/>
+                        <span asp-validation-for="EventCategoryTagId" class="text-danger"></span>
+                    </div>
+
+                    @foreach (var tag in Model.Tags)
+                    {
+                        <div class="form-group"> 
+                            <span>@tag.TagEmoji</span>
+                            <span>@tag.TagName</span>
+                        </div>
+                    }
+                    
+                    <div class="form-group
+                    ">
+                        <label for="MaxParticipant">Max Participant</label>
+                        <input asp-for="MaxParticipant" class="form-control" />
+                        <span asp-validation-for="MaxParticipant" class="text-danger"></span>
+                    </div>
+                    <div class="form-group
+                    ">
+                        <label for="EventDate">Event Date</label>
+                        <input asp-for="EventDate" class="form-control" />
+                        <span asp-validation-for="EventDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group
+                    ">
+                        <label for="PostExpiryDate">PostExpiryDate</label>
+                        <input asp-for="PostExpiryDate" class="form-control" />
+                        <span asp-validation-for="PostExpiryDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group
+                    ">
+                        <label for="EventLocation">Event Location</label>
+                        <input asp-for="EventLocationTagId" class="form-control" />
+                        <span asp-validation-for="EventLocationTagId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group
+                    ">
+
+                    @* cost *@
+                    <div class="form-group">
+                        <label for="Cost">Cost</label>
+                        <input asp-for="Cost" class="form-control" />
+                        <span asp-validation-for="Cost" class="text-danger"></span>
+                    </div>
+
+                    @* question *@
+                    <div class="form-group">
+                        <span> Question : </span>
+                    </div>
+
+                    <button type="submit" style="border:5px solid red">Create</button>
+
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </div>
+
+
+
+
+
+
+            
+
+</form>

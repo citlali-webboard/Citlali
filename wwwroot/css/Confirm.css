@@ -18,12 +18,12 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-
+    
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
+    
     width: 90vw;
     height: 90vh;
     background: rgb(252, 252, 252);
@@ -80,14 +80,10 @@ form input{
     box-shadow: 0px 0px 2px 1.2px rgba(0, 0, 0, 0.10);
     border: 1px solid var(--text-gray-color);
 }
-
 form input::-webkit-inner-spin-button,
 form input::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
-}
-input[type=number] {
-    -moz-appearance:textfield;
 }
 
 button{
