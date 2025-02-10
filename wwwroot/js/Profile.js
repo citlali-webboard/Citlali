@@ -1,11 +1,10 @@
-
-function openPopup() {
+function openDialog() {
     document.getElementById('edit-popup').style.display = 'flex';
 }
 
-function closePopup() {
-    console.log('close');
+function closeDialog() {
     document.getElementById('edit-popup').style.display = 'none';
+    window.location.reload();       // reload the page to reset the edit form
 }
 
 document.addEventListener("DOMContentLoaded", function () {
