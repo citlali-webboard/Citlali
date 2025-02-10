@@ -27,6 +27,10 @@
   margin-bottom: 8px;
 }
 
+.space-y-4 > *:last-child {
+  margin-bottom: 0;
+}
+
 .tag{
   display: inline-block;
   margin: 3px;

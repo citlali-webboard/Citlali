@@ -3,11 +3,11 @@
 <div class="event-detail detail-column space-y-4">
     <div class="justify-between">
         <h1>@Model.EventTitle</h1>
-        <p>@Model.CurrentParticipant/@Model.MaxParticipant</p>
+        <p>e@Model.CurrentParticipant/@Model.MaxParticipant</p>
     </div>
     <div class="justify-between">
         <span>Posted by @Model.CreatorDisplayName</span>
-        <span>@Model.CreatedAt.ToString("t") @Model.CreatedAt.ToString("d")</span>
+        <span>@Model.CreatedAt.ToString("t") • @Model.CreatedAt.ToString("d")</span>
     </div>
     <div class="tags-container">
         <div class="tag">

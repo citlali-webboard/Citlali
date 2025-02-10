@@ -7,16 +7,16 @@
   padding: 15px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  
+
   z-index: 99999;
-  width: max-content; 
+  width: max-content;
   min-width: 200px;
-  height: auto; 
-  white-space: nowrap; 
+  height: auto;
+  white-space: nowrap;
 }
 
 .error-popup button {
@@ -43,9 +43,11 @@
   --pink-color: #FFC0CB;
   --color-primary: var(--pink-color);
   --color-muted: #6C7086;
+  --color-constructive: #40a02b;
+  --color-destructive: #d20f39;
 
   --max-text-width: 65ch;
-  --max-screen-width: 960px;
+  --max-screen-width: 768px;
 }
 
 body {
