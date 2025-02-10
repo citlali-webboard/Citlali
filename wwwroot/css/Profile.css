@@ -330,7 +330,7 @@ input[type="file"] {
     }
 
     .display-name {
-        flex-direction: column-reverse;
+        flex-direction: column;
         align-items: center;
     }
 
@@ -342,5 +342,53 @@ input[type="file"] {
     .meta-data {
         align-items: center;
         justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .display-name h1 {
+        order: 1;
+        margin: 1rem 0 0 0;
+    }
+
+    .display-name .username {
+        order: 2;
+    }
+
+    .user-bio {
+        text-align: center;
+    }
+
+    .popup-content {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        z-index: 9999;
+    }
+    
+    .popup-navigation {
+        position: sticky;
+    }
+
+    .popup-navigation h1 {
+        font-size: 1.5rem;
+    }
+    
+    .popup-body {
+        margin: 0;
+        padding: 0;
+        flex-direction: column;
+        width: 100%;
+        row-gap: 2rem;
+    }
+
+    .popup-body .popup-profile-image {
+        width: 60%;
+        align-self: center;
+    }
+
+    .popup-info {
+       width: 90% !important;
+       align-self: center;
     }
 }
