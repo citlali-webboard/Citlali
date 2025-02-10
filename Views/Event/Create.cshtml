@@ -9,7 +9,6 @@
 
 @{ 
     var testTagId = @Model.Tags[0].TagId; //test
-    var questionListTest = new List<string> { "What is your favorite color?", "What is your favorite food?", "What is your favorite animal?" };
 }
 
 
@@ -81,10 +80,6 @@
                     @* question *@
                     <div class="form-group">
                         <span> Question : </span>
-                        @foreach (var question in questionListTest)
-                        {
-                            <li>@question</li>
-                        }
                     </div>
 
                     <button type="submit" style="border:5px solid red">Create</button>

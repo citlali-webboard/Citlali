@@ -3,22 +3,47 @@
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
 
-
 namespace Citlali.Models;
 
-public class Event : BaseModel {
-    public Guid EventId = new();
-    public Guid CreatorUserId = new();
-    public string EventTitle = "";
-    public string EventDescription = "";
-    public Guid EventCategoryTagId = new();
-    public Guid EventLocationTagId = new();
-    public int MaxParticipant = 0;
-    public int Cost = 0;
-    public DateTime EventDate = new();
-    public DateTime PostExpiryDate = new();
-    public DateTime CreatedAt = new();
-    public List<QuestionViewModel> Questions = new();
+[Table("EVENTS")]
+public class Event : BaseModel 
+{
+    [PrimaryKey]
+    [Column("EventId")]
+    public Guid EventId { get; set; } = new();
+    
+    [Column("CreatorUserId")]
+    public Guid CreatorUserId { get; set; } = new();
+
+    [Column("EventTitle")]
+    public string EventTitle { get; set; } = "";
+
+    [Column("EventDescription")]
+    public string EventDescription { get; set; } = "";
+
+    [Column("EventCategoryTagId")]
+    public Guid EventCategoryTagId { get; set; } = new();
+
+    [Column("EventLocationTagId")]
+    public Guid EventLocationTagId { get; set; } = new();
+
+    [Column("MaxParticipant")]
+    public int MaxParticipant { get; set; } = 0;
+
+    [Column("Cost")]
+    public int Cost { get; set; } = 0;
+
+    [Column("EventDate")]
+    public DateTime EventDate { get; set; } = new();
+
+    [Column("PostExpiryDate")]
+    public DateTime PostExpiryDate { get; set; } = new();
+    
+    [Column("CreatedAt")]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+  
+    [Column("Deleted")]
+    public bool Deleted { get; set; } = false;
     
 }
 
@@ -90,7 +115,6 @@ public class CreateEventViewModel {
     public int Cost { get; set; } = 0;
     public DateTime EventDate { get; set; } = new();
     public DateTime PostExpiryDate { get; set; } = new();
-    public List<QuestionViewModel> Questions { get; set; } = [];
 
     public List<Tag> Tags { get; set; } = [];
 }

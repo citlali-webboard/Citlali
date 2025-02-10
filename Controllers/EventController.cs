@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace Citlali.Controllers;
 
+[Route("event")]
+
 public class EventController : Controller
 {
     private readonly ILogger<EventController> _logger;
@@ -26,11 +28,17 @@ public class EventController : Controller
         return View();
     }
 
-    [HttpGet("event/create")]
+    [HttpGet("create")]
+    [Authorize]
     public async Task<IActionResult> Create()
     {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return RedirectToAction("SignIn", "Auth");
+        }
+        
         CreateEventViewModel createEventViewModel = new();
-
         createEventViewModel.Tags = await _eventService.GetTags();
         
         return View(createEventViewModel);
@@ -39,11 +47,13 @@ public class EventController : Controller
     [HttpPost("createEvent")]
     public async Task<IActionResult> Create(CreateEventViewModel createEventViewModel)
     {
-        await _eventService.CreateEvent(createEventViewModel);
-        return RedirectToAction("detail", 2);
+        Console.WriteLine("Create Event");
+        var newEvent = await _eventService.CreateEvent(createEventViewModel);
+        return RedirectToAction("detail", new { id = newEvent.EventId });
     }
 
     
+    [HttpGet("detail/{id}")]
     public IActionResult Detail(string id)
     {
         EventDetailViewModel eventDetailViewModel = new();

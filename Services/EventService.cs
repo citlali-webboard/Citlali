@@ -61,15 +61,18 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
             Cost = createEventViewModel.Cost,
             EventDate = createEventViewModel.EventDate,
             PostExpiryDate = createEventViewModel.PostExpiryDate,
-            Questions = createEventViewModel.Questions
         };
 
+        Console.WriteLine(model);
+
+        Console.WriteLine("Before Insert--------------------------------");
         await _supabaseClient
             .From<Event>()
             .Insert(model);
+        Console.WriteLine("After Insert---------------------------------");
 
         return model;
     }
-    
+
     
     }
