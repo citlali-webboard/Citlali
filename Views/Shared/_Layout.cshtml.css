@@ -41,7 +41,9 @@
   --margin-container: 2% 3% 2% 3%;
   --auth-background-color : #F5C2E7;
   --pink-color: #FFC0CB;
+  --pink-saturated: #fd9ae3;
   --color-primary: var(--pink-color);
+  --color-primary-hover: var(--pink-saturated);
   --color-muted: #6C7086;
   --color-constructive: #40a02b;
   --color-destructive: #d20f39;

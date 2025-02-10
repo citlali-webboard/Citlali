@@ -6,6 +6,10 @@ nav {
     background-color: #F5C2E7;
     height: 60px;
     box-shadow: 2px 2px 8px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
 }
 
 .container {
