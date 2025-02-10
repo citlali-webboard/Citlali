@@ -1,52 +1,71 @@
 @model Citlali.Models.AuthLoginDto
-@{
-    string LoginImageUrl = "http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-login.jpg";
+
+@section head {
+  <link rel="stylesheet" href="~/css/Login.css" asp-append-version="true" />
 }
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <title>Sign in</title>
-    <link rel="stylesheet" href="~/css/Login.css" asp-append-version="true" />
-</head>
+@{
+  string LoginImageUrl =
+  "http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-login.jpg";
+}
 
 <div class="form-container">
-    <div class="form-content">
-        <div class="form-img">
-            <img src="@LoginImageUrl" alt="Sign In Illustration">
-        </div>
-        <div class="form-data">
-            <h2>🩷 Citlali 🩷</h2>
-            <div class="form-input">
-                <form asp-action="SignIn" method="post" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="Email">
-                            <svg class="icon-email" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M6.75732 6.22215L11.9865 10.0365L17.3285 6.09078C18.1446 5.44632 19.191 5.33494 20.046 5.76509C20.9153 6.20242 21.5 7.1513 21.5 8.44705V16.7618C21.5 17.2333 21.4407 17.9088 21.0814 18.4781C20.6956 19.0893 20.019 19.4943 18.9793 19.4943H16.889C16.6129 19.4943 16.389 19.2704 16.389 18.9943V13.2008L12.2867 16.2518C12.1093 16.3838 11.8662 16.3835 11.689 16.2511L7.61098 13.2036V16.7186C7.61098 16.9947 7.38713 17.2186 7.11098 17.2186C6.83484 17.2186 6.61098 16.9947 6.61098 16.7186V12.2058C6.61098 12.0165 6.71781 11.8435 6.88699 11.7588C7.05617 11.674 7.25871 11.692 7.41029 11.8053L11.9891 15.2269L16.5906 11.8046C16.7423 11.6918 16.9446 11.6741 17.1135 11.759C17.2824 11.8439 17.389 12.0168 17.389 12.2058V18.4943H18.9793C19.7234 18.4943 20.0572 18.2272 20.2358 17.9443C20.4408 17.6194 20.5 17.1787 20.5 16.7618V8.44705C20.5 7.46479 20.0744 6.89879 19.5966 6.65841C19.1071 6.41213 18.4732 6.45826 17.9434 6.87938C17.9388 6.88305 17.9341 6.88664 17.9294 6.89014L12.2854 11.0589C12.1097 11.1887 11.8701 11.1894 11.6937 11.0607L6.16182 7.02554C5.66596 6.65592 4.93253 6.43285 4.36979 6.51816C4.10149 6.55884 3.89833 6.66433 3.75932 6.82883C3.62023 6.99343 3.5 7.27084 3.5 7.74087V17.1491C3.5 17.8103 3.73627 18.1246 3.96224 18.2868C4.21573 18.4688 4.53566 18.5148 4.74399 18.4962C4.75875 18.4949 4.77357 18.4943 4.78839 18.4943H6.11098C6.38713 18.4943 6.61098 18.7181 6.61098 18.9943C6.61098 19.2704 6.38713 19.4943 6.11098 19.4943H4.80887C4.42163 19.5237 3.86072 19.445 3.37906 19.0992C2.85986 18.7264 2.5 18.0915 2.5 17.1491V7.74087C2.5 7.09846 2.66719 6.57192 2.99552 6.18339C3.32393 5.79476 3.7682 5.59794 4.2199 5.52946C5.09621 5.39661 6.09189 5.72702 6.75732 6.22215Z" fill="#000000"></path> </g></svg>
-                        </label>
-                        <input asp-for="Email" id="Email" placeholder="Email" />
-                        <span asp-validation-for="Email"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="Password">
-                            <svg class="icon-lock" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12 14V18" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> <path d="M11 22H8C5.17157 22 3.75736 22 2.87868 21.1213C2 20.2426 2 18.8284 2 16C2 13.1716 2 11.7574 2.87868 10.8787C3.75736 10 5.17157 10 8 10H16C18.8284 10 20.2426 10 21.1213 10.8787C22 11.7574 22 13.1716 22 16C22 18.8284 22 20.2426 21.1213 21.1213C20.2426 22 18.8284 22 16 22H15" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> <path d="M6 10V8C6 7.65929 6.0284 7.32521 6.08296 7M17.811 6.5C17.1449 3.91216 14.7958 2 12 2C10.223 2 8.62643 2.7725 7.52779 4" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
-                        </label>
-                        <input asp-for="Password" id="Password" placeholder="Password" type="password" />
-                        <span asp-validation-for="Password"></span>
-                    </div>
-
-                    <div class="options">
-                        <a href="#">Forgot password?</a>
-                    </div>
-
-                    <button type="submit" class="btn-submit">Sign in</button>
-                </form>
-            </div>
-
-            <div class="sign-up">
-                Don't have an account? <a href="/auth/signup">Sign up</a>
-            </div>
-        </div>
+  <div class="form-content">
+    <div class="form-img">
+      <img src="@LoginImageUrl" alt="Sign In Illustration">
     </div>
+    <div class="form-data">
+      <h2>🩷 Citlali 🩷</h2>
+      <div class="form-input">
+        <form asp-action="SignIn" method="post" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="Email">
+              <svg class="icon-email" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M6.75732 6.22215L11.9865 10.0365L17.3285 6.09078C18.1446 5.44632 19.191 5.33494 20.046 5.76509C20.9153 6.20242 21.5 7.1513 21.5 8.44705V16.7618C21.5 17.2333 21.4407 17.9088 21.0814 18.4781C20.6956 19.0893 20.019 19.4943 18.9793 19.4943H16.889C16.6129 19.4943 16.389 19.2704 16.389 18.9943V13.2008L12.2867 16.2518C12.1093 16.3838 11.8662 16.3835 11.689 16.2511L7.61098 13.2036V16.7186C7.61098 16.9947 7.38713 17.2186 7.11098 17.2186C6.83484 17.2186 6.61098 16.9947 6.61098 16.7186V12.2058C6.61098 12.0165 6.71781 11.8435 6.88699 11.7588C7.05617 11.674 7.25871 11.692 7.41029 11.8053L11.9891 15.2269L16.5906 11.8046C16.7423 11.6918 16.9446 11.6741 17.1135 11.759C17.2824 11.8439 17.389 12.0168 17.389 12.2058V18.4943H18.9793C19.7234 18.4943 20.0572 18.2272 20.2358 17.9443C20.4408 17.6194 20.5 17.1787 20.5 16.7618V8.44705C20.5 7.46479 20.0744 6.89879 19.5966 6.65841C19.1071 6.41213 18.4732 6.45826 17.9434 6.87938C17.9388 6.88305 17.9341 6.88664 17.9294 6.89014L12.2854 11.0589C12.1097 11.1887 11.8701 11.1894 11.6937 11.0607L6.16182 7.02554C5.66596 6.65592 4.93253 6.43285 4.36979 6.51816C4.10149 6.55884 3.89833 6.66433 3.75932 6.82883C3.62023 6.99343 3.5 7.27084 3.5 7.74087V17.1491C3.5 17.8103 3.73627 18.1246 3.96224 18.2868C4.21573 18.4688 4.53566 18.5148 4.74399 18.4962C4.75875 18.4949 4.77357 18.4943 4.78839 18.4943H6.11098C6.38713 18.4943 6.61098 18.7181 6.61098 18.9943C6.61098 19.2704 6.38713 19.4943 6.11098 19.4943H4.80887C4.42163 19.5237 3.86072 19.445 3.37906 19.0992C2.85986 18.7264 2.5 18.0915 2.5 17.1491V7.74087C2.5 7.09846 2.66719 6.57192 2.99552 6.18339C3.32393 5.79476 3.7682 5.59794 4.2199 5.52946C5.09621 5.39661 6.09189 5.72702 6.75732 6.22215Z"
+                    fill="#000000"></path>
+                </g>
+              </svg>
+            </label>
+            <input asp-for="Email" id="Email" placeholder="Email" />
+            <span asp-validation-for="Email"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="Password">
+              <svg class="icon-lock" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                  <path d="M12 14V18" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round">
+                  </path>
+                  <path
+                    d="M11 22H8C5.17157 22 3.75736 22 2.87868 21.1213C2 20.2426 2 18.8284 2 16C2 13.1716 2 11.7574 2.87868 10.8787C3.75736 10 5.17157 10 8 10H16C18.8284 10 20.2426 10 21.1213 10.8787C22 11.7574 22 13.1716 22 16C22 18.8284 22 20.2426 21.1213 21.1213C20.2426 22 18.8284 22 16 22H15"
+                    stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path>
+                  <path
+                    d="M6 10V8C6 7.65929 6.0284 7.32521 6.08296 7M17.811 6.5C17.1449 3.91216 14.7958 2 12 2C10.223 2 8.62643 2.7725 7.52779 4"
+                    stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path>
+                </g>
+              </svg>
+            </label>
+            <input asp-for="Password" id="Password" placeholder="Password" type="password" />
+            <span asp-validation-for="Password"></span>
+          </div>
+
+          <div class="options">
+            <a href="#">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn-submit">Sign in</button>
+        </form>
+      </div>
+
+      <div class="sign-up">
+        Don't have an account? <a href="/auth/signup">Sign up</a>
+      </div>
+    </div>
+  </div>
 </div>

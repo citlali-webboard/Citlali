@@ -41,6 +41,10 @@ body {
     padding: 4% 10%;
 }
 
+.form-content > svg {
+    padding: 1rem;
+}
+
 :where(.form-content, form, .input-field){
     display: flex;
     flex-direction: column;
@@ -96,12 +100,7 @@ button{
     pointer-events: none;
 }
 
-button.active{
-    pointer-events: auto;
-    background-color: #fd9ae3;
-}
-
-button:hover{
+.form-group > button:hover{
     background-color: #fd9ae3;
     cursor: pointer;
 }
