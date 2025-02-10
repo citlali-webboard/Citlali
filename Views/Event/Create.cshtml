@@ -28,21 +28,25 @@
                         <input asp-for="EventDescription" class="form-control" />
                         <span asp-validation-for="EventDescription" class="text-danger"></span>
                     </div>
-                    <div class="form-group
+                    @* <div class="form-group
                     ">
                         <label for="EventCategoryTagId">Event Category</label>
                         <input asp-for="EventCategoryTagId" class="form-control" value="@testTagId"/>
                         <span asp-validation-for="EventCategoryTagId" class="text-danger"></span>
+                    </div> *@
+
+                    <div class="form-group">
+                        <select name="EventCategoryTagId" id="EventCategoryTagId" asp-for="EventCategoryTagId" class="form-control">
+                            <option value="">-- Select Tag --</option>
+                            @foreach (var tag in Model.Tags)
+                            {
+                                <option value="@tag.TagId">@tag.TagName @tag.TagEmoji</option>
+                            }
+                        </select>
+                        <span asp-validation-for="EventCategoryTagId" class="text-danger"></span>
                     </div>
 
-                    @foreach (var tag in Model.Tags)
-                    {
-                        <div class="form-group"> 
-                            <span>@tag.TagEmoji</span>
-                            <span>@tag.TagName</span>
-                        </div>
-                    }
-                    
+                     
                     <div class="form-group
                     ">
                         <label for="MaxParticipant">Max Participant</label>
@@ -61,12 +65,19 @@
                         <input asp-for="PostExpiryDate" class="form-control" />
                         <span asp-validation-for="PostExpiryDate" class="text-danger"></span>
                     </div>
-                    <div class="form-group
-                    ">
-                        <label for="EventLocation">Event Location</label>
-                        <input asp-for="EventLocationTagId" class="form-control" />
+
+                    <div class="form-group">
+                        <select name="EventLocationTagId" id="EventLocationTagId" asp-for="EventLocationTagId" class="form-control">
+                            <option value="">-- Select Location --</option>
+                            @foreach (var location in Model.LocationTags)
+                            {
+                                <option value="@location.EventLocationTagId">@location.EventLocationTagName</option>
+                            }
+                        </select>
                         <span asp-validation-for="EventLocationTagId" class="text-danger"></span>
+
                     </div>
+
                     <div class="form-group
                     ">
 

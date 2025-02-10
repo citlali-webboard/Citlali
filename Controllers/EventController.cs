@@ -32,6 +32,7 @@ public class EventController : Controller
     {
         CreateEventViewModel createEventViewModel = new();
         createEventViewModel.Tags = await _eventService.GetTags();
+        createEventViewModel.LocationTags = await _eventService.GetLocationTags();
 
         return View(createEventViewModel);
     }

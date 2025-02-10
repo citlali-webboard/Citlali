@@ -35,9 +35,28 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
             }
         }
 
-        Console.WriteLine(tags);
         return tags;   
     }
+
+    public async Task<List<Location>> GetLocationTags()
+    {
+        var response = await _supabaseClient
+            .From<LocationTag>()
+            .Select("*")
+            .Get();
+
+        var locations = new List<Location>();
+        
+        if (response != null){
+            foreach (var location in response.Models)
+            {
+                locations.Add(new Location { EventLocationTagId = location.EventLocationTagId,
+                                             EventLocationTagName = location.EventLocationTagName });
+            }
+        }
+
+        return locations;
+    } 
 
     public async Task<Event> CreateEvent(CreateEventViewModel createEventViewModel)
     {
@@ -63,7 +82,7 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
             PostExpiryDate = createEventViewModel.PostExpiryDate,
         };
 
-        Console.WriteLine(model);
+        Console.WriteLine(model.EventLocationTagId);
 
         Console.WriteLine("Before Insert--------------------------------");
         await _supabaseClient
