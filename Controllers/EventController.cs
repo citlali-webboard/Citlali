@@ -32,12 +32,6 @@ public class EventController : Controller
     [Authorize]
     public async Task<IActionResult> Create()
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
-        if (currentUser == null)
-        {
-            return RedirectToAction("SignIn", "Auth");
-        }
-        
         CreateEventViewModel createEventViewModel = new();
         createEventViewModel.Tags = await _eventService.GetTags();
         
