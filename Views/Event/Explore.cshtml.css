@@ -11,6 +11,7 @@
 .main-container {
   width: 100%;
   max-width: var(--max-screen-width);
+  padding: 0 1rem;
 }
 
 .detail-column {
