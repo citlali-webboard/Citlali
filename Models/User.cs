@@ -12,10 +12,13 @@ public class User : BaseModel
 {
         [PrimaryKey]
         [Column("UserId")]
-        public Guid UserId { get; set; } // Linked to Supabase Auth
+        public Guid UserId { get; set; }
 
         [Column("Email")]
         public string Email { get; set; } = "";
+
+        [Column("Username")]
+        public string Username { get; set; } = "";
 
         [Column("ProfileImageURL")]
         public string ProfileImageUrl { get; set; } = "";
