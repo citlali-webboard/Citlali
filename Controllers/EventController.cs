@@ -13,10 +13,8 @@ namespace Citlali.Controllers;
 public class EventController : Controller
 {
     private readonly ILogger<EventController> _logger;
-    private readonly Supabase.Client _supabaseClient;
-    private readonly UserService _userService;
     private readonly EventService _eventService;
-    
+
     public EventController(ILogger<EventController> logger, EventService eventService)
     {
         _logger = logger;
@@ -34,7 +32,7 @@ public class EventController : Controller
     {
         CreateEventViewModel createEventViewModel = new();
         createEventViewModel.Tags = await _eventService.GetTags();
-        
+
         return View(createEventViewModel);
     }
 
@@ -46,18 +44,12 @@ public class EventController : Controller
         return RedirectToAction("detail", new { id = newEvent.EventId });
     }
 
-    
+
     [HttpGet("detail/{id}")]
     public IActionResult Detail(string id)
     {
         EventDetailViewModel eventDetailViewModel = new();
         return View(eventDetailViewModel);
-    }
-
-    public IActionResult Explore()
-    {
-        EventExploreViewModel eventExploreViewModel = new();
-        return View(eventExploreViewModel);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

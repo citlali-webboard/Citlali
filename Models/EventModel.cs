@@ -1,7 +1,6 @@
-// using System.ComponentModel.DataAnnotations;
-// using System.ComponentModel.DataAnnotations.Schema;
-using Supabase.Postgrest.Attributes;
+using System.ComponentModel.DataAnnotations;
 using Supabase.Postgrest.Models;
+using Supabase.Postgrest.Attributes;
 
 namespace Citlali.Models;
 
@@ -25,13 +24,6 @@ public class EventQuestion : BaseModel
     public Guid EventQuestionId = new();
     public Guid EventId = new();
     public string Question = "Question";
-}
-
-public class EventCategoryTag
-{
-    public Guid EventCategoryTagId = new();
-    public string EventCategoryTagName = "FOOD!!!!";
-    public string EventCategoryTagEmoji = "😋";
 }
 
 public class EventLocationTag
@@ -70,11 +62,47 @@ public class QuestionViewModel
 {
     public Guid EventQuestionId { get; set; }
     public string Question { get; set; } = "Question Question";
-    // [Required(ErrorMessage = "This field is required")]
+    [Required(ErrorMessage = "This field is required")]
     public string Answer { get; set; } = "Answer Answer";
 }
 
 public class EventExploreViewModel
 {
     public EventBriefCardData[] EventBriefCardDatas = [new()];
+}
+
+[Table("EVENT_CATEGORY_TAG")]
+public class EventCategoryTag : BaseModel {
+    [PrimaryKey]
+    [Column("EventCategoryTagId")]
+    public Guid EventCategoryTagId { get; set; } = new();
+
+    [Column("EventCategoryTagEmoji")]
+    public string EventCategoryTagEmoji { get; set; } = "";
+
+    [Column("EventCategoryTagName")]
+    public string EventCategoryTagName { get; set; } = "";
+
+    [Column("Deleted")]
+    public bool Deleted { get; set; } = false;
+}
+
+public class Tag{
+    public Guid TagId = new();
+    public string TagEmoji = "";
+    public string TagName = "";
+}
+
+
+public class CreateEventViewModel {
+    public string EventTitle { get; set; } = "";
+    public string EventDescription { get; set; } = "";
+    public Guid EventCategoryTagId { get; set; } = new();
+    public Guid EventLocationTagId { get; set; } = new();
+    public int MaxParticipant { get; set; } = 0;
+    public int Cost { get; set; } = 0;
+    public DateTime EventDate { get; set; } = new();
+    public DateTime PostExpiryDate { get; set; } = new();
+
+    public List<Tag> Tags { get; set; } = [];
 }

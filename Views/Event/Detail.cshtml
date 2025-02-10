@@ -8,22 +8,22 @@
     <div class="detail-main-container">
         <div class="event-detail detail-column space-y-4">
             <div class="justify-between">
-                <h1>@Model.EventTitle</h1>
-                <p>@Model.CurrentParticipant/@Model.MaxParticipant</p>
+                <h1>@Model.EventDetailCardData.EventTitle</h1>
+                <p>@Model.EventDetailCardData.CurrentParticipant/@Model.EventDetailCardData.MaxParticipant</p>
             </div>
             <div class="justify-between">
-                <span>Posted by @Model.CreatorDisplayName</span>
-                <span>@Model.CreatedAt.ToString("t") @Model.CreatedAt.ToString("d")</span>
+                <span>Posted by @Model.EventDetailCardData.CreatorDisplayName</span>
+                <span>@Model.EventDetailCardData.CreatedAt.ToString("t") @Model.EventDetailCardData.CreatedAt.ToString("d")</span>
             </div>
             <div class="tags-container">
                 <div class="tags" id="tags">
                     <div class="tag">
-                        <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
-                        <span>@Model.EventCategoryTag.EventCategoryTagName</span>
+                        <span>@Model.EventDetailCardData.EventCategoryTag.EventCategoryTagEmoji</span>
+                        <span>@Model.EventDetailCardData.EventCategoryTag.EventCategoryTagName</span>
                     </div>
                 </div>
             </div>
-            <p>@Model.EventDescription</p>
+            <p>@Model.EventDetailCardData.EventDescription</p>
         </div>
         <div class="pad"></div>
         <div class="event-form detail-column">
