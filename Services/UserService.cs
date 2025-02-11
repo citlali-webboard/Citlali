@@ -1,6 +1,7 @@
 using Citlali.Models;
 using Supabase;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Citlali.Services;
 
@@ -41,17 +42,22 @@ public class UserService
 
             if (supabaseUser?.Id == null)
             {
-                throw new Exception($"Error during user creation.");
+                throw new Exception("Error during user creation.");
             }
 
             if (supabaseUser?.Email == null)
             {
-                throw new Exception($"Error during user creation.");
+                throw new Exception("Error during user creation.");
             }
 
             if (userOnboardingDto.ProfileImage != null)
             {
                 profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? _configuration.User.DefaultProfileImage;
+            }
+
+            if (!IsUsernameValid(userOnboardingDto.Username))
+            {
+                throw new InvalidUsernameException();
             }
 
             var dbUser = new User
@@ -69,9 +75,13 @@ public class UserService
                 .Insert(dbUser);
 
             return dbUser;
-        } catch(Exception e) {
-           var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
-            string msgError = errorJson.GetProperty("msg").GetString()??"";
+        }
+        catch (InvalidUsernameException) {
+            throw new InvalidUsernameException();
+        }
+         catch(Exception e) {
+            var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
+            string msgError = errorJson.GetProperty("msg").GetString() ?? "";
             Console.WriteLine(msgError);
             throw new Exception(msgError);
         }
@@ -84,13 +94,13 @@ public class UserService
 
         if (supabaseUser?.Id == null || supabaseUser?.Email == null)
         {
-            throw new Exception($"Error during user editing.");
+            throw new Exception("Error during user editing.");
         }
 
         var model = await GetUserByUserId(Guid.Parse(supabaseUser.Id));
         if (model == null)
         {
-            throw new Exception($"Error during user editing.");
+            throw new Exception("Error during user editing.");
         }
 
         if (userOnboardingDto.ProfileImage != null)
@@ -116,6 +126,16 @@ public class UserService
         var response = await _supabaseClient
             .From<User>()
             .Where(row => row.Email == email)
+            .Single();
+
+        return response ?? null;
+    }
+
+    public async Task<User?> GetUserByUsername(string username)
+    {
+        var response = await _supabaseClient
+            .From<User>()
+            .Where(row => row.Username == username)
             .Single();
 
         return response ?? null;
@@ -191,4 +211,19 @@ public class UserService
         }
     }
 
+    public bool IsUsernameValid(string username)
+    {
+        return Regex.IsMatch(username, @"^[A-Za-z][A-Za-z0-9_]{3,29}$");
+    }
+
+}
+
+public class InvalidUsernameException : Exception
+{
+    public InvalidUsernameException() : base("Invalid username.") { }
+
+    public InvalidUsernameException(string message) : base(message) { }
+
+    public InvalidUsernameException(string message, Exception innerException) 
+        : base(message, innerException) { }
 }

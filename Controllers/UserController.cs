@@ -59,20 +59,32 @@ public class UserController : Controller
     public async Task<IActionResult> Create(UserOnboardingDto user)
     {
         try {
+            if (!await _userService.RedirectToOnboarding()) {
+                return RedirectToAction("Profile");
+            }
+
             if (string.IsNullOrEmpty(user.DisplayName)) {
                 TempData["Error"] = "Display name is required.";
                 return RedirectToAction("Onboarding");
             }
 
-            if (!await _userService.RedirectToOnboarding()) {
-                RedirectToAction("Profile");
+            if (await _userService.GetUserByUsername(user.Username) != null) {
+                TempData["Error"] = "Username is already taken.";
+                return RedirectToAction("Onboarding");
             }
+
             var userCreated = await _userService.CreateUser(user);
             if (userCreated == null) {
+                TempData["Error"] = "Something went wrong. Please try again.";
                 return RedirectToAction("Onboarding");
             }
             return RedirectToAction("Profile");
-        } catch (Exception ex){
+        } 
+        catch (InvalidUsernameException ex) {
+            TempData["Error"] = ex.Message;
+            return RedirectToAction("Onboarding");
+        }
+        catch (Exception ex) {
             Console.WriteLine(ex.Message);
             TempData["Error"] = "Something went wrong. Please try again.";
             return RedirectToAction("Onboarding");
