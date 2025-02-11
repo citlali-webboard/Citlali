@@ -17,8 +17,8 @@ RUN dotnet publish --no-restore -a $TARGETARCH -o /app
 # https://github.com/dotnet/dotnet-docker/blob/main/samples/enable-globalization.md
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
-EXPOSE 8080
+EXPOSE 8000
 WORKDIR /app
 COPY --link --from=build /app .
 USER $APP_UID
-ENTRYPOINT ["."]
+ENTRYPOINT ["./Citlali"]
