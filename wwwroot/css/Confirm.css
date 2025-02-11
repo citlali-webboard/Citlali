@@ -7,9 +7,22 @@ body {
 
 .logo{
     background-color: #F5C2E7;
-    border-radius: 50vh;
-    width: 14%;
-    padding: 20px;
+    border-radius: 5100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 5rem;
+    height: 5rem;
+    padding: 1rem;
+}
+
+.logo:hover{
+    background-color: #fd9ae3;
+    transition: .2s;
+}
+
+.logo svg {
+    fill: white !important;
 }
 
 /* Form container */
@@ -18,12 +31,12 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    
+
     width: 90vw;
     height: 90vh;
     background: rgb(252, 252, 252);
@@ -103,10 +116,4 @@ button{
 .form-group > button:hover{
     background-color: #fd9ae3;
     cursor: pointer;
-}
-
-
-.logo:hover{
-    background-color: #fd9ae3;
-    transition: .2s;
 }
