@@ -1,6 +1,7 @@
 .window {
     width: 100vw;
-    height: 100vh;
+    min-height: calc(100vh - var(--navbar-size));
+    margin-top: var(--navbar-size);
     
     display: flex;
     flex-direction: column;
