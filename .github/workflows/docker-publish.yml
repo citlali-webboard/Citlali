@@ -104,6 +104,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd citlali/
+            git pull
             docker compose pull
             docker compose down
             docker compose up -d
