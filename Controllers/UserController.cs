@@ -81,28 +81,28 @@ public class UserController : Controller
     }
 
     [HttpGet("profile")]
-    // [Authorize]
+    [Authorize]
     public async Task<IActionResult> Profile()
     {
         try
         {
-            // var currentUser = _supabaseClient.Auth.CurrentUser;
+            var currentUser = _supabaseClient.Auth.CurrentUser;
 
-            // if (currentUser == null)
-            // {
-            //     Console.WriteLine("User is not authenticated.");
-            //     return RedirectToAction("SignIn", "Auth");
-            // }
+            if (currentUser == null)
+            {
+                Console.WriteLine("User is not authenticated.");
+                return RedirectToAction("SignIn", "Auth");
+            }
 
-            // var userId = currentUser.Id;
-            // if (string.IsNullOrEmpty(userId))
-            // {
-            //     Console.WriteLine("User ID is null");
-            //     return RedirectToAction("Onboarding");
-            // }
+            var userId = currentUser.Id;
+            if (string.IsNullOrEmpty(userId))
+            {
+                Console.WriteLine("User ID is null");
+                return RedirectToAction("Onboarding");
+            }
 
-            // var user = await _userService.GetUserByUserId(Guid.Parse(userId));
-            var user = await _userService.GetUserByEmail("paratpanu18@gmail.com");
+            var user = await _userService.GetUserByUserId(Guid.Parse(userId));
+
             if (user == null)
             {
                 Console.WriteLine("User not found in DB");
