@@ -1,94 +1,127 @@
 @model Citlali.Models.User
 
-<form asp-controller="Auth" asp-action="SignOut" method="post">
-  <button type="submit" class="btn btn-danger">Sign Out</button>
-</form>
+@section head{
+  <link rel="stylesheet" href="~/css/Profile.css" asp-append-version="true" />
+  <script src="~/js/Profile.js" asp-append-version="true"></script>
+}
+
+@{
+  ViewData["Title"] = "Profile";
+}
 
 
 <partial name="_NavBar" />
+<div class="window">
+  
+  <form asp-controller="Auth" asp-action="SignOut" method="post">
+    <button type="submit" class="btn btn-danger">Sign Out</button>
+  </form>
 
-<div class="container" id="container">
-  <div class="profile">
-    <div class="pf_and_btn">
-      <div style="
-              width: 300px;
-              height: 300px;
-              background-color: grey;
-              border-radius: 50%;
-            " class="pf_img">
-        <img id="pf_image" src="@Model.ProfileImageUrl" alt=""
-          style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-      </div>
-      <input type="file" id="image_inp" accept="image/*" style="display: none;">
-      <button id="editProfileBtn" onclick="openPopup()">
-        Edit profile
-      </button>
-      @* onclick="toggleEditPopup('@Html.Raw(Model.ProfileImageUrl)', '@Html.Raw(Model.DisplayName)', '@Html.Raw(Model.UserBio)')" *@
-    </div>
-
-    <div class="pf_detail">
-      <div class="pf_usr">
-        <h1 contenteditable="false" id="username">@Model.DisplayName</h1>
-
-      </div>
-
-      <div>
-        <div class="pf_stat">
-          <p>22 post</p>
-          <p>33 followers</p>
-          <p>44 following</p>
+  <div class="edit-popup" id="edit-popup">
+    <div class="popup-content">
+      <form class="edit_form" asp-controller="User" asp-action="edit" method="post" enctype="multipart/form-data">
+        <div class="popup-navigation">
+          <a class="popup-action-button" onclick="closeDialog()">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10.0303 8.96965C9.73741 8.67676 9.26253 8.67676 8.96964 8.96965C8.67675 9.26255 8.67675 9.73742 8.96964 10.0303L10.9393 12L8.96966 13.9697C8.67677 14.2625 8.67677 14.7374 8.96966 15.0303C9.26255 15.3232 9.73743 15.3232 10.0303 15.0303L12 13.0607L13.9696 15.0303C14.2625 15.3232 14.7374 15.3232 15.0303 15.0303C15.3232 14.7374 15.3232 14.2625 15.0303 13.9696L13.0606 12L15.0303 10.0303C15.3232 9.73744 15.3232 9.26257 15.0303 8.96968C14.7374 8.67678 14.2625 8.67678 13.9696 8.96968L12 10.9393L10.0303 8.96965Z" fill="#666"></path> <path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.25C6.06294 1.25 1.25 6.06294 1.25 12C1.25 17.9371 6.06294 22.75 12 22.75C17.9371 22.75 22.75 17.9371 22.75 12C22.75 6.06294 17.9371 1.25 12 1.25ZM2.75 12C2.75 6.89137 6.89137 2.75 12 2.75C17.1086 2.75 21.25 6.89137 21.25 12C21.25 17.1086 17.1086 21.25 12 21.25C6.89137 21.25 2.75 17.1086 2.75 12Z" fill="#666"></path> </g></svg>
+          </a>
+          <h1>Edit Profile</h1>
+          <button type="submit" class="popup-action-button">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="System / Save"> <path id="Vector" d="M17 21.0002L7 21M17 21.0002L17.8031 21C18.921 21 19.48 21 19.9074 20.7822C20.2837 20.5905 20.5905 20.2843 20.7822 19.908C21 19.4806 21 18.921 21 17.8031V9.21955C21 8.77072 21 8.54521 20.9521 8.33105C20.9095 8.14 20.8393 7.95652 20.7432 7.78595C20.6366 7.59674 20.487 7.43055 20.1929 7.10378L17.4377 4.04241C17.0969 3.66374 16.9242 3.47181 16.7168 3.33398C16.5303 3.21 16.3242 3.11858 16.1073 3.06287C15.8625 3 15.5998 3 15.075 3H6.2002C5.08009 3 4.51962 3 4.0918 3.21799C3.71547 3.40973 3.40973 3.71547 3.21799 4.0918C3 4.51962 3 5.08009 3 6.2002V17.8002C3 18.9203 3 19.4796 3.21799 19.9074C3.40973 20.2837 3.71547 20.5905 4.0918 20.7822C4.5192 21 5.07899 21 6.19691 21H7M17 21.0002V17.1969C17 16.079 17 15.5192 16.7822 15.0918C16.5905 14.7155 16.2837 14.4097 15.9074 14.218C15.4796 14 14.9203 14 13.8002 14H10.2002C9.08009 14 8.51962 14 8.0918 14.218C7.71547 14.4097 7.40973 14.7155 7.21799 15.0918C7 15.5196 7 16.0801 7 17.2002V21M15 7H9" stroke="#666" stroke-width="1.44" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
+          </button>      
         </div>
-        <p contenteditable="false" id="email">@Model.Email</p>
-        <p contenteditable="false" id="bio">@Model.UserBio</p>
+
+        <div class="popup-body">
+          <div class="popup-profile-image">
+              <img src="@Model.ProfileImageUrl" alt="Profile Image" id="profilePreview" />
+                <label for="profileImage" class="upload-button">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 21H9C6.17157 21 4.75736 21 3.87868 20.1213C3 19.2426 3 17.8284 3 15M21 15C21 17.8284 21 19.2426 20.1213 20.1213C19.8215 20.4211 19.4594 20.6186 19 20.7487" 
+                            stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> 
+                        <path d="M12 16V3M12 3L16 7.375M12 3L8 7.375" 
+                            stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> 
+                    </svg>
+                    Upload image...
+                </label>
+              <input type="file" id="profileImage" name="ProfileImage" style="display: none;" />
+          </div>
+
+          <div class="popup-info">
+            <div class="form-group">
+              <label for="Email">Email</label>
+                  <input asp-for="Email" class="form-control disabled-input" value=@Model.Email id="Email" disabled />
+                  <span asp-validation-for="Email" class="text-danger"></span>
+              </div>
+
+              <div class="form-group">
+                  <label for="Username">Username</label>
+                  <input asp-for="Username" class="form-control" id="Username" />
+                  <span asp-validation-for="Username" class="text-danger"></span>
+              </div>
+
+              <div class="form-group">
+                  <label for="DisplayName">Display Name</label>
+                  <input asp-for="DisplayName" class="form-control" id="DisplayName" />
+                  <span asp-validation-for="DisplayName" class="text-danger"></span>
+              </div>
+
+              <div class="form-group" id="bio">
+                  <label for="UserBio">User Bio</label>
+                  <textarea asp-for="UserBio" id="UserBio" rows="3"></textarea>
+                  <span asp-validation-for="UserBio" class="text-danger"></span>
+              </div>
+          </div>
+            
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-image">
+        <img src=@Model.ProfileImageUrl alt="Profile Image" />
+      </div>
+      <div class="user-info">
+        <div class="display-name">
+          <h1>@Model.DisplayName</h1>
+          <p class="username">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="12" cy="6" r="4" stroke="#666" stroke-width="1.5"></circle> <path d="M19.9975 18C20 17.8358 20 17.669 20 17.5C20 15.0147 16.4183 13 12 13C7.58172 13 4 15.0147 4 17.5C4 19.9853 4 22 12 22C14.231 22 15.8398 21.8433 17 21.5634" stroke="#666" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
+              @Model.Username
+          </p>
+          <div class="button-group">
+            <a class="action-button" id="edit-button" onclick="openDialog()"> 
+              <svg viewBox="0 -0.5 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M13.2942 7.95881C13.5533 7.63559 13.5013 7.16358 13.178 6.90453C12.8548 6.64549 12.3828 6.6975 12.1238 7.02072L13.2942 7.95881ZM6.811 14.8488L7.37903 15.3385C7.38489 15.3317 7.39062 15.3248 7.39623 15.3178L6.811 14.8488ZM6.64 15.2668L5.89146 15.2179L5.8908 15.2321L6.64 15.2668ZM6.5 18.2898L5.7508 18.2551C5.74908 18.2923 5.75013 18.3296 5.75396 18.3667L6.5 18.2898ZM7.287 18.9768L7.31152 19.7264C7.36154 19.7247 7.41126 19.7181 7.45996 19.7065L7.287 18.9768ZM10.287 18.2658L10.46 18.9956L10.4716 18.9927L10.287 18.2658ZM10.672 18.0218L11.2506 18.4991L11.2571 18.491L10.672 18.0218ZM17.2971 10.959C17.5562 10.6358 17.5043 10.1638 17.1812 9.90466C16.8581 9.64552 16.386 9.69742 16.1269 10.0206L17.2971 10.959ZM12.1269 7.02052C11.8678 7.34365 11.9196 7.81568 12.2428 8.07484C12.5659 8.33399 13.0379 8.28213 13.2971 7.95901L12.1269 7.02052ZM14.3 5.50976L14.8851 5.97901C14.8949 5.96672 14.9044 5.95412 14.9135 5.94123L14.3 5.50976ZM15.929 5.18976L16.4088 4.61332C16.3849 4.59344 16.3598 4.57507 16.3337 4.5583L15.929 5.18976ZM18.166 7.05176L18.6968 6.52192C18.6805 6.50561 18.6635 6.49007 18.6458 6.47532L18.166 7.05176ZM18.5029 7.87264L19.2529 7.87676V7.87676L18.5029 7.87264ZM18.157 8.68976L17.632 8.15412C17.6108 8.17496 17.5908 8.19704 17.5721 8.22025L18.157 8.68976ZM16.1271 10.0203C15.8678 10.3433 15.9195 10.8153 16.2425 11.0746C16.5655 11.3339 17.0376 11.2823 17.2969 10.9593L16.1271 10.0203ZM13.4537 7.37862C13.3923 6.96898 13.0105 6.68666 12.6009 6.74805C12.1912 6.80943 11.9089 7.19127 11.9703 7.60091L13.4537 7.37862ZM16.813 11.2329C17.2234 11.1772 17.5109 10.7992 17.4552 10.3888C17.3994 9.97834 17.0215 9.69082 16.611 9.74659L16.813 11.2329ZM12.1238 7.02072L6.22577 14.3797L7.39623 15.3178L13.2942 7.95881L12.1238 7.02072ZM6.24297 14.359C6.03561 14.5995 5.91226 14.9011 5.89159 15.218L7.38841 15.3156C7.38786 15.324 7.38457 15.3321 7.37903 15.3385L6.24297 14.359ZM5.8908 15.2321L5.7508 18.2551L7.2492 18.3245L7.3892 15.3015L5.8908 15.2321ZM5.75396 18.3667C5.83563 19.1586 6.51588 19.7524 7.31152 19.7264L7.26248 18.2272C7.25928 18.2273 7.25771 18.2268 7.25669 18.2264C7.25526 18.2259 7.25337 18.2249 7.25144 18.2232C7.2495 18.2215 7.24825 18.2198 7.24754 18.2185C7.24703 18.2175 7.24637 18.216 7.24604 18.2128L5.75396 18.3667ZM7.45996 19.7065L10.46 18.9955L10.114 17.536L7.11404 18.247L7.45996 19.7065ZM10.4716 18.9927C10.7771 18.9151 11.05 18.7422 11.2506 18.499L10.0934 17.5445C10.0958 17.5417 10.0989 17.5397 10.1024 17.5388L10.4716 18.9927ZM11.2571 18.491L17.2971 10.959L16.1269 10.0206L10.0869 17.5526L11.2571 18.491ZM13.2971 7.95901L14.8851 5.97901L13.7149 5.04052L12.1269 7.02052L13.2971 7.95901ZM14.9135 5.94123C15.0521 5.74411 15.3214 5.6912 15.5243 5.82123L16.3337 4.5583C15.4544 3.99484 14.2873 4.2241 13.6865 5.0783L14.9135 5.94123ZM15.4492 5.7662L17.6862 7.6282L18.6458 6.47532L16.4088 4.61332L15.4492 5.7662ZM17.6352 7.58161C17.7111 7.6577 17.7535 7.761 17.7529 7.86852L19.2529 7.87676C19.2557 7.36905 19.0555 6.88127 18.6968 6.52192L17.6352 7.58161ZM17.7529 7.86852C17.7524 7.97604 17.7088 8.07886 17.632 8.15412L18.682 9.22541C19.0446 8.87002 19.2501 8.38447 19.2529 7.87676L17.7529 7.86852ZM17.5721 8.22025L16.1271 10.0203L17.2969 10.9593L18.7419 9.15928L17.5721 8.22025ZM11.9703 7.60091C12.3196 9.93221 14.4771 11.5503 16.813 11.2329L16.611 9.74659C15.0881 9.95352 13.6815 8.89855 13.4537 7.37862L11.9703 7.60091Z" fill="#000000"></path> </g></svg>
+              Edit profile...
+            </a>
+            <a class="action-button">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="12" cy="12" r="10" stroke="#1C274C" stroke-width="1.5"></circle> <path d="M15 12L12 12M12 12L9 12M12 12L12 9M12 12L12 15" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>            
+              Follow
+            </a>
+          </div>
+        </div>
+        <div class="meta-data">
+          <div class="data">
+            <h3>32</h3>
+            <p>Posts</p>
+          </div>
+          <div class="data">
+            <h3>1332</h3>
+            <p>Followers</p>
+          </div>
+          <div class="data">
+            <h3>6969</h3>
+            <p>Followings</p>
+          </div>
+        </div>
+        <div class="user-bio">
+          <p>
+            @Model.UserBio
+          </p>
+        </div>
       </div>
     </div>
-
-    <div class="feedback">
-      <?xml version="1.0" encoding="utf-8"?><!-- feedback -->
-      <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="3" cy="3" r="3" transform="matrix(-1 0 0 1 22 2)" stroke="#1C274C" stroke-width="1.5" />
-        <path
-          d="M14 2.20004C13.3538 2.06886 12.6849 2 12 2C10.1786 2 8.47087 2.48697 7 3.33782M21.8 10C21.9311 10.6462 22 11.3151 22 12C22 17.5228 17.5228 22 12 22C10.4003 22 8.88837 21.6244 7.54753 20.9565C7.19121 20.7791 6.78393 20.72 6.39939 20.8229L4.17335 21.4185C3.20701 21.677 2.32295 20.793 2.58151 19.8267L3.17712 17.6006C3.28001 17.2161 3.22094 16.8088 3.04346 16.4525C2.37562 15.1116 2 13.5997 2 12C2 10.1786 2.48697 8.47087 3.33782 7"
-          stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-      </svg>
-    </div>
-
-  </div>
-  <!-- Profile Edit Pop-up (Hidden by Default) -->
-  <div id="editProfilePopup" class="popup" style="display: none;">
-    <form class="edit_form" asp-controller="User" asp-action="edit" method="post" enctype="multipart/form-data">
-
-      <h2>Edit Profile</h2>
-
-      <!-- Profile Image -->
-      <div class="popup_img">
-        <img id="profilePreview" src="@Model.ProfileImageUrl" alt=""
-          style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer;">
-        <input type="file" id="profileImage" name="ProfileImage" style="display: none;" />
-      </div>
-
-      <!-- Username -->
-      <div>
-        <label for="displayName">Username:</label>
-        <input type="text" id="displayName" name="DisplayName" value="@Model.DisplayName" required />
-      </div>
-
-      <!-- Bio -->
-      <div>
-        <label for="userBio">Bio:</label>
-        <textarea id="userBio" name="UserBio">@Model.UserBio</textarea>
-      </div>
-
-      <!-- Save Button -->
-      <button type="submit">Save</button>
-      <button type="button" onclick="closePopup()">Cancel</button>
-    </form>
-
   </div>
 
-
-  <div class="post_list"></div>
+  <hr />
 
 </div>
-
-<script src="~/js/Profile.js"></script>

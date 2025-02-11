@@ -1,213 +1,43 @@
 @model Citlali.Models.UserOnboardingDto
 
 @{
-    @* string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
-     *@
-    string UserEmail = Model?.Email ?? "No email provided";
-    string profileImageUrl = "http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.jpeg";
-}
-<!DOCTYPE html>
-
-<style>
-body {
-    margin: 0;
-    padding: 0;
-    background-color: #ffffff;
-    position: relative;
+    string userEmail = ViewBag.Email ?? "No email provided";
+    string profileImageUrl = ViewBag.ProfileImageUrl ?? "";
 }
 
-.form-container{
-
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    
-    width: 100vw;
-    height: 90vh;
-    transform: translateY(6%);
-
-    
-    background-color: #ffffff;
-    border-radius: 10px;
+@section head{
+    <link rel="stylesheet" href="~/css/Onboarding.css" asp-append-version="true" />
+    <script src="~/js/Register.js"></script>
 }
 
-.content{
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    background-color: #ffffff;
-    border-radius: 5%;
-    box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.3);
-    width: 70%;
-    height: 100%;
-    padding: 1% 0% 1% 0% ;
-    justify-content: center;
-    align-items: center;
-}
+<div class="window">
+    <div class="content">
+        <div class="header">
+            <h1>Setup your basic profile 🎉</h1>
+            <p>This profile represents you in the community and will be shown to others when you engage with events. Take a moment to personalize it as you wish ! </p>
+        </div>
+        <form class="form-container" asp-action="onboarding" method="post" enctype="multipart/form-data">
+            <div class="profile-wrapper">
+                <div class="profile-img">
+                    <img src="@profileImageUrl" class="profileImage" id="profileImage" alt="Profile Picture">
+                    <input type="file" asp-for="ProfileImage" id="ProfileImageInput" hidden />
+                    
+                    <label for="ProfileImageInput" class="upload-button">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 21H9C6.17157 21 4.75736 21 3.87868 20.1213C3 19.2426 3 17.8284 3 15M21 15C21 17.8284 21 19.2426 20.1213 20.1213C19.8215 20.4211 19.4594 20.6186 19 20.7487" 
+                                stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> 
+                            <path d="M12 16V3M12 3L16 7.375M12 3L8 7.375" 
+                                stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> 
+                        </svg>
+                        Upload image...
+                    </label>
 
-.form-content{
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-
-}
-
-.form-data{
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-}
-
-.form-img{
-    width: 50%;
-    height: 60%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.form-img img{
-    width: 70%;
-    height: auto;
-    object-fit: cover;
-    border-radius: 50%;
-    aspect-ratio: 1 / 1; 
-}
-
-.form-group{
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 10px;
-    width: 100%;
-}
-
-h2{
-    display: flex;
-    justify-content: center;
-    font-size: 2rem;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-}
-
-#text-upload-file {
-    color: var(--white-color);
-    font-size: 16px;
-}
-
-.upload-file-button {
-    margin-top: 4%;
-    background-color: var(--text-gray-color);
-    display: inline-block;
-    padding: 8px 16px;  
-    cursor: pointer;
-    border-radius: 15px;
-    text-align: center;
-    transition: 0.2s;
-}
-
-.upload-file-button:hover{
-    background-color: #F5C2E7;
-}
-
-.form-img input[type="file"] {
-    display: none;
-}
-
-.sign-up-button{
-    width: 40%;
-    padding: 10px;
-    background-color: #7fdb7f;
-    color: #ffffff;
-    font-size: 18px;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.sign-up-button:hover{
-    background-color: #72c572;
-}
-
-.form-group input{
-    width: 70%;
-    padding: 10px;
-    border: 1px solid var(--text-gray-color);
-    border-radius: 5px;
-    font-size: 16px;
-    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
-}
-
-.form-group textarea{
-    width: 70%;
-    padding: 10px;
-    border: 1px solid var(--text-gray-color);
-    border-radius: 5px;
-    font-size: 16px;
-    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
-}
-
-textarea{
-    resize: none;
-}
-
-.tags-container{
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    width: 80%;
-}
-
-.tags-container .tags{
-    width: 100%;
-    height: auto;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-}
-
-.tags-container .tags .tag{
-    display: inline-block;
-    margin: 3px;
-    padding: 4px 8px 4px 8px ;
-    border: 2px solid var(--text-gray-color);
-    border-radius: 30px;
-    cursor: pointer;
-}
-
-.tags-container .tags .tag:hover{
-    background-color: var(--pink-color);
-    border: 2px solid var(--pink-color);
-}
-
-</style>
-<html lang="en">
-
-@* <head>
-    <link rel="stylesheet" href="~/css/Register.css?v=1.0" asp-append-version="true" />
-</head> *@
-
-<body>
-    <form class="form-container" asp-action="onboarding" method="post" enctype="multipart/form-data">
-        <div class="content">
-            <h2>🩷 Citlali Account 🩷</h2>
-            <div class="form-content">
-                <div class="form-data">
+                    <p class="description">Support jpeg / jpg / png file with the size less than 10 MB</p>
+                </div>
+                <div class="profile-info">
                     <div class="form-group">
                         <label for="Email">Email</label>
-                        <input asp-for="Email" class="form-control" value=@UserEmail id="Email" disabled/>
+                        <input asp-for="Email" class="form-control disabled-input" value=@userEmail id="Email" disabled />
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
 
@@ -228,117 +58,22 @@ textarea{
                         <textarea asp-for="UserBio" id="UserBio" rows="3"></textarea>
                         <span asp-validation-for="UserBio" class="text-danger"></span>
                     </div>
-
-                    <div class="tags-container">
-                        <div> 
-                            Choose category that best applicable to your event
-                        </div>
-                        <div class="tags" id="tags">
-                        </div>
+                    <div class="tag-selecting">
+                        <h3>What are you interested in?</h3>
+                        <div class="tags" id="tags"></div>
                     </div>
+                    <div class="continue">
+                        <button class="continue-button" type="submit">
+                            <div>
+                                Continue
+                            </div>
+                            <div>
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M11.0005 15.9995L15.0005 11.9995M15.0005 11.9995L11.0005 7.99951M15.0005 11.9995H3.00049M11.0005 2.99951H17.7997C18.9198 2.99951 19.4799 2.99951 19.9077 3.2175C20.284 3.40925 20.59 3.71521 20.7817 4.09153C20.9997 4.51935 20.9997 5.07941 20.9997 6.19951V17.7995C20.9997 18.9196 20.9997 19.4797 20.7817 19.9075C20.59 20.2838 20.284 20.5898 19.9077 20.7815C19.4799 20.9995 18.9198 20.9995 17.7997 20.9995H11.0005" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>                    </div>
+                            </div>
+                        </button>
                 </div>
 
-                <div class="form-img">
-                    <img id="profileImage" src=@profileImageUrl alt="ProfileImage">
-                    <input type="file" asp-for="ProfileImage" id="ProfileImageInput"/>
-                    <label for="ProfileImageInput" class="upload-file-button" id="text-upload-file" >Upload file...</label>
-                    <span asp-validation-for="ProfileImage"></span>
-                </div>
-            
             </div>
-            <button class="sign-up-button" type="submit">Sign up</button>
-        </div>
-    </form>
-
-    <script> 
-        const image = document.getElementById('profileImage');
-        const input = document.querySelector('input[type="file"]');
-        const div_tags = document.getElementById('tags');
-        localStorage.setItem('tags_selected', '[]');
-
-        const tags = [
-            {
-                emoji: '🐶',
-                name: 'dog'
-            }
-            , {
-                emoji: '🐱',
-                name: 'cat'
-            }
-            , {
-                emoji: '🐭',
-                name: 'mouse'
-            }
-            , {
-                emoji: '🐹',
-                name: 'hamster'
-            }
-            , {
-                emoji: '🐰',
-                name: 'rabbit'
-            }
-            , {
-                emoji: '🦊',
-                name: 'fox'
-            }
-            , {
-                emoji: '🐻',
-                name: 'bear'
-            }
-            , {
-                emoji: '🐼',
-                name: 'panda'
-            }
-            , {
-                emoji: '🐨',
-                name: 'koala'
-            }
-            , {
-                emoji: '🐯',
-                name: 'tiger'
-            }
-            , {
-                emoji: '🦁',
-                name: 'lion'
-            }
-            , {
-                emoji: '🐷',
-                name: 'pig'
-            }
-            , {
-                emoji: '🐸',
-                name: 'frog'
-            }
-        ]
-
-        input.addEventListener('change', (e) => {
-            console.log('input changed');
-            image.src = URL.createObjectURL(e.target.files[0]);
-        });
-
-        tags.forEach(tag => {
-            const div = document.createElement('div');
-            div.className = 'tag';
-            div.style = 'display: inline-block; margin: 3px; padding: 4px 8px 4px 8px ; border: 2px solid var(--text-gray-color); border-radius: 30px; cursor: pointer;';
-            div.onclick = () =>{
-                if (div.name === 'selected'){
-                    div.style.backgroundColor = 'transparent';
-                    div.style.border = '2px solid var(--text-gray-color)';
-                    div.name = '';
-                    localStorage.setItem('tags_selected', JSON.stringify(JSON.parse(localStorage.getItem('tags_selected')).filter(t => t !== tag.name)));
-                    return;
-                }
-                else{
-                    div.style.backgroundColor = 'var(--pink-color)';
-                    div.style.border = '2px solid var(--pink-color)';
-                    div.name = 'selected';
-                    localStorage.setItem('tags_selected', JSON.stringify([...JSON.parse(localStorage.getItem('tags_selected')), tag.name]));
-                }
-            }
-
-            div.innerHTML = tag.emoji + ' ' + tag.name;
-            div_tags.appendChild(div);
-        });
-    </script>
-</body>
-</html>
+        </form>
+    </div>
+</div>

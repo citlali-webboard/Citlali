@@ -1,13 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>44d3bd42-37a1-4795-b8bf-831fb3b93a30</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetEnv" Version="3.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.*-*" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.11.*-*" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.11.*-*" />
