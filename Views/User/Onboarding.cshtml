@@ -21,15 +21,14 @@
                 <div class="profile-img">
                     <img src="@profileImageUrl" class="profileImage" id="profileImage" alt="Profile Picture">
                     <input type="file" asp-for="ProfileImage" id="ProfileImageInput" hidden />
-                    
+
                     <label for="ProfileImageInput" class="upload-button">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M15 21H9C6.17157 21 4.75736 21 3.87868 20.1213C3 19.2426 3 17.8284 3 15M21 15C21 17.8284 21 19.2426 20.1213 20.1213C19.8215 20.4211 19.4594 20.6186 19 20.7487" 
-                                stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> 
-                            <path d="M12 16V3M12 3L16 7.375M12 3L8 7.375" 
-                                stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> 
-                        </svg>
-                        Upload image...
+                        <span>
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Image>>(RenderMode.ServerPrerendered))
+                        </span>
+                        <span>
+                            Upload image...
+                        </span>
                     </label>
 
                     <p class="description">Support jpeg / jpg / png file with the size less than 10 MB</p>
@@ -64,12 +63,12 @@
                     </div>
                     <div class="continue">
                         <button class="continue-button" type="submit">
-                            <div>
+                            <span>
                                 Continue
-                            </div>
-                            <div>
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M11.0005 15.9995L15.0005 11.9995M15.0005 11.9995L11.0005 7.99951M15.0005 11.9995H3.00049M11.0005 2.99951H17.7997C18.9198 2.99951 19.4799 2.99951 19.9077 3.2175C20.284 3.40925 20.59 3.71521 20.7817 4.09153C20.9997 4.51935 20.9997 5.07941 20.9997 6.19951V17.7995C20.9997 18.9196 20.9997 19.4797 20.7817 19.9075C20.59 20.2838 20.284 20.5898 19.9077 20.7815C19.4799 20.9995 18.9198 20.9995 17.7997 20.9995H11.0005" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>                    </div>
-                            </div>
+                            </span>
+                            <span>
+                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.ArrowCircleRight>>(RenderMode.ServerPrerendered))
+                            </span>
                         </button>
                 </div>
 
