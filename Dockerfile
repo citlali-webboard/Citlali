@@ -17,6 +17,17 @@ RUN dotnet publish --no-restore -a $TARGETARCH -o /app
 # https://github.com/dotnet/dotnet-docker/blob/main/samples/enable-globalization.md
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
+
+# Globalization
+ENV \
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8
+RUN apk add --no-cache \
+    icu-data-full \
+    icu-libs \
+    tzdata
+
 EXPOSE 8000
 WORKDIR /app
 COPY --link --from=build /app .
