@@ -26,10 +26,13 @@ ENV \
 RUN apk add --no-cache \
     icu-data-full \
     icu-libs \
-    tzdata
+    tzdata \
+    openssl
 
 EXPOSE 8000
 WORKDIR /app
 COPY --link --from=build /app .
 USER $APP_UID
+RUN mkdir -p /https && \
+    chown -R $APP_UID:$APP_UID /https
 ENTRYPOINT ["./Citlali"]
