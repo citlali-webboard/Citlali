@@ -32,7 +32,8 @@ RUN apk add --no-cache \
 EXPOSE 8000
 WORKDIR /app
 COPY --link --from=build /app .
-USER $APP_UID
 RUN mkdir -p /https && \
     chown -R $APP_UID:$APP_UID /https
+
+USER $APP_UID
 ENTRYPOINT ["./Citlali"]
