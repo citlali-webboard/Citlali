@@ -8,7 +8,12 @@
 </style>
 
 @{ 
-    var testTagId = @Model.Tags[0].TagId; //test
+    //make list of stings questions 
+    List<string> questions = new List<string>();
+    questions.Add("What is your favorite color?");
+    questions.Add("What is your favorite food?");
+    questions.Add("What is your favorite animal?");
+    questions.Add("What is your favorite movie?");
 }
 
 
@@ -89,9 +94,11 @@
                     </div>
 
                     @* question *@
-                    <div class="form-group">
+                    @* <div class="form-group">
                         <span> Question : </span>
-                    </div>
+                        <input asp-for="Questions" class="form-control" value="" />
+                        <span asp-validation-for="Questions" class="text-danger"></span>
+                    </div> *@
 
                     <button type="submit" style="border:5px solid red">Create</button>
 

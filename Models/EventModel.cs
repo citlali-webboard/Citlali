@@ -13,7 +13,7 @@ public class Event : BaseModel
 
     [Column("CreatorUserId")]
     public Guid CreatorUserId { get; set; } = new();
-    
+
     [Column("EventTitle")]
     public string EventTitle { get; set; } = "Sample title";
 
@@ -39,7 +39,7 @@ public class Event : BaseModel
     public DateTime PostExpiryDate { get; set; } = new();
 
     [Column("CreatedAt")]
-    public DateTime CreatedAt { get; set; } = new();
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [Column("Deleted")]
     public bool Deleted { get; set; } = false;
@@ -47,11 +47,22 @@ public class Event : BaseModel
 
 }
 
+[Table("EVENT_QUESTION")]
 public class EventQuestion : BaseModel
 {
-    public Guid EventQuestionId = new();
-    public Guid EventId = new();
-    public string Question = "Question";
+    [PrimaryKey]
+    [Column("EventQuestionId")]
+    public Guid EventQuestionId { get; set; } = new();
+
+    [Column("EventId")]
+    public Guid EventId { get; set; } = new();
+
+    [Column("Question")]
+    public string Question { get; set; } = "Question";
+
+    [Column("CreatedAt")]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
 }
 
 public class EventLocationTag
@@ -105,7 +116,8 @@ public class EventExploreViewModel
 }
 
 [Table("EVENT_CATEGORY_TAG")]
-public class EventCategoryTag : BaseModel {
+public class EventCategoryTag : BaseModel
+{
     [PrimaryKey]
     [Column("EventCategoryTagId")]
     public Guid EventCategoryTagId { get; set; } = new();
@@ -120,14 +132,16 @@ public class EventCategoryTag : BaseModel {
     public bool Deleted { get; set; } = false;
 }
 
-public class Tag{
+public class Tag
+{
     public Guid TagId = new();
     public string TagEmoji = "";
     public string TagName = "";
 }
 
 [Table("LOCATION_TAG")]
-public class LocationTag : BaseModel {
+public class LocationTag : BaseModel
+{
     [PrimaryKey]
     [Column("LocationTagId")]
     public Guid EventLocationTagId { get; set; } = new();
@@ -139,13 +153,15 @@ public class LocationTag : BaseModel {
     public bool Deleted { get; set; } = false;
 }
 
-public class Location{
+public class Location
+{
     public Guid EventLocationTagId = new();
     public string EventLocationTagName = "";
 }
 
 
-public class CreateEventViewModel {
+public class CreateEventViewModel
+{
     public string EventTitle { get; set; } = "";
     public string EventDescription { get; set; } = "";
     public Guid EventCategoryTagId { get; set; } = new();
@@ -156,4 +172,5 @@ public class CreateEventViewModel {
     public DateTime EventDate { get; set; } = new();
     public DateTime PostExpiryDate { get; set; } = new();
     public List<Tag> Tags { get; set; } = [];
+    public List<string> Questions { get; set; } = ["test1", "test2", "test3"];
 }

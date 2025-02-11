@@ -54,7 +54,7 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
                                              EventLocationTagName = location.EventLocationTagName });
             }
         }
-
+        
         return locations;
     } 
 
@@ -68,9 +68,10 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
 
         Guid userId = Guid.Parse(supabaseUser.Id ?? "");
 
-        var model = new Event
+        Guid eventId = Guid.NewGuid();
+        var modelEvent = new Event
         {
-            EventId =  Guid.NewGuid(),
+            EventId =  eventId,
             CreatorUserId = userId,
             EventTitle = createEventViewModel.EventTitle,
             EventDescription = createEventViewModel.EventDescription,
@@ -82,15 +83,34 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
             PostExpiryDate = createEventViewModel.PostExpiryDate,
         };
 
-        Console.WriteLine(model.EventLocationTagId);
+        List<string> questionsList = createEventViewModel.Questions;
+
+        Console.WriteLine(questionsList[0]);
+        List<EventQuestion> eventQuestions = new();
+        foreach (var question in questionsList)
+        {
+            eventQuestions.Add(new EventQuestion
+            {
+                EventQuestionId = Guid.NewGuid(),
+                EventId = eventId,
+                Question = question,
+            });
+        }
 
         Console.WriteLine("Before Insert--------------------------------");
         await _supabaseClient
             .From<Event>()
-            .Insert(model);
-        Console.WriteLine("After Insert---------------------------------");
+            .Insert(modelEvent);
 
-        return model;
+        foreach (var question in eventQuestions)
+        {
+            await _supabaseClient
+                .From<EventQuestion>()
+                .Insert(question);
+        }    
+
+        Console.WriteLine("After Insert---------------------------------");
+        return modelEvent;
     }
 
     
