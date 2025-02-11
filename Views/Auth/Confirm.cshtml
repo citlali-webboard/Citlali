@@ -20,8 +20,8 @@
     <span class="logo">
       @(await Html.RenderComponentAsync<FluentIcon<Icons.Filled.Size48.ShieldTask>>(RenderMode.ServerPrerendered, new { Color = Color.Fill }))
     </span>
-    <h2>Verify OTP</h2>
-    <h3>Your OTP was sent to @Model.Email</h3>
+    <h2>Verification Needed</h2>
+    <h3>Please enter the token that was sent to @Model.Email</h3>
     <form asp-action="Confirm" method="post" enctype="multipart/form-data">
       <div class="form-group" style="display: none;">
         <label for="Email">Email</label>
