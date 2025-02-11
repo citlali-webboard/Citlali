@@ -95,6 +95,10 @@ jobs:
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
+  deploy:
+    runs-on: self-hosted
+    needs: build
+    steps:
       # - name: SSH Deployment
       #   uses: appleboy/ssh-action@7eaf76671a0d7eec5d98ee897acda4f968735a17 # v1.2.0
       #   with:
@@ -108,3 +112,11 @@ jobs:
       #       docker compose pull
       #       docker compose down
       #       docker compose up -d
+
+      - name: Deployment
+        run: |
+          cd ~/citlali
+          git pull
+          docker compose pull
+          docker compose down
+          docker compose up -d
