@@ -20,6 +20,11 @@ public class AuthController : Controller
         ("Auth", "AuthCodeError")
     };
 
+    private bool IsValidRedirect(string controller, string action)
+    {
+        return _validRedirects.Contains((controller, action));
+    }
+
     public AuthController(
         ILogger<AuthController> logger,
         Supabase.Client supabaseClient,
