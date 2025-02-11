@@ -49,17 +49,18 @@ public class UserService
                 throw new Exception($"Error during user creation.");
             }
 
-        if (userOnboardingDto.ProfileImage != null)
-        {
-            profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? _configuration.User.DefaultProfileImage;
-        }
+            if (userOnboardingDto.ProfileImage != null)
+            {
+                profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? _configuration.User.DefaultProfileImage;
+            }
 
             var dbUser = new User
             {
                 UserId = Guid.Parse(supabaseUser.Id),
                 Email = supabaseUser.Email,
-                DisplayName = userOnboardingDto.DisplayName,
                 ProfileImageUrl = profileImageUrl,
+                Username = userOnboardingDto.Username,
+                DisplayName = userOnboardingDto.DisplayName,
                 UserBio = userOnboardingDto.UserBio
             };
 
@@ -72,7 +73,7 @@ public class UserService
            var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
             string msgError = errorJson.GetProperty("msg").GetString()??"";
             Console.WriteLine(msgError);
-            throw new Exception(msgError); 
+            throw new Exception(msgError);
         }
     }
 
