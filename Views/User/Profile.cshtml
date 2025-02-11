@@ -7,10 +7,14 @@
 
 @{
   ViewData["Title"] = "Profile";
+  var navModel = new Citlali.Models.NavModel
+  {
+    profileImageUrl = Model.ProfileImageUrl
+  };
 }
 
 
-<partial name="_NavBar" />
+<partial name="_NavBar" model=@navModel />
 <div class="window">
 
   <form asp-controller="Auth" asp-action="SignOut" method="post">
