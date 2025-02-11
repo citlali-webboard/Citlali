@@ -1,15 +1,18 @@
 using Citlali.Models;
 using Supabase;
 using System.Text.Json;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Webp;
 
 namespace Citlali.Services;
 
 public class UserService
 {
     private readonly Client _supabaseClient;
-    private readonly Configuration _configuration;
+    private readonly Citlali.Models.Configuration _configuration;
 
-    public UserService(Client supabaseClient, Configuration configuration)
+    public UserService(Client supabaseClient, Citlali.Models.Configuration configuration)
     {
         _supabaseClient = supabaseClient;
         _configuration = configuration;
@@ -167,12 +170,28 @@ public class UserService
                 await file.CopyToAsync(fileStream);
             }
 
-            string targetFilePath = $"{userId}/{userId}-{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            using (var image = Image.Load(tempFilePath))
+            {
+                int size = Math.Min(image.Width, image.Height);
+                image.Mutate(x => x.Crop(new Rectangle((image.Width - size) / 2, (image.Height - size) / 2, size, size)));
+
+                if (size > 480)
+                {
+                    image.Mutate(x => x.Resize(480, 480));
+                }
+            }
+
+            string targetFilePath = $"{userId}/{userId}-{Guid.NewGuid()}.webp";
+            using (var image = Image.Load(tempFilePath))
+            {
+                image.Save(tempFilePath, new WebpEncoder() { Quality = 80 });
+            }
+
             await _supabaseClient.Storage
                 .From(bucketName)
                 .Upload(tempFilePath, targetFilePath, new Supabase.Storage.FileOptions
                 {
-                    Upsert = true // Overwrite if file exists
+                    Upsert = true
                 });
 
             if (File.Exists(tempFilePath))
