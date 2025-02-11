@@ -7,9 +7,22 @@ body {
 
 .logo{
     background-color: #F5C2E7;
-    border-radius: 50vh;
-    width: 14%;
-    padding: 20px;
+    border-radius: 5100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 5rem;
+    height: 5rem;
+    padding: 1rem;
+}
+
+.logo:hover{
+    background-color: #fd9ae3;
+    transition: .2s;
+}
+
+.logo svg {
+    fill: white !important;
 }
 
 /* Form container */
@@ -144,10 +157,10 @@ button{
         width: 100%;
         max-width: 100%;
     }
-    
+
     form .input-field input {
-        flex: 1; 
-        min-width: 30px; 
+        flex: 1;
+        min-width: 30px;
         height: auto;
         aspect-ratio: 1/1;
         border-radius: 10px;
@@ -157,5 +170,5 @@ button{
         box-shadow: 0px 0px 2px 1.2px rgba(0, 0, 0, 0.10);
         border: 1px solid var(--text-gray-color);
     }
-    
+
 }
