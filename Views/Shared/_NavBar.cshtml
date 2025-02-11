@@ -1,0 +1,53 @@
+<nav>
+  <ul>
+    <div class="nav-group">
+      <a href="#">
+        <li>
+          @* Navigation Hamburger *@
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Navigation>>(RenderMode.ServerPrerendered))
+        </li>
+      </a>
+
+      <a href="#">
+        <li class="logo">
+          @* Logo *@
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.DocumentEdit>>(RenderMode.ServerPrerendered))
+          </span>
+          <p>Citlali</p>
+        </li>
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <a href="#">
+        <li>
+          @* History *@
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.History>>(RenderMode.ServerPrerendered))
+        </li>
+      </a>
+
+      <a href="#">
+        @* Notification *@
+        <li>
+
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Alert>>(RenderMode.ServerPrerendered))
+        </li>
+      </a>
+
+      <a href="#">
+        @* Follow Heart *@
+        <li>
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Heart>>(RenderMode.ServerPrerendered))
+        </li>
+      </a>
+
+      <a href="#">
+        @* Profile *@
+        <li>
+          <div class="profile-placeholder"></div>
+        </li>
+      </a>
+    </div>
+  </ul>
+</nav>

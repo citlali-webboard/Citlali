@@ -86,10 +86,10 @@ h1, p {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.5rem; 
-    
+    gap: 0.5rem;
+
     margin-top: 1rem;
-    padding: 0.3rem 1rem; 
+    padding: 0.3rem 1rem;
 
     border: 1px solid #000;
     border-radius: 20px;
@@ -144,7 +144,7 @@ input[type="file"] {
 .disabled-input {
     background-color: #e0e0e0 !important;
     color: #666 !important;
-    cursor: not-allowed; 
+    cursor: not-allowed;
     opacity: 0.7;
 }
 
@@ -181,6 +181,7 @@ input[type="file"] {
     padding: 1rem;
     background-color: #000;
     color: #fff;
+    fill: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -196,8 +197,6 @@ input[type="file"] {
 }
 
 .continue-button svg {
-    height: 1rem;
-    color: #fff;
     margin-left: 0.5rem;
     align-self: center;
 }
@@ -218,7 +217,7 @@ input[type="file"] {
         align-self: flex-start;
     }
 
-    
+
 }
 
 @media screen and (max-width: 768px) {
@@ -270,5 +269,5 @@ input[type="file"] {
     .profile-info {
         margin-top: 2rem;
     }
-    
+
 }

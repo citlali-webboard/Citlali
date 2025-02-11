@@ -28,6 +28,7 @@ builder.Services.AddSingleton(supabaseClient);
 builder.Services.AddSingleton(configuration);
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<EventService>();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication()
@@ -52,6 +53,7 @@ builder.Services.AddAuthentication()
                                 context.Token = accessToken;
                                 await supabaseClient.Auth.SetSession(accessToken, refreshToken);
                                 // await supabaseClient.Auth.RefreshSession();
+                                // return Task.CompletedTask;
                             }
                         },
                         OnAuthenticationFailed = context =>
@@ -63,7 +65,7 @@ builder.Services.AddAuthentication()
                             context.Response.Cookies.Delete(configuration.Jwt.AccessCookie);
                             context.Response.Cookies.Delete(configuration.Jwt.RefreshCookie);
 
-                            // Redirect to login page
+                            // Redirect to signin page
                             context.Response.Redirect("/auth/signin");
 
                             return Task.CompletedTask;
@@ -76,7 +78,7 @@ builder.Services.AddAuthentication()
                         }
                     };
                 });
-builder.Services.AddFluentUIComponents();
+
 
 var app = builder.Build();
 

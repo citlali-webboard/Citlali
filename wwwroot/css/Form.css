@@ -1,0 +1,44 @@
+.form-content {
+  display: flex;
+  flex-direction: row;
+  background-color: #ffffff;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: 100%;
+}
+
+.form-group {
+  display: flex;
+  width: 100%;
+  position: relative;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.form-group > input {
+  padding: 10px;
+  border: none;
+  border: 2px solid #cccccc;
+  border-radius: 0.5rem;
+  font-size: 16px;
+  background-color: transparent;
+  color: #333333;
+  transition: border-color 0.3s;
+  width: 100%;
+}
+
+.form-data {
+  width: 100%;
+}
+
+.form-group > input::placeholder {
+  color: #999999;
+  font-size: 16px;
+}
+
+.form-group > input:focus {
+  border-color: #a6e3a1;
+  outline: none;
+}
