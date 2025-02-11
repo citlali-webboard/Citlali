@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using System.Globalization;
+using Microsoft.FluentUI.AspNetCore.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services.AddSingleton(supabaseClient);
 builder.Services.AddSingleton(configuration);
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddServerSideBlazor();
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication()
                 .AddJwtBearer(options =>
@@ -74,6 +76,7 @@ builder.Services.AddAuthentication()
                         }
                     };
                 });
+builder.Services.AddFluentUIComponents();
 
 var app = builder.Build();
 
@@ -95,5 +98,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+app.MapBlazorHub();
 
 app.Run();
