@@ -80,10 +80,15 @@ public class EventDetailCardData : EventBriefCardData
     public string EventDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 }
 
+public class EventFormDto
+{
+    public List<QuestionViewModel> Questions { get; set; } = [new(), new(), new(), new(), new(), new(), new()];
+}
+
 public class EventDetailViewModel
 {
-    public EventDetailCardData EventDetailCardData = new();
-    public List<QuestionViewModel> Questions { get; set; } = [new()];
+    public EventDetailCardData EventDetailCardData { get; set; } = new();
+    public EventFormDto EventFormDto { get; set; } = new();
 }
 
 public class QuestionViewModel

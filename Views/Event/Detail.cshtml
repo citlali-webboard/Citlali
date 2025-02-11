@@ -5,41 +5,10 @@
 }
 
 <div class="center-wrapper">
+    <partial name="_NavBar" />
+
     <div class="detail-main-container">
-        <div class="event-detail detail-column space-y-4">
-            <div class="justify-between">
-                <h1>@Model.EventDetailCardData.EventTitle</h1>
-                <p>@Model.EventDetailCardData.CurrentParticipant/@Model.EventDetailCardData.MaxParticipant</p>
-            </div>
-            <div class="justify-between">
-                <span>Posted by @Model.EventDetailCardData.CreatorDisplayName</span>
-                <span>@Model.EventDetailCardData.CreatedAt.ToString("t") @Model.EventDetailCardData.CreatedAt.ToString("d")</span>
-            </div>
-            <div class="tags-container">
-                <div class="tags" id="tags">
-                    <div class="tag">
-                        <span>@Model.EventDetailCardData.EventCategoryTag.EventCategoryTagEmoji</span>
-                        <span>@Model.EventDetailCardData.EventCategoryTag.EventCategoryTagName</span>
-                    </div>
-                </div>
-            </div>
-            <p>@Model.EventDetailCardData.EventDescription</p>
-        </div>
-        <div class="pad"></div>
-        <div class="event-form detail-column">
-            <form class="form-form" asp-action="onboarding" style="width: 100%;" method="post"
-                enctype="multipart/form-data">
-                <div class="form-data">
-                    @for (var i = 0; i < Model.Questions.Count; i++)
-                    {
-                        <div class="form-group">
-                            <label for="@Model.Questions[i]">@Model.Questions[i].Question</label>
-                            <input asp-for="@Model.Questions[i]" class="form-control" value=@Model.Questions[i].Answer />
-                            <span asp-validation-for="@Model.Questions[i].Answer" class="text-danger"></span>
-                        </div>
-                    }
-                </div>
-            </form>
-        </div>
+        <partial name="_EventDetailCard" model=@Model.EventDetailCardData />
+        <partial name="_EventJoinForm" model=@Model.EventFormDto />
     </div>
 </div>

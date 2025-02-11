@@ -16,6 +16,7 @@
   border: 2px solid var(--color-muted);
   border-radius: 1rem;
   padding: 1rem;
+  height: fit-content;
 }
 
 .justify-between {
@@ -31,6 +32,14 @@
   margin-bottom: 0;
 }
 
+.space-x-2 > * {
+  margin-right: 4px;
+}
+
+.space-x-2 > *:last-child {
+  margin-right: 0;
+}
+
 .tag{
   display: inline-block;
   padding: 4px 8px 4px 8px ;
@@ -44,4 +53,13 @@
 .text-level-1 {
   font-size: 1.5rem;
   font-weight: bold;
+}
+
+.text-align-right {
+  text-align: right;
+}
+
+.align-center {
+  display: flex;
+  align-items: center;
 }

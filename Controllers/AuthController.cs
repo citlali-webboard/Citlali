@@ -132,7 +132,8 @@ public class AuthController : Controller
                 await _supabaseClient.Auth.SetSession(session.AccessToken, session.RefreshToken);
                 Response.Cookies.Append(_accessCookieName, session.AccessToken);
                 Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
-                if (!string.IsNullOrEmpty(Next))
+                var authorizedRedirects = new List<string> { "User/Profile", "User/Onboarding" };
+                if (!string.IsNullOrEmpty(Next) && authorizedRedirects.Contains(Next))
                 {
                     var parts = Next.Split('/');
                     if (parts.Length == 2)
