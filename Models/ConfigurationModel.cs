@@ -28,6 +28,7 @@ public class UserConfig
     public required int ProfileImageEncodeQuality { get; set; }
     public required int ProfileImageMaxSize { get; set; }
     public required SKEncodedImageFormat ProfileImageFormat { get; set; }
+    public required string ProfileImageName { get; set; }
 }
 
 public class JwtConfig
