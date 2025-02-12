@@ -172,5 +172,5 @@ public class CreateEventViewModel
     public DateTime EventDate { get; set; } = new();
     public DateTime PostExpiryDate { get; set; } = new();
     public List<Tag> Tags { get; set; } = [];
-    public List<string> Questions { get; set; } = ["test1", "test2", "test3"];
+    public List<string> Questions { get; set; } = ["Why are you interested in this event?"];
 }
