@@ -115,6 +115,7 @@ jobs:
       #       docker compose up -d
 
       - name: Deployment
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           cd ~/citlali
           git pull
