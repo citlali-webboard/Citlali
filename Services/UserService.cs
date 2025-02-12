@@ -1,21 +1,19 @@
 using Citlali.Models;
 using Supabase;
-using System.Text.Json;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Formats.Webp;
 
 namespace Citlali.Services;
 
 public class UserService
 {
     private readonly Client _supabaseClient;
-    private readonly Citlali.Models.Configuration _configuration;
+    private readonly Configuration _configuration;
+    private readonly UtilitiesService _utilityService;
 
-    public UserService(Client supabaseClient, Citlali.Models.Configuration configuration)
+    public UserService(Client supabaseClient, Configuration configuration, UtilitiesService utilityService)
     {
         _supabaseClient = supabaseClient;
         _configuration = configuration;
+        _utilityService = utilityService;
     }
 
     /// <summary>
@@ -126,68 +124,34 @@ public class UserService
         return response ?? null;
     }
 
-    public async Task<string?> UploadProfileImage(IFormFile file, string userId)
+    public async Task<string?> UploadProfileImage(IFormFile image, string userId)
     {
         try
         {
-            string bucketName = _configuration.User.ProfileImageBucket ?? "";
-            string userFolder = $"{userId}/";
+            var bucketName = _configuration.User.ProfileImageBucket;
+            var fileName = $"{_configuration.User.ProfileImageName}.{_configuration.User.ProfileImageFormat}";
+            var bucketFilePath = $"{userId}/{fileName}";
 
-            // List all files in the user's folder
-            var existingFiles = await _supabaseClient.Storage
-                .From(bucketName)
-                .List(userFolder);
-
-            // Delete all existing profile images (assuming one per user, different extensions possible)
-            if (existingFiles != null)
-            {
-                foreach (var existingFile in existingFiles)
-                {
-                    if (existingFile != null && existingFile.Name != null && existingFile.Name.StartsWith(userId))
-                    {
-                        _ = await _supabaseClient.Storage
-                            .From(bucketName)
-                            .Remove(new List<string> { $"{userFolder}{existingFile.Name}" ?? string.Empty });
-                    }
-                }
+            try {
+                await _supabaseClient.Storage
+                    .From(bucketName)
+                    .Remove(bucketFilePath);
+            } catch { 
             }
 
-            string tempFolder = Path.GetTempPath(); // System temp folder
-            string tempFilePath = Path.Combine(tempFolder, $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}");
-            string targetFilePath = $"{userId}/{userId}-{Guid.NewGuid()}.webp";
-
-            using (var fileStream = new FileStream(tempFilePath, FileMode.Create))
-            {
-                await file.CopyToAsync(fileStream);
-            }
-
-            using (var image = Image.Load(tempFilePath))
-            {
-                int size = Math.Min(image.Width, image.Height);
-                image.Mutate(x => x.Crop(new Rectangle((image.Width - size) / 2, (image.Height - size) / 2, size, size)));
-
-                if (size > 480)
-                {
-                    image.Mutate(x => x.Resize(480, 480));
-                }
-                await image.SaveAsWebpAsync(tempFilePath, new WebpEncoder() { Quality = 80 });
-            }
+            var imageBytes = _utilityService.ProcessProfileImage(image);
 
             await _supabaseClient.Storage
                 .From(bucketName)
-                .Upload(tempFilePath, targetFilePath, new Supabase.Storage.FileOptions
+                .Upload(imageBytes, bucketFilePath, new Supabase.Storage.FileOptions
                 {
                     Upsert = true
                 });
 
-            if (File.Exists(tempFilePath))
-            {
-                File.Delete(tempFilePath);
-            }
 
             string publicUrl = _supabaseClient.Storage
                 .From(bucketName)
-                .GetPublicUrl(targetFilePath);
+                .GetPublicUrl(bucketFilePath);
 
             return publicUrl;
         }
@@ -198,5 +162,4 @@ public class UserService
             return null;
         }
     }
-
 }

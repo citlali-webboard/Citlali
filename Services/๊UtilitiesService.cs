@@ -2,14 +2,9 @@ using SkiaSharp;
 
 namespace Citlali.Services;
 
-public class UtilitiesService
+public class UtilitiesService(Models.Configuration configuration)
 {
-    private readonly Models.Configuration _configuration;
-
-    public UtilitiesService(Models.Configuration configuration)
-    {
-        _configuration = configuration;
-    }
+    private readonly Models.Configuration _configuration = configuration;
 
     public byte[] ProcessProfileImage(IFormFile image)
     {
