@@ -103,10 +103,16 @@ public class UserService
             throw new Exception("Error during user editing.");
         }
 
+        if (userOnboardingDto.DisplayName == null || userOnboardingDto.DisplayName == "")
+        {
+           throw new Exception("Display name is required.");
+        }
+
         if (userOnboardingDto.ProfileImage != null)
         {
             profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? _configuration.User.DefaultProfileImage;
         }
+
         else
         {
             profileImageUrl = model.ProfileImageUrl;

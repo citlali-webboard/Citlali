@@ -177,7 +177,15 @@ public class UserController : Controller
     [Authorize]
     public async Task<IActionResult> ProfileEdit(UserOnboardingDto userOnboardingDto)
     {
+
+        if (string.IsNullOrEmpty(userOnboardingDto.DisplayName))
+            {
+                TempData["Error"] = "Display name is required.";
+                return RedirectToAction("Profile");
+            }
+            
         await _userService.EditUser(userOnboardingDto);
+
         return RedirectToAction("Profile");
     }
 }
