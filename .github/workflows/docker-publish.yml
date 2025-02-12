@@ -99,6 +99,7 @@ jobs:
     needs: build
     permissions:
       contents: read
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       # - name: SSH Deployment
       #   uses: appleboy/ssh-action@7eaf76671a0d7eec5d98ee897acda4f968735a17 # v1.2.0
@@ -115,7 +116,6 @@ jobs:
       #       docker compose up -d
 
       - name: Deployment
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           cd ~/citlali
           git pull
