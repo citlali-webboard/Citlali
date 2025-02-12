@@ -95,7 +95,8 @@ jobs:
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
   deploy:
-    runs-on: self-hosted
+    runs-on: 
+      labels: wheelbarrow
     needs: build
     permissions:
       contents: read
