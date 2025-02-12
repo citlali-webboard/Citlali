@@ -84,7 +84,6 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
 
         List<string> questionsList = createEventViewModel.Questions;
 
-        Console.WriteLine(questionsList[0]);
         List<EventQuestion> eventQuestions = new();
         foreach (var question in questionsList)
         {
@@ -96,7 +95,6 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
             });
         }
 
-        Console.WriteLine("Before Insert--------------------------------");
         await _supabaseClient
             .From<Event>()
             .Insert(modelEvent);
@@ -108,9 +106,8 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
                 .Insert(question);
         }    
 
-        Console.WriteLine("After Insert---------------------------------");
         return modelEvent;
     }
 
     
-    }
+}
