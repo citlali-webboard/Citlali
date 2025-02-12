@@ -1,118 +1,110 @@
 @model Citlali.Models.CreateEventViewModel
 
-
-<style>
-    input{
-        border: 1px solid red;
-    }
-</style>
-
-@{ 
-    //make list of stings questions 
-    List<string> questions = new List<string>();
-    questions.Add("What is your favorite color?");
-    questions.Add("What is your favorite food?");
-    questions.Add("What is your favorite animal?");
-    questions.Add("What is your favorite movie?");
+@section head {
+    <link rel="stylesheet" href="~/css/Event/Create.css" asp-append-version="true" />
+    <script src="~/js/Event/Create.js"></script>
 }
 
+<partial name="_NavBar" />
 
-<form asp-action="createEvent" method="post" enctype="multipart/form-data">
-    <div class="form-container">
-        <div class="content">
-            <div class="form-content">
-                <div class="form-data">
-                    <div class="form-group">
-                        <label for="EventTitle">Event Title</label>
-                        <input asp-for="EventTitle" class="form-control" />
-                        <span asp-validation-for="EventTitle" class="text-danger"></span>
-                    </div>
-                    <div class="form-group
-                    ">
-                        <label for="EventDescription">Event Description</label>
-                        <input asp-for="EventDescription" class="form-control" />
-                        <span asp-validation-for="EventDescription" class="text-danger"></span>
-                    </div>
-                    @* <div class="form-group
-                    ">
-                        <label for="EventCategoryTagId">Event Category</label>
-                        <input asp-for="EventCategoryTagId" class="form-control" value="@testTagId"/>
-                        <span asp-validation-for="EventCategoryTagId" class="text-danger"></span>
-                    </div> *@
-
-                    <div class="form-group">
-                        <select name="EventCategoryTagId" id="EventCategoryTagId" asp-for="EventCategoryTagId" class="form-control">
-                            <option value="">-- Select Tag --</option>
+<div class="window">
+    <div class="content">
+        <h2><span id="title">Citlali</span> excited to help you set up your event! 🎉</h2>
+        <p>Just fill in the details below, and we’ll take care of the rest to make it amazing!</p>
+        <form asp-action="createEvent" method="post" enctype="multipart/form-data">
+            <div class="header">
+                <div class="form-group" id="eventTitle">
+                    <label for="EventTitle">Event Title</label>
+                    <input asp-for="EventTitle" class="form-control" />
+                    <span asp-validation-for="EventTitle" class="text-danger"></span>
+                </div>
+                <div class="form-group" id="eventTag">
+                    <label for="EventTag">Event Tag</label>
+                    <select name="EventCategoryTagId" id="EventCategoryTagId" asp-for="EventCategoryTagId" class="form-control">
+                            <option value="" disabled selected>🎯 Select event category tag</option>
                             @foreach (var tag in Model.Tags)
                             {
                                 <option value="@tag.TagId">@tag.TagName @tag.TagEmoji</option>
                             }
-                        </select>
-                        <span asp-validation-for="EventCategoryTagId" class="text-danger"></span>
-                    </div>
-
-                     
-                    <div class="form-group
-                    ">
-                        <label for="MaxParticipant">Max Participant</label>
-                        <input asp-for="MaxParticipant" class="form-control" />
-                        <span asp-validation-for="MaxParticipant" class="text-danger"></span>
-                    </div>
-                    <div class="form-group
-                    ">
-                        <label for="EventDate">Event Date</label>
-                        <input asp-for="EventDate" class="form-control" />
-                        <span asp-validation-for="EventDate" class="text-danger"></span>
-                    </div>
-                    <div class="form-group
-                    ">
-                        <label for="PostExpiryDate">PostExpiryDate</label>
-                        <input asp-for="PostExpiryDate" class="form-control" />
-                        <span asp-validation-for="PostExpiryDate" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <select name="EventLocationTagId" id="EventLocationTagId" asp-for="EventLocationTagId" class="form-control">
-                            <option value="">-- Select Location --</option>
+                    </select>
+                    <span asp-validation-for="EventCategoryTagId" class="text-danger"></span>
+                </div>
+                <div class="form-group" id="eventLocation">
+                    <label for="EventLocation">Location</label>
+                    <select name="EventLocationTagId" id="EventLocationTagId" asp-for="EventLocationTagId" class="form-control">
+                        <option value="" disabled selected>📍 Select event location</option>
                             @foreach (var location in Model.LocationTags)
                             {
                                 <option value="@location.EventLocationTagId">@location.EventLocationTagName</option>
                             }
-                        </select>
-                        <span asp-validation-for="EventLocationTagId" class="text-danger"></span>
-
-                    </div>
-
-                    <div class="form-group
-                    ">
-
-                    @* cost *@
-                    <div class="form-group">
-                        <label for="Cost">Cost</label>
-                        <input asp-for="Cost" class="form-control" />
-                        <span asp-validation-for="Cost" class="text-danger"></span>
-                    </div>
-
-                    @* question *@
-                    @* <div class="form-group">
-                        <span> Question : </span>
-                        <input asp-for="Questions" class="form-control" value="" />
-                        <span asp-validation-for="Questions" class="text-danger"></span>
-                    </div> *@
-
-                    <button type="submit" style="border:5px solid red">Create</button>
-
+                    </select>
+                    <span asp-validation-for="EventLocationTagId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="detail">
+                <div class="description">
+                    <div class="form-group" id="eventDescription">
+                        <label for="EventDescription">Description</label>
+                        <textarea asp-for="EventDescription" class="form-control"></textarea>
+                        <span asp-validation-for="EventDescription" class="text-danger"></span>
                     </div>
                 </div>
-            </div> 
-        </div>
+                <div class="meta-data">
+                    <div class="form-group" id="eventDate">
+                        <label for="EventDate">Event Date</label>
+                        <input asp-for="EventDate" class="form-control" />
+                        <span asp-validation-for="EventDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group" id="postExpiryDate">
+                        <label for="PostExpiryDate">Post Expiry Date</label>
+                        <input asp-for="PostExpiryDate" class="form-control" />
+                        <span asp-validation-for="PostExpiryDate" class="text-danger"></span>
+                    </div>
+                    <div class="participate-detail">
+                        <div class="form-group">
+                            <label for="Cost">Participation Cost (THB) / Person </label>
+                            <input asp-for="Cost" class="form-control" />
+                            <span asp-validation-for="Cost" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="MaxParticipant">Max Participant</label>
+                            <input asp-for="MaxParticipant" class="form-control" />
+                            <span asp-validation-for="MaxParticipant" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="question">
+                <h3>Want to get to know your participants better? 🤔</h3>
+                <p>Create some fun and insightful questions to help you learn more about them and make the best selections!</p>
+                <div class="question-list" id="question-list">
+                    <div class="form-group">
+                        <div class="add-question-control">
+                            <input type="text" id="new-question" class="question-input" placeholder="Type your question here" />
+                            <button type="button" id="add-question" class="add-button">Add</button>
+                        </div>
+                        <div class="added-question">
+                            <h5>Current questions</h5>
+                            <p>Once the event is created, these questions cannot be changed. Please take your time to choose the best ones!</p>
+                            <ol>
+                                @for (int i = 0; i < Model.Questions.Count; i++)
+                                {   
+                                    <li class="question-item">
+                                        <input type="hidden" name="Questions[]" value="@Model.Questions[@i]" />
+                                        <a class="popup-action-button" href="javascript:void(0);" onclick="removeQuestion(this)">
+                                            <span>❌</span>
+                                        </a>
+                                        <p>@Model.Questions[@i]</p>
+                                    </li>
+                                }
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="submit">
+                <button type="submit" class="submit-button">Create</button>
+            </div>
+        </form>
     </div>
-
-
-
-
-
-
-            
-
-</form>
+</div>
