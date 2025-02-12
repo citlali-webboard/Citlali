@@ -38,9 +38,9 @@ public class EventController : Controller
     }
 
     [HttpPost("createEvent")]
+    [Authorize]
     public async Task<IActionResult> Create(CreateEventViewModel createEventViewModel)
     {
-        Console.WriteLine("Create Event");
         var newEvent = await _eventService.CreateEvent(createEventViewModel);
         return RedirectToAction("detail", new { id = newEvent.EventId });
     }
