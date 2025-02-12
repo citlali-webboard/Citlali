@@ -1,0 +1,65 @@
+@model Citlali.Models.EventBriefCardData;
+
+@functions {
+    public string GetFutureRelativeTime(DateTime date) {
+        const int SECOND = 1;
+        const int MINUTE = 60 * SECOND;
+        const int HOUR = 60 * MINUTE;
+        const int DAY = 24 * HOUR;
+        const int MONTH = 30 * DAY;
+
+        var diff = date - DateTime.Now;
+        var timeSpan = Math.Floor(diff.TotalSeconds);
+        if (timeSpan <= 0) {
+            throw new InvalidDataException();
+        }
+
+        if (timeSpan < 1 * MINUTE)
+            return "a few seconds";
+        if (timeSpan < 2 * MINUTE)
+            return "a minute";
+        if (timeSpan < 1 * HOUR)
+            return $"{Math.Floor(timeSpan / MINUTE)} minutes";
+        if (timeSpan < 2 * HOUR)
+            return "an hour";
+        if (timeSpan < 1 * DAY)
+            return $"{Math.Floor(timeSpan / HOUR)} hours";
+        if (timeSpan < 2 * DAY)
+            return "tomorrow";
+        if (timeSpan < 1 * MONTH)
+            return $"{Math.Floor(timeSpan / DAY)} days";
+
+        return date.ToString("MMM dd, yyyy");
+    }
+}
+
+@{
+    string relativeTime;
+    bool expired = false;
+    try {
+        relativeTime = $"Expiring in {GetFutureRelativeTime(Model.CreatedAt)}";
+    } catch (InvalidDataException) {
+        expired = true;
+        relativeTime = "Expired";
+    }
+}
+
+<div class="card space-y-4">
+    <div class="justify-between">
+        <h2>@Model.CreatedAt.ToString("t") • @Model.CreatedAt.ToString("d")</h2>
+        <span>@Model.CurrentParticipant/@Model.MaxParticipant</span>
+    </div>
+    <div>
+        <span class="space-x-4 items-center">
+            <span class="tag">
+                <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
+                <span>@Model.EventCategoryTag.EventCategoryTagName</span>
+            </span>
+            <span class="event-title">@Model.EventTitle</span>
+        </span>
+    </div>
+    <div class="justify-between">
+        <span>Posted by @Model.CreatorDisplayName</span>
+        <span class="@(expired ? "expired" : "active")">@relativeTime</span>
+    </div>
+</div>

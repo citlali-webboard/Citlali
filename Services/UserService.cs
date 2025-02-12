@@ -38,48 +38,38 @@ public class UserService
 
     public async Task<User> CreateUser(UserOnboardingDto userOnboardingDto)
     {
-        try {
-            var supabaseUser = _supabaseClient.Auth.CurrentUser;
-            string profileImageUrl = _configuration.User.DefaultProfileImage;
+        var supabaseUser = _supabaseClient.Auth.CurrentUser;
+        string profileImageUrl = _configuration.User.DefaultProfileImage;
 
-            if (supabaseUser?.Id == null)
-            {
-                throw new Exception($"Error during user creation.");
-            }
-
-            if (supabaseUser?.Email == null)
-            {
-                throw new Exception($"Error during user creation.");
-            }
-
-            if (userOnboardingDto.ProfileImage != null)
-            {
-                profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
-            }
-
-
-
-            var dbUser = new User
-            {
-                UserId = Guid.Parse(supabaseUser.Id),
-                Email = supabaseUser.Email,
-                ProfileImageUrl = profileImageUrl,
-                Username = userOnboardingDto.Username,
-                DisplayName = userOnboardingDto.DisplayName,
-                UserBio = userOnboardingDto.UserBio
-            };
-
-            await _supabaseClient
-                .From<User>()
-                .Insert(dbUser);
-
-            return dbUser;
-        } catch(Exception e) {
-           var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
-            string msgError = errorJson.GetProperty("msg").GetString()??"";
-            Console.WriteLine(msgError);
-            throw new Exception(msgError);
+        if (supabaseUser?.Id == null)
+        {
+            throw new Exception($"Error during user creation.");
         }
+
+        if (supabaseUser?.Email == null)
+        {
+            throw new Exception($"Error during user creation.");
+        }
+
+        if (userOnboardingDto.ProfileImage != null)
+        {
+            profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? _configuration.User.DefaultProfileImage;
+        }
+
+        var dbUser = new User
+        {
+            UserId = Guid.Parse(supabaseUser.Id),
+            Email = supabaseUser.Email,
+            DisplayName = userOnboardingDto.DisplayName,
+            ProfileImageUrl = profileImageUrl,
+            UserBio = userOnboardingDto.UserBio
+        };
+
+        await _supabaseClient
+            .From<User>()
+            .Insert(dbUser);
+
+        return dbUser;
     }
 
     public async Task<User> EditUser(UserOnboardingDto userOnboardingDto)

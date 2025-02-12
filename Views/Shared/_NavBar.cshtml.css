@@ -1,0 +1,40 @@
+ul {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--color-primary);
+  height: 3rem;
+  box-shadow: 2px 2px 8px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 0 1rem;
+}
+
+li > svg {
+  fill: black !important;
+}
+
+.nav-group {
+  display: flex;
+  gap: 1rem;
+  height: 100%;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.profile-placeholder {
+  height: 2rem;
+  width: 2rem;
+  background-color: black;
+  border-radius: 100%;
+}

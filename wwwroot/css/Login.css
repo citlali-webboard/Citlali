@@ -3,7 +3,7 @@ body {
     padding: 0;
     background-color: #ffffff;
     position: relative;
-    
+
 }
 
 /* Form container */
@@ -12,24 +12,24 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    
+
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     width: 90vw;
     height: 90vh;
     background: white;
-    border-radius: 10px;
 }
 
 .form-content {
     display: flex;
     flex-direction: row;
     background-color: #ffffff;
-    border-radius: 5%;
+    border-radius: 2rem;
     box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.3);
-    width: 70%;
+    max-width: var(--max-screen-width);
+    width: 100%;
     height: 100%;
 }
 
@@ -39,7 +39,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 5% 0 0 5%;
+    border-radius: 2rem 0 0 2rem;
     overflow: hidden;
     background-color: #f0f0f0;
 }
@@ -48,7 +48,6 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 5% 0 0 5%;
 }
 
 
@@ -70,7 +69,8 @@ body {
 }
 
 h2 {
-    font-size: 36px;
+    font-size: 2rem;
+    font-weight: bold;
     margin-bottom: 30px;
     color: #333333;
 }
@@ -102,31 +102,11 @@ h2 {
     outline: none;
 }
 
-.form-group .icon {
+.form-group .icon svg {
     position: absolute;
-    top: 50%;
-    left: 10px;
-    transform: translateY(-50%);
-    font-size: 18px;
-    color: #999999;
-}
-
-.form-group .icon-email {
-    position: absolute;
-    left: 4%; 
-    top: 40%;
-    transform: translateY(-50%);
-    width: 20px; 
-    height: 20px;
-}
-
-.form-group .icon-lock {
-    position: absolute;
-    left: 4%;
-    top: 40%;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
+    left: 0.5rem;
+    top: 0.5rem;
+    fill: black !important;
 }
 
 .options {
@@ -184,7 +164,7 @@ h2 {
     .form-img {
         display: none;
     }
-    
+
     .form-container {
         width: 100vw;
         height: 100vh;
@@ -192,7 +172,7 @@ h2 {
         margin: 0;
         padding: 0;
     }
-    
+
     .form-content {
         height: 90%;
     }
@@ -218,4 +198,3 @@ h2 {
         width: 100%;
     }
 }
-

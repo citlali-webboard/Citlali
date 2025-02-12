@@ -42,7 +42,6 @@ inputs.forEach((input, index) => {
             Otp.value = OtpValue;
             
             if (OtpValue.length === 6) {
-               
                 button.classList.add("active");
                 button.click();
                 //wait for 1 second
@@ -85,7 +84,6 @@ inputs.forEach((input, index) => {
         }
 
         if (OtpValue.length === 6) {
-           
             button.classList.add("active");
             button.click();
             //wait for 1 second

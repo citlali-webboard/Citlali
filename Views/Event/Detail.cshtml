@@ -1,0 +1,14 @@
+@model Citlali.Models.EventDetailViewModel;
+
+@section head {
+    <link rel="stylesheet" href="~/css/Form.css" asp-append-version="true" />
+}
+
+<div class="center-wrapper">
+    <partial name="_NavBar" />
+
+    <div class="detail-main-container">
+        <partial name="_EventDetailCard" model=@Model.EventDetailCardData />
+        <partial name="_EventJoinForm" model=@Model.EventFormDto />
+    </div>
+</div>
