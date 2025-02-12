@@ -1,3 +1,16 @@
+function escapeHtml(unsafe) {
+    return unsafe.replace(/[&<>"']/g, function (match) {
+        const escapeMap = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        };
+        return escapeMap[match];
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     let addQuestionBtn = document.getElementById("add-question");
     let newQuestionInput = document.getElementById("new-question");
@@ -22,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <a class="popup-action-button" href="javascript:void(0);" onclick="removeQuestion(this)">
                     <span>❌</span>
                 </a>
-                <p>${questionText}</p>
+                <p>${escapeHtml(questionText)}</p>
             `;
             
             questionList.appendChild(newQuestionItem);
