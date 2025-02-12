@@ -44,7 +44,8 @@ public class UserController : Controller
             return RedirectToAction("SignIn", "Auth");
         }
 
-        if (!await _userService.RedirectToOnboarding()) {
+        if (!await _userService.RedirectToOnboarding())
+        {
             return RedirectToAction("Profile");
         }
 
@@ -58,33 +59,46 @@ public class UserController : Controller
     [Authorize]
     public async Task<IActionResult> Create(UserOnboardingDto user)
     {
-        try {
-            if (!await _userService.RedirectToOnboarding()) {
+        try
+        {
+            if (!await _userService.RedirectToOnboarding())
+            {
                 return RedirectToAction("Profile");
             }
 
-            if (string.IsNullOrEmpty(user.DisplayName)) {
+            if (string.IsNullOrEmpty(user.DisplayName))
+            {
                 TempData["Error"] = "Display name is required.";
                 return RedirectToAction("Onboarding");
             }
 
-            if (await _userService.GetUserByUsername(user.Username) != null) {
+            if (string.IsNullOrEmpty(user.Username))
+            {
+                TempData["Error"] = "Username is required.";
+                return RedirectToAction("Onboarding");
+            }
+
+            if (await _userService.GetUserByUsername(user.Username) != null)
+            {
                 TempData["Error"] = "Username is already taken.";
                 return RedirectToAction("Onboarding");
             }
 
             var userCreated = await _userService.CreateUser(user);
-            if (userCreated == null) {
+            if (userCreated == null)
+            {
                 TempData["Error"] = "Something went wrong. Please try again.";
                 return RedirectToAction("Onboarding");
             }
             return RedirectToAction("Profile");
-        } 
-        catch (InvalidUsernameException ex) {
+        }
+        catch (InvalidUsernameException ex)
+        {
             TempData["Error"] = ex.Message;
             return RedirectToAction("Onboarding");
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             Console.WriteLine(ex.Message);
             TempData["Error"] = "Something went wrong. Please try again.";
             return RedirectToAction("Onboarding");
