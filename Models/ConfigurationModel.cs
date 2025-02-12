@@ -1,3 +1,5 @@
+using SkiaSharp;
+
 namespace Citlali.Models;
 
 public class Configuration
@@ -23,6 +25,9 @@ public class UserConfig
 {
     public required string DefaultProfileImage { get; set; }
     public required string ProfileImageBucket { get; set; }
+    public required int ProfileImageEncodeQuality { get; set; }
+    public required int ProfileImageMaxSize { get; set; }
+    public required SKEncodedImageFormat ProfileImageFormat { get; set; }
 }
 
 public class JwtConfig
