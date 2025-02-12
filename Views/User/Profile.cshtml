@@ -1,94 +1,146 @@
 @model Citlali.Models.User
 
-<form asp-controller="Auth" asp-action="SignOut" method="post">
-  <button type="submit" class="btn btn-danger">Sign Out</button>
-</form>
+@section head{
+  <link rel="stylesheet" href="~/css/Profile.css" asp-append-version="true" />
+  <script src="~/js/Profile.js" asp-append-version="true"></script>
+}
+
+@{
+  ViewData["Title"] = "Profile";
+  var navModel = new Citlali.Models.NavModel
+  {
+    profileImageUrl = Model.ProfileImageUrl
+  };
+}
 
 
-<partial name="_NavBar" />
+<partial name="_NavBar" model=@navModel />
+<div class="window">
 
-<div class="container" id="container">
-  <div class="profile">
-    <div class="pf_and_btn">
-      <div style="
-              width: 300px;
-              height: 300px;
-              background-color: grey;
-              border-radius: 50%;
-            " class="pf_img">
-        <img id="pf_image" src="@Model.ProfileImageUrl" alt=""
-          style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-      </div>
-      <input type="file" id="image_inp" accept="image/*" style="display: none;">
-      <button id="editProfileBtn" onclick="openPopup()">
-        Edit profile
-      </button>
-      @* onclick="toggleEditPopup('@Html.Raw(Model.ProfileImageUrl)', '@Html.Raw(Model.DisplayName)', '@Html.Raw(Model.UserBio)')" *@
-    </div>
+  <form asp-controller="Auth" asp-action="SignOut" method="post">
+    <button type="submit" class="btn btn-danger">Sign Out</button>
+  </form>
 
-    <div class="pf_detail">
-      <div class="pf_usr">
-        <h1 contenteditable="false" id="username">@Model.DisplayName</h1>
-
-      </div>
-
-      <div>
-        <div class="pf_stat">
-          <p>22 post</p>
-          <p>33 followers</p>
-          <p>44 following</p>
+  <div class="edit-popup" id="edit-popup">
+    <div class="popup-content">
+      <form class="edit_form" asp-controller="User" asp-action="edit" method="post" enctype="multipart/form-data">
+        <div class="popup-navigation">
+          <a class="popup-action-button" onclick="closeDialog()">
+            <span>
+              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.DismissCircle>>(RenderMode.ServerPrerendered))
+            </span>
+          </a>
+          <h1>Edit Profile</h1>
+          <button type="submit" class="popup-action-button">
+            <span>
+              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Save>>(RenderMode.ServerPrerendered))
+            </span>
+          </button>
         </div>
-        <p contenteditable="false" id="email">@Model.Email</p>
-        <p contenteditable="false" id="bio">@Model.UserBio</p>
-      </div>
+
+        <div class="popup-body">
+          <div class="popup-profile-image">
+              <img src="@Model.ProfileImageUrl" alt="Profile Image" id="profilePreview" />
+                <label for="profileImage" class="upload-button">
+                    <span>
+                      @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Image>>(RenderMode.ServerPrerendered))
+                    </span>
+                    <span>
+                      Upload image...
+                    </span>
+                </label>
+              <input type="file" id="profileImage" name="ProfileImage" style="display: none;" />
+          </div>
+
+          <div class="popup-info">
+            <div class="form-group">
+              <label for="Email">Email</label>
+                  <input asp-for="Email" class="form-control disabled-input" value=@Model.Email id="Email" disabled />
+                  <span asp-validation-for="Email" class="text-danger"></span>
+              </div>
+
+              <div class="form-group">
+                  <label for="Username">Username</label>
+                  <input asp-for="Username" class="form-control disabled-input" id="Username" disabled />
+                  <span asp-validation-for="Username" class="text-danger"></span>
+              </div>
+
+              <div class="form-group">
+                  <label for="DisplayName">Display Name</label>
+                  <input asp-for="DisplayName" class="form-control" id="DisplayName" />
+                  <span asp-validation-for="DisplayName" class="text-danger"></span>
+              </div>
+
+              <div class="form-group" id="bio">
+                  <label for="UserBio">User Bio</label>
+                  <textarea asp-for="UserBio" id="UserBio" rows="3"></textarea>
+                  <span asp-validation-for="UserBio" class="text-danger"></span>
+              </div>
+          </div>
+
+        </div>
+      </form>
     </div>
-
-    <div class="feedback">
-      <?xml version="1.0" encoding="utf-8"?><!-- feedback -->
-      <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="3" cy="3" r="3" transform="matrix(-1 0 0 1 22 2)" stroke="#1C274C" stroke-width="1.5" />
-        <path
-          d="M14 2.20004C13.3538 2.06886 12.6849 2 12 2C10.1786 2 8.47087 2.48697 7 3.33782M21.8 10C21.9311 10.6462 22 11.3151 22 12C22 17.5228 17.5228 22 12 22C10.4003 22 8.88837 21.6244 7.54753 20.9565C7.19121 20.7791 6.78393 20.72 6.39939 20.8229L4.17335 21.4185C3.20701 21.677 2.32295 20.793 2.58151 19.8267L3.17712 17.6006C3.28001 17.2161 3.22094 16.8088 3.04346 16.4525C2.37562 15.1116 2 13.5997 2 12C2 10.1786 2.48697 8.47087 3.33782 7"
-          stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-      </svg>
-    </div>
-
-  </div>
-  <!-- Profile Edit Pop-up (Hidden by Default) -->
-  <div id="editProfilePopup" class="popup" style="display: none;">
-    <form class="edit_form" asp-controller="User" asp-action="edit" method="post" enctype="multipart/form-data">
-
-      <h2>Edit Profile</h2>
-
-      <!-- Profile Image -->
-      <div class="popup_img">
-        <img id="profilePreview" src="@Model.ProfileImageUrl" alt=""
-          style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer;">
-        <input type="file" id="profileImage" name="ProfileImage" style="display: none;" />
-      </div>
-
-      <!-- Username -->
-      <div>
-        <label for="displayName">Username:</label>
-        <input type="text" id="displayName" name="DisplayName" value="@Model.DisplayName" required />
-      </div>
-
-      <!-- Bio -->
-      <div>
-        <label for="userBio">Bio:</label>
-        <textarea id="userBio" name="UserBio">@Model.UserBio</textarea>
-      </div>
-
-      <!-- Save Button -->
-      <button type="submit">Save</button>
-      <button type="button" onclick="closePopup()">Cancel</button>
-    </form>
-
   </div>
 
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-image">
+        <img src=@Model.ProfileImageUrl alt="Profile Image" />
+      </div>
+      <div class="user-info">
+        <div class="display-name">
+          <h1>@Model.DisplayName</h1>
+          <p class="username">
+            <span>
+              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.ContactCard>>(RenderMode.ServerPrerendered))
+            </span>
+            <span>
+              @Model.Username
+            </span>
+          </p>
+          <div class="button-group">
+            <a class="action-button" id="edit-button" onclick="openDialog()">
+              <span>
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Pen>>(RenderMode.ServerPrerendered))
+              </span>
+              <span>
+                Edit profile...
+              </span>
+            </a>
+            <a class="action-button">
+              <span>
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.AddCircle>>(RenderMode.ServerPrerendered))
+              </span>
+              <span>
+                Follow
+              </span>
+            </a>
+          </div>
+        </div>
+        <div class="meta-data">
+          <div class="data">
+            <h3>32</h3>
+            <p>Posts</p>
+          </div>
+          <div class="data">
+            <h3>1332</h3>
+            <p>Followers</p>
+          </div>
+          <div class="data">
+            <h3>6969</h3>
+            <p>Followings</p>
+          </div>
+        </div>
+        <div class="user-bio">
+          <p>
+            @Model.UserBio
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <div class="post_list"></div>
+  <hr />
 
 </div>
-
-<script src="~/js/Profile.js"></script>

@@ -21,7 +21,7 @@ public class User : BaseModel
         public string Username { get; set; } = "";
 
         [Column("ProfileImageURL")]
-        public string ProfileImageUrl { get; set; } = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+        public string ProfileImageUrl { get; set; } = "";
 
         [Column("DisplayName")]
         public string DisplayName { get; set; } = "";

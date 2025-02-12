@@ -1,17 +1,16 @@
 using Citlali.Models;
 using Supabase;
-using Microsoft.Extensions.Configuration;
-using System.Threading.Tasks;
-using DotNetEnv;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Citlali.Services;
 
 public class UserService
 {
-    private readonly Supabase.Client _supabaseClient;
-    private readonly IConfiguration _configuration;
+    private readonly Client _supabaseClient;
+    private readonly Configuration _configuration;
 
-    public UserService(Supabase.Client supabaseClient, IConfiguration configuration)
+    public UserService(Client supabaseClient, Configuration configuration)
     {
         _supabaseClient = supabaseClient;
         _configuration = configuration;
@@ -37,60 +36,83 @@ public class UserService
 
     public async Task<User> CreateUser(UserOnboardingDto userOnboardingDto)
     {
-        var supabaseUser = _supabaseClient.Auth.CurrentUser;
-        string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+        try {
+            var supabaseUser = _supabaseClient.Auth.CurrentUser;
+            string profileImageUrl = _configuration.User.DefaultProfileImage;
 
-        if (supabaseUser?.Id == null)
-        {
-            throw new Exception($"Error during user creation.");
+            if (supabaseUser?.Id == null)
+            {
+                throw new Exception("Error during user creation.");
+            }
+
+            if (supabaseUser?.Email == null)
+            {
+                throw new Exception("Error during user creation.");
+            }
+
+            if (userOnboardingDto.ProfileImage != null)
+            {
+                profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? _configuration.User.DefaultProfileImage;
+            }
+
+            if (!IsUsernameValid(userOnboardingDto.Username))
+            {
+                throw new InvalidUsernameException();
+            }
+
+            var dbUser = new User
+            {
+                UserId = Guid.Parse(supabaseUser.Id),
+                Email = supabaseUser.Email,
+                ProfileImageUrl = profileImageUrl,
+                Username = userOnboardingDto.Username,
+                DisplayName = userOnboardingDto.DisplayName,
+                UserBio = userOnboardingDto.UserBio
+            };
+
+            await _supabaseClient
+                .From<User>()
+                .Insert(dbUser);
+
+            return dbUser;
         }
-
-        if (supabaseUser?.Email == null)
-        {
-            throw new Exception($"Error during user creation.");
+        catch (InvalidUsernameException) {
+            throw new InvalidUsernameException();
         }
-
-        if (userOnboardingDto.ProfileImage != null)
-        {
-            profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+         catch(Exception e) {
+            var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
+            string msgError = errorJson.GetProperty("msg").GetString() ?? "";
+            Console.WriteLine(msgError);
+            throw new Exception(msgError);
         }
-
-        var dbUser = new User
-        {
-            UserId = Guid.Parse(supabaseUser.Id),
-            Email = supabaseUser.Email,
-            DisplayName = userOnboardingDto.DisplayName,
-            ProfileImageUrl = profileImageUrl,
-            UserBio = userOnboardingDto.UserBio
-        };
-
-        await _supabaseClient
-            .From<User>()
-            .Insert(dbUser);
-
-        return dbUser;
     }
 
     public async Task<User> EditUser(UserOnboardingDto userOnboardingDto)
     {
         var supabaseUser = _supabaseClient.Auth.CurrentUser;
-        string profileImageUrl = Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+        string profileImageUrl = _configuration.User.DefaultProfileImage;
 
         if (supabaseUser?.Id == null || supabaseUser?.Email == null)
         {
-            throw new Exception($"Error during user editing.");
+            throw new Exception("Error during user editing.");
         }
 
         var model = await GetUserByUserId(Guid.Parse(supabaseUser.Id));
         if (model == null)
         {
-            throw new Exception($"Error during user editing.");
+            throw new Exception("Error during user editing.");
+        }
+
+        if (userOnboardingDto.DisplayName == null || userOnboardingDto.DisplayName == "")
+        {
+           throw new Exception("Display name is required.");
         }
 
         if (userOnboardingDto.ProfileImage != null)
         {
-            profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? Environment.GetEnvironmentVariable("DEFAULT_PROFILE_IMAGE_URL") ?? "";
+            profileImageUrl = await UploadProfileImage(userOnboardingDto.ProfileImage, supabaseUser.Id) ?? _configuration.User.DefaultProfileImage;
         }
+
         else
         {
             profileImageUrl = model.ProfileImageUrl;
@@ -115,6 +137,16 @@ public class UserService
         return response ?? null;
     }
 
+    public async Task<User?> GetUserByUsername(string username)
+    {
+        var response = await _supabaseClient
+            .From<User>()
+            .Where(row => row.Username == username)
+            .Single();
+
+        return response ?? null;
+    }
+
     public async Task<User?> GetUserByUserId(Guid userId)
     {
         var response = await _supabaseClient
@@ -129,7 +161,7 @@ public class UserService
     {
         try
         {
-            string bucketName = Environment.GetEnvironmentVariable("SUPABASE_BUCKET_NAME") ?? "";
+            string bucketName = _configuration.User.ProfileImageBucket ?? "";
             string userFolder = $"{userId}/";
 
             // List all files in the user's folder
@@ -185,4 +217,19 @@ public class UserService
         }
     }
 
+    public bool IsUsernameValid(string username)
+    {
+        return Regex.IsMatch(username, @"^[A-Za-z][A-Za-z0-9_]{3,29}$");
+    }
+
+}
+
+public class InvalidUsernameException : Exception
+{
+    public InvalidUsernameException() : base("Invalid username.") { }
+
+    public InvalidUsernameException(string message) : base(message) { }
+
+    public InvalidUsernameException(string message, Exception innerException) 
+        : base(message, innerException) { }
 }

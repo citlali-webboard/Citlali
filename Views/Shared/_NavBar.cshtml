@@ -1,161 +1,57 @@
+@* @model Citlali.Models.NavModel; *@
+
 <nav>
-      <div class="left_box">
-        <?xml version="1.0" encoding="utf-8"?><!-- Hamberger Menu -->
-        <svg
-          width="40px"
-          height="40px"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M4 7L7 7M20 7L11 7"
-            stroke="#1C274C"
-            stroke-width="1.5"
-            stroke-linecap="round"
-          />
-          <path
-            d="M20 17H17M4 17L13 17"
-            stroke="#1C274C"
-            stroke-width="1.5"
-            stroke-linecap="round"
-          />
-          <path
-            d="M4 12H7L20 12"
-            stroke="#1C274C"
-            stroke-width="1.5"
-            stroke-linecap="round"
-          />
-        </svg>
+  <ul>
+    <div class="nav-group">
+      <a href="#">
+        <li>
+          @* Navigation Hamburger *@
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Navigation>>(RenderMode.ServerPrerendered))
+        </li>
+      </a>
 
-        <a href="#">
-          <div class="logo">
-            <?xml version="1.0" encoding="utf-8"?><!-- Citlali Logo -->
-            <svg
-              width="25px"
-              height="25px"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M18.18 8.03933L18.6435 7.57589C19.4113 6.80804 20.6563 6.80804 21.4241 7.57589C22.192 8.34374 22.192 9.58868 21.4241 10.3565L20.9607 10.82M18.18 8.03933C18.18 8.03933 18.238 9.02414 19.1069 9.89309C19.9759 10.762 20.9607 10.82 20.9607 10.82M18.18 8.03933L13.9194 12.2999C13.6308 12.5885 13.4865 12.7328 13.3624 12.8919C13.2161 13.0796 13.0906 13.2827 12.9882 13.4975C12.9014 13.6797 12.8368 13.8732 12.7078 14.2604L12.2946 15.5L12.1609 15.901M20.9607 10.82L16.7001 15.0806C16.4115 15.3692 16.2672 15.5135 16.1081 15.6376C15.9204 15.7839 15.7173 15.9094 15.5025 16.0118C15.3203 16.0986 15.1268 16.1632 14.7396 16.2922L13.5 16.7054L13.099 16.8391M13.099 16.8391L12.6979 16.9728C12.5074 17.0363 12.2973 16.9867 12.1553 16.8447C12.0133 16.7027 11.9637 16.4926 12.0272 16.3021L12.1609 15.901M13.099 16.8391L12.1609 15.901"
-                stroke="#1C274C"
-                stroke-width="1.5"
-              />
-              <path
-                d="M8 13H10.5"
-                stroke="#1C274C"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
-              <path
-                d="M8 9H14.5"
-                stroke="#1C274C"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
-              <path
-                d="M8 17H9.5"
-                stroke="#1C274C"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
-              <path
-                d="M3 14V10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H13C16.7712 2 18.6569 2 19.8284 3.17157M21 14C21 17.7712 21 19.6569 19.8284 20.8284M4.17157 20.8284C5.34315 22 7.22876 22 11 22H13C16.7712 22 18.6569 22 19.8284 20.8284M19.8284 20.8284C20.7715 19.8853 20.9554 18.4796 20.9913 16"
-                stroke="#1C274C"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
-            </svg>
-            <p>Citlali</p>
+      <a href="#">
+        <li class="logo">
+          @* Logo *@
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.DocumentEdit>>(RenderMode.ServerPrerendered))
+          </span>
+          <p>Citlali</p>
+        </li>
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <a href="#">
+        <li>
+          @* History *@
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.History>>(RenderMode.ServerPrerendered))
+        </li>
+      </a>
+
+      <a href="#">
+        @* Notification *@
+        <li>
+
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Alert>>(RenderMode.ServerPrerendered))
+        </li>
+      </a>
+
+      <a href="#">
+        @* Follow Heart *@
+        <li>
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Heart>>(RenderMode.ServerPrerendered))
+        </li>
+      </a>
+
+      <a href="#">
+        @* Profile *@
+        <li>
+          <div class="profile-placeholder">
+            @* <img src=@Model.profileImageUrl alt=""> *@
           </div>
-        </a>
-      </div>
-
-      <div class="right_box">
-        <a href="#">
-          <?xml version="1.0" encoding="utf-8"?><!-- History Shortcut -->
-          <svg
-            width="40px"
-            height="40px"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M2 12C2 17.5228 6.47715 22 12 22C13.8214 22 15.5291 21.513 17 20.6622M12 2C17.5228 2 22 6.47715 22 12C22 13.8214 21.513 15.5291 20.6622 17"
-              stroke="#1C274C"
-              stroke-width="1.5"
-              stroke-linecap="round"
-            />
-            <path
-              d="M12 9V13H16"
-              stroke="#1C274C"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M17 20.6622C15.5291 21.513 13.8214 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 13.8214 21.513 15.5291 20.6622 17"
-              stroke="#1C274C"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-dasharray="0.5 3.5"
-            />
-          </svg>
-        </a>
-
-        <a href="#">
-          <?xml version="1.0" encoding="utf-8"?><!-- Notification?? -->
-          <svg
-            width="40px"
-            height="40px"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M9.10745 2.67414C9.98414 2.24187 10.9649 2 12 2C15.7274 2 18.7491 5.13623 18.7491 9.00497V9.70957C18.7491 10.5552 18.9903 11.3818 19.4422 12.0854L20.5496 13.8095C21.5612 15.3843 20.789 17.5249 19.0296 18.0229C14.4273 19.3257 9.57274 19.3257 4.97036 18.0229C3.21105 17.5249 2.43882 15.3843 3.45036 13.8095L4.5578 12.0854C5.00972 11.3818 5.25087 10.5552 5.25087 9.70957V9.00497C5.25087 7.93058 5.48391 6.91269 5.90039 6.00277"
-              stroke="#1C274C"
-              stroke-width="1.5"
-              stroke-linecap="round"
-            />
-            <path
-              d="M7.5 19C8.15503 20.7478 9.92246 22 12 22C12.2445 22 12.4847 21.9827 12.7192 21.9492M16.5 19C16.2329 19.7126 15.781 20.3428 15.1985 20.8393"
-              stroke="#1C274C"
-              stroke-width="1.5"
-              stroke-linecap="round"
-            />
-          </svg>
-        </a>
-
-        <a href="#">
-          <?xml version="1.0" encoding="utf-8"?><!-- Followed Shortcut -->
-          <svg
-            width="40px"
-            height="40px"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M8.96173 18.9109L9.42605 18.3219L8.96173 18.9109ZM12 5.50063L11.4596 6.02073C11.601 6.16763 11.7961 6.25063 12 6.25063C12.2039 6.25063 12.399 6.16763 12.5404 6.02073L12 5.50063ZM15.0383 18.9109L15.5026 19.4999L15.0383 18.9109ZM7.00061 16.4209C6.68078 16.1577 6.20813 16.2036 5.94491 16.5234C5.68169 16.8432 5.72758 17.3159 6.04741 17.5791L7.00061 16.4209ZM2.34199 13.4115C2.54074 13.7749 2.99647 13.9084 3.35988 13.7096C3.7233 13.5108 3.85677 13.0551 3.65801 12.6917L2.34199 13.4115ZM2.75 9.1371C2.75 6.98623 3.96537 5.18252 5.62436 4.42419C7.23607 3.68748 9.40166 3.88258 11.4596 6.02073L12.5404 4.98053C10.0985 2.44352 7.26409 2.02539 5.00076 3.05996C2.78471 4.07292 1.25 6.42503 1.25 9.1371H2.75ZM8.49742 19.4999C9.00965 19.9037 9.55954 20.3343 10.1168 20.6599C10.6739 20.9854 11.3096 21.25 12 21.25V19.75C11.6904 19.75 11.3261 19.6293 10.8736 19.3648C10.4213 19.1005 9.95208 18.7366 9.42605 18.3219L8.49742 19.4999ZM15.5026 19.4999C16.9292 18.3752 18.7528 17.0866 20.1833 15.4758C21.6395 13.8361 22.75 11.8026 22.75 9.1371H21.25C21.25 11.3345 20.3508 13.0282 19.0617 14.4798C17.7469 15.9603 16.0896 17.1271 14.574 18.3219L15.5026 19.4999ZM22.75 9.1371C22.75 6.42503 21.2153 4.07292 18.9992 3.05996C16.7359 2.02539 13.9015 2.44352 11.4596 4.98053L12.5404 6.02073C14.5983 3.88258 16.7639 3.68748 18.3756 4.42419C20.0346 5.18252 21.25 6.98623 21.25 9.1371H22.75ZM14.574 18.3219C14.0479 18.7366 13.5787 19.1005 13.1264 19.3648C12.6739 19.6293 12.3096 19.75 12 19.75V21.25C12.6904 21.25 13.3261 20.9854 13.8832 20.6599C14.4405 20.3343 14.9903 19.9037 15.5026 19.4999L14.574 18.3219ZM9.42605 18.3219C8.63014 17.6945 7.82129 17.0963 7.00061 16.4209L6.04741 17.5791C6.87768 18.2624 7.75472 18.9144 8.49742 19.4999L9.42605 18.3219ZM3.65801 12.6917C3.0968 11.6656 2.75 10.5033 2.75 9.1371H1.25C1.25 10.7746 1.66995 12.1827 2.34199 13.4115L3.65801 12.6917Z"
-              fill="#1C274C"
-            />
-          </svg>
-        </a>
-
-        <a href="#">
-          <!-- User Profile -->
-          <div
-            style="
-              background-color: grey;
-              border-radius: 50%;
-              width: 40px;
-              height: 40px;
-            "
-          ></div>
-        </a>
-      </div>
-    </nav>
+        </li>
+      </a>
+    </div>
+  </ul>
+</nav>

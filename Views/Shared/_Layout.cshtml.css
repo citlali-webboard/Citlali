@@ -1,4 +1,3 @@
-﻿
 .error-popup {
   position: fixed;
   top: 20px;
@@ -8,16 +7,16 @@
   padding: 15px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-
+  
   display: flex;
   align-items: center;
   justify-content: space-between;
-
+  
   z-index: 99999;
-  width: max-content;
+  width: max-content; 
   min-width: 200px;
-  height: auto;
-  white-space: nowrap;
+  height: auto; 
+  white-space: nowrap; 
 }
 
 .error-popup button {

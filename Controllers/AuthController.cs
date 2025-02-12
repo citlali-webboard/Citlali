@@ -1,11 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-
 using Citlali.Models;
 using Citlali.Services;
-using Citlali.Controllers;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Net;
 
 namespace Citlali.Controllers;
 
@@ -14,16 +9,34 @@ public class AuthController : Controller
     private readonly ILogger<AuthController> _logger;
     private readonly Supabase.Client _supabaseClient;
     private readonly AuthService _authService;
-    private readonly string _accessCookieName;
-    private readonly string _refreshCookieName;
+    private readonly UserService _userService;
+    private readonly Configuration _configuration;
+    private readonly List<(string Controller, string Action)> _validRedirects = new()
+    {
+        ("User", "Profile"),
+        ("Auth", "SignIn"),
+        ("Auth", "SignUp"),
+        ("Auth", "Confirm"),
+        ("Auth", "AuthCodeError")
+    };
 
-    public AuthController(ILogger<AuthController> logger, Supabase.Client supabaseClient, AuthService authService)
+    private bool IsValidRedirect(string controller, string action)
+    {
+        return _validRedirects.Contains((controller, action));
+    }
+
+    public AuthController(
+        ILogger<AuthController> logger,
+        Supabase.Client supabaseClient,
+        AuthService authService,
+        Configuration configuration,
+        UserService userService)
     {
         _logger = logger;
         _supabaseClient = supabaseClient;
         _authService = authService;
-        _accessCookieName = Environment.GetEnvironmentVariable("JWT_ACCESS_COOKIE") ?? throw new Exception("JWT_ACCESS_COOKIE must be set in the environment variables.");
-        _refreshCookieName = Environment.GetEnvironmentVariable("JWT_REFRESH_COOKIE") ?? throw new Exception("JWT_REFRESH_COOKIE must be set in the environment variables.");
+        _userService = userService;
+        _configuration = configuration;
     }
 
     public IActionResult AuthCodeError()
@@ -44,31 +57,30 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> SignIn(AuthLoginDto authLoginDto)
     {
-        
+     
     try{
         var session = await _authService.SignIn(authLoginDto.Email, authLoginDto.Password);
         if (session != null && session.AccessToken != null && session.RefreshToken != null)
-        {
-            Response.Cookies.Append(_accessCookieName, session.AccessToken);
-            Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
-            return RedirectToAction("Profile", "User");
+            {
+                Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
+                Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
+                return RedirectToAction("Profile", "User");
+            }
+            throw new Exception("Wrong credentials.");
         }
-
-        throw new Exception("Wrong credentials.");
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            TempData["Error"] = ex.Message;
+            return RedirectToAction("SignIn");
+        }
     }
-    catch (Exception ex){
-        Console.WriteLine(ex.Message);
-        TempData["Error"] = ex.Message;
-        return RedirectToAction("SignIn");
-    }
-}
-
 
     [HttpPost("auth/signout")]
     public new async Task<IActionResult> SignOut()
     {
-        Response.Cookies.Delete(_accessCookieName);
-        Response.Cookies.Delete(_refreshCookieName);
+        Response.Cookies.Delete(_configuration.Jwt.AccessCookie);
+        Response.Cookies.Delete(_configuration.Jwt.RefreshCookie);
         await _supabaseClient.Auth.SignOut();
         return RedirectToAction("SignIn");
     }
@@ -81,14 +93,20 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> SignUp(AuthRegisterDto authRegisterDto)
     {
-        try{
+        if (await _userService.GetUserByEmail(authRegisterDto.Email) != null)
+        {
+            TempData["Error"] = "User with this email already exists.";
+            return RedirectToAction("SignUp");
+        }
+
+        try
+        {
             var session = await _authService.SignUp(authRegisterDto.Email, authRegisterDto.Password);
             if (session != null && session.AccessToken != null && session.RefreshToken != null)
-
             {
-                Response.Cookies.Append(_accessCookieName, session.AccessToken);
-                Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
-                return RedirectToAction("UserController.Profile");
+                Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
+                Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
+                return RedirectToAction("Profile", "User");
             }
             else
             {
@@ -99,8 +117,9 @@ public class AuthController : Controller
                 };
                 return RedirectToAction("Confirm", authConfirmDto);
             }
-            
-        }catch(Exception ex){
+        }
+        catch (Exception ex)
+        {
             Console.WriteLine(ex.Message);
             TempData["Error"] = ex.Message;
             return RedirectToAction("SignUp");
@@ -121,7 +140,8 @@ public class AuthController : Controller
     [HttpPost("auth/confirm")]
     public async Task<IActionResult> ConfirmPost(AuthConfirmDto authConfirmDto, string? Next)
     {
-        try{
+        try
+        {
             if (!ModelState.IsValid)
             {
                 return View(authConfirmDto);
@@ -130,15 +150,15 @@ public class AuthController : Controller
             if (session != null && session.AccessToken != null && session.RefreshToken != null)
             {
                 await _supabaseClient.Auth.SetSession(session.AccessToken, session.RefreshToken);
-                Response.Cookies.Append(_accessCookieName, session.AccessToken);
-                Response.Cookies.Append(_refreshCookieName, session.RefreshToken);
+                Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
+                Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
                 var authorizedRedirects = new List<string> { "User/Profile", "User/Onboarding" };
                 if (!string.IsNullOrEmpty(Next) && authorizedRedirects.Contains(Next))
                 {
                     var parts = Next.Split('/');
-                    if (parts.Length == 2)
+                    if (parts.Length == 2 && IsValidRedirect(parts[0], parts[1]))
                     {
-                        return RedirectToAction(parts[1], parts[0]); // RedirectToAction(Action, Controller)
+                        return RedirectToAction(parts[1], parts[0]);
                     }
                 }
                 return RedirectToAction("Profile", "User");
@@ -147,12 +167,14 @@ public class AuthController : Controller
             {
                 return RedirectToAction("AuthCodeError");
             }
-        }catch(Exception ex){
+        }
+        catch (Exception ex)
+        {
             Console.WriteLine(ex.Message);
-            TempData["Error"] = "Invalid OTP";
+            TempData["Error"] = "Token is invalid or expired.";
             return RedirectToAction("Confirm", authConfirmDto);
 
         }
-        
+
     }
 }

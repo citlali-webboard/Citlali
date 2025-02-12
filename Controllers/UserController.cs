@@ -13,12 +13,14 @@ public class UserController : Controller
     private readonly ILogger<UserController> _logger;
     private readonly Supabase.Client _supabaseClient;
     private readonly UserService _userService;
+    private readonly Configuration _configuration;
 
-    public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService)
+    public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService, Configuration configuration)
     {
         _logger = logger;
         _supabaseClient = supabaseClient;
         _userService = userService;
+        _configuration = configuration;
     }
 
     public IActionResult Index()
@@ -28,6 +30,7 @@ public class UserController : Controller
         {
             return RedirectToAction("SignIn", "Auth");
         }
+
         return RedirectToAction("Onboarding");
     }
 
@@ -41,9 +44,13 @@ public class UserController : Controller
             return RedirectToAction("SignIn", "Auth");
         }
 
-        if (!await _userService.RedirectToOnboarding()) {
+        if (!await _userService.RedirectToOnboarding())
+        {
             return RedirectToAction("Profile");
         }
+
+        ViewBag.Email = currentUser.Email;
+        ViewBag.ProfileImageUrl = _configuration.User.DefaultProfileImage;
 
         return View();
     }
@@ -52,14 +59,51 @@ public class UserController : Controller
     [Authorize]
     public async Task<IActionResult> Create(UserOnboardingDto user)
     {
-        if (!await _userService.RedirectToOnboarding()) {
-            RedirectToAction("Profile");
+        try
+        {
+            if (!await _userService.RedirectToOnboarding())
+            {
+                return RedirectToAction("Profile");
+            }
+
+            if (string.IsNullOrEmpty(user.DisplayName))
+            {
+                TempData["Error"] = "Display name is required.";
+                return RedirectToAction("Onboarding");
+            }
+
+            if (string.IsNullOrEmpty(user.Username))
+            {
+                TempData["Error"] = "Username is required.";
+                return RedirectToAction("Onboarding");
+            }
+
+            if (await _userService.GetUserByUsername(user.Username) != null)
+            {
+                TempData["Error"] = "Username is already taken.";
+                return RedirectToAction("Onboarding");
+            }
+
+            var userCreated = await _userService.CreateUser(user);
+            if (userCreated == null)
+            {
+                TempData["Error"] = "Something went wrong. Please try again.";
+                return RedirectToAction("Onboarding");
+            }
+            return RedirectToAction("Profile");
         }
-        var userCreated = await _userService.CreateUser(user);
-        if (userCreated == null) {
+        catch (InvalidUsernameException ex)
+        {
+            TempData["Error"] = ex.Message;
             return RedirectToAction("Onboarding");
         }
-        return RedirectToAction("Profile");
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            TempData["Error"] = "Something went wrong. Please try again.";
+            return RedirectToAction("Onboarding");
+        }
+
     }
 
     [HttpGet("profile")]
@@ -133,7 +177,15 @@ public class UserController : Controller
     [Authorize]
     public async Task<IActionResult> ProfileEdit(UserOnboardingDto userOnboardingDto)
     {
+
+        if (string.IsNullOrEmpty(userOnboardingDto.DisplayName))
+            {
+                TempData["Error"] = "Display name is required.";
+                return RedirectToAction("Profile");
+            }
+            
         await _userService.EditUser(userOnboardingDto);
+
         return RedirectToAction("Profile");
     }
 }

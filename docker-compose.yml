@@ -1,0 +1,21 @@
+services:
+  app:
+    image: ${DOCKER_IMAGE}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+      - "5443:443"
+    env_file:
+      - path: ./.env
+        required: true
+    environment:
+      - ASPNETCORE_HTTP_PORTS=80
+      - ASPNETCORE_HTTPS_PORTS=443
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${KESTREL_PASSWORD}
+    volumes:
+      - ~/.microsoft/usersecrets/:/home/app/.microsoft/usersecrets:ro
+      - ~/.aspnet/https/:/https/:ro
