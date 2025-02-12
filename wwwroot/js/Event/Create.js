@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     newQuestionInput.addEventListener("keypress", function (e) {
         if (e.key === 'Enter') {
+            e.preventDefault();
             addQuestionBtn.click();
         }
     });
