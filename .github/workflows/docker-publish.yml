@@ -22,7 +22,6 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -98,6 +97,8 @@ jobs:
   deploy:
     runs-on: self-hosted
     needs: build
+    permissions:
+      contents: read
     steps:
       # - name: SSH Deployment
       #   uses: appleboy/ssh-action@7eaf76671a0d7eec5d98ee897acda4f968735a17 # v1.2.0
