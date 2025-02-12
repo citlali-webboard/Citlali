@@ -133,7 +133,7 @@ public class UserService
             var bucketFilePath = $"{userId}/{fileName}";
 
             try {
-                await _supabaseClient.Storage
+                _ = await _supabaseClient.Storage
                     .From(bucketName)
                     .Remove(bucketFilePath);
             } catch { 
@@ -153,7 +153,10 @@ public class UserService
                 .From(bucketName)
                 .GetPublicUrl(bucketFilePath);
 
-            return publicUrl;
+            // generate a short id to prevent caching
+            string imageId = Guid.NewGuid().ToString("N")[..8];
+            
+            return $"{publicUrl}?id={imageId}";
         }
 
         catch (Exception ex)
