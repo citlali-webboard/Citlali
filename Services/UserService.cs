@@ -164,6 +164,7 @@ public class UserService
 
             string tempFolder = Path.GetTempPath(); // System temp folder
             string tempFilePath = Path.Combine(tempFolder, $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}");
+            string targetFilePath = $"{userId}/{userId}-{Guid.NewGuid()}.webp";
 
             using (var fileStream = new FileStream(tempFilePath, FileMode.Create))
             {
@@ -179,12 +180,7 @@ public class UserService
                 {
                     image.Mutate(x => x.Resize(480, 480));
                 }
-            }
-
-            string targetFilePath = $"{userId}/{userId}-{Guid.NewGuid()}.webp";
-            using (var image = Image.Load(tempFilePath))
-            {
-                image.Save(tempFilePath, new WebpEncoder() { Quality = 80 });
+                await image.SaveAsWebpAsync(tempFilePath, new WebpEncoder() { Quality = 80 });
             }
 
             await _supabaseClient.Storage
@@ -205,6 +201,7 @@ public class UserService
 
             return publicUrl;
         }
+
         catch (Exception ex)
         {
             Console.WriteLine($"Error uploading profile image: {ex.Message}");
