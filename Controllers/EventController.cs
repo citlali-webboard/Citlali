@@ -49,9 +49,20 @@ public class EventController : Controller
     [HttpGet("detail/{id}")]
     public async Task<IActionResult> Detail(string id)
     {
-        EventDetailViewModel eventDetailViewModel = await _eventService.GetEventDetail(Guid.Parse(id));
+        try{
+            if (!Guid.TryParse(id, out _))
+            {
+                throw new Exception("Invalid Event id");
+            }
+
+            EventDetailViewModel eventDetailViewModel = await _eventService.GetEventDetail(Guid.Parse(id));
+            return View(eventDetailViewModel);
+
+        }catch (Exception e){
+            TempData["Error"] = e.Message;
+            return RedirectToAction("profile", "user");
+        }
         
-        return View(eventDetailViewModel);
     }
 
     [HttpGet("explore")]
