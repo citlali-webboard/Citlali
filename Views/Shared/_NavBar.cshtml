@@ -1,3 +1,5 @@
+@* @model Citlali.Models.NavModel; *@
+
 <nav>
   <ul>
     <div class="nav-group">
@@ -45,7 +47,9 @@
       <a href="#">
         @* Profile *@
         <li>
-          <div class="profile-placeholder"></div>
+          <div class="profile-placeholder">
+            @* <img src=@Model.profileImageUrl alt=""> *@
+          </div>
         </li>
       </a>
     </div>
