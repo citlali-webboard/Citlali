@@ -1,17 +1,22 @@
 @model Citlali.Models.EventDetailCardData;
 
 <div class="event-detail detail-column space-y-4">
-    <div class="justify-between">
-        <h1 class="text-level-1">@Model.EventTitle</h1>
-        <span class="text-level-1 text-align-right align-center space-x-2">
+    <div class="info-line">
+        <h1 class="title">@Model.EventTitle</h1>
+        <span class="participants">
             <span>
-                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size32.PeopleTeam>>(RenderMode.ServerPrerendered))
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size28.PeopleTeam>>(RenderMode.ServerPrerendered))
             </span>
-            <span>@Model.CurrentParticipant/@Model.MaxParticipant</span>
+            <span >@Model.CurrentParticipant/@Model.MaxParticipant</span>
         </span>
     </div>
-    <div class="justify-between">
-        <span>Posted by @Model.CreatorDisplayName</span>
+    <div class="info-line">
+        <span class="creator">
+            <span>
+                <img class="pfp" src=@Model.CreatorProfileImageUrl alt="Creator Profile Picture"/>
+            </span>
+            <span>@Model.CreatorDisplayName</span>
+        </span>
         <span class="text-align-right">@Model.CreatedAt.ToString("t") • @Model.CreatedAt.ToString("d")</span>
     </div>
     <div class="tags-container">

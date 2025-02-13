@@ -81,6 +81,7 @@ public class EventBriefCardData
     public Guid EventId {get ; set;} = new();
     public string EventTitle {get ; set;} = "Basketball? Anyone?";
     public string CreatorDisplayName {get ; set;} = "John Basketball";
+    public string CreatorProfileImageUrl {get ; set;} = "";
     public LocationTag LocationTag {get ; set;} = new();
     public EventCategoryTag EventCategoryTag {get ; set;} = new();
     public int CurrentParticipant {get ; set;} = 0;

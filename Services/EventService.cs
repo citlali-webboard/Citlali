@@ -1,19 +1,14 @@
 using Supabase;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using System.Text.Json;
 using Citlali.Models;
-using Microsoft.AspNetCore.Mvc;
 
 // using Supabase.Gotrue;
 
 namespace Citlali.Services;
 
-public class EventService(Client supabaseClient, IConfiguration configuration)
+public class EventService(Client supabaseClient, UserService userService)
 {
     private readonly Client _supabaseClient = supabaseClient;
-    private readonly IConfiguration _configuration = configuration;
-
+    private readonly UserService _userService = userService;
     // CreateEvent 
 
     public async Task<List<Tag>> GetTags()
@@ -185,20 +180,6 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
         return questions;
     }
 
-    public async Task<string> GetCreatorDisplayNameById(Guid userId)
-    {
-        var response = await _supabaseClient
-            .From<User>()
-            .Where(row => row.UserId == userId)
-            .Single();
-
-        if (response != null)
-        {
-            return response.DisplayName;
-        }
-        return "";
-    }
-
     public async Task<EventDetailViewModel> GetEventDetail(Guid id)
     {
         var Event = await GetEventById(id);
@@ -208,7 +189,7 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
         }
         var tag = await GetTagById(Event.EventCategoryTagId);
         var location = await GetLocationTagById(Event.EventLocationTagId);
-        string CreatorDisplayName = await GetCreatorDisplayNameById(Event.CreatorUserId);
+        var creator = await _userService.GetUserByUserId(Event.CreatorUserId) ?? throw new Exception("Creator not found");
 
         var eventDetailViewModel = new EventDetailViewModel();
 
@@ -222,12 +203,12 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
         eventDetailViewModel.EventDetailCardData.EventDate = Event.EventDate;
         eventDetailViewModel.EventDetailCardData.PostExpiryDate = Event.PostExpiryDate;
         eventDetailViewModel.EventDetailCardData.CreatedAt = Event.CreatedAt;
-        eventDetailViewModel.EventDetailCardData.CreatorDisplayName = CreatorDisplayName;
+        eventDetailViewModel.EventDetailCardData.CreatorDisplayName = creator.DisplayName;
+        eventDetailViewModel.EventDetailCardData.CreatorProfileImageUrl = creator.ProfileImageUrl;
 
         var questions = await GetQuestionsByEventId(Event.EventId);
-        eventDetailViewModel.EventFormDto.Questions = questions ?? new();
+        eventDetailViewModel.EventFormDto.Questions = questions ?? [];
 
         return eventDetailViewModel;
     }
 }
-
