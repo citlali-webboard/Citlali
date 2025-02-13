@@ -63,3 +63,7 @@
   display: flex;
   align-items: center;
 }
+
+.description {
+  white-space: pre-wrap;
+}
