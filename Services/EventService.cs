@@ -148,14 +148,14 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
 
         if (response != null)
         {
-            Console.WriteLine("LocationTag found--------------------------------");
+
             return new LocationTag
             {
                 LocationTagId = response.LocationTagId,
                 LocationTagName = response.LocationTagName
             };
         }
-        Console.WriteLine("LocationTag not found");
+       
         return null;
     }
 
@@ -185,6 +185,20 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
         return questions;
     }
 
+    public async Task<string> GetCreatorDisplayNameById(Guid userId)
+    {
+        var response = await _supabaseClient
+            .From<User>()
+            .Where(row => row.UserId == userId)
+            .Single();
+
+        if (response != null)
+        {
+            return response.DisplayName;
+        }
+        return "";
+    }
+
     public async Task<EventDetailViewModel> GetEventDetail(Guid id)
     {
         var Event = await GetEventById(id);
@@ -194,6 +208,7 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
         }
         var tag = await GetTagById(Event.EventCategoryTagId);
         var location = await GetLocationTagById(Event.EventLocationTagId);
+        string CreatorDisplayName = await GetCreatorDisplayNameById(Event.CreatorUserId);
 
         var eventDetailViewModel = new EventDetailViewModel();
 
@@ -206,6 +221,8 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
         eventDetailViewModel.EventDetailCardData.Cost = Event.Cost;
         eventDetailViewModel.EventDetailCardData.EventDate = Event.EventDate;
         eventDetailViewModel.EventDetailCardData.PostExpiryDate = Event.PostExpiryDate;
+        eventDetailViewModel.EventDetailCardData.CreatedAt = Event.CreatedAt;
+        eventDetailViewModel.EventDetailCardData.CreatorDisplayName = CreatorDisplayName;
 
         var questions = await GetQuestionsByEventId(Event.EventId);
         eventDetailViewModel.EventFormDto.Questions = questions ?? new();
