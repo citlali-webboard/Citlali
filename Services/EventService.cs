@@ -21,20 +21,24 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
         var response = await _supabaseClient
             .From<EventCategoryTag>()
             .Select("*")
-            .Get();  
+            .Get();
 
         var tags = new List<Tag>();
 
-        if (response != null){
+        if (response != null)
+        {
             foreach (var tag in response.Models)
             {
-                tags.Add(new Tag { TagId = tag.EventCategoryTagId,
-                                   TagEmoji = tag.EventCategoryTagEmoji, 
-                                   TagName = tag.EventCategoryTagName });
+                tags.Add(new Tag
+                {
+                    TagId = tag.EventCategoryTagId,
+                    TagEmoji = tag.EventCategoryTagEmoji,
+                    TagName = tag.EventCategoryTagName
+                });
             }
         }
 
-        return tags;   
+        return tags;
     }
 
     public async Task<List<Location>> GetLocationTags()
@@ -45,17 +49,21 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
             .Get();
 
         var locations = new List<Location>();
-        
-        if (response != null){
+
+        if (response != null)
+        {
             foreach (var location in response.Models)
             {
-                locations.Add(new Location { EventLocationTagId = location.EventLocationTagId,
-                                             EventLocationTagName = location.EventLocationTagName });
+                locations.Add(new Location
+                {
+                    EventLocationTagId = location.LocationTagId,
+                    EventLocationTagName = location.LocationTagName
+                });
             }
         }
-        
+
         return locations;
-    } 
+    }
 
     public async Task<Event> CreateEvent(CreateEventViewModel createEventViewModel)
     {
@@ -70,7 +78,7 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
         Guid eventId = Guid.NewGuid();
         var modelEvent = new Event
         {
-            EventId =  eventId,
+            EventId = eventId,
             CreatorUserId = userId,
             EventTitle = createEventViewModel.EventTitle,
             EventDescription = createEventViewModel.EventDescription,
@@ -104,10 +112,105 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
             await _supabaseClient
                 .From<EventQuestion>()
                 .Insert(question);
-        }    
+        }
 
         return modelEvent;
     }
 
-    
+    // GetEventDetail
+
+    public async Task<Event?> GetEventById(Guid eventId)
+    {
+        var response = await _supabaseClient
+            .From<Event>()
+            .Where(row => row.EventId == eventId)
+            .Single();
+
+        return response ?? null;
+    }
+
+    public async Task<EventCategoryTag?> GetTagById(Guid tagId)
+    {
+        var response = await _supabaseClient
+            .From<EventCategoryTag>()
+            .Where(row => row.EventCategoryTagId == tagId)
+            .Single();
+
+        return response ?? null;
+    }
+
+    public async Task<LocationTag?> GetLocationTagById(Guid locationTagId)
+    {
+        var response = await _supabaseClient
+            .From<LocationTag>()
+            .Where(row => row.LocationTagId == locationTagId)
+            .Single();
+
+        if (response != null)
+        {
+            Console.WriteLine("LocationTag found--------------------------------");
+            return new LocationTag
+            {
+                LocationTagId = response.LocationTagId,
+                LocationTagName = response.LocationTagName
+            };
+        }
+        Console.WriteLine("LocationTag not found");
+        return null;
+    }
+
+    //get question by event id
+    public async Task<List<QuestionViewModel>> GetQuestionsByEventId(Guid eventId)
+    {
+        var response = await _supabaseClient
+            .From<EventQuestion>()
+            .Where(row => row.EventId == eventId)
+            .Get();
+
+        var questions = new List<QuestionViewModel>();
+
+        if (response != null)
+        {
+            foreach (var question in response.Models)
+            {
+                questions.Add(new QuestionViewModel
+                {
+                    EventQuestionId = question.EventQuestionId,
+                    Question = question.Question,
+                    Answer = "answer answer"
+                });
+            }
+        }
+
+        return questions;
+    }
+
+    public async Task<EventDetailViewModel> GetEventDetail(Guid id)
+    {
+        var Event = await GetEventById(id);
+        if (Event == null)
+        {
+            throw new Exception("Event not found");
+        }
+        var tag = await GetTagById(Event.EventCategoryTagId);
+        var location = await GetLocationTagById(Event.EventLocationTagId);
+
+        var eventDetailViewModel = new EventDetailViewModel();
+
+        eventDetailViewModel.EventDetailCardData.EventId = Event.EventId;
+        eventDetailViewModel.EventDetailCardData.EventTitle = Event.EventTitle;
+        eventDetailViewModel.EventDetailCardData.EventDescription = Event.EventDescription;
+        eventDetailViewModel.EventDetailCardData.EventCategoryTag = tag ?? new();
+        eventDetailViewModel.EventDetailCardData.LocationTag = location ?? new();
+        eventDetailViewModel.EventDetailCardData.MaxParticipant = Event.MaxParticipant;
+        eventDetailViewModel.EventDetailCardData.Cost = Event.Cost;
+        eventDetailViewModel.EventDetailCardData.EventDate = Event.EventDate;
+        eventDetailViewModel.EventDetailCardData.PostExpiryDate = Event.PostExpiryDate;
+
+        var questions = await GetQuestionsByEventId(Event.EventId);
+        eventDetailViewModel.EventFormDto.Questions = questions ?? new();
+
+        return eventDetailViewModel;
+    }
 }
+

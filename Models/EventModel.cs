@@ -65,25 +65,31 @@ public class EventQuestion : BaseModel
 
 }
 
+[Table("LOCATION_TAG")]
 public class EventLocationTag
 {
-    public Guid EventLocationTagId = new();
-    public string EventLocationTagName = "Lat Krabang";
+    [PrimaryKey]
+    [Column("LocationTagId")]
+    public Guid EventLocationTagId {get ; set;} = new();
+
+    [Column("LocationTagName")]
+    public string EventLocationTagName {get ; set;} = "Lat Krabang";
 }
 
 public class EventBriefCardData
 {
-    public Guid EventId = new();
-    public string EventTitle = "Basketball? Anyone?";
-    public string CreatorDisplayName = "John Basketball";
-    public EventLocationTag LocationTag = new();
-    public EventCategoryTag EventCategoryTag = new();
-    public int CurrentParticipant = 32;
-    public int MaxParticipant = 64;
-    public int Cost = 64;
-    public DateTime EventDate = new(2024, 12, 31);
-    public DateTime PostExpiryDate = new(2024, 12, 30);
-    public DateTime CreatedAt = new(2024, 12, 3);
+    public Guid EventId {get ; set;} = new();
+    public string EventTitle {get ; set;} = "Basketball? Anyone?";
+    public string CreatorDisplayName {get ; set;} = "John Basketball";
+    public LocationTag LocationTag {get ; set;} = new();
+    public EventCategoryTag EventCategoryTag {get ; set;} = new();
+    public int CurrentParticipant {get ; set;} = 0;
+    public int MaxParticipant {get ; set;} = 64;
+    public int Cost {get ; set;} = 64;
+    public DateTime EventDate {get ; set;} = new(2024, 12, 31);
+    public DateTime PostExpiryDate {get ; set;} = new(2024, 12, 30);
+    public DateTime CreatedAt {get ; set;} = new(2024, 12, 3);
+
 }
 
 public class EventDetailCardData : EventBriefCardData
@@ -93,7 +99,7 @@ public class EventDetailCardData : EventBriefCardData
 
 public class EventFormDto
 {
-    public List<QuestionViewModel> Questions { get; set; } = [new(), new(), new(), new(), new(), new(), new()];
+    public List<QuestionViewModel> Questions { get; set; } = [];
 }
 
 public class EventDetailViewModel
@@ -144,10 +150,10 @@ public class LocationTag : BaseModel
 {
     [PrimaryKey]
     [Column("LocationTagId")]
-    public Guid EventLocationTagId { get; set; } = new();
+    public Guid LocationTagId { get; set; } = new();
 
     [Column("LocationTagName")]
-    public string EventLocationTagName { get; set; } = "";
+    public string LocationTagName { get; set; } = "";
 
     [Column("Deleted")]
     public bool Deleted { get; set; } = false;

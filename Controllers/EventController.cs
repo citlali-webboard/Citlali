@@ -47,9 +47,10 @@ public class EventController : Controller
 
 
     [HttpGet("detail/{id}")]
-    public IActionResult Detail(string id)
+    public async Task<IActionResult> Detail(string id)
     {
-        EventDetailViewModel eventDetailViewModel = new();
+        EventDetailViewModel eventDetailViewModel = await _eventService.GetEventDetail(Guid.Parse(id));
+        
         return View(eventDetailViewModel);
     }
 
