@@ -9,11 +9,13 @@ public class UserService
 {
     private readonly Client _supabaseClient;
     private readonly Configuration _configuration;
+    private readonly UtilitiesService _utilityService;
 
-    public UserService(Client supabaseClient, Configuration configuration)
+    public UserService(Client supabaseClient, Configuration configuration, UtilitiesService utilityService)
     {
         _supabaseClient = supabaseClient;
         _configuration = configuration;
+        _utilityService = utilityService;
     }
 
     /// <summary>
@@ -157,59 +159,41 @@ public class UserService
         return response ?? null;
     }
 
-    public async Task<string?> UploadProfileImage(IFormFile file, string userId)
+    public async Task<string?> UploadProfileImage(IFormFile image, string userId)
     {
         try
         {
-            string bucketName = _configuration.User.ProfileImageBucket ?? "";
-            string userFolder = $"{userId}/";
+            var bucketName = _configuration.User.ProfileImageBucket;
+            var fileName = $"{_configuration.User.ProfileImageName}.{_configuration.User.ProfileImageFormat}";
+            var bucketFilePath = $"{userId}/{fileName}";
 
-            // List all files in the user's folder
-            var existingFiles = await _supabaseClient.Storage
-                .From(bucketName)
-                .List(userFolder);
-
-            // Delete all existing profile images (assuming one per user, different extensions possible)
-            if (existingFiles != null)
-            {
-                foreach (var existingFile in existingFiles)
-                {
-                    if (existingFile != null && existingFile.Name != null && existingFile.Name.StartsWith(userId))
-                    {
-                        _ = await _supabaseClient.Storage
-                            .From(bucketName)
-                            .Remove(new List<string> { $"{userFolder}{existingFile.Name}" ?? string.Empty });
-                    }
-                }
+            try {
+                _ = await _supabaseClient.Storage
+                    .From(bucketName)
+                    .Remove(bucketFilePath);
+            } catch { 
             }
 
-            string tempFolder = Path.GetTempPath(); // System temp folder
-            string tempFilePath = Path.Combine(tempFolder, $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}");
+            var imageBytes = _utilityService.ProcessProfileImage(image);
 
-            using (var fileStream = new FileStream(tempFilePath, FileMode.Create))
-            {
-                await file.CopyToAsync(fileStream);
-            }
-
-            string targetFilePath = $"{userId}/{userId}-{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
             await _supabaseClient.Storage
                 .From(bucketName)
-                .Upload(tempFilePath, targetFilePath, new Supabase.Storage.FileOptions
+                .Upload(imageBytes, bucketFilePath, new Supabase.Storage.FileOptions
                 {
-                    Upsert = true // Overwrite if file exists
+                    Upsert = true
                 });
 
-            if (File.Exists(tempFilePath))
-            {
-                File.Delete(tempFilePath);
-            }
 
             string publicUrl = _supabaseClient.Storage
                 .From(bucketName)
-                .GetPublicUrl(targetFilePath);
+                .GetPublicUrl(bucketFilePath);
 
-            return publicUrl;
+            // generate a short id to prevent caching
+            string imageId = Guid.NewGuid().ToString("N")[..8];
+            
+            return $"{publicUrl}?id={imageId}";
         }
+
         catch (Exception ex)
         {
             Console.WriteLine($"Error uploading profile image: {ex.Message}");
@@ -221,7 +205,6 @@ public class UserService
     {
         return Regex.IsMatch(username, @"^[A-Za-z][A-Za-z0-9_]{3,29}$");
     }
-
 }
 
 public class InvalidUsernameException : Exception

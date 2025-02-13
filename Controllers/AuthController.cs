@@ -57,10 +57,15 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> SignIn(AuthLoginDto authLoginDto)
     {
-     
-    try{
-        var session = await _authService.SignIn(authLoginDto.Email, authLoginDto.Password);
-        if (session != null && session.AccessToken != null && session.RefreshToken != null)
+
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new Exception("All fields are required.");
+            }
+            var session = await _authService.SignIn(authLoginDto.Email, authLoginDto.Password);
+            if (session != null && session.AccessToken != null && session.RefreshToken != null)
             {
                 Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
                 Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
@@ -93,6 +98,20 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> SignUp(AuthRegisterDto authRegisterDto)
     {
+
+        if (!ModelState.IsValid)
+        {
+            TempData["Error"] = "All fields are required.";
+            return RedirectToAction("SignUp");
+        }
+
+        if (authRegisterDto.Password != authRegisterDto.ConfirmPassword)
+        {
+            TempData["Error"] = "Passwords do not match.";
+            return RedirectToAction("SignUp");
+        }
+
+
         if (await _userService.GetUserByEmail(authRegisterDto.Email) != null)
         {
             TempData["Error"] = "User with this email already exists.";
