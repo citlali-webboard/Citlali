@@ -1,0 +1,4 @@
+main {
+    display: flex;
+    min-height: calc(100dvh - var(--navbar-size));
+}

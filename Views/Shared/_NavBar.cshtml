@@ -6,7 +6,7 @@
       <a href="#">
         <li>
           @* Navigation Hamburger *@
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Navigation>>(RenderMode.ServerPrerendered))
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Navigation>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
         </li>
       </a>
 
@@ -14,7 +14,7 @@
         <li class="logo">
           @* Logo *@
           <span>
-            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.DocumentEdit>>(RenderMode.ServerPrerendered))
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.DocumentEdit>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
           </span>
           <p>Citlali</p>
         </li>
@@ -25,7 +25,7 @@
       <a href="#">
         <li>
           @* History *@
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.History>>(RenderMode.ServerPrerendered))
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.History>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
         </li>
       </a>
 
@@ -33,14 +33,14 @@
         @* Notification *@
         <li>
 
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Alert>>(RenderMode.ServerPrerendered))
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
         </li>
       </a>
 
       <a href="#">
         @* Follow Heart *@
         <li>
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Heart>>(RenderMode.ServerPrerendered))
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Heart>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
         </li>
       </a>
 

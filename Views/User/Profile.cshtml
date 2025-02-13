@@ -13,10 +13,7 @@
   };
 }
 
-
-<partial name="_NavBar" model=@navModel />
 <div class="window">
-
   <form asp-controller="Auth" asp-action="SignOut" method="post">
     <button type="submit" class="btn btn-danger">Sign Out</button>
   </form>
@@ -27,13 +24,13 @@
         <div class="popup-navigation">
           <a class="popup-action-button" onclick="closeDialog()">
             <span>
-              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.DismissCircle>>(RenderMode.ServerPrerendered))
+              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.DismissCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
             </span>
           </a>
           <h1>Edit Profile</h1>
           <button type="submit" class="popup-action-button">
             <span>
-              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Save>>(RenderMode.ServerPrerendered))
+              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Save>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
             </span>
           </button>
         </div>
@@ -43,7 +40,7 @@
               <img src="@Model.ProfileImageUrl" alt="Profile Image" id="profilePreview" />
                 <label for="profileImage" class="upload-button">
                     <span>
-                      @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Image>>(RenderMode.ServerPrerendered))
+                      @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Image>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
                     </span>
                     <span>
                       Upload image...
@@ -89,11 +86,11 @@
         <img src=@Model.ProfileImageUrl alt="Profile Image" />
       </div>
       <div class="user-info">
+        <h1>@Model.DisplayName</h1>
         <div class="display-name">
-          <h1>@Model.DisplayName</h1>
           <p class="username">
             <span>
-              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.ContactCard>>(RenderMode.ServerPrerendered))
+              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.ContactCard>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
             </span>
             <span>
               @Model.Username
@@ -102,7 +99,7 @@
           <div class="button-group">
             <a class="action-button" id="edit-button" onclick="openDialog()">
               <span>
-                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Pen>>(RenderMode.ServerPrerendered))
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Edit>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
               </span>
               <span>
                 Edit profile...
@@ -110,7 +107,7 @@
             </a>
             <a class="action-button">
               <span>
-                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.AddCircle>>(RenderMode.ServerPrerendered))
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.AddCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
               </span>
               <span>
                 Follow
