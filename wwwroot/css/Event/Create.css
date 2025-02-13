@@ -187,11 +187,13 @@ form {
     display: flex;
     flex-direction: row;
     gap: 1rem;
+    justify-content: center;
     align-items: center;
 }
 
 .add-question-control button {
-    padding: 0.5rem;
+    height: 100%;
+    padding: 0.5rem 1rem 0.5rem 1rem;
     background-color: #000;
     color: #fff;
     border: none;
@@ -219,6 +221,10 @@ form {
     margin-top: 1rem;
 
     width: 100%;
+}
+
+.question-item svg {
+    height: 1.7rem;
 }
 
 .question-item p {
