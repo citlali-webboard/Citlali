@@ -1,6 +1,6 @@
 @model Citlali.Models.EventDetailCardData;
 
-<div class="event-detail detail-column space-y-4">
+<div class="event-detail detail-column">
     <div class="info-line">
         <h1 class="title">@Model.EventTitle</h1>
         <span class="participants">
@@ -19,11 +19,9 @@
         </span>
         <span class="text-align-right">@Model.CreatedAt.ToString("t") • @Model.CreatedAt.ToString("d")</span>
     </div>
-    <div class="tags-container">
-        <div class="tag">
-            <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
-            <span>@Model.EventCategoryTag.EventCategoryTagName</span>
-        </div>
+    <div class="tag">
+        <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
+        <span>@Model.EventCategoryTag.EventCategoryTagName</span>
     </div>
     <p class="description">@Model.EventDescription</p>
 </div>

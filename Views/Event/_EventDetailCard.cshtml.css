@@ -17,27 +17,14 @@
   border-radius: 1rem;
   padding: 1rem;
   height: fit-content;
-}
-
-.space-y-4 > * {
-  margin-bottom: 8px;
-}
-
-.space-y-4 > *:last-child {
-  margin-bottom: 0;
-}
-
-.space-x-2 > * {
-  margin-right: 4px;
-}
-
-.space-x-2 > *:last-child {
-  margin-right: 0;
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.5rem;
 }
 
 .tag {
   display: flex;
-  padding: 0.5rem 1rem;
+  padding: 0.325rem 0.75rem;
   background-color: var(--pink-color);
   border-radius: 2rem;
   width: fit-content;
