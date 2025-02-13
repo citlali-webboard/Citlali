@@ -28,7 +28,7 @@ h3 {
 
 .profile-card {
     width: 90%;
-    max-width: var(--max-screen-width);
+    max-width: 768px;
 
     height: fit-content;
     align-self: center;
