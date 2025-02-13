@@ -1,33 +1,26 @@
-html {
-  font-size: 14px;
+* {
+  font-family: "IBM Plex Sans Thai Looped", serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
+* {
+  --white-color: #ffffff;
+  --text-gray-color: #a1a1a1;
+  --margin-container: 2% 3% 2% 3%;
+  --auth-background-color: #f5c2e7;
+  --pink-color: #ffc0cb;
+  --pink-saturated: #fd9ae3;
+  --color-primary: var(--pink-color);
+  --color-primary-hover: var(--pink-saturated);
+  --color-muted: #6c7086;
+  --color-constructive: #40a02b;
+  --color-destructive: #d20f39;
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-  margin: 0;
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+  --max-text-width: 65ch;
+  /* --max-screen-width: 786px; */
+  --max-screen-width: 1024px;
+  --navbar-size: 3rem;
 }
 
 .error-popup {
@@ -58,49 +51,6 @@ body {
   font-size: 16px;
   cursor: pointer;
   margin-left: 5px;
-}
-
-* {
-  font-family: "IBM Plex Sans Thai Looped", serif;
-  font-weight: 400;
-  font-style: normal;
-}
-
-* {
-  --white-color: #ffffff;
-  --text-gray-color: #a1a1a1;
-  --margin-container: 2% 3% 2% 3%;
-  --auth-background-color: #f5c2e7;
-  --pink-color: #ffc0cb;
-  --pink-saturated: #fd9ae3;
-  --color-primary: var(--pink-color);
-  --color-primary-hover: var(--pink-saturated);
-  --color-muted: #6c7086;
-  --color-constructive: #40a02b;
-  --color-destructive: #d20f39;
-
-  --max-text-width: 65ch;
-  /* --max-screen-width: 786px; */
-  --max-screen-width: 1024px;
-  --navbar-size: 3rem;
-}
-
-*,
-::after,
-::before,
-::backdrop,
-::file-selector-button {
-  margin: 0;
-  padding: 0;
-}
-
-*,
-::after,
-::before,
-::backdrop,
-::file-selector-button {
-  box-sizing: border-box;
-  border: 0 solid;
 }
 
 .main-container {
