@@ -140,35 +140,6 @@ public class UserController : Controller
         return View(userViewModel);
     }
 
-    [HttpGet("profile/edit")]
-    [Authorize]
-    public async Task<IActionResult> ProfileEdit()
-    {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
-        if (currentUser == null || currentUser.Id == null)
-        {
-            return RedirectToAction("SignIn", "Auth");
-        }
-
-        var user = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id));
-        if (user == null)
-        {
-            return RedirectToAction("SignIn", "Auth");
-        }
-
-        var dto = new UserOnboardingDto
-        {
-            UserId = user.UserId,
-            Email = user.Email,
-            ProfileImageUrl = user.ProfileImageUrl,
-            DisplayName = user.DisplayName,
-            UserBio = user.UserBio,
-            CreatedAt = user.CreatedAt,
-            Deleted = user.Deleted
-        };
-        return View(dto);
-    }
-
     [HttpPost("edit")]
     [Authorize]
     public async Task<IActionResult> ProfileEdit(UserOnboardingDto userOnboardingDto)
