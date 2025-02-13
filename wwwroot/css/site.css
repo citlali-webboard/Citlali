@@ -29,3 +29,81 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+.error-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #ff4d4d;
+  color: white;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  z-index: 99999;
+  width: max-content;
+  min-width: 200px;
+  height: auto;
+  white-space: nowrap;
+}
+
+.error-popup button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+* {
+  font-family: "IBM Plex Sans Thai Looped", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+* {
+  --white-color: #ffffff;
+  --text-gray-color: #a1a1a1;
+  --margin-container: 2% 3% 2% 3%;
+  --auth-background-color: #f5c2e7;
+  --pink-color: #ffc0cb;
+  --pink-saturated: #fd9ae3;
+  --color-primary: var(--pink-color);
+  --color-primary-hover: var(--pink-saturated);
+  --color-muted: #6c7086;
+  --color-constructive: #40a02b;
+  --color-destructive: #d20f39;
+
+  --max-text-width: 65ch;
+  /* --max-screen-width: 786px; */
+  --max-screen-width: 1024px;
+  --navbar-size: 3rem;
+}
+
+*,
+::after,
+::before,
+::backdrop,
+::file-selector-button {
+  margin: 0;
+  padding: 0;
+}
+
+*,
+::after,
+::before,
+::backdrop,
+::file-selector-button {
+  box-sizing: border-box;
+  border: 0 solid;
+}
+
+.main-container {
+  min-height: 100dvh;
+  width: 100dvw;
+}
