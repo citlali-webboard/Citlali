@@ -23,15 +23,23 @@ public class UserController : Controller
         _configuration = configuration;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         var currentUser = _supabaseClient.Auth.CurrentUser;
-        if (currentUser == null)
+        if (currentUser == null || currentUser.Id == null)
         {
-            return RedirectToAction("SignIn", "Auth");
+            return RedirectToAction("explore", "event");
         }
 
-        return RedirectToAction("Onboarding");
+        var dbUser = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id));
+        if (dbUser == null)
+        {
+            return RedirectToAction("Onboarding");
+        }
+
+        var username = dbUser.Username;
+
+        return RedirectToAction("Profile", new { username });
     }
 
     [HttpGet("onboarding")]
@@ -46,7 +54,7 @@ public class UserController : Controller
 
         if (!await _userService.RedirectToOnboarding())
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction("Index");
         }
 
         ViewBag.Email = currentUser.Email;
@@ -63,7 +71,7 @@ public class UserController : Controller
         {
             if (!await _userService.RedirectToOnboarding())
             {
-                return RedirectToAction("Profile");
+                return RedirectToAction("Index");
             }
 
             if (string.IsNullOrEmpty(user.DisplayName))
@@ -90,7 +98,7 @@ public class UserController : Controller
                 TempData["Error"] = "Something went wrong. Please try again.";
                 return RedirectToAction("Onboarding");
             }
-            return RedirectToAction("Profile");
+            return RedirectToAction("Index");
         }
         catch (InvalidUsernameException ex)
         {
@@ -106,42 +114,30 @@ public class UserController : Controller
 
     }
 
-    [HttpGet("profile")]
-    [Authorize]
-    public async Task<IActionResult> Profile()
+    [HttpGet("{username}")]
+    public async Task<IActionResult> Profile(string username)
     {
-        try
+        var user = await _userService.GetUserByUsername(username);
+        if (user == null)
         {
-            var currentUser = _supabaseClient.Auth.CurrentUser;
-
-            if (currentUser == null)
-            {
-                Console.WriteLine("User is not authenticated.");
-                return RedirectToAction("SignIn", "Auth");
-            }
-
-            var userId = currentUser.Id;
-            if (string.IsNullOrEmpty(userId))
-            {
-                Console.WriteLine("User ID is null");
-                return RedirectToAction("Onboarding");
-            }
-
-            var user = await _userService.GetUserByUserId(Guid.Parse(userId));
-
-            if (user == null)
-            {
-                Console.WriteLine("User not found in DB");
-                return RedirectToAction("Onboarding");
-            }
-
-            return View(user);
+            return Content("User not found.");
         }
-        catch (Exception ex)
+
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
+
+        var userViewModel = new UserViewModel
         {
-            Console.WriteLine($"Error: {ex.Message}");
-            return RedirectToAction("SignIn", "Auth");
-        }
+            UserId = user.UserId,
+            Email = user.Email,
+            Username = user.Username,
+            ProfileImageUrl = user.ProfileImageUrl,
+            DisplayName = user.DisplayName,
+            UserBio = user.UserBio,
+            IsCurrentUser = isCurrentUser
+        };
+
+        return View(userViewModel);
     }
 
     [HttpGet("profile/edit")]
@@ -181,11 +177,11 @@ public class UserController : Controller
         if (string.IsNullOrEmpty(userOnboardingDto.DisplayName))
             {
                 TempData["Error"] = "Display name is required.";
-                return RedirectToAction("Profile");
+                return RedirectToAction("Index");
             }
             
         await _userService.EditUser(userOnboardingDto);
 
-        return RedirectToAction("Profile");
+        return RedirectToAction("Index");
     }
 }
