@@ -12,25 +12,10 @@
     <search class="section">
       <h1>Search!</h1>
       <form id="search-form">
-        <div class="form-data">
-          <div class="form-group">
-            <label for="type">Search type</label>
-            <div class="type-select">
-              <div>
-                <input type="radio" id="user" name="type" value="user" checked />
-                <label for="user">User</label>
-              </div>
-              <div>
-                <input type="radio" id="event" name="type" value="event" />
-                <label for="event">Event</label>
-              </div>
-            </div>
-          </div>
-        </div>
         <div class="form-group">
           <label for="query">Query</label>
           <div class="form-group query-input">
-            <input id="Query" name="query" placeholder="Search" />
+            <input id="query" name="query" placeholder="Search" />
             <button class="form-submit search-button" type="submit">
               @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size32.Search>>(RenderMode.ServerPrerendered,
                             new
@@ -52,19 +37,6 @@
         </div>
       </div>
       <ul id="results">
-        <a href="">
-          <li class="search-result">
-            <div class="search-result-image">
-              <img
-                src="http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.webp"
-                alt="Profile picture of John Basketball" />
-            </div>
-            <div class="search-result-text">
-              <h3>John Basketball</h3>
-              <p>the final boss of wii sports basketball</p>
-            </div>
-          </li>
-        </a>
       </ul>
     </div>
   </div>

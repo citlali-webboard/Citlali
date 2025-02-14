@@ -73,17 +73,15 @@ if (searchForm) {
     event.preventDefault();
 
     const formData = new FormData(searchForm);
-    const searchType = formData.get("type") as string;
     const query = formData.get("query") as string;
 
-    if (!searchType || !query) {
+    if (!query) {
       toggleResultsNull();
       return;
     }
     toggleResultsLoading();
 
     const params = new URLSearchParams({
-      type: searchType,
       query: query,
     });
 

@@ -11,7 +11,7 @@ public class SearchService(Supabase.Client supabaseClient, Configuration configu
     private readonly Configuration _configuration = configuration;
     private readonly ILogger<SearchService> _logger = logger;
 
-    public async Task<SearchResponse> QueryUser(string query)
+    public async Task<List<SearchResult>> QueryUser(string query)
     {
         try
         {
@@ -23,7 +23,7 @@ public class SearchService(Supabase.Client supabaseClient, Configuration configu
 
             if (databaseResult == null)
             {
-                return new SearchResponse();
+                return [];
             }
 
             List<SearchResult> searchResults = databaseResult.Models.ConvertAll(model => new SearchResult
@@ -34,7 +34,7 @@ public class SearchService(Supabase.Client supabaseClient, Configuration configu
                 ImageUrl = model.ProfileImageUrl
             });
 
-            return new SearchResponse { Results = searchResults };
+            return searchResults;
         }
         catch (Exception e)
         {
@@ -45,7 +45,7 @@ public class SearchService(Supabase.Client supabaseClient, Configuration configu
             throw new Exception(msgError);
         }
     }
-    public async Task<SearchResponse> QueryEvent(string query)
+    public async Task<List<SearchResult>> QueryEvent(string query)
     {
         try
         {
@@ -57,7 +57,7 @@ public class SearchService(Supabase.Client supabaseClient, Configuration configu
 
             if (databaseResult == null)
             {
-                return new SearchResponse();
+                return [];
             }
 
             List<SearchResult> searchResults = databaseResult.Models.ConvertAll(model => new SearchResult
@@ -67,7 +67,7 @@ public class SearchService(Supabase.Client supabaseClient, Configuration configu
                 Description = model.EventDescription
             });
 
-            return new SearchResponse { Results = searchResults };
+            return searchResults;
         }
         catch (Exception e)
         {

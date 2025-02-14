@@ -19,20 +19,16 @@ public class SearchController(ILogger<SearchController> logger, SearchService se
     [HttpGet("/search/query")]
     public async Task<IActionResult> Query(SearchQueryDto searchQuery)
     {
-        SearchResponse results;
-        switch (searchQuery.Type)
-        {
-            case SearchType.User:
-                results = await _searchService.QueryUser(searchQuery.Query);
-                break;
-            case SearchType.Event:
-                results = await _searchService.QueryEvent(searchQuery.Query);
-                break;
-            default:
-                return BadRequest("Invalid search type.");
-        }
+        var userTask = _searchService.QueryUser(searchQuery.Query);
+        var eventTask = _searchService.QueryEvent(searchQuery.Query);
 
-        return Json(results);
+        await Task.WhenAll(userTask, eventTask);
+
+        List<SearchResult> results = [];
+        results.AddRange(await userTask);
+        results.AddRange(await eventTask);
+
+        return Json(new SearchResponse { Results = results });
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

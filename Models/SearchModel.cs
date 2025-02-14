@@ -1,14 +1,7 @@
 namespace Citlali.Models;
 
-public enum SearchType
-{
-    User,
-    Event
-}
-
 public class SearchQueryDto
 {
-    public SearchType Type { get; set; } = SearchType.User;
     public string Query { get; set; } = "";
 }
 

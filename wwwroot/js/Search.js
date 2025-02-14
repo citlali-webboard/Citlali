@@ -92,21 +92,19 @@ function getResultCard(searchResult) {
 }
 if (searchForm) {
     searchForm.addEventListener("submit", function (event) { return __awaiter(_this, void 0, void 0, function () {
-        var formData, searchType, query, params, response, cards;
+        var formData, query, params, response, cards;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     event.preventDefault();
                     formData = new FormData(searchForm);
-                    searchType = formData.get("type");
                     query = formData.get("query");
-                    if (!searchType || !query) {
+                    if (!query) {
                         toggleResultsNull();
                         return [2 /*return*/];
                     }
                     toggleResultsLoading();
                     params = new URLSearchParams({
-                        type: searchType,
                         query: query,
                     });
                     return [4 /*yield*/, fetch("".concat(apiUrl, "?").concat(params.toString()))
