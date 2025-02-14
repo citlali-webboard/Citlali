@@ -92,7 +92,7 @@ public class EventController : Controller
 
         }catch (Exception e){
             TempData["Error"] = e.Message;
-            return RedirectToAction("profile", "user");
+            return RedirectToAction("explore");
         }
         
     }
