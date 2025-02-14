@@ -1,7 +1,10 @@
 @section head {
-  <script src="https://cdn.jsdelivr.net/npm/typescript@5/lib/typescript.min.js"></script>
-  <script src="~/js/Search.js"></script>
   <link rel="stylesheet" href="~/css/Form.css" asp-append-version="true" />
+  <link rel="stylesheet" href="~/css/Search.css" asp-append-version="true" />
+}
+
+@section Scripts {
+  <script src="~/js/Search.js" asp-append-version="true"></script>
 }
 
 <div class="center-container">
@@ -27,10 +30,11 @@
         <div class="form-group">
           <label for="query">Query</label>
           <div class="form-group query-input">
-            <input id="Query" placeholder="Search" />
+            <input id="Query" name="query" placeholder="Search" />
             <button class="form-submit search-button" type="submit">
-              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size32.Search>>(RenderMode.ServerPrerendered, new
-              { Color = Color.Fill }))
+              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size32.Search>>(RenderMode.ServerPrerendered,
+                            new
+                            { Color = Color.Fill }))
             </button>
           </div>
         </div>
@@ -38,11 +42,22 @@
     </search>
     <div class="section">
       <h2>Results</h2>
-      <ul class="results">
+      <div id="results-null">
+        <h3>No results found.</h3>
+      </div>
+      <div id="results-loading">
+        <div class="rotating">
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size48.ArrowSyncCircle>>(RenderMode.ServerPrerendered, new
+          { Color = Color.Neutral }))
+        </div>
+      </div>
+      <ul id="results">
         <a href="">
           <li class="search-result">
             <div class="search-result-image">
-              <img src="http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.webp" alt="Profile picture of John Basketball"/>
+              <img
+                src="http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.webp"
+                alt="Profile picture of John Basketball" />
             </div>
             <div class="search-result-text">
               <h3>John Basketball</h3>
