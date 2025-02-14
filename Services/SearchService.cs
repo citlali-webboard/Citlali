@@ -17,7 +17,8 @@ public class SearchService(Supabase.Client supabaseClient, Configuration configu
         {
             var databaseResult = await _supabaseClient
                 .From<User>()
-                .Select(x => new object[] { x.DisplayName, x.Username, x.UserBio, x.ProfileImageUrl })
+                .Select(x => new object[] { x.DisplayName, x.Username, x.UserBio, x.ProfileImageUrl, x.Deleted })
+                .Filter(x => x.Deleted, Constants.Operator.NotEqual, true)
                 .Filter(x => x.DisplayName, Constants.Operator.WFTS, new FullTextSearchConfig(query, null))
                 .Get();
 
