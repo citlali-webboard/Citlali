@@ -91,12 +91,13 @@ if (searchForm) {
       .then((response) => response.json())
       .then((data: SearchResponse) => data)
       .catch((error) => {
+        toggleResultsNull();
         console.error(`Error querying search ${error}`);
         return { results: [] };
       });
     
       const cards = response.results.map((result: SearchResult) => getResultCard(result))
-      if (results) {
+      if (results && cards) {
         results.innerHTML = '';
         cards.forEach(card => results.appendChild(card));
       } else {
