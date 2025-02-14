@@ -99,6 +99,8 @@ if (searchForm) {
       if (results) {
         results.innerHTML = '';
         cards.forEach(card => results.appendChild(card));
+      } else {
+        toggleResultsNull();
       }
       toggleResults();
   });

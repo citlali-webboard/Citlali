@@ -123,6 +123,9 @@ if (searchForm) {
                         results.innerHTML = '';
                         cards.forEach(function (card) { return results.appendChild(card); });
                     }
+                    else {
+                        toggleResultsNull();
+                    }
                     toggleResults();
                     return [2 /*return*/];
             }
