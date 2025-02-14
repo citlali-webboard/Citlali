@@ -251,6 +251,50 @@ public class UserService
         return true;
     }
 
+    public async Task<List<Tag>?> GetFollowedTags(string userId)
+    {
+        var response = await _supabaseClient
+            .From<UserFollowedCategory>()
+            .Filter(row => row.UserId, Supabase.Postgrest.Constants.Operator.Equals, userId)
+            .Select("*")
+            .Get();
+
+        var allTags = await _supabaseClient
+            .From<EventCategoryTag>()
+            .Select("*")
+            .Get();
+
+        var tags = new List<Tag>();
+        foreach (var tag in response.Models)
+        {
+            var eventTagId = tag.EventCategoryTagId;
+            var tagResponse = allTags.Models.FirstOrDefault(x => x.EventCategoryTagId == eventTagId);
+            if (tagResponse != null)
+            {
+                tags.Add(new Tag
+                {
+                    TagId = tagResponse.EventCategoryTagId,
+                    TagEmoji = tagResponse.EventCategoryTagEmoji,
+                    TagName = tagResponse.EventCategoryTagName
+                });
+            }
+        }
+
+        return tags;
+    }
+
+    public int GetFollowedUser(string userId) {
+        return 0;
+    }
+
+    public async Task<int> GetFollowedCount(string userId) {
+        var followedTags = await GetFollowedTags(userId);
+        var followedTagCount = followedTags?.Count ?? 0;
+
+        var followedUserCount = GetFollowedUser(userId);
+        return followedTagCount + followedUserCount;
+    }
+
 }
 
 public class InvalidUsernameException : Exception

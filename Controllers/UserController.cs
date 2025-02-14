@@ -128,6 +128,7 @@ public class UserController : Controller
 
         var currentUser = _supabaseClient.Auth.CurrentUser;
         var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
+        var followedCount = await _userService.GetFollowedCount(user.UserId.ToString());
 
         var userViewModel = new UserViewModel
         {
@@ -137,6 +138,7 @@ public class UserController : Controller
             ProfileImageUrl = user.ProfileImageUrl,
             DisplayName = user.DisplayName,
             UserBio = user.UserBio,
+            FollowedCount = followedCount,
             IsCurrentUser = isCurrentUser
         };
 

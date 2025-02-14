@@ -59,5 +59,6 @@ public class UserOnboardingDto : User
 
 public class UserViewModel : User
 {
+        public int FollowedCount { get; set; } = 0;
         public bool IsCurrentUser { get; set; }
 }
