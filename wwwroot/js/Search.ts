@@ -42,11 +42,11 @@ function getResultCard(searchResult: SearchResult) {
   listItem.className = 'search-result';
   card.appendChild(listItem);
 
-  const imageDiv = document.createElement('div');
-  imageDiv.className = 'search-result-image';
-  listItem.appendChild(imageDiv);
-
   if (searchResult.imageUrl)  {
+    const imageDiv = document.createElement('div');
+    imageDiv.className = 'search-result-image';
+    listItem.appendChild(imageDiv);
+
     const img = document.createElement('img');
     img.src = searchResult.imageUrl;
     img.alt = `Profile picture of ${searchResult.title}`;

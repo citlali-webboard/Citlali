@@ -70,10 +70,10 @@ function getResultCard(searchResult) {
     var listItem = document.createElement('li');
     listItem.className = 'search-result';
     card.appendChild(listItem);
-    var imageDiv = document.createElement('div');
-    imageDiv.className = 'search-result-image';
-    listItem.appendChild(imageDiv);
     if (searchResult.imageUrl) {
+        var imageDiv = document.createElement('div');
+        imageDiv.className = 'search-result-image';
+        listItem.appendChild(imageDiv);
         var img = document.createElement('img');
         img.src = searchResult.imageUrl;
         img.alt = "Profile picture of ".concat(searchResult.title);
