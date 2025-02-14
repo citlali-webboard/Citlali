@@ -11,7 +11,6 @@ using System.Runtime.InteropServices.Marshalling;
 namespace Citlali.Controllers;
 
 [Route("event")]
-
 public class EventController : Controller
 {
     private readonly ILogger<EventController> _logger;
@@ -25,9 +24,10 @@ public class EventController : Controller
         _userService = userService;
     }
 
+    [HttpGet("")]
     public IActionResult Index()
     {
-        return View();
+        return RedirectToAction("Explore");
     }
 
     [HttpGet("create")]
