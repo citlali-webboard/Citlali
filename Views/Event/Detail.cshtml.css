@@ -1,10 +1,8 @@
 .center-wrapper {
   width: 100%;
-  min-height: calc(100vh - var(--navbar-size));
+  min-height: calc(100dvh - var(--navbar-size));
   margin-left: auto;
   margin-right: auto;
-  margin-top: calc(var(--navbar-size) + 1rem);
-  margin-bottom: 1rem;
   height: 100%;
   display: flex;
   flex-direction: column;

@@ -5,6 +5,7 @@
 }
 
 @{
+    Layout= "_LayoutBase";
     ViewData["Title"] = "Sign Up";
 
     string RegisterImageUrl = "http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-register-email/password.jpg";
@@ -23,7 +24,7 @@
                     <div class="form-group">
                         <label for="Email">
                             <div class="icon">
-                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Mail>>(RenderMode.ServerPrerendered))
+                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Mail>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
                             </div>
                         </label>
                         <input asp-for="Email" id="Email" placeholder="Email" />
@@ -33,7 +34,7 @@
                     <div class="form-group">
                         <label for="Password">
                             <div class="icon">
-                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.LockClosed>>(RenderMode.ServerPrerendered))
+                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.LockClosed>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
                             </div>
                         </label>
                         <input asp-for="Password" id="Password" placeholder="Password" type="password" />
@@ -43,7 +44,7 @@
                     <div class="form-group"#>
                         <label for="Confirm-Password">
                             <div class="icon">
-                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.LockClosed>>(RenderMode.ServerPrerendered))
+                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.LockClosed>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
                             </div>
                         </label>
                         <input asp-for="ConfirmPassword" id="Confirm-Password" placeholder="Confirm Password" type="password" />

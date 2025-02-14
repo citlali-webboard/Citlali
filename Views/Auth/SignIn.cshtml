@@ -5,6 +5,7 @@
 }
 
 @{
+  Layout= "_LayoutBase";
   ViewData["Title"] = "Sign In";
 
   string LoginImageUrl =
@@ -23,7 +24,7 @@
           <div class="form-group">
             <label for="Email">
               <div class="icon">
-                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Mail>>(RenderMode.ServerPrerendered))
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Mail>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
               </div>
             </label>
             <input asp-for="Email" id="Email" placeholder="Email" />
@@ -33,7 +34,7 @@
           <div class="form-group">
             <label for="Password">
               <div class="icon">
-                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.LockClosed>>(RenderMode.ServerPrerendered))
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.LockClosed>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
               </div>
             </label>
             <input asp-for="Password" id="Password" placeholder="Password" type="password" />
