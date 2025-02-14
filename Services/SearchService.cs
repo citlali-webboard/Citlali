@@ -18,7 +18,7 @@ public class SearchService(Supabase.Client supabaseClient, Configuration configu
             var databaseResult = await _supabaseClient
                 .From<User>()
                 .Select(x => new object[] { x.DisplayName, x.Username, x.UserBio, x.ProfileImageUrl, x.Deleted })
-                .Filter(x => x.Deleted, Constants.Operator.NotEqual, true)
+                .Filter(x => x.Deleted, Constants.Operator.Equals, "FALSE")
                 .Filter(x => x.DisplayName, Constants.Operator.WFTS, new FullTextSearchConfig(query, null))
                 .Get();
 
@@ -53,7 +53,7 @@ public class SearchService(Supabase.Client supabaseClient, Configuration configu
             var databaseResult = await _supabaseClient
                 .From<Event>()
                 .Select(x => new object[] { x.EventTitle, x.EventDescription, x.EventId, x.Deleted })
-                .Filter(x => x.Deleted, Constants.Operator.NotEqual, true)
+                .Filter(x => x.Deleted, Constants.Operator.Equals, "FALSE")
                 .Filter(x => x.EventTitle, Constants.Operator.WFTS, new FullTextSearchConfig(query, null))
                 .Get();
 
