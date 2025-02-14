@@ -5,7 +5,7 @@
         <h1 class="title">@Model.EventTitle</h1>
         <span class="participants">
             <span>
-                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size28.PeopleTeam>>(RenderMode.ServerPrerendered))
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size32.PeopleTeam>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
             </span>
             <span >@Model.CurrentParticipant/@Model.MaxParticipant</span>
         </span>
