@@ -3,6 +3,7 @@
 @{
     string userEmail = ViewBag.Email ?? "No email provided";
     string profileImageUrl = ViewBag.ProfileImageUrl ?? "";
+    List<Tag> tags = ViewBag.Tags ?? new List<Tag>();
 }
 
 @section head{
@@ -59,7 +60,16 @@
                     </div>
                     <div class="tag-selecting">
                         <h3>What are you interested in?</h3>
-                        <div class="tags" id="tags"></div>
+                        <div class="tags" id="tags">
+                            @foreach (var tag in tags)
+                            {
+                                <div class="tag" id="@tag.TagId" name="" onclick="toggleTagSelection(this, '@tag.TagId')">
+                                    <span>@tag.TagEmoji</span>
+                                    <span>@tag.TagName</span>
+                                    <input type="hidden" name="SelectedTags" value="" id="tagInput_@tag.TagId" />
+                                </div>
+                            }
+                        </div>
                     </div>
                     <div class="continue">
                         <button class="continue-button" type="submit">

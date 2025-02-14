@@ -40,4 +40,5 @@ public class User : BaseModel
 public class UserOnboardingDto : User
 {
         public IFormFile? ProfileImage { get; set; }
+        public List<Guid> SelectedTags { get; set; } = new List<Guid>();
 }

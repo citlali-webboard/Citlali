@@ -13,13 +13,15 @@ public class UserController : Controller
     private readonly ILogger<UserController> _logger;
     private readonly Supabase.Client _supabaseClient;
     private readonly UserService _userService;
+    private readonly EventService _eventService;
     private readonly Configuration _configuration;
 
-    public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService, Configuration configuration)
+    public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService, EventService eventService, Configuration configuration)
     {
         _logger = logger;
         _supabaseClient = supabaseClient;
         _userService = userService;
+        _eventService = eventService;
         _configuration = configuration;
     }
 
@@ -51,6 +53,7 @@ public class UserController : Controller
 
         ViewBag.Email = currentUser.Email;
         ViewBag.ProfileImageUrl = _configuration.User.DefaultProfileImage;
+        ViewBag.Tags = await _eventService.GetTags();
 
         return View();
     }
