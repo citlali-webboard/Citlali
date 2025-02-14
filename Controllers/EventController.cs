@@ -122,6 +122,7 @@ public class EventController : Controller
             {
                 EventId = ev.EventId,
                 EventTitle = ev.EventTitle,
+                EventDescription = ev.EventDescription,
                 CreatorDisplayName = creator.DisplayName,
                 CreatorProfileImageUrl = creator.ProfileImageUrl,
                 LocationTag = await _eventService.GetLocationTagById(ev.EventLocationTagId) ?? new LocationTag(),

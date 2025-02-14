@@ -6,12 +6,26 @@
 
 <div class="center-wrapper">
     <div class="container">
-        @for (var i = 0; i < Model.EventBriefCardDatas.Length; i++)
-        {
-            <div>
-                <partial name="_EventBriefCard" model=@Model.EventBriefCardDatas[i] />
+        <header>
+            <div class="title">
+                <h1>Welcome to Citlali 🩷</h1>
+                <p>Cute webboard which brings people together~ Let's explore events and find what suits you the best !</p>
             </div>
-        }
+            @* /* Search Bar: Change this later */ *@
+            <div class="search-bar">
+                <input type="text" name="search" placeholder="Search events..." />
+                <button type="submit">Search</button>
+            </div>
+            @* /* Search Bar: Change this later */ *@
+        </header>
+        <div class="event-list">
+            @for (var i = 0; i < Model.EventBriefCardDatas.Length; i++)
+            {
+                <div>
+                    <partial name="_EventBriefCard" model=@Model.EventBriefCardDatas[i] />
+                </div>
+            }
+        </div>
     </div>
     <div class="pagination">
         @if (Model.CurrentPage > 1)
