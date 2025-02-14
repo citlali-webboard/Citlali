@@ -172,7 +172,7 @@ public class EventService(Client supabaseClient, UserService userService)
                 {
                     EventQuestionId = question.EventQuestionId,
                     Question = question.Question,
-                    Answer = "answer answer"
+                    Answer = ""
                 });
             }
         }

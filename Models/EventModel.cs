@@ -112,9 +112,9 @@ public class EventDetailViewModel
 public class QuestionViewModel
 {
     public Guid EventQuestionId { get; set; }
-    public string Question { get; set; } = "Question Question";
+    public string Question { get; set; } = "";
     [Required(ErrorMessage = "This field is required")]
-    public string Answer { get; set; } = "Answer Answer";
+    public string Answer { get; set; } = "";
 }
 
 public class EventExploreViewModel
