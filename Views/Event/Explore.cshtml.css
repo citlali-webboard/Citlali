@@ -5,6 +5,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
 .container {
@@ -40,4 +41,37 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination a {
+  margin: 0 5px;
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  color: #333;
+  background-color: var(--color-primary);
+  transition: background-color 0.3s;
+}
+
+.pagination a:hover {
+  background-color: var(--pink-saturated);
+}
+
+.pagination a.active {
+  font-weight: bold;
+  background-color: var(-color-primary);
+  color: white;
+}
+
+.pagination a.disabled {
+  pointer-events: none;
+  color: #ccc;
+  border-color: #ccc;
 }

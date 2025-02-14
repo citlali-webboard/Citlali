@@ -120,6 +120,8 @@ public class QuestionViewModel
 public class EventExploreViewModel
 {
     public EventBriefCardData[] EventBriefCardDatas = [new()];
+    public int CurrentPage { get; set; } = 1;
+    public int TotalPage { get; set; }
 }
 
 [Table("EVENT_CATEGORY_TAG")]

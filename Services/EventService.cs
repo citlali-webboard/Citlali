@@ -211,4 +211,39 @@ public class EventService(Client supabaseClient, UserService userService)
 
         return eventDetailViewModel;
     }
+
+    public async Task<List<Event>> GetAllEvents()
+    {
+        var response = await _supabaseClient
+            .From<Event>()
+            .Select("*")
+            .Filter(row => row.Deleted, Supabase.Postgrest.Constants.Operator.Equals, "false")
+            .Get();
+
+        var events = new List<Event>();
+
+        if (response != null)
+        {
+            foreach (var e in response.Models)
+            {
+                events.Add(new Event
+                {
+                    EventId = e.EventId,
+                    CreatorUserId = e.CreatorUserId,
+                    EventTitle = e.EventTitle,
+                    EventDescription = e.EventDescription,
+                    EventCategoryTagId = e.EventCategoryTagId,
+                    EventLocationTagId = e.EventLocationTagId,
+                    MaxParticipant = e.MaxParticipant,
+                    Cost = e.Cost,
+                    EventDate = e.EventDate,
+                    PostExpiryDate = e.PostExpiryDate,
+                    CreatedAt = e.CreatedAt,
+                    Deleted = e.Deleted
+                });
+            }
+        }
+
+        return events;
+    }
 }

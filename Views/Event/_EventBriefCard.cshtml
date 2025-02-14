@@ -45,21 +45,23 @@
 }
 
 <div class="card space-y-4">
-    <div class="justify-between">
-        <h2>@Model.CreatedAt.ToString("t") • @Model.CreatedAt.ToString("d")</h2>
-        <span>@Model.CurrentParticipant/@Model.MaxParticipant</span>
-    </div>
-    <div>
-        <span class="space-x-4 items-center">
-            <span class="tag">
-                <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
-                <span>@Model.EventCategoryTag.EventCategoryTagName</span>
+    <a href="../event/detail/@Model.EventId">
+        <div class="justify-between">
+            <h2>@Model.CreatedAt.ToString("t") • @Model.CreatedAt.ToString("d")</h2>
+            <span>@Model.CurrentParticipant/@Model.MaxParticipant</span>
+        </div>
+        <div class="card-title">
+            <span class="space-x-4">
+                <span class="tag">
+                    <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
+                    <span>@Model.EventCategoryTag.EventCategoryTagName</span>
+                </span>
+                <span class="event-title">@Model.EventTitle</span>
             </span>
-            <span class="event-title">@Model.EventTitle</span>
-        </span>
-    </div>
-    <div class="justify-between">
-        <span>Posted by @Model.CreatorDisplayName</span>
-        <span class="@(expired ? "expired" : "active")">@relativeTime</span>
-    </div>
+        </div>
+        <div class="justify-between">
+            <span>Posted by @Model.CreatorDisplayName</span>
+            <span class="@(expired ? "expired" : "active")">@relativeTime</span>
+        </div>
+    </a>
 </div>

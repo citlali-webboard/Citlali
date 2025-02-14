@@ -13,4 +13,20 @@
             </div>
         }
     </div>
+    <div class="pagination">
+        @if (Model.CurrentPage > 1)
+        {
+            <a href="@Url.Action("Explore", new { page = Model.CurrentPage - 1 })">Previous</a>
+        }
+
+        @for (var i = 1; i <= Model.TotalPage; i++)
+        {
+            <a href="@Url.Action("Explore", new { page = i })" class="@(i == Model.CurrentPage ? "active" : "")">@i</a>
+        }
+
+        @if (Model.CurrentPage < Model.TotalPage)
+        {
+            <a href="@Url.Action("Explore", new { page = Model.CurrentPage + 1 })">Next</a>
+        }
+    </div>
 </div>
