@@ -28,28 +28,73 @@ public class EventController : Controller
 
     [HttpGet("create")]
     [Authorize]
-    public async Task<IActionResult> Create()
+    public async Task<IActionResult> Create(CreateEventViewModel createEventViewModel)
     {
-        CreateEventViewModel createEventViewModel = new();
+        // CreateEventViewModel createEventViewModel = new();
         createEventViewModel.Tags = await _eventService.GetTags();
+        createEventViewModel.LocationTags = await _eventService.GetLocationTags();
 
         return View(createEventViewModel);
     }
 
     [HttpPost("createEvent")]
-    public async Task<IActionResult> Create(CreateEventViewModel createEventViewModel)
+    [Authorize]
+    public async Task<IActionResult> CreateEvent(CreateEventViewModel createEventViewModel)
     {
-        Console.WriteLine("Create Event");
-        var newEvent = await _eventService.CreateEvent(createEventViewModel);
-        return RedirectToAction("detail", new { id = newEvent.EventId });
+        try{
+            if (!ModelState.IsValid)
+            {
+                throw new Exception("All fields are required");
+            }
+            if (createEventViewModel.PostExpiryDate < DateTime.UtcNow || createEventViewModel.EventDate < DateTime.UtcNow)
+            {
+                throw new Exception("Post expiry date and event date must be in the future");
+            }
+            if (createEventViewModel.EventDate <= createEventViewModel.PostExpiryDate)
+            {
+                throw new Exception("Event date must be after post expiry date");
+            }
+            if (createEventViewModel.Cost < 0)
+            {
+                throw new Exception("Cost must be a positive number");
+            }
+            if (createEventViewModel.MaxParticipant < 0)
+            {
+                throw new Exception("Max participants must be a positive number");
+            }
+            if (createEventViewModel.EventLocationTagId == Guid.Empty || createEventViewModel.EventCategoryTagId == Guid.Empty)
+            {
+                throw new Exception("Location and Category tags are required");
+            }
+
+            var newEvent = await _eventService.CreateEvent(createEventViewModel);
+            return RedirectToAction("detail", new { id = newEvent.EventId });
+        }catch (Exception e){
+            TempData["Error"] = e.Message;
+            // createEventViewModel.Tags = await _eventService.GetTags();
+            // createEventViewModel.LocationTags = await _eventService.GetLocationTags();
+            return RedirectToAction("create", createEventViewModel);
+        }
     }
 
 
     [HttpGet("detail/{id}")]
-    public IActionResult Detail(string id)
+    public async Task<IActionResult> Detail(string id)
     {
-        EventDetailViewModel eventDetailViewModel = new();
-        return View(eventDetailViewModel);
+        try{
+            if (!Guid.TryParse(id, out _))
+            {
+                throw new Exception("Invalid Event id");
+            }
+
+            EventDetailViewModel eventDetailViewModel = await _eventService.GetEventDetail(Guid.Parse(id));
+            return View(eventDetailViewModel);
+
+        }catch (Exception e){
+            TempData["Error"] = e.Message;
+            return RedirectToAction("profile", "user");
+        }
+        
     }
 
     [HttpGet("explore")]
