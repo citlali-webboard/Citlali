@@ -51,7 +51,8 @@ public class SearchService(Supabase.Client supabaseClient, Configuration configu
         {
             var databaseResult = await _supabaseClient
                 .From<Event>()
-                .Select(x => new object[] { x.EventTitle, x.EventDescription, x.EventId })
+                .Select(x => new object[] { x.EventTitle, x.EventDescription, x.EventId, x.Deleted })
+                .Filter(x => x.Deleted, Constants.Operator.NotEqual, true)
                 .Filter(x => x.EventTitle, Constants.Operator.WFTS, new FullTextSearchConfig(query, null))
                 .Get();
 

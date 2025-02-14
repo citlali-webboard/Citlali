@@ -40,6 +40,9 @@ public class Event : BaseModel
     
     [Column("CreatedAt")]
     public DateTime CreatedAt { get; set; } = new();
+
+    [Column("Deleted")]
+    public bool Deleted { get; set; } = new();
 }
 
 public class EventQuestion : BaseModel
