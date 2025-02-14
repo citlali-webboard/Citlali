@@ -56,3 +56,8 @@ public class UserOnboardingDto : User
         public IFormFile? ProfileImage { get; set; }
         public List<Guid> SelectedTags { get; set; } = new List<Guid>();
 }
+
+public class UserViewModel : User
+{
+        public bool IsCurrentUser { get; set; }
+}
