@@ -89,18 +89,19 @@ if (searchForm) {
       .then((response) => response.json())
       .then((data: SearchResponse) => data)
       .catch((error) => {
-        toggleResultsNull();
         console.error(`Error querying search ${error}`);
         return { results: [] };
       });
     
       const cards = response.results.map((result: SearchResult) => getResultCard(result))
-      if (results && cards) {
-        results.innerHTML = '';
-        cards.forEach(card => results.appendChild(card));
-      } else {
-        toggleResultsNull();
+      if (results) {
+        if (cards.length > 0) {
+          results.innerHTML = '';
+          cards.forEach(card => results.appendChild(card));
+          toggleResults();
+        } else {
+          toggleResultsNull();
+        }
       }
-      toggleResults();
   });
 }

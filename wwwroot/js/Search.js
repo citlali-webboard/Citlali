@@ -111,21 +111,22 @@ if (searchForm) {
                             .then(function (response) { return response.json(); })
                             .then(function (data) { return data; })
                             .catch(function (error) {
-                            toggleResultsNull();
                             console.error("Error querying search ".concat(error));
                             return { results: [] };
                         })];
                 case 1:
                     response = _a.sent();
                     cards = response.results.map(function (result) { return getResultCard(result); });
-                    if (results && cards) {
-                        results.innerHTML = '';
-                        cards.forEach(function (card) { return results.appendChild(card); });
+                    if (results) {
+                        if (cards.length > 0) {
+                            results.innerHTML = '';
+                            cards.forEach(function (card) { return results.appendChild(card); });
+                            toggleResults();
+                        }
+                        else {
+                            toggleResultsNull();
+                        }
                     }
-                    else {
-                        toggleResultsNull();
-                    }
-                    toggleResults();
                     return [2 /*return*/];
             }
         });
