@@ -1,4 +1,4 @@
-@* @model Citlali.Models.NavModel; *@
+@model Citlali.Models.NavModel;
 
 <nav>
   <ul>
@@ -10,7 +10,7 @@
         </li>
       </a>
 
-      <a href="#">
+      <a href="../Home/Index">
         <li class="logo">
           @* Logo *@
           <span>
@@ -22,6 +22,18 @@
     </div>
 
     <div class="nav-group">
+      <a href="../Event/Create">
+        <li class="create-event">
+          @* Create Event *@
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.AddCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          </span>
+          <p>
+            Create Event
+          </p>
+        </li>
+      </a>
+
       <a href="#">
         <li>
           @* History *@
@@ -48,10 +60,21 @@
         @* Profile *@
         <li>
           <div class="profile-placeholder">
-            @* <img src=@Model.profileImageUrl alt=""> *@
+            <img src=@Model.profileImageUrl alt="">
           </div>
         </li>
       </a>
+
+      <div class="sign-out-btn">
+        <form asp-controller="Auth" asp-action="SignOut" method="post">
+          <button type="submit">
+            <span class="sign-out-icon">
+              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.ConferenceRoom>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+            </span>
+            <p class="sign-out-text">Sign Out</p>
+          </button>
+        </form>
+      </div>
     </div>
   </ul>
 </nav>

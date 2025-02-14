@@ -44,3 +44,63 @@ li > svg {
   width: 100%;
   border-radius: 50%;
 }
+
+.sign-out-btn {
+  color: black;
+  border: 0.1rem solid black;
+  border-radius: 25px;
+  height: 1.5rem;
+}
+
+.sign-out-btn:hover {
+  /* background-color: rgb(255, 77, 77);
+  color: white; */
+  box-shadow: 2px 2px 8px 5px rgb(0, 0, 0, 0.1);
+}
+
+.create-event {
+  display: flex;
+  align-items: center;
+  border: 0.1rem solid black;
+  padding: 0.2rem 0.5rem;
+  border-radius: 25px;
+  gap: 0.25rem;
+}
+
+.create-event:hover {
+  /* background-color: rgb(255, 147, 183); */
+  box-shadow: 2px 2px 8px 5px rgb(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .create-event {
+    border: none;
+    padding: 0;
+  }
+
+  .create-event p {
+    display: none;
+  }
+
+  .sign-out-btn {
+    border: none;
+    padding: 0;
+  }
+
+  .sign-out-text {
+    display: none;
+    padding: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .sign-out-btn {
+    padding: 0.2rem 0.5rem;
+    height: 2rem;
+  }
+
+  .sign-out-icon {
+    display: none;
+    padding: 0;
+  }
+}

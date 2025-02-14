@@ -11,12 +11,10 @@
   {
     profileImageUrl = Model.ProfileImageUrl
   };
+  ViewBag.profileImageUrl = Model.ProfileImageUrl ?? "";
 }
 
 <div class="window">
-  <form asp-controller="Auth" asp-action="SignOut" method="post">
-    <button type="submit" class="btn btn-danger">Sign Out</button>
-  </form>
 
   <div class="edit-popup" id="edit-popup">
     <div class="popup-content">
