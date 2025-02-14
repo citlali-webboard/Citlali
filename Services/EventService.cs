@@ -218,6 +218,7 @@ public class EventService(Client supabaseClient, UserService userService)
             .From<Event>()
             .Select("*")
             .Filter(row => row.Deleted, Supabase.Postgrest.Constants.Operator.Equals, "false")
+            .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
             .Get();
 
         var events = new List<Event>();
