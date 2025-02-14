@@ -4,19 +4,42 @@ using Supabase.Postgrest.Attributes;
 
 namespace Citlali.Models;
 
+[Table("EVENTS")]
 public class Event : BaseModel
 {
-    public Guid EventId = new();
-    public Guid CreatorUserId = new();
-    public string EventTitle = "Sample title";
-    public string EventDescription = "Sample description";
-    public Guid EventCategoryTagId = new();
-    public Guid EventLocationTagId = new();
-    public int MaxParticipant = 64;
-    public int Cost = 64;
-    public DateTime EventDate = new();
-    public DateTime PostExpiryDate = new();
-    public DateTime CreatedAt = new();
+    [PrimaryKey]
+    [Column("EventId")]
+    public Guid EventId { get; set; } = new();
+    
+    [Column("CreatorUserId")]
+    public Guid CreatorUserId { get; set; } = new();
+    
+    [Column("EventTitle")]
+    public string EventTitle { get; set; } = "Sample title";
+    
+    [Column("EventDescription")]
+    public string EventDescription { get; set; } = "Sample description";
+    
+    [Column("EventCategoryTagId")]
+    public Guid EventCategoryTagId { get; set; } = new();
+    
+    [Column("EventLocationTagId")]
+    public Guid EventLocationTagId { get; set; } = new();
+    
+    [Column("MaxParticipant")]
+    public int MaxParticipant { get; set; } = 64;
+    
+    [Column("Cost")]
+    public int Cost { get; set; } = 64;
+    
+    [Column("EventDate")]
+    public DateTime EventDate { get; set; } = new();
+    
+    [Column("PostExpiryDate")]
+    public DateTime PostExpiryDate { get; set; } = new();
+    
+    [Column("CreatedAt")]
+    public DateTime CreatedAt { get; set; } = new();
 }
 
 public class EventQuestion : BaseModel
