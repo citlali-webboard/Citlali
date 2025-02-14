@@ -37,6 +37,20 @@ public class User : BaseModel
 
 }
 
+[Table("USER_FOLLOWED_CATEGORY")]
+public class UserFollowedCategory : BaseModel
+{
+        [PrimaryKey]
+        [Column("UserFollowedTagId")]
+        public Guid UserFollowedTagId { get; set; } = Guid.NewGuid();
+
+        [Column("UserId")]
+        public Guid UserId { get; set; }
+
+        [Column("EventCategoryTagId")]
+        public Guid EventCategoryTagId { get; set; }
+} 
+
 public class UserOnboardingDto : User
 {
         public IFormFile? ProfileImage { get; set; }

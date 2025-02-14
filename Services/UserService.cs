@@ -1,4 +1,5 @@
 using Citlali.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Supabase;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -75,6 +76,16 @@ public class UserService
             await _supabaseClient
                 .From<User>()
                 .Insert(dbUser);
+
+            // I know this is not the best way to do this, but I'm too lazy to improve this - OkuSan
+            var SelectedTags = userOnboardingDto.SelectedTags;
+            if (SelectedTags != null && SelectedTags.Count > 0)
+            {
+                for (int i = 0; i < SelectedTags.Count; i++)
+                {
+                    await FollowTag(SelectedTags[i]);
+                }
+            }
 
             return dbUser;
         }
@@ -205,6 +216,28 @@ public class UserService
     {
         return Regex.IsMatch(username, @"^[A-Za-z][A-Za-z0-9_]{3,29}$");
     }
+
+    public async Task<bool> FollowTag(Guid tagId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null || currentUser.Id == null)
+        {
+            throw new UnauthorizedAccessException("User is not authenticated.");
+        }
+
+        var model = new UserFollowedCategory
+        {
+            UserId = Guid.Parse(currentUser.Id),
+            EventCategoryTagId = tagId
+        };
+
+        await _supabaseClient
+            .From<UserFollowedCategory>()
+            .Insert(model);
+
+        return true;
+    }
+
 }
 
 public class InvalidUsernameException : Exception
