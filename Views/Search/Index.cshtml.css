@@ -49,7 +49,7 @@ h2 {
 #results {
   display: none;
   flex-direction: column;
-  column-gap: 0.5rem;
+  row-gap: 0.5rem;
 }
 
 #results-null {
