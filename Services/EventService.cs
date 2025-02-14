@@ -203,6 +203,7 @@ public class EventService(Client supabaseClient, UserService userService)
         eventDetailViewModel.EventDetailCardData.EventDate = Event.EventDate;
         eventDetailViewModel.EventDetailCardData.PostExpiryDate = Event.PostExpiryDate;
         eventDetailViewModel.EventDetailCardData.CreatedAt = Event.CreatedAt;
+        eventDetailViewModel.EventDetailCardData.CreatorUsername = creator.Username;
         eventDetailViewModel.EventDetailCardData.CreatorDisplayName = creator.DisplayName;
         eventDetailViewModel.EventDetailCardData.CreatorProfileImageUrl = creator.ProfileImageUrl;
 

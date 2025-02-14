@@ -12,10 +12,14 @@
     </div>
     <div class="info-line">
         <span class="creator">
-            <span>
-                <img class="pfp" src=@Model.CreatorProfileImageUrl alt="Creator Profile Picture"/>
-            </span>
-            <span>@Model.CreatorDisplayName</span>
+            <a href="/user/@Model.CreatorUsername">
+                <span>
+                    <img class="pfp" src=@Model.CreatorProfileImageUrl alt="Creator Profile Picture"/>
+                </span>
+            </a>
+            <a href="/user/@Model.CreatorUsername">
+                <span>@Model.CreatorDisplayName</span>
+            </a>
         </span>
         <span class="text-align-right">@Model.CreatedAt.ToString("t") • @Model.CreatedAt.ToString("d")</span>
     </div>
