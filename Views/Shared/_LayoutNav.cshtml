@@ -1,3 +1,10 @@
+@using Citlali.Models
+@{
+    var navModel = new NavModel
+    {
+        profileImageUrl = ViewBag.profileImageUrl as string
+    };
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -17,7 +24,7 @@
     @RenderSection("head", required: false)
 </head>
 
-
+@await Html.PartialAsync("_Navbar", navModel)
 <body>
     @if (TempData["Error"] != null)
     {
@@ -26,27 +33,19 @@
             <button onclick="closePopup()">✖</button>
         </div>
     }
+    
     <div class="main-container">
-        
-        @using Citlali.Models
-        @{
-            var navModel = new NavModel
-            {
-                profileImageUrl = ViewBag.profileImageUrl as string
-            };
-        }
-        @await Html.PartialAsync("_Navbar", navModel)
-        @* <partial name="_NavBar" /> *@
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
+
     <script src="~/js/ErrorHandle.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @* <script src="_framework/blazor.server.js"></script> *@
     <script src="_content/Microsoft.FluentUI.AspNetCore.Components/Microsoft.FluentUI.AspNetCore.Components.lib.module.js" type="module" async></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>
