@@ -1,4 +1,7 @@
-@model Citlali.Models.NavModel;
+@* @model Citlali.Models.NavModel; *@
+@{
+    var profileImageUrl = Context.Request.Cookies["profileImageUrl"] ?? "";
+}
 
 <nav>
   <ul>
@@ -59,7 +62,7 @@
         @* Profile *@
         <li>
           <div class="profile-placeholder">
-            <img src=@Model.profileImageUrl alt="">
+            <img src=@profileImageUrl alt="">
           </div>
 
           @* Dropdown *@
