@@ -28,44 +28,58 @@
           <span>
             @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.AddCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
           </span>
-          <p>
-            Create Event
-          </p>
+          <span class="create-event-text">Create Event</span>
         </li>
       </a>
 
       <a href="#">
-        <li>
+        <li class="create-event">
           @* History *@
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.History>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.History>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          </span>
+          <p class="create-event-text">History</p>
         </li>
       </a>
 
       <a href="#">
         @* Notification *@
-        <li>
-
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+        <li class="create-event">
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          </span>
+          <p class="create-event-text">Notification</p>
         </li>
       </a>
 
       <a href="#">
         @* Follow Heart *@
-        <li>
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Heart>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+        <li class="create-event">
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Heart>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          </span>
+          <p class="create-event-text">Followed</p>
         </li>
       </a>
 
-      <a href="#">
+      <div href="#" class="profile-container">
         @* Profile *@
         <li>
           <div class="profile-placeholder">
             <img src=@Model.profileImageUrl alt="">
           </div>
-        </li>
-      </a>
 
-      <div class="sign-out-btn">
+          @* Dropdown *@
+          <div class="profile-dropdown">
+            <a href="#" class="dropdown-item">User Profile</a>
+            <form asp-controller="Auth" asp-action="SignOut" method="post">
+              <button type="submit" class="dropdown-item">Sign Out</button>
+            </form>
+          </div>
+        </li>
+      </div>
+
+      @* <div class="sign-out-btn">
         <form asp-controller="Auth" asp-action="SignOut" method="post">
           <button type="submit">
             <span class="sign-out-icon">
@@ -74,7 +88,7 @@
             <p class="sign-out-text">Sign Out</p>
           </button>
         </form>
-      </div>
+      </div> *@
     </div>
   </ul>
 </nav>

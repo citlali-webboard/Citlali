@@ -1,3 +1,11 @@
+@model Citlali.Models.NavModel;
+
+@* @using Citlali.Services.UserService; *@
+
+@* @{
+    ViewBag.profileImageUrl = Model.ProfileImageUrl ?? "";
+} *@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,6 +34,7 @@
         </div>
     }
     <div class="main-container">
+        
         @using Citlali.Models
         @{
             var navModel = new NavModel

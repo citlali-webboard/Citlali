@@ -45,7 +45,71 @@ li > svg {
   border-radius: 50%;
 }
 
-.sign-out-btn {
+.profile-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 120%; 
+  right: 10%;
+  background: white;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 8px 0 8px 8px;
+  width: 8rem;
+  max-width: 150px; 
+  padding: 0.5rem;
+  display: none; 
+  flex-direction: column;
+  z-index: 10;
+  opacity: 0;
+
+  transition: opacity 0.5s ease-in-out, visibility 0s linear 2s;
+}
+
+.dropdown-item {
+  padding: 0.75rem;
+  width: 100%;
+  text-align: center;
+  color: black;
+  text-decoration: none;
+  display: block;
+  border-radius: 5px;
+}
+
+.dropdown-item:hover {
+  background-color: #f2f2f2;
+}
+
+/* .profile-container:hover .profile-dropdown {
+  display: flex;
+  opacity: 1;
+
+  visibility: visible;
+  transition: opacity 2s ease-in-out;
+} */
+
+/* 
+.profile-container:hover .profile-dropdown {
+  animation: delay-hide 2s ease-in-out forwards;
+}
+
+@keyframes delay-hide {
+  0% {
+    opacity: 1;
+    visibility: visible;
+  }
+  50% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+} */
+/* .sign-out-btn {
   color: black;
   border: 0.1rem solid black;
   border-radius: 25px;
@@ -53,23 +117,48 @@ li > svg {
 }
 
 .sign-out-btn:hover {
-  /* background-color: rgb(255, 77, 77);
-  color: white; */
-  box-shadow: 2px 2px 8px 5px rgb(0, 0, 0, 0.1);
-}
+  
+} */
 
 .create-event {
+  position: relative;
   display: flex;
-  align-items: center;
-  border: 0.1rem solid black;
-  padding: 0.2rem 0.5rem;
-  border-radius: 25px;
-  gap: 0.25rem;
 }
 
-.create-event:hover {
-  /* background-color: rgb(255, 147, 183); */
-  box-shadow: 2px 2px 8px 5px rgb(0, 0, 0, 0.1);
+.create-event .create-event-text {
+  visibility: hidden;
+  display: inline-block;
+  max-width: 120px;
+  width: fit-content;
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 25px;
+  background-color: rgb(255, 255, 255);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  color: rgb(0, 0, 0);
+
+  position: absolute;
+  z-index: 1;
+  top: 180%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.create-event .create-event-text::before {
+  content: "";
+  border: 5px solid;
+  border-color: transparent transparent rgb(255, 255, 255) transparent;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.create-event:hover .create-event-text {
+  visibility: visible;
+  opacity: 1;
 }
 
 @media (max-width: 768px) {
