@@ -123,7 +123,7 @@
         </div>
         <div class="meta-data">
           <div class="data">
-            <h3>32</h3>
+            <h3>@Model.UserEvents.Count</h3>
             <p>Events</p>
           </div>
           <div class="data">
@@ -145,5 +145,22 @@
   </div>
 
   <hr />
+
+  <div class="content">
+    <div class="event-wrap">
+      <div class="header">
+        <h1 class="event-header">@Model.DisplayName's Events 🎉</h1>
+        <p>Here you can find all the events that @Model.DisplayName has created. Stay updated with the latest events and join in to connect with others!</p>
+      </div>
+      <div class="event-list">
+          @foreach (var userEvent in Model.UserEvents)
+          {
+              <div class="event-card">
+                  <partial name="~/Views/Event/_EventBriefCard.cshtml" model=userEvent />
+              </div>
+          }
+      </div>
+    </div>
+  </div>
 
 </div>

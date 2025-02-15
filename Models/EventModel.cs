@@ -43,6 +43,10 @@ public class Event : BaseModel
 
     [Column("Deleted")]
     public bool Deleted { get; set; } = false;
+    public string CreatorProfileImageUrl { get; set; } = "";
+    public string CreatorDisplayName { get; set; } = "";
+    public int CurrentParticipant { get; set; } = 0;
+    public EventCategoryTag EventCategoryTag { get; set; } = new();
 
 
 }
