@@ -4,6 +4,8 @@
 
     display: flex;
     flex-direction: column;
+
+    margin-bottom: 2rem;
 }
 
 h1 {
@@ -342,24 +344,39 @@ input[type="file"] {
     display: none;
 }
 
+.content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.event-wrap {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    width: 90%;
+    max-width: 1150px;
+    gap: 2rem;
+}
+
 .event-header {
+    width: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-bottom: 1rem;
-    margin-left: 10rem;
 }
 
 .event-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 2px;
+    gap: 1rem;
     justify-content: center;
 }
 
 .event-card {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1150px;
 }
 
 
@@ -458,6 +475,14 @@ input[type="file"] {
     .event-card {
         flex: 1 1 100%;
         max-width: 100%;
+    }
+
+    .event-header {
+        font-size: 1.5rem;
+    }
+
+    .event-wrap .header p {
+        font-size: 0.8rem;
     }
 }
 
