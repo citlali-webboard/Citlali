@@ -112,37 +112,45 @@ public class EventService(Client supabaseClient, UserService userService)
         return modelEvent;
     }
 
-    public async Task<List<EventBriefCardData>> GetEventsByUserId(Guid userId)
+    public async Task<List<Event>> GetEventsByUserId(Guid userId)
     {
         var response = await _supabaseClient
             .From<Event>()
             .Select("*")
             .Filter("CreatorUserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
+            .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
             .Get();
 
-        var events = new List<EventBriefCardData>();
+        var events = new List<Event>();
 
         if (response != null)
         {
-            foreach (var item in response.Models)
+            foreach (var e in response.Models)
             {
-                events.Add(new EventBriefCardData
+                var creator = await _userService.GetUserByUserId(e.CreatorUserId);
+                var categoryTag = await GetTagById(e.EventCategoryTagId);
+
+                events.Add(new Event
                 {
-                    EventId = item.EventId,
-                    EventTitle = item.EventTitle,
-                    CreatorDisplayName = "Some Creator", // Example placeholder
-                    EventCategoryTag = new EventCategoryTag { EventCategoryTagName = "Category" },
-                    LocationTag = new LocationTag { LocationTagName = "Location" },
-                    CurrentParticipant = 10, // Example data
-                    MaxParticipant = 50, // Example data
-                    Cost = item.Cost,
-                    EventDate = item.EventDate,
-                    PostExpiryDate = item.PostExpiryDate,
-                    CreatedAt = item.CreatedAt
+                    EventId = e.EventId,
+                    CreatorUserId = e.CreatorUserId,
+                    EventTitle = e.EventTitle,
+                    EventDescription = e.EventDescription,
+                    EventCategoryTagId = e.EventCategoryTagId,
+                    EventLocationTagId = e.EventLocationTagId,
+                    MaxParticipant = e.MaxParticipant,
+                    Cost = e.Cost,
+                    EventDate = e.EventDate,
+                    PostExpiryDate = e.PostExpiryDate,
+                    CreatedAt = e.CreatedAt,
+                    Deleted = e.Deleted,
+                    CreatorProfileImageUrl = creator?.ProfileImageUrl ?? "",
+                    CreatorDisplayName = creator?.DisplayName ?? "",
+                    CurrentParticipant = e.CurrentParticipant,
+                    EventCategoryTag = categoryTag ?? new EventCategoryTag()
                 });
             }
         }
-
         return events;
     }
 

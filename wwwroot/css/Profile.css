@@ -342,6 +342,26 @@ input[type="file"] {
     display: none;
 }
 
+.event-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 1rem;
+    margin-left: 10rem;
+}
+
+.event-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    justify-content: center;
+}
+
+.event-card {
+    width: 100%;
+    max-width: 1200px;
+}
+
 
 @media screen and (max-width: 768px) {
 
@@ -427,4 +447,17 @@ input[type="file"] {
        width: 90% !important;
        align-self: center;
     }
+
+    .event-header {
+        margin-left: 0;
+        justify-content: center;
+        width: 100%;
+        text-align: center;
+    }
+
+    .event-card {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
 }
+

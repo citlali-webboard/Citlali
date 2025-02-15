@@ -128,6 +128,20 @@ public class UserController : Controller
         var currentUser = _supabaseClient.Auth.CurrentUser;
         var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
 
+        var userEvents = await _eventService.GetEventsByUserId(user.UserId);
+        var userEventBriefCards = userEvents.Select(e => new EventBriefCardData
+        {
+            EventId = e.EventId,
+            EventTitle = e.EventTitle,
+            EventDescription = e.EventDescription,
+            CreatedAt = e.CreatedAt,
+            CreatorProfileImageUrl = e.CreatorProfileImageUrl,
+            CreatorDisplayName = e.CreatorDisplayName,
+            CurrentParticipant = e.CurrentParticipant,
+            MaxParticipant = e.MaxParticipant,
+            EventCategoryTag = e.EventCategoryTag
+        }).ToList();
+
         var userViewModel = new UserViewModel
         {
             UserId = user.UserId,
@@ -136,12 +150,9 @@ public class UserController : Controller
             ProfileImageUrl = user.ProfileImageUrl,
             DisplayName = user.DisplayName,
             UserBio = user.UserBio,
-            IsCurrentUser = isCurrentUser
+            IsCurrentUser = isCurrentUser,
+            UserEvents = userEventBriefCards
         };
-
-         // ดึง Event ของ User
-        var userEvents = await _eventService.GetEventsByUserId(user.UserId);
-        ViewBag.UserEvents = userEvents;
 
         return View(userViewModel);
     }

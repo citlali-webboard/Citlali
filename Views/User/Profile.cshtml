@@ -123,7 +123,7 @@
         </div>
         <div class="meta-data">
           <div class="data">
-            <h3>32</h3>
+            <h3>@Model.UserEvents.Count</h3>
             <p>Events</p>
           </div>
           <div class="data">
@@ -146,21 +146,17 @@
 
   <hr />
 
-  <h3>My Events</h3>
+  <h1 class="event-header">@Model.DisplayName's Events</h1>
   <div class="event-list">
-      @if (ViewBag.UserEvents != null && ViewBag.UserEvents.Count > 0)
+      @foreach (var userEvent in Model.UserEvents)
       {
-          foreach (var eventItem in ViewBag.UserEvents)
-          {
-              @await Html.PartialAsync("_EventBriefCard", Model.EventBriefCardData)
-
-          }
-      }
-      else
-      {
-          <p>No events found.</p>
+          <div class="event-card">
+              <partial name="~/Views/Event/_EventBriefCard.cshtml" model=userEvent />
+          </div>
       }
   </div>
+
+
 
 
 </div>
