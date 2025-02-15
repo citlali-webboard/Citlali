@@ -97,6 +97,16 @@ public class EventController : Controller
         
     }
 
+    [HttpPost("join")]
+    [Authorize]
+    public async Task<IActionResult> JoinEvent(JoinEventModel joinEventModel)
+    {
+        
+        var RequestJoinEvent = await _eventService.JoinEvent(joinEventModel);
+        return RedirectToAction("profile", "user");
+    }
+
+
     [HttpGet("explore")]
     public IActionResult Explore()
     {

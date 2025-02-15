@@ -109,12 +109,18 @@ public class EventDetailViewModel
     public EventFormDto EventFormDto { get; set; } = new();
 }
 
+public class JoinEventModel
+{
+    public Guid EventId { get; set; } = new();
+    public EventFormDto EventFormDto { get; set; } = new();
+}
+
 public class QuestionViewModel
 {
     public Guid EventQuestionId { get; set; }
     public string Question { get; set; } = "Question Question";
     [Required(ErrorMessage = "This field is required")]
-    public string Answer { get; set; } = "Answer Answer";
+    public string Answer { get; set; } = "xxxx";
 }
 
 public class EventExploreViewModel
@@ -180,4 +186,45 @@ public class CreateEventViewModel
     public DateTime PostExpiryDate { get; set; } = new();
     public List<Tag> Tags { get; set; } = [];
     public List<string> Questions { get; set; } = ["Why are you interested in this event?"];
+}
+
+[Table("REGISTRATION")]
+public class Registrantion : BaseModel
+{
+    [PrimaryKey]
+    [Column("RegistrationId")]
+    public Guid RegistrationId { get; set; } = new();
+
+    [Column("UserId")]
+    public Guid UserId { get; set; } = new();
+
+    [Column("EventId")]
+    public Guid EventId { get; set; } = new();
+
+    [Column("Status")]
+    public string Status { get; set; } = "xxxx";
+
+    [Column("CreatedAt")]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    
+}
+
+[Table("REGISTRATION_ANSWER")]
+public class RegistrationAnswer : BaseModel
+{
+    [PrimaryKey]
+    [Column("RegistrationAnswerId")]
+    public Guid RegistrationAnswerId { get; set; } = new();
+
+    [Column("RegistrationId")]
+    public Guid RegistrationId { get; set; } = new();
+
+    [Column("EventQuestionId")]
+    public Guid EventQuestionId { get; set; } = new();
+
+    [Column("Answer")]
+    public string Answer { get; set; } = "";
+
+    [Column("CreatedAt")]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

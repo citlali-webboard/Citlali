@@ -211,4 +211,32 @@ public class EventService(Client supabaseClient, UserService userService)
 
         return eventDetailViewModel;
     }
+
+    //JoinEvent
+    public async Task<Registrantion> JoinEvent(JoinEventModel joinEventModel)
+    {
+        var supabaseUser = _supabaseClient.Auth.CurrentUser;
+
+        if (supabaseUser == null)
+        {
+            throw new Exception("User not authenticated");
+        }
+
+        Guid userId = Guid.Parse(supabaseUser.Id ?? ""); 
+        Guid EventID = joinEventModel.EventId;
+        var QuestionsList = joinEventModel.EventFormDto.Questions;
+
+        var newRegistration = new Registrantion
+        {
+            RegistrationId = Guid.NewGuid(),
+            EventId = EventID,
+            UserId = userId,
+        };
+
+        await _supabaseClient
+            .From<Registrantion>()
+            .Insert(newRegistration);
+
+        return newRegistration;
+    }
 }
