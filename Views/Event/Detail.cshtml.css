@@ -3,37 +3,38 @@
   min-height: calc(100dvh - var(--navbar-size));
   margin-left: auto;
   margin-right: auto;
+  margin-top: 4rem;
+  margin-bottom: 2rem;
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 }
 
 .detail-main-container {
-  display: grid;
-  grid-template-columns: 3fr 2fr;
-  gap: 1rem;
-  max-width: var(--max-screen-width);
-  width: 100%;
-  padding: 0 1rem;
+  width: 80%;
+  /* max-width: 768px; */
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+}
+
+.detail {
+  flex: 0 0 60%
+}
+
+.request-form {
+  flex: 0 0 40%
 }
 
 @media screen and (max-width: 768px) {
   .detail-main-container {
-    grid-template-columns: 1fr;
+    width: 90%;
+    flex-direction: column;
   }
-}
 
-.detail-column {
-  width: 100%;
-}
-
-.justify-between {
-  display: flex;
-  justify-content: space-between;
-}
-
-.space-y-4 > * {
-  margin-bottom: 8px;
+  .request-form,
+  .detail {
+    flex: 1 1 100%;
+  }
 }

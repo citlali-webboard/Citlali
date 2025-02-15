@@ -67,8 +67,21 @@ public class AuthController : Controller
             var session = await _authService.SignIn(authLoginDto.Email, authLoginDto.Password);
             if (session != null && session.AccessToken != null && session.RefreshToken != null)
             {
+
                 Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
                 Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
+
+                var user = await _userService.GetUserByEmail(authLoginDto.Email);
+                string profileImageUrl = user?.ProfileImageUrl ?? ""; // ถ้าไม่มีใช้รูปเริ่มต้น
+
+                HttpContext.Response.Cookies.Append("ProfileImageUrl", profileImageUrl, new CookieOptions
+                {
+                    HttpOnly = false, 
+                    Secure = true, 
+                    SameSite = SameSiteMode.Strict, 
+                    Expires = DateTime.UtcNow.AddDays(30)
+                });
+
                 return RedirectToAction("Index", "User");
             }
             throw new Exception("Wrong credentials.");

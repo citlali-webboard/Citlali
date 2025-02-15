@@ -1,16 +1,12 @@
 @* @model Citlali.Models.NavModel; *@
+@{
+    var profileImageUrl = Context.Request.Cookies["profileImageUrl"] ?? "";
+}
 
 <nav>
   <ul>
     <div class="nav-group">
-      <a href="#">
-        <li>
-          @* Navigation Hamburger *@
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Navigation>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
-        </li>
-      </a>
-
-      <a href="#">
+      <a href="/Home/Index">
         <li class="logo">
           @* Logo *@
           <span>
@@ -22,36 +18,63 @@
     </div>
 
     <div class="nav-group">
+      <a href="/Event/Create">
+        <li class="tooltip">
+          @* Create Event *@
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.AddCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          </span>
+          <span class="tooltip-text">Create Event</span>
+        </li>
+      </a>
+
       <a href="#">
-        <li>
+        <li class="tooltip">
           @* History *@
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.History>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.History>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          </span>
+          <p class="tooltip-text">History</p>
         </li>
       </a>
 
       <a href="#">
         @* Notification *@
-        <li>
-
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+        <li class="tooltip">
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          </span>
+          <p class="tooltip-text">Notification</p>
         </li>
       </a>
 
       <a href="#">
         @* Follow Heart *@
-        <li>
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Heart>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+        <li class="tooltip">
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Heart>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          </span>
+          <p class="tooltip-text">Followed</p>
         </li>
       </a>
 
-      <a href="#">
+      <a href="/user">
         @* Profile *@
         <li>
           <div class="profile-placeholder">
-            @* <img src=@Model.profileImageUrl alt=""> *@
+            <img src=@profileImageUrl alt="">
+          </div>
+
+          @* Dropdown *@
+          <div class="profile-dropdown">
+            <a href="../User/Profile" class="dropdown-item">User Profile</a>
           </div>
         </li>
       </a>
+      <form asp-controller="Auth" asp-action="SignOut" method="post">
+        <button type="submit" class="dropdown-item">Sign Out</button>
+      </form>
+
     </div>
   </ul>
 </nav>
