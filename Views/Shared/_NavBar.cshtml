@@ -68,12 +68,12 @@
           @* Dropdown *@
           <div class="profile-dropdown">
             <a href="../User/Profile" class="dropdown-item">User Profile</a>
-            <form asp-controller="Auth" asp-action="SignOut" method="post">
-              <button type="submit" class="dropdown-item">Sign Out</button>
-            </form>
           </div>
         </li>
-      </div>
+      </a>
+      <form asp-controller="Auth" asp-action="SignOut" method="post">
+        <button type="submit" class="dropdown-item">Sign Out</button>
+      </form>
 
     </div>
   </ul>
