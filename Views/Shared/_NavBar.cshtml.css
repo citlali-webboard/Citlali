@@ -44,3 +44,104 @@ li > svg {
   width: 100%;
   border-radius: 50%;
 }
+
+.profile-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 120%; 
+  right: 10%;
+  background: white;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 8px 0 8px 8px;
+  width: 8rem;
+  max-width: 150px; 
+  padding: 0.5rem;
+  display: none; 
+  flex-direction: column;
+  z-index: 10;
+  
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.dropdown-item {
+  padding: 0.75rem;
+  width: 100%;
+  text-align: center;
+  color: black;
+  text-decoration: none;
+  display: block;
+  border-radius: 5px;
+}
+
+.dropdown-item:hover {
+  background-color: #f2f2f2;
+}
+
+.tooltip {
+  position: relative;
+  display: flex;
+}
+
+.tooltip .tooltip-text {
+  visibility: hidden;
+  display: inline-block;
+  max-width: 120px;
+  width: fit-content;
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 25px;
+  background-color: rgb(255, 255, 255);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  color: rgb(0, 0, 0);
+
+  position: absolute;
+  z-index: 1;
+  top: 180%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.tooltip .tooltip-text::before {
+  content: "";
+  border: 5px solid;
+  border-color: transparent transparent rgb(255, 255, 255) transparent;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .tooltip {
+    border: none;
+    padding: 0;
+  }
+
+  .tooltip p {
+    display: none;
+  }
+
+  .profile-dropdown {
+    position: absolute;
+    right: 0;
+    left: auto;
+    width: 10rem;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    display: none; /* Hidden by default */
+  }
+}
+

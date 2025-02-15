@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,7 +27,16 @@
         </div>
     }
     <div class="main-container">
-        <partial name="_NavBar" />
+        
+        @using Citlali.Models
+        @{
+            var navModel = new NavModel
+            {
+                profileImageUrl = ViewBag.profileImageUrl as string
+            };
+        }
+        @await Html.PartialAsync("_Navbar", navModel)
+        @* <partial name="_NavBar" /> *@
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
