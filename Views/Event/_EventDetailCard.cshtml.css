@@ -24,11 +24,15 @@
 
 .tag {
   display: flex;
-  padding: 0.325rem 0.75rem;
-  background-color: var(--pink-color);
-  border-radius: 2rem;
+  height: fit-content;
+  font-size: 0.8rem;
+  padding: 3px 6px;
+  border: 1px solid #666;
+  border-radius: 30px;
+  cursor: default;
   width: fit-content;
-  column-gap: 0.5rem;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .title {
@@ -38,7 +42,6 @@
 
 .participants {
   font-size: 1.25rem;
-  font-weight: 600;
   display: flex;
   align-items: center;
   column-gap: 0.5rem;
