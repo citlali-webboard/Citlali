@@ -134,6 +134,7 @@ public class QuestionViewModel
 public class EventExploreViewModel
 {
     public EventBriefCardData[] EventBriefCardDatas = [new()];
+    public Tag[] Tags = [new()];
     public int CurrentPage { get; set; } = 1;
     public int TotalPage { get; set; }
 }
@@ -195,7 +196,7 @@ public class CreateEventViewModel
     public DateTime EventDate { get; set; } = new();
     public DateTime PostExpiryDate { get; set; } = new();
     public List<Tag> Tags { get; set; } = [];
-    public List<string> Questions { get; set; } = ["Why are you interested in this event?"];
+    public List<string> Questions { get; set; } = [];
 }
 
 [Table("REGISTRATION")]

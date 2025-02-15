@@ -16,11 +16,22 @@
                 <p>Cute webboard which brings people together~ Let's explore events and find what suits you the best !</p>
             </div>
             @* /* Search Bar: Change this later */ *@
-            <div class="search-bar">
+            @* <div class="search-bar">
                 <input type="text" name="search" placeholder="Search events..." />
                 <button type="submit">Search</button>
-            </div>
+            </div> *@
             @* /* Search Bar: Change this later */ *@
+            <div class="tags">
+                @foreach (var tag in Model.Tags)
+                {
+                    <a href="/event/tag/@tag.TagId">
+                        <span class="tag">
+                            <span>@tag.TagEmoji</span>
+                            <span>@tag.TagName</span>
+                        </span>
+                    </a>
+                }
+            </div>
         </header>
         <div class="event-list">
             @for (var i = 0; i < Model.EventBriefCardDatas.Length; i++)

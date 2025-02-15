@@ -152,9 +152,12 @@ public class EventController : Controller
             };
         }
 
+        var tags = (await _eventService.GetTags()).ToArray();
+
         var model = new EventExploreViewModel
         {
             EventBriefCardDatas = paginatedEventsCardData,
+            Tags = tags,
             CurrentPage = page,
             TotalPage = (int)Math.Ceiling(events.Count() / (double)pageSize)
         };
