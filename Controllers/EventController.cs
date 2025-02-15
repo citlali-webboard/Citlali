@@ -15,7 +15,7 @@ public class EventController : Controller
 {
     private readonly ILogger<EventController> _logger;
     private readonly EventService _eventService;
-    private readonly UserService _userService; 
+    private readonly UserService _userService;
 
     public EventController(ILogger<EventController> logger, EventService eventService, UserService userService)
     {
@@ -45,7 +45,8 @@ public class EventController : Controller
     [Authorize]
     public async Task<IActionResult> CreateEvent(CreateEventViewModel createEventViewModel)
     {
-        try{
+        try
+        {
             if (!ModelState.IsValid)
             {
                 throw new Exception("All fields are required");
@@ -73,7 +74,9 @@ public class EventController : Controller
 
             var newEvent = await _eventService.CreateEvent(createEventViewModel);
             return RedirectToAction("detail", new { id = newEvent.EventId });
-        }catch (Exception e){
+        }
+        catch (Exception e)
+        {
             TempData["Error"] = e.Message;
             // createEventViewModel.Tags = await _eventService.GetTags();
             // createEventViewModel.LocationTags = await _eventService.GetLocationTags();
@@ -85,7 +88,8 @@ public class EventController : Controller
     [HttpGet("detail/{id}")]
     public async Task<IActionResult> Detail(string id)
     {
-        try{
+        try
+        {
             if (!Guid.TryParse(id, out _))
             {
                 throw new Exception("Invalid Event id");
@@ -94,12 +98,24 @@ public class EventController : Controller
             EventDetailViewModel eventDetailViewModel = await _eventService.GetEventDetail(Guid.Parse(id));
             return View(eventDetailViewModel);
 
-        }catch (Exception e){
+        }
+        catch (Exception e)
+        {
             TempData["Error"] = e.Message;
             return RedirectToAction("explore");
         }
-        
+
     }
+
+    [HttpPost("join")]
+    [Authorize]
+    public async Task<IActionResult> JoinEvent(JoinEventModel joinEventModel)
+    {
+
+        var RequestJoinEvent = await _eventService.JoinEvent(joinEventModel);
+        return RedirectToAction("explore");
+    }
+
 
     [HttpGet("explore")]
     public async Task<IActionResult> Explore(int page = 1, int pageSize = 10)

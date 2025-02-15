@@ -250,11 +250,60 @@ public class EventService(Client supabaseClient, UserService userService)
         eventDetailViewModel.EventDetailCardData.CreatorProfileImageUrl = creator.ProfileImageUrl;
 
         var questions = await GetQuestionsByEventId(Event.EventId);
+
         eventDetailViewModel.EventFormDto.Questions = questions ?? [];
+        eventDetailViewModel.EventFormDto.EventId = Event.EventId;
 
         return eventDetailViewModel;
     }
 
+    //JoinEvent
+    public async Task<Registrantion> JoinEvent(JoinEventModel joinEventModel)
+    {
+        var supabaseUser = _supabaseClient.Auth.CurrentUser;
+
+        if (supabaseUser == null)
+        {
+            throw new Exception("User not authenticated");
+        }
+
+        Guid userId = Guid.Parse(supabaseUser.Id ?? ""); 
+        Guid EventID = joinEventModel.EventId;
+        var QuestionsList = joinEventModel.EventFormDto.Questions;
+
+        var newRegistration = new Registrantion
+        {
+            RegistrationId = Guid.NewGuid(),
+            EventId = EventID,
+            UserId = userId,
+        };
+
+        await _supabaseClient
+            .From<Registrantion>()
+            .Insert(newRegistration);
+
+        Console.WriteLine("Registration created");
+
+        foreach (var question in QuestionsList)
+        {
+            var newRegistrationAnswer = new RegistrationAnswer
+            {
+                RegistrationAnswerId = Guid.NewGuid(),
+                RegistrationId = newRegistration.RegistrationId,
+                EventQuestionId = question.EventQuestionId,
+                Answer = question.Answer
+            };
+
+            await _supabaseClient
+                .From<RegistrationAnswer>()
+                .Insert(newRegistrationAnswer);
+        }
+
+        Console.WriteLine("Registration answers created");
+
+        return newRegistration;
+    }
+    
     public async Task<List<Event>> GetAllEvents()
     {
         var response = await _supabaseClient
