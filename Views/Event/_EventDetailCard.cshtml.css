@@ -35,9 +35,16 @@
   gap: 0.25rem;
 }
 
-.title {
+.title-text {
   font-size: 1.5rem;
   font-weight: bold;
+}
+
+.title {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
 }
 
 .participants {
@@ -47,8 +54,15 @@
   column-gap: 0.5rem;
 }
 
+.participants span {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
 .description {
+  margin-top: 1rem;
   white-space: pre-wrap;
+
 }
 
 .info-line {
@@ -67,4 +81,72 @@
   border-radius: 100%;
   height: 2rem;
   width: 2rem;
+}
+
+.creator-name {
+  font-size: 1rem;
+}
+
+.location {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.location,
+.created-time {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.datetime,
+.cost {
+  display: flex;
+  flex-direction: row;
+  font-size: 1rem;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.more-data {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+@media screen and (max-width: 768px) {
+  .title-text {
+    font-size: 1.25rem;
+  }
+
+  .participants {
+    font-size: 1rem;
+  }
+
+  .description {
+    margin-top: 0.5rem;
+  }
+
+  .creator-name {
+    font-size: 0.8rem;
+  }
+
+  .location,
+  .created-time {
+    font-size: 0.7rem;
+  }
+
+  .datetime,
+  .cost {
+    font-size: 0.8rem;
+  }
+
+  .info-line#title-line{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
 }

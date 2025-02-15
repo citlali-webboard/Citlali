@@ -17,7 +17,10 @@
             }
         </div>
         <div class="justify-flex-end">
-            <button class="form-submit" type="submit">Request to join</button>
+            <button class="form-submit" type="submit">
+                Request to join
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.BranchRequest>>(RenderMode.ServerPrerendered, new { Color = Color.Lightweight}))
+            </button>
         </div>
     </form>
 </div>
