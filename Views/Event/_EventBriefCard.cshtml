@@ -45,21 +45,30 @@
 }
 
 <div class="card space-y-4">
-    <div class="justify-between">
-        <h2>@Model.CreatedAt.ToString("t") • @Model.CreatedAt.ToString("d")</h2>
-        <span>@Model.CurrentParticipant/@Model.MaxParticipant</span>
-    </div>
-    <div>
-        <span class="space-x-4 items-center">
+    <a href="../event/detail/@Model.EventId">
+        <div class="header-data">
+            <span class="creator">
+                <img src="@Model.CreatorProfileImageUrl" alt="Creator" />
+                <span>@Model.CreatorDisplayName</span>
+                <span class="created-time">@Model.CreatedAt.ToString("t") • @Model.CreatedAt.ToString("d")</span>
+            </span>
+            <span class="participant">
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.PeopleTeam>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                @Model.CurrentParticipant/@Model.MaxParticipant
+            </span>
+        </div>
+
+        <div class="card-title">
+            <span class="event-title">@Model.EventTitle</span>
             <span class="tag">
                 <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
                 <span>@Model.EventCategoryTag.EventCategoryTagName</span>
             </span>
-            <span class="event-title">@Model.EventTitle</span>
-        </span>
-    </div>
-    <div class="justify-between">
-        <span>Posted by @Model.CreatorDisplayName</span>
-        <span class="@(expired ? "expired" : "active")">@relativeTime</span>
-    </div>
+        </div>
+
+        <div class="footer">
+            <span class="description">@Model.EventDescription</span>
+            <span class="@(expired ? "expired" : "active")">@relativeTime</span>
+        </div>
+    </a>
 </div>

@@ -7,9 +7,9 @@ ul {
   height: 3rem;
   box-shadow: 2px 2px 8px 4px rgba(0, 0, 0, 0.1);
   width: 100%;
-  position: fixed;
+  /* position: fixed;
   top: 0;
-  left: 0;
+  left: 0; */
   padding: 0 1rem;
 }
 

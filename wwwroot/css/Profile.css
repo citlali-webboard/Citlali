@@ -1,7 +1,6 @@
 .window {
-    width: 100vw;
-    min-height: calc(100vh - var(--navbar-size));
-    margin-top: var(--navbar-size);
+    width: 100dvw;
+    min-height: calc(100dvh - var(--navbar-size));
 
     display: flex;
     flex-direction: column;
@@ -11,7 +10,7 @@ h1 {
     display: block;
     font-size: 2em;
     margin-top: 0.67em;
-    margin-bottom: 0.67em;
+    /* margin-bottom: 0.67em; */
     margin-left: 0;
     margin-right: 0;
     font-weight: bold;
@@ -50,7 +49,7 @@ h3 {
 
 .profile-image {
     width: 100%;
-    max-width: 100%;
+    max-width: 16rem;
     height: auto;
 
     margin-top: 2rem;
@@ -77,8 +76,8 @@ h3 {
     width: 100%;
     height: fit-content;
 
-
     display: flex;
+    row-gap: 1rem;
     flex-direction: column;
     justify-self: center;
 }
@@ -358,11 +357,12 @@ input[type="file"] {
     .display-name {
         flex-direction: column;
         align-items: center;
+        row-gap: 0.5rem;
     }
 
     .button-group {
-        margin-top: 2rem;
         flex-direction: row-reverse;
+        order: 2;
     }
 
     .meta-data {
@@ -371,13 +371,14 @@ input[type="file"] {
         margin-top: 2rem;
     }
 
-    .display-name h1 {
-        order: 1;
+    h1 {
+        order: 0;
         margin: 1rem 0 0 0;
+        text-align: center;
     }
 
     .display-name .username {
-        order: 2;
+        order: 1;
     }
 
     .user-bio {

@@ -80,6 +80,8 @@ public class EventBriefCardData
 {
     public Guid EventId {get ; set;} = new();
     public string EventTitle {get ; set;} = "Basketball? Anyone?";
+    public string EventDescription {get ; set;} = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    public string? CreatorUsername {get ; set; }
     public string CreatorDisplayName {get ; set;} = "John Basketball";
     public string CreatorProfileImageUrl {get ; set;} = "";
     public LocationTag LocationTag {get ; set;} = new();
@@ -119,14 +121,17 @@ public class JoinEventModel
 public class QuestionViewModel
 {
     public Guid EventQuestionId { get; set; }
-    public string Question { get; set; } = "Question Question";
+    public string Question { get; set; } = "";
     [Required(ErrorMessage = "This field is required")]
-    public string Answer { get; set; } = "xxxx";
+
+    public string Answer { get; set; } = "";
 }
 
 public class EventExploreViewModel
 {
     public EventBriefCardData[] EventBriefCardDatas = [new()];
+    public int CurrentPage { get; set; } = 1;
+    public int TotalPage { get; set; }
 }
 
 [Table("EVENT_CATEGORY_TAG")]

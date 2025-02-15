@@ -5,25 +5,29 @@ using Citlali.Models;
 using Citlali.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace Citlali.Controllers;
 
 [Route("event")]
-
 public class EventController : Controller
 {
     private readonly ILogger<EventController> _logger;
     private readonly EventService _eventService;
+    private readonly UserService _userService; 
 
-    public EventController(ILogger<EventController> logger, EventService eventService)
+    public EventController(ILogger<EventController> logger, EventService eventService, UserService userService)
     {
         _logger = logger;
         _eventService = eventService;
+        _userService = userService;
     }
 
+    [HttpGet("")]
     public IActionResult Index()
     {
-        return View();
+        return RedirectToAction("Explore");
     }
 
     [HttpGet("create")]
@@ -92,7 +96,7 @@ public class EventController : Controller
 
         }catch (Exception e){
             TempData["Error"] = e.Message;
-            return RedirectToAction("profile", "user");
+            return RedirectToAction("explore");
         }
         
     }
@@ -108,10 +112,48 @@ public class EventController : Controller
 
 
     [HttpGet("explore")]
-    public IActionResult Explore()
+    public async Task<IActionResult> Explore(int page = 1, int pageSize = 10)
     {
-        EventExploreViewModel eventExploreViewModel = new();
-        return View(eventExploreViewModel);
+        var events = await _eventService.GetAllEvents();
+        var paginatedEvents = events.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
+
+        var paginatedEventsCardData = new EventBriefCardData[paginatedEvents.Length];
+
+        for (int i = 0; i < paginatedEvents.Length; i++)
+        {
+            var ev = paginatedEvents[i];
+            var creator = await _userService.GetUserByUserId(ev.CreatorUserId);
+            if (creator == null)
+            {
+                continue;
+            }
+
+            paginatedEventsCardData[i] = new EventBriefCardData
+            {
+                EventId = ev.EventId,
+                EventTitle = ev.EventTitle,
+                EventDescription = ev.EventDescription,
+                CreatorDisplayName = creator.DisplayName,
+                CreatorProfileImageUrl = creator.ProfileImageUrl,
+                LocationTag = await _eventService.GetLocationTagById(ev.EventLocationTagId) ?? new LocationTag(),
+                EventCategoryTag = await _eventService.GetTagById(ev.EventCategoryTagId) ?? new EventCategoryTag(),
+                CurrentParticipant = 0,
+                MaxParticipant = ev.MaxParticipant,
+                Cost = ev.Cost,
+                EventDate = ev.EventDate,
+                PostExpiryDate = ev.PostExpiryDate,
+                CreatedAt = ev.CreatedAt,
+            };
+        }
+
+        var model = new EventExploreViewModel
+        {
+            EventBriefCardDatas = paginatedEventsCardData,
+            CurrentPage = page,
+            TotalPage = (int)Math.Ceiling(events.Count() / (double)pageSize)
+        };
+
+        return View(model);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

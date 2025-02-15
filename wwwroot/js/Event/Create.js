@@ -17,7 +17,24 @@ document.addEventListener('DOMContentLoaded', function () {
     let questionList = document.querySelector(".added-question ol");
 
     let now = new Date();
-    let formattedDateTime = now.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
+
+    // Convert to Bangkok Time in YYYY-MM-DDTHH:MM format
+    let options = {
+        timeZone: "Asia/Bangkok",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    };
+
+    let formattedDateTime = new Intl.DateTimeFormat("en-US", options).format(now)
+        .replace(",", "") // Remove comma
+        .replace(/(\d+)\/(\d+)\/(\d+)/, "$3-$1-$2") //YYYY-MM-DD
+        .replace(" ", "T"); // Add "T" separator
+
+    console.log(formattedDateTime);
 
     document.getElementById("EventDate").value = formattedDateTime;
     document.getElementById("PostExpiryDate").value = formattedDateTime;

@@ -1,14 +1,15 @@
 .center-wrapper {
   width: 100%;
-  min-height: 100vh;
   height: 100%;
   margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  margin-bottom: 2rem;
 }
 
-.main-container {
+.container {
   width: 100%;
   max-width: var(--max-screen-width);
   padding: 0 1rem;
@@ -42,3 +43,93 @@
   align-items: center;
   justify-content: center;
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination a {
+  margin: 0 5px;
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  color: #333;
+  background-color: white;
+  transition: background-color 0.3s;
+}
+
+.pagination a:hover {
+  background-color: #f0efef;
+}
+
+.pagination a.active {
+  font-weight: bold;
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.pagination a.disabled {
+  pointer-events: none;
+  color: #ccc;
+  border-color: #ccc;
+}
+
+header {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+}
+
+header .title h1 {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Search Bar: Change this later */
+
+.search-bar {
+  width: 100%;
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  
+  gap: 1rem;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.search-bar button {
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/* Search Bar: Change this later */
