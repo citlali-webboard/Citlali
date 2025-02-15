@@ -13,7 +13,7 @@ public class AuthController : Controller
     private readonly Configuration _configuration;
     private readonly List<(string Controller, string Action)> _validRedirects = new()
     {
-        ("User", "Profile"),
+        ("User", "Index"),
         ("Auth", "SignIn"),
         ("Auth", "SignUp"),
         ("Auth", "Confirm"),
@@ -49,7 +49,7 @@ public class AuthController : Controller
         var currentUser = _supabaseClient.Auth.CurrentUser;
         if (currentUser != null)
         {
-            return RedirectToAction("Profile", "User");
+            return RedirectToAction("Index", "User");
         }
         return View();
     }
@@ -69,7 +69,7 @@ public class AuthController : Controller
             {
                 Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
                 Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
-                return RedirectToAction("Profile", "User");
+                return RedirectToAction("Index", "User");
             }
             throw new Exception("Wrong credentials.");
         }
@@ -125,7 +125,7 @@ public class AuthController : Controller
             {
                 Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
                 Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
-                return RedirectToAction("Profile", "User");
+                return RedirectToAction("Index", "User");
             }
             else
             {
@@ -171,7 +171,7 @@ public class AuthController : Controller
                 await _supabaseClient.Auth.SetSession(session.AccessToken, session.RefreshToken);
                 Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
                 Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
-                var authorizedRedirects = new List<string> { "User/Profile", "User/Onboarding" };
+                var authorizedRedirects = new List<string> { "User/Index", "User/Onboarding" };
                 if (!string.IsNullOrEmpty(Next) && authorizedRedirects.Contains(Next))
                 {
                     var parts = Next.Split('/');
@@ -180,7 +180,7 @@ public class AuthController : Controller
                         return RedirectToAction(parts[1], parts[0]);
                     }
                 }
-                return RedirectToAction("Profile", "User");
+                return RedirectToAction("Index", "User");
             }
             else
             {
