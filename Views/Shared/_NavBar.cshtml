@@ -23,46 +23,46 @@
 
     <div class="nav-group">
       <a href="../Event/Create">
-        <li class="create-event">
+        <li class="tooltip">
           @* Create Event *@
           <span>
             @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.AddCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
           </span>
-          <span class="create-event-text">Create Event</span>
+          <span class="tooltip-text">Create Event</span>
         </li>
       </a>
 
       <a href="#">
-        <li class="create-event">
+        <li class="tooltip">
           @* History *@
           <span>
             @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.History>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
           </span>
-          <p class="create-event-text">History</p>
+          <p class="tooltip-text">History</p>
         </li>
       </a>
 
       <a href="#">
         @* Notification *@
-        <li class="create-event">
+        <li class="tooltip">
           <span>
             @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
           </span>
-          <p class="create-event-text">Notification</p>
+          <p class="tooltip-text">Notification</p>
         </li>
       </a>
 
       <a href="#">
         @* Follow Heart *@
-        <li class="create-event">
+        <li class="tooltip">
           <span>
             @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Heart>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
           </span>
-          <p class="create-event-text">Followed</p>
+          <p class="tooltip-text">Followed</p>
         </li>
       </a>
 
-      <div href="#" class="profile-container">
+      <div class="profile-container">
         @* Profile *@
         <li>
           <div class="profile-placeholder">
@@ -71,7 +71,7 @@
 
           @* Dropdown *@
           <div class="profile-dropdown">
-            <a href="#" class="dropdown-item">User Profile</a>
+            <a href="../User/Profile" class="dropdown-item">User Profile</a>
             <form asp-controller="Auth" asp-action="SignOut" method="post">
               <button type="submit" class="dropdown-item">Sign Out</button>
             </form>
@@ -79,16 +79,6 @@
         </li>
       </div>
 
-      @* <div class="sign-out-btn">
-        <form asp-controller="Auth" asp-action="SignOut" method="post">
-          <button type="submit">
-            <span class="sign-out-icon">
-              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.ConferenceRoom>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
-            </span>
-            <p class="sign-out-text">Sign Out</p>
-          </button>
-        </form>
-      </div> *@
     </div>
   </ul>
 </nav>

@@ -48,6 +48,7 @@ li > svg {
 .profile-container {
   position: relative;
   display: inline-block;
+  cursor: pointer;
 }
 
 .profile-dropdown {
@@ -63,9 +64,9 @@ li > svg {
   display: none; 
   flex-direction: column;
   z-index: 10;
+  
   opacity: 0;
-
-  transition: opacity 0.5s ease-in-out, visibility 0s linear 2s;
+  transition: opacity 0.5s ease-in-out;
 }
 
 .dropdown-item {
@@ -82,50 +83,12 @@ li > svg {
   background-color: #f2f2f2;
 }
 
-/* .profile-container:hover .profile-dropdown {
-  display: flex;
-  opacity: 1;
-
-  visibility: visible;
-  transition: opacity 2s ease-in-out;
-} */
-
-/* 
-.profile-container:hover .profile-dropdown {
-  animation: delay-hide 2s ease-in-out forwards;
-}
-
-@keyframes delay-hide {
-  0% {
-    opacity: 1;
-    visibility: visible;
-  }
-  50% {
-    opacity: 1;
-    visibility: visible;
-  }
-  100% {
-    opacity: 0;
-    visibility: hidden;
-  }
-} */
-/* .sign-out-btn {
-  color: black;
-  border: 0.1rem solid black;
-  border-radius: 25px;
-  height: 1.5rem;
-}
-
-.sign-out-btn:hover {
-  
-} */
-
-.create-event {
+.tooltip {
   position: relative;
   display: flex;
 }
 
-.create-event .create-event-text {
+.tooltip .tooltip-text {
   visibility: hidden;
   display: inline-block;
   max-width: 120px;
@@ -146,7 +109,7 @@ li > svg {
   transition: opacity 1s;
 }
 
-.create-event .create-event-text::before {
+.tooltip .tooltip-text::before {
   content: "";
   border: 5px solid;
   border-color: transparent transparent rgb(255, 255, 255) transparent;
@@ -156,40 +119,29 @@ li > svg {
   transform: translateX(-50%);
 }
 
-.create-event:hover .create-event-text {
+.tooltip:hover .tooltip-text {
   visibility: visible;
   opacity: 1;
 }
 
 @media (max-width: 768px) {
-  .create-event {
+  .tooltip {
     border: none;
     padding: 0;
   }
 
-  .create-event p {
+  .tooltip p {
     display: none;
   }
 
-  .sign-out-btn {
-    border: none;
-    padding: 0;
-  }
-
-  .sign-out-text {
-    display: none;
-    padding: 0;
+  .profile-dropdown {
+    position: absolute;
+    right: 0;
+    left: auto;
+    width: 10rem;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    display: none; /* Hidden by default */
   }
 }
 
-@media (min-width: 768px) {
-  .sign-out-btn {
-    padding: 0.2rem 0.5rem;
-    height: 2rem;
-  }
-
-  .sign-out-icon {
-    display: none;
-    padding: 0;
-  }
-}
