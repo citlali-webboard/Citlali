@@ -14,13 +14,15 @@ public class UserController : Controller
     private readonly Supabase.Client _supabaseClient;
     private readonly UserService _userService;
     private readonly Configuration _configuration;
+    private readonly EventService _eventService;
 
-    public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService, Configuration configuration)
+    public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService, Configuration configuration, EventService eventService)
     {
         _logger = logger;
         _supabaseClient = supabaseClient;
         _userService = userService;
         _configuration = configuration;
+        _eventService = eventService;
     }
 
     public async Task<IActionResult> Index()
@@ -136,6 +138,10 @@ public class UserController : Controller
             UserBio = user.UserBio,
             IsCurrentUser = isCurrentUser
         };
+
+         // ดึง Event ของ User
+        var userEvents = await _eventService.GetEventsByUserId(user.UserId);
+        ViewBag.UserEvents = userEvents;
 
         return View(userViewModel);
     }

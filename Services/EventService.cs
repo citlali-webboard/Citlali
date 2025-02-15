@@ -73,5 +73,39 @@ public class EventService(Client supabaseClient, IConfiguration configuration)
         return model;
     }
 
+    public async Task<List<EventBriefCardData>> GetEventsByUserId(Guid userId)
+    {
+        var response = await _supabaseClient
+            .From<Event>()
+            .Select("*")
+            .Filter("CreatorUserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
+            .Get();
+
+        var events = new List<EventBriefCardData>();
+
+        if (response != null)
+        {
+            foreach (var item in response.Models)
+            {
+                events.Add(new EventBriefCardData
+                {
+                    EventId = item.EventId,
+                    EventTitle = item.EventTitle,
+                    CreatorDisplayName = "Some Creator", // Example placeholder
+                    EventCategoryTag = new EventCategoryTag { EventCategoryTagName = "Category" },
+                    LocationTag = new EventLocationTag { EventLocationTagName = "Location" },
+                    CurrentParticipant = 10, // Example data
+                    MaxParticipant = 50, // Example data
+                    Cost = item.Cost,
+                    EventDate = item.EventDate,
+                    PostExpiryDate = item.PostExpiryDate,
+                    CreatedAt = item.CreatedAt
+                });
+            }
+        }
+
+        return events;
+    }
+
     
     }

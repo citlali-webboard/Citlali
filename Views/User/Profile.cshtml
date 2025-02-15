@@ -146,4 +146,21 @@
 
   <hr />
 
+  <h3>My Events</h3>
+  <div class="event-list">
+      @if (ViewBag.UserEvents != null && ViewBag.UserEvents.Count > 0)
+      {
+          foreach (var eventItem in ViewBag.UserEvents)
+          {
+              @await Html.PartialAsync("_EventBriefCard", Model.EventBriefCardData)
+
+          }
+      }
+      else
+      {
+          <p>No events found.</p>
+      }
+  </div>
+
+
 </div>

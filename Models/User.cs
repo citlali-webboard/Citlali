@@ -45,4 +45,5 @@ public class UserOnboardingDto : User
 public class UserViewModel : User
 {
         public bool IsCurrentUser { get; set; }
+        public List<EventBriefCardData> EventBriefCardData { get; set; } = new List<EventBriefCardData>();
 }
