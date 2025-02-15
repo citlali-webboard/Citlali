@@ -11,7 +11,7 @@ public class SearchService(Supabase.Client supabaseClient, Configuration configu
     private readonly Configuration _configuration = configuration;
     private readonly ILogger<SearchService> _logger = logger;
 
-    public async Task<List<SearchResult>> QueryUser(string query)
+    public async Task<List<SearchResult>> QueryDisplayName(string query)
     {
         try
         {
@@ -19,7 +19,7 @@ public class SearchService(Supabase.Client supabaseClient, Configuration configu
                 .From<User>()
                 .Select(x => new object[] { x.DisplayName, x.Username, x.UserBio, x.ProfileImageUrl, x.Deleted })
                 .Filter(x => x.Deleted, Constants.Operator.Equals, "FALSE")
-                .Filter(x => x.DisplayName, Constants.Operator.WFTS, new FullTextSearchConfig(query, null))
+                .Filter(x => x.DisplayName , Constants.Operator.WFTS, new FullTextSearchConfig(query, null))
                 .Get();
 
             if (databaseResult == null)
@@ -46,6 +46,43 @@ public class SearchService(Supabase.Client supabaseClient, Configuration configu
             throw new Exception(msgError);
         }
     }
+
+    public async Task<List<SearchResult>> QueryUsername(string query)
+    {
+        try
+        {
+            var databaseResult = await _supabaseClient
+                .From<User>()
+                .Select(x => new object[] { x.DisplayName, x.Username, x.UserBio, x.ProfileImageUrl, x.Deleted })
+                .Filter(x => x.Deleted, Constants.Operator.Equals, "FALSE")
+                .Filter(x => x.Username , Constants.Operator.WFTS, new FullTextSearchConfig(query, null))
+                .Get();
+
+            if (databaseResult == null)
+            {
+                return [];
+            }
+
+            List<SearchResult> searchResults = databaseResult.Models.ConvertAll(model => new SearchResult
+            {
+                Url = $"/user/{model.Username}",
+                Title = model.DisplayName,
+                Description = model.UserBio,
+                ImageUrl = model.ProfileImageUrl
+            });
+
+            return searchResults;
+        }
+        catch (Exception e)
+        {
+            var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
+            string msgError = errorJson.GetProperty("msg").GetString() ?? "";
+            _logger.LogError("Search error occurred: {ErrorMessage}", msgError);
+
+            throw new Exception(msgError);
+        }
+    }
+    
     public async Task<List<SearchResult>> QueryEvent(string query)
     {
         try

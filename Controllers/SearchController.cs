@@ -19,13 +19,15 @@ public class SearchController(ILogger<SearchController> logger, SearchService se
     [HttpGet("/search/query")]
     public async Task<IActionResult> Query(SearchQueryDto searchQuery)
     {
-        var userTask = _searchService.QueryUser(searchQuery.Query);
+        var displayNameTask = _searchService.QueryDisplayName(searchQuery.Query);
+        var usernameTask = _searchService.QueryUsername(searchQuery.Query);
         var eventTask = _searchService.QueryEvent(searchQuery.Query);
 
-        await Task.WhenAll(userTask, eventTask);
+        await Task.WhenAll(displayNameTask, usernameTask, eventTask);
 
         List<SearchResult> results = [];
-        results.AddRange(await userTask);
+        results.AddRange(await displayNameTask);
+        results.AddRange(await usernameTask);
         results.AddRange(await eventTask);
 
         return Json(new SearchResponse { Results = results });
