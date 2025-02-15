@@ -51,6 +51,10 @@
                 <img src="@Model.CreatorProfileImageUrl" alt="Creator" />
                 <span>@Model.CreatorDisplayName</span>
                 <span class="created-time">@Model.CreatedAt.ToString("t") • @Model.CreatedAt.ToString("d")</span>
+                <span class="location">
+                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Location>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                    @Model.LocationTag.LocationTagName
+                </span>
             </span>
             <span class="participant">
                 @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.PeopleTeam>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))

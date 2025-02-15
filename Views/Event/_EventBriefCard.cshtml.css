@@ -47,6 +47,14 @@
   font-weight: 300;
 }
 
+.location {
+  display: flex;
+  color: #666;
+  font-weight: 300;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .participant {
   display: flex;
   align-items: center;
@@ -58,18 +66,21 @@
   display: flex;
   flex-direction: row;
   gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .tag {
   display: flex;
+  height: fit-content;
   font-size: 0.8rem;
-  padding: 4px 8px;
+  padding: 3px 6px;
   border: 1px solid #666;
   border-radius: 30px;
   cursor: default;
   width: fit-content;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
 
 .event-title {
