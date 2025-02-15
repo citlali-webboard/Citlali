@@ -100,6 +100,7 @@ public class EventDetailCardData : EventBriefCardData
 
 public class EventFormDto
 {
+    public Guid EventId { get; set; } = new();
     public List<QuestionViewModel> Questions { get; set; } = [];
 }
 

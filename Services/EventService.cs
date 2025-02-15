@@ -207,7 +207,9 @@ public class EventService(Client supabaseClient, UserService userService)
         eventDetailViewModel.EventDetailCardData.CreatorProfileImageUrl = creator.ProfileImageUrl;
 
         var questions = await GetQuestionsByEventId(Event.EventId);
+
         eventDetailViewModel.EventFormDto.Questions = questions ?? [];
+        eventDetailViewModel.EventFormDto.EventId = Event.EventId;
 
         return eventDetailViewModel;
     }
@@ -236,6 +238,25 @@ public class EventService(Client supabaseClient, UserService userService)
         await _supabaseClient
             .From<Registrantion>()
             .Insert(newRegistration);
+
+        Console.WriteLine("Registration created");
+
+        foreach (var question in QuestionsList)
+        {
+            var newRegistrationAnswer = new RegistrationAnswer
+            {
+                RegistrationAnswerId = Guid.NewGuid(),
+                RegistrationId = newRegistration.RegistrationId,
+                EventQuestionId = question.EventQuestionId,
+                Answer = question.Answer
+            };
+
+            await _supabaseClient
+                .From<RegistrationAnswer>()
+                .Insert(newRegistrationAnswer);
+        }
+
+        Console.WriteLine("Registration answers created");
 
         return newRegistration;
     }
