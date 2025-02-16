@@ -99,6 +99,7 @@ public class AuthController : Controller
     {
         Response.Cookies.Delete(_configuration.Jwt.AccessCookie);
         Response.Cookies.Delete(_configuration.Jwt.RefreshCookie);
+        Response.Cookies.Delete("ProfileImageUrl");
 
         HttpContext.Response.Cookies.Append("ProfileImageUrl", _configuration.User.DefaultProfileImage, new CookieOptions
         {
