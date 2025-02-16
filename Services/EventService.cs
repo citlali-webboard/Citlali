@@ -236,6 +236,7 @@ public class EventService(Client supabaseClient, UserService userService)
         eventDetailViewModel.EventDetailCardData.EventDescription = Event.EventDescription;
         eventDetailViewModel.EventDetailCardData.EventCategoryTag = tag ?? new();
         eventDetailViewModel.EventDetailCardData.LocationTag = location ?? new();
+        eventDetailViewModel.EventDetailCardData.CurrentParticipant = (await GetRegistrantsByEventId(Event.EventId)).Count;
         eventDetailViewModel.EventDetailCardData.MaxParticipant = Event.MaxParticipant;
         eventDetailViewModel.EventDetailCardData.Cost = Event.Cost;
         eventDetailViewModel.EventDetailCardData.EventDate = Event.EventDate;
@@ -254,7 +255,7 @@ public class EventService(Client supabaseClient, UserService userService)
     }
 
     //JoinEvent
-    public async Task<Registrantion> JoinEvent(JoinEventModel joinEventModel)
+    public async Task<Registration> JoinEvent(JoinEventModel joinEventModel)
     {
         var supabaseUser = _supabaseClient.Auth.CurrentUser;
 
@@ -267,7 +268,7 @@ public class EventService(Client supabaseClient, UserService userService)
         Guid EventID = joinEventModel.EventId;
         var QuestionsList = joinEventModel.EventFormDto.Questions;
 
-        var newRegistration = new Registrantion
+        var newRegistration = new Registration
         {
             RegistrationId = Guid.NewGuid(),
             EventId = EventID,
@@ -275,7 +276,7 @@ public class EventService(Client supabaseClient, UserService userService)
         };
 
         await _supabaseClient
-            .From<Registrantion>()
+            .From<Registration>()
             .Insert(newRegistration);
 
         Console.WriteLine("Registration created");
@@ -334,5 +335,28 @@ public class EventService(Client supabaseClient, UserService userService)
         }
 
         return events;
+    }
+
+    public async Task<List<User>> GetRegistrantsByEventId(Guid eventId)
+    {
+        var response = await _supabaseClient
+            .From<Registration>()
+            .Where(row => row.EventId == eventId)     // Please add a filter here to get only the registrants whol have been accepted
+            .Select("UserId")
+            .Get();
+
+        var eventRegistrants = response.Models;
+
+        var registrants = new List<User>();
+        foreach (var registrant in eventRegistrants)
+        {
+            var user = await _userService.GetUserByUserId(registrant.UserId);
+            if (user != null)
+            {
+                registrants.Add(user);
+            }
+        }
+
+        return registrants;
     }
 }

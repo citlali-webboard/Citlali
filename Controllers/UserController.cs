@@ -141,6 +141,7 @@ public class UserController : Controller
             var eventTag = await _eventService.GetTagById(userEvent.EventCategoryTagId);
             var locationTag = await _eventService.GetLocationTagById(userEvent.EventLocationTagId);
 
+            var currentParticipant = (await _eventService.GetRegistrantsByEventId(userEvent.EventId)).Count;
 
             userEventBriefCards.Add(new EventBriefCardData
             {
@@ -149,6 +150,8 @@ public class UserController : Controller
                 EventDescription = userEvent.EventDescription,
                 CreatorDisplayName = creator.DisplayName,
                 CreatorProfileImageUrl = creator.ProfileImageUrl,
+                CurrentParticipant = currentParticipant,
+                MaxParticipant = userEvent.MaxParticipant,
                 EventCategoryTag = eventTag ?? new EventCategoryTag(),
                 LocationTag = locationTag ?? new LocationTag()
             });

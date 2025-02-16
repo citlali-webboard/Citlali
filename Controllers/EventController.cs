@@ -143,7 +143,7 @@ public class EventController : Controller
                 CreatorProfileImageUrl = creator.ProfileImageUrl,
                 LocationTag = await _eventService.GetLocationTagById(ev.EventLocationTagId) ?? new LocationTag(),
                 EventCategoryTag = await _eventService.GetTagById(ev.EventCategoryTagId) ?? new EventCategoryTag(),
-                CurrentParticipant = 0,
+                CurrentParticipant = (await _eventService.GetRegistrantsByEventId(ev.EventId)).Count,
                 MaxParticipant = ev.MaxParticipant,
                 Cost = ev.Cost,
                 EventDate = ev.EventDate,

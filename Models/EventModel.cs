@@ -194,7 +194,7 @@ public class CreateEventViewModel
 }
 
 [Table("REGISTRATION")]
-public class Registrantion : BaseModel
+public class Registration : BaseModel
 {
     [PrimaryKey]
     [Column("RegistrationId")]
