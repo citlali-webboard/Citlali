@@ -133,6 +133,13 @@ public class EventExploreViewModel
     public int TotalPage { get; set; }
 }
 
+public class TagEventExploreViewModel : EventExploreViewModel
+{
+    public Guid TagId { get; set; } = new();
+    public string TagName { get; set; } = "";
+    public string TagEmoji { get; set; } = "";
+}
+
 [Table("EVENT_CATEGORY_TAG")]
 public class EventCategoryTag : BaseModel
 {

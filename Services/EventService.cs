@@ -1,5 +1,6 @@
 using Supabase;
 using Citlali.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 // using Supabase.Gotrue;
 
@@ -381,6 +382,141 @@ public class EventService(Client supabaseClient, UserService userService)
             .Get();
 
         return response.Models.Count != 0;
+    }
+
+    //GetEventsByTagId
+    public async Task<List<Event>> GetEventsByTagId(Guid tagId)
+    {
+        var response = await _supabaseClient
+            .From<Event>()
+            .Select("*")
+            .Filter("EventCategoryTagId", Supabase.Postgrest.Constants.Operator.Equals, tagId.ToString())
+            .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
+            .Get();
+
+        var events = new List<Event>();
+
+        if (response != null)
+        {
+            foreach (var e in response.Models)
+            {
+                events.Add(new Event
+                {
+                    EventId = e.EventId,
+                    CreatorUserId = e.CreatorUserId,
+                    EventTitle = e.EventTitle,
+                    EventDescription = e.EventDescription,
+                    EventCategoryTagId = e.EventCategoryTagId,
+                    EventLocationTagId = e.EventLocationTagId,
+                    MaxParticipant = e.MaxParticipant,
+                    Cost = e.Cost,
+                    EventDate = e.EventDate,
+                    PostExpiryDate = e.PostExpiryDate,
+                    CreatedAt = e.CreatedAt,
+                    Deleted = e.Deleted
+                });
+            }
+        }
+
+        return events;
+    }
+
+    public async Task<EventManagementViewModel> GetEventManagement(Guid eventId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            throw new UnauthorizedAccessException("User not authenticated");
+        }
+
+        var userId = currentUser.Id;
+        if (userId == null)
+        {
+            throw new UnauthorizedAccessException("User not authenticated");
+        }
+
+        var user = await _userService.GetUserByUserId(Guid.Parse(userId));
+        if (user == null)
+        {
+            throw new UnauthorizedAccessException("User not authenticated");
+        }
+
+        var ev = await GetEventById(eventId);
+        if (ev == null)
+        {
+            throw new KeyNotFoundException("Event not found");
+        }
+
+        if (ev.CreatorUserId.ToString() != userId)
+        {
+            throw new UnauthorizedAccessException("User not authorized");
+        }
+
+        var locationTag = await GetLocationTagById(ev.EventLocationTagId) ?? new LocationTag();
+        var eventCategoryTag = await GetTagById(ev.EventCategoryTagId) ?? new EventCategoryTag();
+        var registrants = await GetRegistrantsByEventId(ev.EventId);
+        var currentParticipant = registrants.Count;
+
+        var answerSet = new List<EventManagementAnswerCollection>();
+
+        foreach (var registrant in registrants)
+        {
+            var registeredUserId = registrant.UserId;
+            var registration = await _supabaseClient
+                .From<Registration>()
+                .Select("*")
+                .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, ev.EventId.ToString())
+                .Filter("UserId", Supabase.Postgrest.Constants.Operator.Equals, registeredUserId.ToString())
+                .Single();
+
+            if (registration == null)
+            {
+                continue;
+            }
+
+            var registrationId = registration.RegistrationId;
+            var answersRes = await _supabaseClient
+                .From<RegistrationAnswer>()
+                .Select("*")
+                .Filter("RegistrationId", Supabase.Postgrest.Constants.Operator.Equals, registrationId.ToString())
+                .Get();
+
+            if (answersRes == null)
+            {
+                continue;
+            }
+
+
+
+            var answerCollection = new EventManagementAnswerCollection 
+            {
+                User = registrant,
+                RegistrationAnswers = new List<RegistrationAnswer>()
+            };
+
+            
+        }
+
+        var eventManagementViewModel = new EventManagementViewModel() 
+        {
+            EventId = ev.EventId,
+            EventTitle = ev.EventTitle,
+            EventDescription = ev.EventDescription,
+            CreatorUsername = user.Username,
+            CreatorDisplayName = user.DisplayName,
+            CreatorProfileImageUrl = user.ProfileImageUrl,
+            LocationTag = locationTag,
+            EventCategoryTag = eventCategoryTag,
+            CurrentParticipant = currentParticipant,
+            MaxParticipant = ev.MaxParticipant,
+            Cost = ev.Cost,
+            EventDate = ev.EventDate,
+            PostExpiryDate = ev.PostExpiryDate,
+            AnswerSet = answerSet
+        };
+
+        return eventManagementViewModel;
+
     }
 }
 
