@@ -69,6 +69,21 @@ li > svg {
   transition: opacity 0.5s ease-in-out;
 }
 
+.signin-btn {
+  padding: 0.25rem;
+  width: 100%;
+  text-align: center;
+  color: black;
+  text-decoration: none;
+  display: block;
+  border: 0.1rem solid black;
+  border-radius: 5px;
+}
+
+.signin-btn:hover {
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.4);
+}
+
 .dropdown-item {
   padding: 0.75rem;
   width: 100%;

@@ -72,7 +72,7 @@ public class AuthController : Controller
                 Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
 
                 var user = await _userService.GetUserByEmail(authLoginDto.Email);
-                string profileImageUrl = user?.ProfileImageUrl ?? ""; 
+                string profileImageUrl = user?.ProfileImageUrl ?? _configuration.User.DefaultProfileImage; 
 
                 HttpContext.Response.Cookies.Append("ProfileImageUrl", profileImageUrl, new CookieOptions
                 {
