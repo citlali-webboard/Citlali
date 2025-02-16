@@ -111,9 +111,22 @@ public class EventController : Controller
     [Authorize]
     public async Task<IActionResult> JoinEvent(JoinEventModel joinEventModel)
     {
-
-        var RequestJoinEvent = await _eventService.JoinEvent(joinEventModel);
-        return RedirectToAction("explore");
+        try {
+            var RequestJoinEvent = await _eventService.JoinEvent(joinEventModel);
+            return RedirectToAction("explore");
+        }
+        catch (UserAlreadyRegisteredException) {
+            TempData["Error"] = "You have already registered for this event";
+            return RedirectToAction("detail", new { id = joinEventModel.EventId });
+        }
+        catch (JoinOwnerException) {
+            TempData["Error"] = "You cannot join your own event";
+            return RedirectToAction("detail", new { id = joinEventModel.EventId });
+        }
+        catch (Exception e) {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
     }
 
 

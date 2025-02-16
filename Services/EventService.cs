@@ -266,6 +266,17 @@ public class EventService(Client supabaseClient, UserService userService)
 
         Guid userId = Guid.Parse(supabaseUser.Id ?? ""); 
         Guid EventID = joinEventModel.EventId;
+
+        if (await IsUserRegistered(EventID, userId))
+        {
+            throw new UserAlreadyRegisteredException();
+        }
+
+        if (userId == (await GetEventById(EventID))?.CreatorUserId)
+        {
+            throw new JoinOwnerException();
+        }
+
         var QuestionsList = joinEventModel.EventFormDto.Questions;
 
         var newRegistration = new Registration
@@ -359,4 +370,36 @@ public class EventService(Client supabaseClient, UserService userService)
 
         return registrants;
     }
+
+    public async Task<bool> IsUserRegistered(Guid eventId, Guid userId)
+    {
+        var response = await _supabaseClient
+            .From<Registration>()
+            .Select("*")
+            .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
+            .Filter("UserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
+            .Get();
+
+        return response.Models.Count != 0;
+    }
+}
+
+public class UserAlreadyRegisteredException : Exception
+{
+    public UserAlreadyRegisteredException() : base("User already register to this event.") { }
+
+    public UserAlreadyRegisteredException(string message) : base(message) { }
+
+    public UserAlreadyRegisteredException(string message, Exception innerException) 
+        : base(message, innerException) { }
+}
+
+public class JoinOwnerException : Exception
+{
+    public JoinOwnerException() : base("Owner cannot join their own event.") { }
+
+    public JoinOwnerException(string message) : base(message) { }
+
+    public JoinOwnerException(string message, Exception innerException) 
+        : base(message, innerException) { }
 }
