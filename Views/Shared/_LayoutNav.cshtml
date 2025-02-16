@@ -4,6 +4,11 @@
     {
         profileImageUrl = ViewBag.profileImageUrl as string
     };
+
+    var ogTitle = ViewData["ogTitle"] ?? "Citlali 🩷";
+    var ogDescription = ViewData["ogDescription"] ?? "Cute webboard which brings people together~ Let's explore events and find what suits you the best !";
+    var ogUrl = ViewData["ogUrl"] ?? "citlali.bigblahaj.com";
+    var ogImage = ViewData["ogImage"] ?? "https://img.4gamers.com.tw/ckfinder-th/image2/auto/2025-01/Citlali_Introduction_Banner-250102-181140.png?versionId=r4yCiZ0mpYQb4la101fQUFNeaAW0mcgl";
 }
 
 <!DOCTYPE html>
@@ -15,11 +20,11 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta property="og:site_name" content="Citlali" />
-    <meta perperty="og:title" content="Citlali 🩷" />
-    <meta property="og:description" content="A cute webboard which brings people together~" />
-    <meta perperty="og:type" content="website" />
-    <meta property="og:url" content="citlali.bigblahaj.com" />
-    <meta property="og:image" content="https://img.4gamers.com.tw/ckfinder-th/image2/auto/2025-01/Citlali_Introduction_Banner-250102-181140.png?versionId=r4yCiZ0mpYQb4la101fQUFNeaAW0mcgl" />
+    <meta property="og:title" content="@ogTitle" />
+    <meta property="og:description" content="@ogDescription" />
+    <meta property="og:type" content="object" />
+    <meta property="og:url" content="@ogUrl" />
+    <meta property="og:image" content="@ogImage" />
     
     <title>@ViewData["Title"] • Citlali</title>
     <script type="importmap"></script>

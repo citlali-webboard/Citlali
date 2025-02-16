@@ -1,15 +1,12 @@
 @model Citlali.Models.EventDetailViewModel;
 
 @{
-    var ogDescription = Model.EventDetailCardData.EventDescription.Length > 100 ? Model.EventDetailCardData.EventDescription.Substring(0, 100) + "..." : Model.EventDetailCardData.EventDescription;
+    ViewData["ogTitle"] = Model.EventDetailCardData.EventTitle + " • Citlali";
+    ViewData["ogDescription"] = Model.EventDetailCardData.EventDescription.Length > 100 ? Model.EventDetailCardData.EventDescription.Substring(0, 100) + "..." : Model.EventDetailCardData.EventDescription;
 }
 
 @section head {
     <link rel="stylesheet" href="~/css/Form.css" asp-append-version="true" />
-    <meta property="og:title" content="@Model.EventDetailCardData.EventTitle" />
-    <meta property="og:description" content="@ogDescription" />
-    <meta property="og:url" content="citlali.bigblahaj.com" />
-    <meta property="og:image" content="https://img.4gamers.com.tw/ckfinder-th/image2/auto/2025-01/Citlali_Introduction_Banner-250102-181140.png?versionId=r4yCiZ0mpYQb4la101fQUFNeaAW0mcgl" />
 }
 
 <div class="center-wrapper">
