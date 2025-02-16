@@ -129,18 +129,30 @@ public class UserController : Controller
         var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
 
         var userEvents = await _eventService.GetEventsByUserId(user.UserId);
-        var userEventBriefCards = userEvents.Select(e => new EventBriefCardData
+        var userEventBriefCards = new List<EventBriefCardData>();
+        foreach (var userEvent in userEvents)
         {
-            EventId = e.EventId,
-            EventTitle = e.EventTitle,
-            EventDescription = e.EventDescription,
-            CreatedAt = e.CreatedAt,
-            CreatorProfileImageUrl = e.CreatorProfileImageUrl,
-            CreatorDisplayName = e.CreatorDisplayName,
-            CurrentParticipant = e.CurrentParticipant,
-            MaxParticipant = e.MaxParticipant,
-            EventCategoryTag = e.EventCategoryTag
-        }).ToList();
+            var creator = await _userService.GetUserByUserId(userEvent.CreatorUserId);
+            if (creator == null)
+            {
+                continue;
+            }
+
+            var eventTag = await _eventService.GetTagById(userEvent.EventCategoryTagId);
+            var locationTag = await _eventService.GetLocationTagById(userEvent.EventLocationTagId);
+
+
+            userEventBriefCards.Add(new EventBriefCardData
+            {
+                EventId = userEvent.EventId,
+                EventTitle = userEvent.EventTitle,
+                EventDescription = userEvent.EventDescription,
+                CreatorDisplayName = creator.DisplayName,
+                CreatorProfileImageUrl = creator.ProfileImageUrl,
+                EventCategoryTag = eventTag ?? new EventCategoryTag(),
+                LocationTag = locationTag ?? new LocationTag()
+            });
+        }
 
         var userViewModel = new UserViewModel
         {
