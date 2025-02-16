@@ -100,6 +100,15 @@ public class UserController : Controller
                 TempData["Error"] = "Something went wrong. Please try again.";
                 return RedirectToAction("Onboarding");
             }
+            
+            HttpContext.Response.Cookies.Append("ProfileImageURL", userCreated.ProfileImageUrl, new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(30)
+            });
+
             return RedirectToAction("Index");
         }
         catch (InvalidUsernameException ex)
@@ -183,7 +192,15 @@ public class UserController : Controller
                 return RedirectToAction("Index");
             }
             
-        await _userService.EditUser(userOnboardingDto);
+        var updatedUser = await _userService.EditUser(userOnboardingDto);
+
+        Response.Cookies.Append("ProfileImageUrl", updatedUser.ProfileImageUrl, new CookieOptions
+        {
+            HttpOnly = false,  
+            Secure = true, 
+            SameSite = SameSiteMode.Strict,  
+            Expires = DateTime.UtcNow.AddDays(30)
+        });
 
         return RedirectToAction("Index");
     }
