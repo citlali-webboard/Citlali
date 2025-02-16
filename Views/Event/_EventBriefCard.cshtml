@@ -37,7 +37,7 @@
     string relativeTime;
     bool expired = false;
     try {
-        relativeTime = $"Expiring in {GetFutureRelativeTime(Model.CreatedAt)}";
+        relativeTime = $"Expiring in {GetFutureRelativeTime(Model.PostExpiryDate)}";
     } catch (InvalidDataException) {
         expired = true;
         relativeTime = "Expired";
