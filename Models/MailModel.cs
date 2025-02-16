@@ -7,5 +7,6 @@ public class MailBaseViewModel {
 
 public class MailSelectedViewModel : MailBaseViewModel
 {
+    public new string Action { get; set; } = "You have been invited to";
     public string Url { get; set; } = "";
 }
