@@ -1,0 +1,66 @@
+.registrants-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+}
+
+.registrant {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    background-color: #f9f9f9;
+}
+
+.registrant-header {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    padding: 10px;
+    cursor: pointer;
+    background-color: #ddd;
+    transition: background-color 0.3s;
+}
+
+.registrant-header:hover {
+    background-color: #ccc;
+}
+
+.profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 2px solid #666;
+}
+
+.registrant-name {
+    flex-grow: 1;
+    font-weight: bold;
+}
+
+.dropdown-icon {
+    font-size: 18px;
+    color: #555;
+}
+
+.registrant-details {
+    display: none;
+    padding: 10px;
+    background-color: white;
+}
+
+.registrant-details ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.registrant-details ul li {
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.registrant-details ul li:last-child {
+    border-bottom: none;
+}

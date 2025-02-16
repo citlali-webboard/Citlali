@@ -245,6 +245,30 @@ public class EventController : Controller
         }
     }
 
+    [HttpGet("manage/{eventId}")]
+    [Authorize]
+    public async Task<IActionResult> Manage(string eventId)
+    {
+        try
+        {
+            var eventManagementViewModel = await _eventService.GetEventManagement(Guid.Parse(eventId));
+            return View(eventManagementViewModel);
+        }
+        catch (UnauthorizedAccessException) {
+            TempData["Error"] = "You are not authorized to manage this event";
+            return RedirectToAction("explore");
+        }
+        catch (KeyNotFoundException) {
+            TempData["Error"] = "Event not found";
+            return RedirectToAction("explore");
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

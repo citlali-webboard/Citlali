@@ -423,81 +423,74 @@ public class EventService(Client supabaseClient, UserService userService)
 
     public async Task<EventManagementViewModel> GetEventManagement(Guid eventId)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
-        if (currentUser == null)
+        var currentUser = _supabaseClient.Auth.CurrentUser 
+                        ?? throw new UnauthorizedAccessException("User not authenticated");
+
+        var user = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id))
+                ?? throw new UnauthorizedAccessException("User not found");
+
+        var ev = await GetEventById(eventId)
+                ?? throw new KeyNotFoundException("Event not found");
+
+        if (ev.CreatorUserId.ToString() != currentUser.Id)
         {
-            throw new UnauthorizedAccessException("User not authenticated");
+            throw new UnauthorizedAccessException("User not authorized to access this event");
         }
 
-        var userId = currentUser.Id;
-        if (userId == null)
-        {
-            throw new UnauthorizedAccessException("User not authenticated");
-        }
+        var locationTagTask = GetLocationTagById(ev.EventLocationTagId);
+        var eventCategoryTagTask = GetTagById(ev.EventCategoryTagId);
+        var registrantsTask = GetRegistrantsByEventId(ev.EventId);
 
-        var user = await _userService.GetUserByUserId(Guid.Parse(userId));
-        if (user == null)
-        {
-            throw new UnauthorizedAccessException("User not authenticated");
-        }
+        await Task.WhenAll(locationTagTask, eventCategoryTagTask, registrantsTask);
 
-        var ev = await GetEventById(eventId);
-        if (ev == null)
-        {
-            throw new KeyNotFoundException("Event not found");
-        }
+        var locationTag = locationTagTask.Result ?? new LocationTag();
+        var eventCategoryTag = eventCategoryTagTask.Result ?? new EventCategoryTag();
+        var registrants = registrantsTask.Result;
+        
+        var eventQuestions = (await _supabaseClient
+            .From<EventQuestion>()
+            .Select("*")
+            .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, ev.EventId.ToString())
+            .Get()).Models;
 
-        if (ev.CreatorUserId.ToString() != userId)
-        {
-            throw new UnauthorizedAccessException("User not authorized");
-        }
-
-        var locationTag = await GetLocationTagById(ev.EventLocationTagId) ?? new LocationTag();
-        var eventCategoryTag = await GetTagById(ev.EventCategoryTagId) ?? new EventCategoryTag();
-        var registrants = await GetRegistrantsByEventId(ev.EventId);
-        var currentParticipant = registrants.Count;
+        var questionLookup = eventQuestions.ToDictionary(q => q.EventQuestionId, q => q.Question);
 
         var answerSet = new List<EventManagementAnswerCollection>();
 
         foreach (var registrant in registrants)
         {
-            var registeredUserId = registrant.UserId;
             var registration = await _supabaseClient
                 .From<Registration>()
                 .Select("*")
                 .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, ev.EventId.ToString())
-                .Filter("UserId", Supabase.Postgrest.Constants.Operator.Equals, registeredUserId.ToString())
+                .Filter("UserId", Supabase.Postgrest.Constants.Operator.Equals, registrant.UserId.ToString())
                 .Single();
 
-            if (registration == null)
-            {
-                continue;
-            }
+            if (registration == null) continue;
 
             var registrationId = registration.RegistrationId;
-            var answersRes = await _supabaseClient
+            
+            var answers = (await _supabaseClient
                 .From<RegistrationAnswer>()
                 .Select("*")
                 .Filter("RegistrationId", Supabase.Postgrest.Constants.Operator.Equals, registrationId.ToString())
-                .Get();
+                .Get()).Models;
 
-            if (answersRes == null)
+            var registrationAnswers = answers.Select(answer => new RegistrationAnswerSimplify
             {
-                continue;
-            }
+                EventQuestionId = answer.EventQuestionId,
+                Question = questionLookup.GetValueOrDefault(answer.EventQuestionId, ""),
+                Answer = answer.Answer
+            }).ToList();
 
-
-
-            var answerCollection = new EventManagementAnswerCollection 
+            answerSet.Add(new EventManagementAnswerCollection
             {
                 User = registrant,
-                RegistrationAnswers = new List<RegistrationAnswer>()
-            };
-
-            
+                RegistrationAnswers = registrationAnswers
+            });
         }
 
-        var eventManagementViewModel = new EventManagementViewModel() 
+        return new EventManagementViewModel
         {
             EventId = ev.EventId,
             EventTitle = ev.EventTitle,
@@ -507,17 +500,15 @@ public class EventService(Client supabaseClient, UserService userService)
             CreatorProfileImageUrl = user.ProfileImageUrl,
             LocationTag = locationTag,
             EventCategoryTag = eventCategoryTag,
-            CurrentParticipant = currentParticipant,
+            CurrentParticipant = registrants.Count,
             MaxParticipant = ev.MaxParticipant,
             Cost = ev.Cost,
             EventDate = ev.EventDate,
             PostExpiryDate = ev.PostExpiryDate,
             AnswerSet = answerSet
         };
-
-        return eventManagementViewModel;
-
     }
+
 }
 
 public class UserAlreadyRegisteredException : Exception

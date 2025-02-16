@@ -240,3 +240,21 @@ public class RegistrationAnswer : BaseModel
     [Column("CreatedAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
+
+public class EventManagementViewModel : EventBriefCardData 
+{
+    public List<EventManagementAnswerCollection> AnswerSet { get; set; } = [];
+}
+
+public class RegistrationAnswerSimplify
+{
+    public Guid EventQuestionId { get; set; } = new();
+    public string Question { get; set; } = "";
+    public string Answer { get; set; } = "";
+}
+
+public class EventManagementAnswerCollection
+{
+    public User User { get; set; } = new();
+    public List<RegistrationAnswerSimplify> RegistrationAnswers { get; set; } = [];
+}

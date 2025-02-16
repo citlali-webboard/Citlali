@@ -1,0 +1,67 @@
+@model Citlali.Models.EventManagementViewModel
+
+@{
+    ViewData["Title"] = Model.EventTitle;
+
+    var eventDetailCardData = new Citlali.Models.EventDetailCardData
+    {
+        EventTitle = Model.EventTitle,
+        CreatorDisplayName = Model.CreatorDisplayName,
+        CreatorUsername = Model.CreatorUsername,
+        CreatorProfileImageUrl = Model.CreatorProfileImageUrl,
+        EventDescription = Model.EventDescription,
+        LocationTag = Model.LocationTag,
+        EventCategoryTag = Model.EventCategoryTag,
+        EventDate = Model.EventDate,
+        MaxParticipant = Model.MaxParticipant,
+        CurrentParticipant = Model.CurrentParticipant,
+        Cost = Model.Cost
+    };
+}
+
+@section head {
+    <link rel="stylesheet" href="Manage.cshtml.css" asp-append-version="true" />
+}
+
+<div class="container mt-4">
+    <partial name="_EventDetailCard" model=@eventDetailCardData />
+
+    <h3 class="mt-4">Registered Participants</h3>
+    @if (Model.AnswerSet.Any())
+    {
+        <div class="registrants-container">
+            @foreach (var participant in Model.AnswerSet)
+            {
+                var collapseId = "collapse_" + participant.User.UserId; // Unique ID for each dropdown
+                
+                <div class="registrant">
+                    <div class="registrant-header" onclick="toggleDropdown('@collapseId')">
+                        <img src="@participant.User.ProfileImageUrl" alt="Profile" class="profile-img">
+                        <span class="registrant-name">@participant.User.DisplayName (@participant.User.Username)</span>
+                        <span class="dropdown-icon">▼</span>
+                    </div>
+                    <div class="registrant-details" id="@collapseId">
+                        <p><strong>Answers:</strong></p>
+                        <ul>
+                            @foreach (var answer in participant.RegistrationAnswers)
+                            {
+                                <li><strong>@answer.Question:</strong> @answer.Answer</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-muted">No participants have registered yet.</p>
+    }
+</div>
+
+<script>
+    function toggleDropdown(id) {
+        var element = document.getElementById(id);
+        element.style.display = (element.style.display === "block") ? "none" : "block";
+    }
+</script>
