@@ -1,6 +1,11 @@
-@* @model Citlali.Models.NavModel; *@
+
 @{
-    var profileImageUrl = Context.Request.Cookies["profileImageUrl"] ?? "";
+    var profileImageUrl = Context.Request.Cookies["profileImageUrl"];
+
+    if (string.IsNullOrEmpty(profileImageUrl))
+    {
+        profileImageUrl = ViewData["DefaultProfileImage"] as string;
+    }
 }
 
 <nav>

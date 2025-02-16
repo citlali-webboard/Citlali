@@ -72,7 +72,7 @@ public class AuthController : Controller
                 Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
 
                 var user = await _userService.GetUserByEmail(authLoginDto.Email);
-                string profileImageUrl = user?.ProfileImageUrl ?? ""; // ถ้าไม่มีใช้รูปเริ่มต้น
+                string profileImageUrl = user?.ProfileImageUrl ?? ""; 
 
                 HttpContext.Response.Cookies.Append("ProfileImageUrl", profileImageUrl, new CookieOptions
                 {
@@ -99,6 +99,15 @@ public class AuthController : Controller
     {
         Response.Cookies.Delete(_configuration.Jwt.AccessCookie);
         Response.Cookies.Delete(_configuration.Jwt.RefreshCookie);
+
+        HttpContext.Response.Cookies.Append("ProfileImageUrl", _configuration.User.DefaultProfileImage, new CookieOptions
+        {
+            HttpOnly = false, 
+            Secure = true, 
+            SameSite = SameSiteMode.Strict, 
+            Expires = DateTime.UtcNow.AddDays(30)
+        });
+        
         await _supabaseClient.Auth.SignOut();
         return RedirectToAction("SignIn");
     }
