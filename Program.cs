@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<Configuration>(builder.Configuration);
 var configuration = builder.Configuration.Get<Configuration>() ?? throw new Exception("Configuration must be set in the app's configuration.");
 
-var supabaseClient = new Client(configuration.Supabase.Url, configuration.Supabase.ServiceRoleKey);
+var supabaseClient = new Client(configuration.Supabase.LocalUrl, configuration.Supabase.ServiceRoleKey);
 await supabaseClient.InitializeAsync();
 
 var cultureInfo = new CultureInfo("en-US");

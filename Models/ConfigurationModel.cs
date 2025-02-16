@@ -17,7 +17,8 @@ public class AppConfig
 
 public class SupabaseConfig
 {
-    public required string Url { get; set; }
+    public required string LocalUrl { get; set; }
+    public required string PublicUrl { get; set; }
     public required string ServiceRoleKey { get; set; }
 }
 
