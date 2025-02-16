@@ -94,6 +94,7 @@ public class MailService(
         {
             Subject = $"{model.Action} {model.Title}",
             BodyEncoding = System.Text.Encoding.UTF8,
+            IsBodyHtml = true,
             Body = body
         };
 

@@ -14,7 +14,6 @@ public class MailController(ILogger<MailController> logger, Configuration config
     public IActionResult Selected()
     {
         MailSelectedViewModel mailSelectedViewModel = new() { Title = "Tax Evasion", Url = $"{_configuration.App.Url}/event/tax_evasion"};
-
         return View(mailSelectedViewModel);
     }
 }
