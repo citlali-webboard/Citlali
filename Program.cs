@@ -5,7 +5,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using System.Globalization;
-using Microsoft.FluentUI.AspNetCore.Components;
+using System.Net;
+using System.Net.Mail;
+using System.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,13 @@ var configuration = builder.Configuration.Get<Configuration>() ?? throw new Exce
 
 var supabaseClient = new Client(configuration.Supabase.Url, configuration.Supabase.ServiceRoleKey);
 await supabaseClient.InitializeAsync();
+
+var smtpClient = new SmtpClient(configuration.Mail.SmtpServer, configuration.Mail.SmtpPort)
+{
+    UseDefaultCredentials = false,
+    Credentials = new NetworkCredential(configuration.Mail.SmtpUsername, configuration.Mail.SmtpPassword),
+    EnableSsl = true
+};
 
 var cultureInfo = new CultureInfo("en-US");
 cultureInfo.DateTimeFormat.Calendar = new GregorianCalendar();
@@ -26,10 +35,12 @@ builder.Logging.AddConsole();
 // Add services to the container.
 builder.Services.AddSingleton(supabaseClient);
 builder.Services.AddSingleton(configuration);
+builder.Services.AddSingleton(smtpClient);
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<EventService>();
 builder.Services.AddScoped<UtilitiesService>();
+builder.Services.AddScoped<MailService>();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication()
