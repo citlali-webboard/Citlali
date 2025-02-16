@@ -6,6 +6,8 @@
     {
         profileImageUrl = ViewData["DefaultProfileImage"] as string;
     }
+    var timestamp = DateTime.Now.Ticks;
+    profileImageUrl = $"{profileImageUrl}?v={timestamp}";
 }
 
 <nav>
@@ -63,22 +65,38 @@
         </li>
       </a>
 
-      <a href="/user">
-        @* Profile *@
-        <li>
-          <div class="profile-placeholder">
-            <img src=@profileImageUrl alt="">
-          </div>
+      <div class="profile-container">
+        @if (User.Identity.IsAuthenticated)
+        {
+          @* Profile *@
+          <li>
+            <div class="profile-placeholder">
+              <img src=@profileImageUrl alt="">
+            </div>
 
-          @* Dropdown *@
-          <div class="profile-dropdown">
-            <a href="../User/Profile" class="dropdown-item">User Profile</a>
-          </div>
-        </li>
-      </a>
-      <form asp-controller="Auth" asp-action="SignOut" method="post">
-        <button type="submit" class="dropdown-item">Sign Out</button>
-      </form>
+            @* Dropdown *@
+            <div class="profile-dropdown">
+              <a href="/user" class="dropdown-item">User Profile</a>
+              <form asp-controller="Auth" asp-action="SignOut" method="post">
+                <button type="submit" class="dropdown-item">Sign Out</button>
+              </form>
+            </div>
+          </li>
+        }
+        else
+        {
+          <li>
+            <div class="profile-placeholder">
+                <img src="@profileImageUrl" alt="Default Profile Image">
+            </div>
+
+            <div class="profile-dropdown">
+                <a href="/auth/signin" class="dropdown-item">Sign In</a> 
+                <a href="/Auth/SignUp" class="dropdown-item">Sign Up</a>
+            </div>
+          </li>
+        }
+      </div>
 
     </div>
   </ul>
