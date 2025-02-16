@@ -11,7 +11,7 @@
 <nav>
   <ul>
     <div class="nav-group">
-      <a href="../Home/Index">
+      <a href="/Home/Index">
         <li class="logo">
           @* Logo *@
           <span>
@@ -23,7 +23,7 @@
     </div>
 
     <div class="nav-group">
-      <a href="../Event/Create">
+      <a href="/Event/Create">
         <li class="tooltip">
           @* Create Event *@
           <span>
@@ -63,7 +63,7 @@
         </li>
       </a>
 
-      <div class="profile-container">
+      <a href="/user">
         @* Profile *@
         <li>
           <div class="profile-placeholder">
@@ -73,12 +73,12 @@
           @* Dropdown *@
           <div class="profile-dropdown">
             <a href="../User/Profile" class="dropdown-item">User Profile</a>
-            <form asp-controller="Auth" asp-action="SignOut" method="post">
-              <button type="submit" class="dropdown-item">Sign Out</button>
-            </form>
           </div>
         </li>
-      </div>
+      </a>
+      <form asp-controller="Auth" asp-action="SignOut" method="post">
+        <button type="submit" class="dropdown-item">Sign Out</button>
+      </form>
 
     </div>
   </ul>

@@ -16,13 +16,11 @@ public class HomeController : Controller
         _configuration = configuration;
     }
 
-    public IActionResult Index()
-    {
-
-        ViewData["DefaultProfileImage"] = _configuration.User.DefaultProfileImage;
-
-        return View();
-    }
+public IActionResult Index()
+{
+    ViewData["DefaultProfileImage"] = _configuration.User.DefaultProfileImage;
+    return RedirectToAction("Index", "Event");
+}
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

@@ -1,3 +1,10 @@
+@using Citlali.Models
+@{
+    var navModel = new NavModel
+    {
+        profileImageUrl = ViewBag.profileImageUrl as string
+    };
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -7,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🩷 Citlali - @ViewData["Title"]</title>
+    <title>@ViewData["Title"] • Citlali</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/css/TailwindDefaults.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -17,7 +24,7 @@
     @RenderSection("head", required: false)
 </head>
 
-
+@await Html.PartialAsync("_Navbar", navModel)
 <body>
     @if (TempData["Error"] != null)
     {
@@ -26,18 +33,20 @@
             <button onclick="closePopup()">✖</button>
         </div>
     }
+    
     <div class="main-container">
-        <partial name="_NavBar" />
         <main role="main" class="pb-3">
+            <partial name="_NavBar" />
             @RenderBody()
         </main>
     </div>
+
     <script src="~/js/ErrorHandle.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @* <script src="_framework/blazor.server.js"></script> *@
     <script src="_content/Microsoft.FluentUI.AspNetCore.Components/Microsoft.FluentUI.AspNetCore.Components.lib.module.js" type="module" async></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

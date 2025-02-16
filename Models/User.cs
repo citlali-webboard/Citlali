@@ -41,3 +41,9 @@ public class UserOnboardingDto : User
 {
         public IFormFile? ProfileImage { get; set; }
 }
+
+public class UserViewModel : User
+{
+        public bool IsCurrentUser { get; set; }
+        public List<EventBriefCardData> UserEvents { get; set; } = new List<EventBriefCardData>();
+}

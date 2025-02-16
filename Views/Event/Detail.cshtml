@@ -6,7 +6,11 @@
 
 <div class="center-wrapper">
     <div class="detail-main-container">
-        <partial name="_EventDetailCard" model=@Model.EventDetailCardData />
-        <partial name="_EventJoinForm" model=@Model.EventFormDto />
+        <div class="detail">
+            <partial name="_EventDetailCard" model=@Model.EventDetailCardData />
+        </div>
+        <div class="request-form">
+            <partial name="_EventJoinForm" model=@Model.EventFormDto />
+        </div>
     </div>
 </div>

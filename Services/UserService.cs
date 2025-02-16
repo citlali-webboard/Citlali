@@ -5,12 +5,21 @@ using System.Text.RegularExpressions;
 
 namespace Citlali.Services;
 
+
 public class UserService
 {
     private readonly Client _supabaseClient;
     private readonly Configuration _configuration;
     private readonly UtilitiesService _utilityService;
 
+    private readonly List<string> reservedUsernames = new List<string> {
+        "admin",
+        "administrator",
+        "root",
+        "superuser",
+        "onboarding",
+        "edit",
+    };
     public UserService(Client supabaseClient, Configuration configuration, UtilitiesService utilityService)
     {
         _supabaseClient = supabaseClient;
@@ -143,7 +152,7 @@ public class UserService
     {
         var response = await _supabaseClient
             .From<User>()
-            .Where(row => row.Username == username)
+            .Filter(row => row.Username, Supabase.Postgrest.Constants.Operator.ILike, username)
             .Single();
 
         return response ?? null;
@@ -203,6 +212,10 @@ public class UserService
 
     public bool IsUsernameValid(string username)
     {
+        if (reservedUsernames.Contains(username.ToLower()))
+        {
+            return false;
+        }
         return Regex.IsMatch(username, @"^[A-Za-z][A-Za-z0-9_]{3,29}$");
     }
 }
