@@ -143,11 +143,7 @@ public class EventService(Client supabaseClient, UserService userService)
                     EventDate = e.EventDate,
                     PostExpiryDate = e.PostExpiryDate,
                     CreatedAt = e.CreatedAt,
-                    Deleted = e.Deleted,
-                    CreatorProfileImageUrl = creator?.ProfileImageUrl ?? "",
-                    CreatorDisplayName = creator?.DisplayName ?? "",
-                    CurrentParticipant = e.CurrentParticipant,
-                    EventCategoryTag = categoryTag ?? new EventCategoryTag()
+                    Deleted = e.Deleted
                 });
             }
         }
