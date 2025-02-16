@@ -161,6 +161,7 @@ public class UserController : Controller
                 CreatorProfileImageUrl = creator.ProfileImageUrl,
                 CurrentParticipant = currentParticipant,
                 MaxParticipant = userEvent.MaxParticipant,
+                PostExpiryDate = userEvent.PostExpiryDate,
                 EventCategoryTag = eventTag ?? new EventCategoryTag(),
                 LocationTag = locationTag ?? new LocationTag()
             });
