@@ -193,14 +193,16 @@ public class UserService
                 });
 
 
-            string publicUrl = _supabaseClient.Storage
+            string localUrl = _supabaseClient.Storage
                 .From(bucketName)
                 .GetPublicUrl(bucketFilePath);
 
             // generate a short id to prevent caching
             string imageId = Guid.NewGuid().ToString("N")[..8];
+
+            string publicUrl = $"{localUrl}?id={imageId}".Replace(_configuration.Supabase.LocalUrl, _configuration.Supabase.PublicUrl);
             
-            return $"{publicUrl}?id={imageId}";
+            return publicUrl;
         }
 
         catch (Exception ex)
