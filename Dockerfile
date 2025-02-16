@@ -27,7 +27,8 @@ RUN apk add --no-cache \
     icu-data-full \
     icu-libs \
     tzdata \
-    openssl
+    openssl \
+    fontconfig
 
 EXPOSE 8000
 WORKDIR /app
