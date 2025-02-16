@@ -165,9 +165,78 @@ public class EventController : Controller
         return View(model);
     }
 
+    [HttpGet("tag/{id}")]
+    public async Task<IActionResult> Tag(string id, int page = 1, int pageSize = 10)
+    {
+        try
+        {
+            if (!Guid.TryParse(id, out _))
+            {
+                throw new Exception("Invalid Tag id");
+            }
+
+            var events = await _eventService.GetEventsByTagId(Guid.Parse(id));
+            var paginatedEvents = events.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
+
+            var paginatedEventsCardData = new EventBriefCardData[paginatedEvents.Length];
+
+            for (int i = 0; i < paginatedEvents.Length; i++)
+            {
+                var ev = paginatedEvents[i];
+                var creator = await _userService.GetUserByUserId(ev.CreatorUserId);
+                if (creator == null)
+                {
+                    continue;
+                }
+
+                paginatedEventsCardData[i] = new EventBriefCardData
+                {
+                    EventId = ev.EventId,
+                    EventTitle = ev.EventTitle,
+                    EventDescription = ev.EventDescription,
+                    CreatorDisplayName = creator.DisplayName,
+                    CreatorProfileImageUrl = creator.ProfileImageUrl,
+                    LocationTag = await _eventService.GetLocationTagById(ev.EventLocationTagId) ?? new LocationTag(),
+                    EventCategoryTag = await _eventService.GetTagById(ev.EventCategoryTagId) ?? new EventCategoryTag(),
+                    CurrentParticipant = 0,
+                    MaxParticipant = ev.MaxParticipant,
+                    Cost = ev.Cost,
+                    EventDate = ev.EventDate,
+                    PostExpiryDate = ev.PostExpiryDate,
+                    CreatedAt = ev.CreatedAt,
+                };
+            }
+
+            var tags = (await _eventService.GetTags()).ToArray();
+
+            var model = new TagEventExploreViewModel
+            {
+                EventBriefCardDatas = paginatedEventsCardData,
+                Tags = tags,
+                CurrentPage = page,
+                TotalPage = (int)Math.Ceiling(events.Count() / (double)pageSize)
+            };
+            
+            var exploreTag = await _eventService.GetTagById(Guid.Parse(id))?? new EventCategoryTag();
+
+            model.TagId = exploreTag.EventCategoryTagId;
+            model.TagName = exploreTag.EventCategoryTagName;
+            model.TagEmoji = exploreTag.EventCategoryTagEmoji;
+
+            return View(model);
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+
+    
 }
