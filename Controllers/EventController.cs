@@ -104,78 +104,44 @@ public class EventController : Controller
             TempData["Error"] = e.Message;
             return RedirectToAction("explore");
         }
-
     }
 
     [HttpPost("join")]
     [Authorize]
     public async Task<IActionResult> JoinEvent(JoinEventModel joinEventModel)
     {
-        try {
-            var RequestJoinEvent = await _eventService.JoinEvent(joinEventModel);
-            return RedirectToAction("explore");
-        }
-        catch (UserAlreadyRegisteredException) {
-            TempData["Error"] = "You have already registered for this event";
-            return RedirectToAction("detail", new { id = joinEventModel.EventId });
-        }
-        catch (JoinOwnerException) {
-            TempData["Error"] = "You cannot join your own event";
-            return RedirectToAction("detail", new { id = joinEventModel.EventId });
-        }
-        catch (Exception e) {
-            TempData["Error"] = e.Message;
-            return RedirectToAction("explore");
-        }
+        var RequestJoinEvent = await _eventService.JoinEvent(joinEventModel);
+        return RedirectToAction("explore");
     }
 
 
     [HttpGet("explore")]
     public async Task<IActionResult> Explore(int page = 1, int pageSize = 10)
     {
-        var events = await _eventService.GetAllEvents();
-        var paginatedEvents = events.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
-
-        var paginatedEventsCardData = new EventBriefCardData[paginatedEvents.Length];
-
-        for (int i = 0; i < paginatedEvents.Length; i++)
+        try
         {
-            var ev = paginatedEvents[i];
-            var creator = await _userService.GetUserByUserId(ev.CreatorUserId);
-            if (creator == null)
-            {
-                continue;
-            }
+            var eventsTask = _eventService.GetPaginatedEvents((page - 1) * pageSize, (page * pageSize) - 1);
+            var tagsTask = _eventService.GetTags();
+            await Task.WhenAll(eventsTask, tagsTask);
+            var events = await eventsTask;
+            var tags = (await tagsTask).ToArray();
 
-            paginatedEventsCardData[i] = new EventBriefCardData
+            var briefCardDatas = await _eventService.EventsToBriefCardArray(events);
+
+            var model = new EventExploreViewModel
             {
-                EventId = ev.EventId,
-                EventTitle = ev.EventTitle,
-                EventDescription = ev.EventDescription,
-                CreatorDisplayName = creator.DisplayName,
-                CreatorProfileImageUrl = creator.ProfileImageUrl,
-                LocationTag = await _eventService.GetLocationTagById(ev.EventLocationTagId) ?? new LocationTag(),
-                EventCategoryTag = await _eventService.GetTagById(ev.EventCategoryTagId) ?? new EventCategoryTag(),
-                CurrentParticipant = await _eventService.GetRegistrationCountByEventId(ev.EventId),
-                MaxParticipant = ev.MaxParticipant,
-                Cost = ev.Cost,
-                EventDate = ev.EventDate,
-                PostExpiryDate = ev.PostExpiryDate,
-                CreatedAt = ev.CreatedAt,
+                EventBriefCardDatas = briefCardDatas,
+                Tags = tags,
+                CurrentPage = page,
+                TotalPage = (int)Math.Ceiling(events.Count / (double)pageSize)
             };
+            return View(model);
         }
-
-        var tags = (await _eventService.GetTags()).ToArray();
-
-        var model = new EventExploreViewModel
+        catch (Exception e)
         {
-            EventBriefCardDatas = paginatedEventsCardData,
-            Tags = tags,
-            CurrentPage = page,
-            TotalPage = (int)Math.Ceiling(events.Count() / (double)pageSize)
-        };
-
-        return View(model);
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
     }
 
     [HttpGet("tag/{id}")]

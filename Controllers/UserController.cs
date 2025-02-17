@@ -137,35 +137,8 @@ public class UserController : Controller
         var currentUser = _supabaseClient.Auth.CurrentUser;
         var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
 
-        var userEvents = await _eventService.GetEventsByUserId(user.UserId);
-        var userEventBriefCards = new List<EventBriefCardData>();
-        foreach (var userEvent in userEvents)
-        {
-            var creator = await _userService.GetUserByUserId(userEvent.CreatorUserId);
-            if (creator == null)
-            {
-                continue;
-            }
-
-            var eventTag = await _eventService.GetTagById(userEvent.EventCategoryTagId);
-            var locationTag = await _eventService.GetLocationTagById(userEvent.EventLocationTagId);
-
-            var currentParticipant = await _eventService.GetRegistrationCountByEventId(userEvent.EventId);
-
-            userEventBriefCards.Add(new EventBriefCardData
-            {
-                EventId = userEvent.EventId,
-                EventTitle = userEvent.EventTitle,
-                EventDescription = userEvent.EventDescription,
-                CreatorDisplayName = creator.DisplayName,
-                CreatorProfileImageUrl = creator.ProfileImageUrl,
-                CurrentParticipant = currentParticipant,
-                MaxParticipant = userEvent.MaxParticipant,
-                PostExpiryDate = userEvent.PostExpiryDate,
-                EventCategoryTag = eventTag ?? new EventCategoryTag(),
-                LocationTag = locationTag ?? new LocationTag()
-            });
-        }
+        var events = await _eventService.GetEventsByUserId(user.UserId);
+        var userEventBriefCards = (await _eventService.EventsToBriefCardArray(events)).ToList();
 
         var userViewModel = new UserViewModel
         {
