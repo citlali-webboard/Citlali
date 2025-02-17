@@ -163,7 +163,7 @@ public class EventController : Controller
     public async Task<IActionResult> JoinEvent(JoinEventModel joinEventModel)
     {
         var RequestJoinEvent = await _eventService.JoinEvent(joinEventModel);
-        return RedirectToAction("explore");
+        return RedirectToAction("status", new { eventId = joinEventModel.EventId });
     }
 
 
