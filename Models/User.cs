@@ -47,3 +47,11 @@ public class UserViewModel : User
         public bool IsCurrentUser { get; set; }
         public List<EventBriefCardData> UserEvents { get; set; } = new List<EventBriefCardData>();
 }
+
+public class BriefUser 
+{
+        public Guid UserId { get; set; } = new();
+        public string Username { get; set; } = "";
+        public string ProfileImageUrl { get; set; } = "";
+        public string DisplayName { get; set; } = "";
+}

@@ -37,7 +37,7 @@
     string relativeTime;
     bool expired = false;
     try {
-        relativeTime = $"Expiring in {GetFutureRelativeTime(Model.CreatedAt)}";
+        relativeTime = $"Expiring in {GetFutureRelativeTime(Model.PostExpiryDate)}";
     } catch (InvalidDataException) {
         expired = true;
         relativeTime = "Expired";
@@ -45,7 +45,7 @@
 }
 
 <div class="card space-y-4">
-    <a href="../event/detail/@Model.EventId">
+    <a href="../../event/detail/@Model.EventId">
         <div class="header-data">
             <span class="creator">
                 <img src="@Model.CreatorProfileImageUrl" alt="Creator" />
