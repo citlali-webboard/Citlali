@@ -121,9 +121,11 @@ public class EventController : Controller
         try
         {
             var eventsTask = _eventService.GetPaginatedEvents((page - 1) * pageSize, (page * pageSize) - 1);
+            var eventsCountTask = _eventService.GetEventsExactCount();
             var tagsTask = _eventService.GetTags();
-            await Task.WhenAll(eventsTask, tagsTask);
+            await Task.WhenAll(eventsTask, eventsCountTask, tagsTask);
             var events = await eventsTask;
+            var eventsCount = await eventsCountTask;
             var tags = (await tagsTask).ToArray();
 
             var briefCardDatas = await _eventService.EventsToBriefCardArray(events);
@@ -133,7 +135,7 @@ public class EventController : Controller
                 EventBriefCardDatas = briefCardDatas,
                 Tags = tags,
                 CurrentPage = page,
-                TotalPage = (int)Math.Ceiling(events.Count / (double)pageSize)
+                TotalPage = (int)Math.Ceiling(eventsCount / (double)pageSize)
             };
             return View(model);
         }

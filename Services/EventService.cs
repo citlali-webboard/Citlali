@@ -254,6 +254,16 @@ public class EventService(Client supabaseClient, UserService userService)
         return response.Models;
     }
 
+    public async Task<int> GetEventsExactCount()
+    {
+        var count = await _supabaseClient
+            .From<Event>()
+            .Filter(row => row.Deleted, Supabase.Postgrest.Constants.Operator.Equals, "false")
+            .Count(Supabase.Postgrest.Constants.CountType.Exact);
+
+        return count;
+    }
+
     public async Task<List<Event>> GetPaginatedEvents(int from, int to)
     {
         var response = await _supabaseClient
