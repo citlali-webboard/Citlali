@@ -44,6 +44,7 @@ you should read all of them and change according to your environment, but you de
 you need to set
 - `Jwt:Secret` : your jwt signing key, should be the same on supabase
 - `Supabase:ServiceRoleKey` : a service role key to access supabase
+- `Supabase:AnonKey` : an anon key to access supabase
 - `Mail:SmtpUsername` : Username for logging in to SmtpServer in appsettings
 - `Mail:SmtpPassword` : Password for logging in to SmtpServer in appsettings
 
