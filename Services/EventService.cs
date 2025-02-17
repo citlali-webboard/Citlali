@@ -498,6 +498,7 @@ public class EventService(Client supabaseClient, UserService userService)
             answerSet.Add(new EventManagementAnswerCollection
             {
                 User = registrant,
+                Status = registration.Status,
                 RegistrationAnswers = registrationAnswers
             });
         }

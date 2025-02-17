@@ -212,6 +212,10 @@
     background-color: #00cc00;
 }
 
+.status-circle.status-rejected {
+    background-color: #ff0000;
+}
+
 .button-group {
     width: 100%;
     margin-top: 1.5rem;
@@ -251,4 +255,20 @@
     }
     background-color: #ff0000;
     color: white;
+}
+
+@media (max-width: 768px) {
+    .registrants {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .registrants * h3 {
+        font-size: 1.1rem;
+    }
+
+    .registrants * description {
+        font-size: 0.8rem;
+    }
 }

@@ -256,5 +256,6 @@ public class RegistrationAnswerSimplify
 public class EventManagementAnswerCollection
 {
     public User User { get; set; } = new();
+    public string Status { get; set; } = "pending";
     public List<RegistrationAnswerSimplify> RegistrationAnswers { get; set; } = [];
 }
