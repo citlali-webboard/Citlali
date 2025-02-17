@@ -104,6 +104,34 @@ public class EventService(Client supabaseClient, UserService userService)
         return modelEvent;
     }
 
+    public async Task<bool> DeleteEvent(Guid eventId)
+    {
+        var supabaseUser = _supabaseClient.Auth.CurrentUser;
+        if (supabaseUser == null)
+        {
+            throw new UnauthorizedAccessException("User not authenticated");
+        }
+
+        var eventToDelete = await GetEventById(eventId);
+        if (eventToDelete == null)
+        {
+            throw new KeyNotFoundException("Event not found");
+        }
+
+        if (eventToDelete.CreatorUserId.ToString() != supabaseUser.Id)
+        {
+            throw new UnauthorizedAccessException("User not authorized to delete this event");
+        }
+
+        await _supabaseClient
+            .From<Event>()
+            .Where(row => row.EventId == eventId)
+            .Set(row => row.Deleted, true)
+            .Update();
+
+        return true;
+    }
+
     public async Task<List<Event>> GetEventsByUserId(Guid userId)
     {
         var response = await _supabaseClient

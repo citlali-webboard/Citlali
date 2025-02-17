@@ -86,6 +86,37 @@ public class EventController : Controller
         }
     }
 
+    [HttpPost("delete/{eventId}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteEvent(string eventId)
+    {
+        try
+        {
+            if (!Guid.TryParse(eventId, out _))
+            {
+                throw new Exception("Invalid Event id");
+            }
+
+            await _eventService.DeleteEvent(Guid.Parse(eventId));
+            return RedirectToAction("explore");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "You are not authorized to delete this event";
+            return RedirectToAction("explore");
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["Error"] = "Event not found";
+            return RedirectToAction("explore");
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
+    }
+
 
     [HttpGet("detail/{id}")]
     public async Task<IActionResult> Detail(string id)

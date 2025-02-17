@@ -36,14 +36,15 @@
                     Archive this event
                     </span>
                 </a>
-                <a class="action-button danger">
-                    <span>
-                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
-                    </span>
-                    <span>
-                    Delete event
-                    </span>
-                </a>
+                <form asp-action="DeleteEvent" asp-route-eventId="@Model.EventId" method="post" onsubmit="return confirm('Are you sure you want to delete this event?');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="action-button danger">
+                        <span>
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                        </span>
+                        <span>Delete event</span>
+                    </button>
+                </form>
             </div>
         </div>
 
