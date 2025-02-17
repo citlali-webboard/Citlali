@@ -15,10 +15,10 @@ public class Event : BaseModel
     public Guid CreatorUserId { get; set; } = new();
 
     [Column("EventTitle")]
-    public string EventTitle { get; set; } = "Sample title";
+    public string EventTitle { get; set; } = "";
 
     [Column("EventDescription")]
-    public string EventDescription { get; set; } = "Sample description";
+    public string EventDescription { get; set; } = "";
 
     [Column("EventCategoryTagId")]
     public Guid EventCategoryTagId { get; set; } = new();
@@ -56,7 +56,7 @@ public class EventQuestion : BaseModel
     public Guid EventId { get; set; } = new();
 
     [Column("Question")]
-    public string Question { get; set; } = "Question";
+    public string Question { get; set; } = "";
 
     [Column("CreatedAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -71,25 +71,25 @@ public class EventLocationTag
     public Guid EventLocationTagId {get ; set;} = new();
 
     [Column("LocationTagName")]
-    public string EventLocationTagName {get ; set;} = "Lat Krabang";
+    public string EventLocationTagName {get ; set;} = "";
 }
 
 public class EventBriefCardData
 {
     public Guid EventId {get ; set;} = new();
-    public string EventTitle {get ; set;} = "Basketball? Anyone?";
-    public string EventDescription {get ; set;} = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-    public string? CreatorUsername {get ; set; }
-    public string CreatorDisplayName {get ; set;} = "John Basketball";
+    public string EventTitle {get ; set;} = "";
+    public string EventDescription {get ; set;} = "";
+    public string CreatorUsername {get ; set; } = "";
+    public string CreatorDisplayName {get ; set;} = "";
     public string CreatorProfileImageUrl {get ; set;} = "";
     public LocationTag LocationTag {get ; set;} = new();
     public EventCategoryTag EventCategoryTag {get ; set;} = new();
     public int CurrentParticipant {get ; set;} = 0;
-    public int MaxParticipant {get ; set;} = 64;
-    public int Cost {get ; set;} = 64;
-    public DateTime EventDate {get ; set;} = new(2024, 12, 31);
-    public DateTime PostExpiryDate {get ; set;} = new(2024, 12, 30);
-    public DateTime CreatedAt {get ; set;} = new(2024, 12, 3);
+    public int MaxParticipant {get ; set;} = 0;
+    public int Cost {get ; set;} = 0;
+    public DateTime EventDate {get ; set;} = new();
+    public DateTime PostExpiryDate {get ; set;} = new();
+    public DateTime CreatedAt {get ; set;} = new();
 
 }
 
@@ -206,7 +206,7 @@ public class Registrantion : BaseModel
     public Guid EventId { get; set; } = new();
 
     [Column("Status")]
-    public string Status { get; set; } = "xxxx";
+    public string Status { get; set; } = "";
 
     [Column("CreatedAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
