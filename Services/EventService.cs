@@ -296,4 +296,10 @@ public class EventService(Client supabaseClient, UserService userService)
             };
     }
     
+    public async Task<EventBriefCardData[]> EventsToBriefCardArray(List<Event> citlaliEvents)
+    {
+        List<Task<EventBriefCardData>> briefCardDataTasks = citlaliEvents.ConvertAll(EventToBriefCard);
+        var briefCardsData = await Task.WhenAll(briefCardDataTasks);
+        return briefCardsData;
+    }
 }

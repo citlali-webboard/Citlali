@@ -126,13 +126,11 @@ public class EventController : Controller
             var events = await eventsTask;
             var tags = (await tagsTask).ToArray();
 
-            
-            List<Task<EventBriefCardData>> briefCardDataTasks = events.ConvertAll(_eventService.EventToBriefCard);
-            var briefCardData = await Task.WhenAll(briefCardDataTasks);
+            var briefCardDatas = await _eventService.EventsToBriefCardArray(events);
 
             var model = new EventExploreViewModel
             {
-                EventBriefCardDatas = briefCardData,
+                EventBriefCardDatas = briefCardDatas,
                 Tags = tags,
                 CurrentPage = page,
                 TotalPage = (int)Math.Ceiling(events.Count / (double)pageSize)
