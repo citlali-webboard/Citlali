@@ -247,35 +247,53 @@ public class EventService(Client supabaseClient, UserService userService)
     {
         var response = await _supabaseClient
             .From<Event>()
-            .Select("*")
             .Filter(row => row.Deleted, Supabase.Postgrest.Constants.Operator.Equals, "false")
             .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
             .Get();
 
-        var events = new List<Event>();
-
-        if (response != null)
-        {
-            foreach (var e in response.Models)
-            {
-                events.Add(new Event
-                {
-                    EventId = e.EventId,
-                    CreatorUserId = e.CreatorUserId,
-                    EventTitle = e.EventTitle,
-                    EventDescription = e.EventDescription,
-                    EventCategoryTagId = e.EventCategoryTagId,
-                    EventLocationTagId = e.EventLocationTagId,
-                    MaxParticipant = e.MaxParticipant,
-                    Cost = e.Cost,
-                    EventDate = e.EventDate,
-                    PostExpiryDate = e.PostExpiryDate,
-                    CreatedAt = e.CreatedAt,
-                    Deleted = e.Deleted
-                });
-            }
-        }
-
-        return events;
+        return response.Models;
     }
+
+    public async Task<List<Event>> GetPaginatedEvents(int from, int to)
+    {
+        var response = await _supabaseClient
+            .From<Event>()
+            .Filter(row => row.Deleted, Supabase.Postgrest.Constants.Operator.Equals, "false")
+            .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
+            .Range(from, to)
+            .Get();
+
+        return response.Models;
+    }
+
+    public async Task<EventBriefCardData> EventToBriefCard(Event citlaliEvent)
+    {
+        var creatorTask = _userService.GetUserByUserId(citlaliEvent.CreatorUserId);
+        var locationTagTask = GetLocationTagById(citlaliEvent.EventLocationTagId);
+        var categoryTagTask = GetTagById(citlaliEvent.EventCategoryTagId);
+
+        await Task.WhenAll(creatorTask, locationTagTask, categoryTagTask);
+
+        var creator = await creatorTask ?? throw new Exception("Creator not found");
+        var locationTag = await locationTagTask ?? throw new Exception("Location not found");
+        var categoryTag = await categoryTagTask ?? throw new Exception("Category not found");
+
+        return new EventBriefCardData
+            {
+                EventId = citlaliEvent.EventId,
+                EventTitle = citlaliEvent.EventTitle,
+                EventDescription = citlaliEvent.EventDescription,
+                CreatorDisplayName = creator.DisplayName,
+                CreatorProfileImageUrl = creator.ProfileImageUrl,
+                LocationTag = locationTag,
+                EventCategoryTag = categoryTag,
+                CurrentParticipant = 0,
+                MaxParticipant = citlaliEvent.MaxParticipant,
+                Cost = citlaliEvent.Cost,
+                EventDate = citlaliEvent.EventDate,
+                PostExpiryDate = citlaliEvent.PostExpiryDate,
+                CreatedAt = citlaliEvent.CreatedAt,
+            };
+    }
+    
 }
