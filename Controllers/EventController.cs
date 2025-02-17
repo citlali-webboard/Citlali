@@ -130,15 +130,21 @@ public class EventController : Controller
 
             var currentUser = _supabaseClient.Auth.CurrentUser;
             var citlaliEvent = await _eventService.GetEventById(Guid.Parse(id));
+            if (citlaliEvent == null || citlaliEvent.Deleted) {
+                TempData["Error"] = "Event not found or deleted";
+                return RedirectToAction("explore");
+            }
+
             if (currentUser != null && currentUser.Id != null && citlaliEvent != null && currentUser.Id == citlaliEvent.CreatorUserId.ToString())
             {
                 return RedirectToAction("manage", new { eventId = id });
             }
 
-            if (citlaliEvent == null || citlaliEvent.Deleted) {
-                TempData["Error"] = "Event not found or deleted";
-                return RedirectToAction("explore");
+            if (await _eventService.IsUserRegistered(Guid.Parse(id), Guid.Parse(currentUser.Id)))
+            {
+                return RedirectToAction("status", new { eventId = id });
             }
+
             
             EventDetailViewModel eventDetailViewModel = await _eventService.GetEventDetail(Guid.Parse(id));
 
@@ -275,6 +281,40 @@ public class EventController : Controller
         catch (KeyNotFoundException) {
             TempData["Error"] = "Event not found";
             return RedirectToAction("explore");
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
+    }
+
+    [HttpGet("status/{eventId}")]
+    [Authorize]
+    public async Task<IActionResult> Status(string eventId)
+    {
+        try
+        {
+            var eventStatusViewModel = await _eventService.GetEventStatus(Guid.Parse(eventId));
+            return View(eventStatusViewModel);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "You are not authorized to view this event status";
+            return RedirectToAction("explore");
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["Error"] = "Event not found";
+            return RedirectToAction("explore");
+        }
+        catch (UserHasNotRegisteredException)
+        {
+            return RedirectToAction("detail", new { id = eventId });
+        }
+        catch (JoinOwnerException) 
+        {
+            return RedirectToAction("detail", new { id = eventId });
         }
         catch (Exception e)
         {

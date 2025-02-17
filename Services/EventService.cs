@@ -347,6 +347,37 @@ public class EventService(Client supabaseClient, UserService userService)
                 CreatedAt = citlaliEvent.CreatedAt,
             };
     }
+
+    public async Task<EventDetailCardData> EventToDetailCard(Event citlaliEvent)
+    {
+        var creatorTask = _userService.GetUserByUserId(citlaliEvent.CreatorUserId);
+        var locationTagTask = GetLocationTagById(citlaliEvent.EventLocationTagId);
+        var categoryTagTask = GetTagById(citlaliEvent.EventCategoryTagId);
+
+        await Task.WhenAll(creatorTask, locationTagTask, categoryTagTask);
+
+        var creator = await creatorTask ?? throw new Exception("Creator not found");
+        var locationTag = await locationTagTask ?? throw new Exception("Location not found");
+        var categoryTag = await categoryTagTask ?? throw new Exception("Category not found");
+        var currentParticipant = await GetRegistrationCountByEventId(citlaliEvent.EventId);
+
+        return new EventDetailCardData
+            {
+                EventId = citlaliEvent.EventId,
+                EventTitle = citlaliEvent.EventTitle,
+                EventDescription = citlaliEvent.EventDescription,
+                CreatorDisplayName = creator.DisplayName,
+                CreatorProfileImageUrl = creator.ProfileImageUrl,
+                LocationTag = locationTag,
+                EventCategoryTag = categoryTag,
+                CurrentParticipant = currentParticipant,
+                MaxParticipant = citlaliEvent.MaxParticipant,
+                Cost = citlaliEvent.Cost,
+                EventDate = citlaliEvent.EventDate,
+                PostExpiryDate = citlaliEvent.PostExpiryDate,
+                CreatedAt = citlaliEvent.CreatedAt,
+            };
+    }
     
     public async Task<EventBriefCardData[]> EventsToBriefCardArray(List<Event> citlaliEvents)
     {
@@ -561,6 +592,45 @@ public class EventService(Client supabaseClient, UserService userService)
         };
     }
 
+    public async Task<Registration?> GetRegistrationByEventIdAndUserId(Guid eventId, Guid userId)
+    {
+        var response = await _supabaseClient
+            .From<Registration>()
+            .Select("*")
+            .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
+            .Filter("UserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
+            .Single();
+
+        return response ?? null;
+    }
+
+    public async Task<EventStatusViewModel> GetEventStatus(Guid eventId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser 
+                        ?? throw new UnauthorizedAccessException("User not authenticated");
+        var user = _userService.GetUserByUserId(Guid.Parse(currentUser.Id))
+                ?? throw new UnauthorizedAccessException("User not found");
+        var ev = await GetEventById(eventId)
+                ?? throw new KeyNotFoundException("Event not found");
+
+        if (ev.CreatorUserId.ToString() == currentUser.Id) 
+            throw new JoinOwnerException("Owner cannot join their own event.");
+        
+        if (!await IsUserRegistered(eventId, Guid.Parse(currentUser.Id))) 
+            throw new UserHasNotRegisteredException("User has not registered to this event.");
+        
+        var registration = await GetRegistrationByEventIdAndUserId(eventId, Guid.Parse(currentUser.Id))
+                ?? throw new KeyNotFoundException("Registration not found");
+        
+        return new EventStatusViewModel
+        {
+            Status = registration.Status,
+            RegistrationTime = registration.CreatedAt,
+            EventDetailCardData = await EventToDetailCard(ev),
+        };
+        
+    }
+
 }
 
 public class UserAlreadyRegisteredException : Exception
@@ -570,6 +640,16 @@ public class UserAlreadyRegisteredException : Exception
     public UserAlreadyRegisteredException(string message) : base(message) { }
 
     public UserAlreadyRegisteredException(string message, Exception innerException) 
+        : base(message, innerException) { }
+}
+
+public class UserHasNotRegisteredException : Exception
+{
+    public UserHasNotRegisteredException() : base("User has not registered to this event.") { }
+
+    public UserHasNotRegisteredException(string message) : base(message) { }
+
+    public UserHasNotRegisteredException(string message, Exception innerException) 
         : base(message, innerException) { }
 }
 

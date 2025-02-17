@@ -105,6 +105,7 @@ public class EventFormDto
 
 public class EventDetailViewModel
 {
+    public bool IsUserRegistered { get; set; } = false;
     public EventDetailCardData EventDetailCardData { get; set; } = new();
     public EventFormDto EventFormDto { get; set; } = new();
 }
@@ -260,4 +261,11 @@ public class EventManagementAnswerCollection
     public User User { get; set; } = new();
     public string Status { get; set; } = "pending";
     public List<RegistrationAnswerSimplify> RegistrationAnswers { get; set; } = [];
+}
+
+public class EventStatusViewModel
+{
+    public EventDetailCardData EventDetailCardData { get; set; } = new();
+    public DateTime RegistrationTime { get; set; } = new();
+    public string Status { get; set; } = "";
 }

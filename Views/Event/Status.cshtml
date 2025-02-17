@@ -1,0 +1,32 @@
+@model Citlali.Models.EventStatusViewModel
+
+<div class="status-page">
+    <h1 class="status-title">You have requested to join this event 🎉</h1>
+    <h3 class="status-subtitle">Please wait for the event owner to select and invite...</h3>
+    <div class="status-message @Model.Status.ToLower()">
+        @if (Model.Status == "pending")
+        {
+            <p>⏳ Your request is pending. The event owner has not reviewed it yet.</p>
+        }
+        else if (Model.Status == "awaiting-confirmation")
+        {
+            <p>🔔 You have been selected! Please confirm your participation.</p>
+        }
+        else if (Model.Status == "rejected")
+        {
+            <p>❌ Unfortunately, your request has been rejected.</p>
+        }
+        else if (Model.Status == "confirmed")
+        {
+            <p>✅ Congratulations! Your participation has been confirmed.</p>
+        }
+    </div>
+
+    <div class="event-detail">
+        <partial name="_EventDetailCard" model=@Model.EventDetailCardData />
+    </div>
+
+    <div class="status-info">
+        <p class="request-time">You requested to join at <span>@Model.RegistrationTime</span></p>
+    </div>
+</div>
