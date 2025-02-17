@@ -210,14 +210,14 @@ public class EventService(Client supabaseClient, UserService userService)
     }
 
     //JoinEvent
-    public async Task<Registrantion> JoinEvent(JoinEventModel joinEventModel)
+    public async Task<Registration> JoinEvent(JoinEventModel joinEventModel)
     {
         var supabaseUser = _supabaseClient.Auth.CurrentUser ?? throw new Exception("User not authenticated");
         Guid userId = Guid.Parse(supabaseUser.Id ?? "");
         Guid EventID = joinEventModel.EventId;
         var questionsList = joinEventModel.EventFormDto.Questions;
 
-        var newRegistration = new Registrantion
+        var newRegistration = new Registration
         {
             RegistrationId = Guid.NewGuid(),
             EventId = EventID,
@@ -225,7 +225,7 @@ public class EventService(Client supabaseClient, UserService userService)
         };
 
         await _supabaseClient
-            .From<Registrantion>()
+            .From<Registration>()
             .Insert(newRegistration);
 
         List<RegistrationAnswer> newRegistrationAnswers = questionsList.ConvertAll(question => new RegistrationAnswer

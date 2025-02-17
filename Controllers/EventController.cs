@@ -104,14 +104,12 @@ public class EventController : Controller
             TempData["Error"] = e.Message;
             return RedirectToAction("explore");
         }
-
     }
 
     [HttpPost("join")]
     [Authorize]
     public async Task<IActionResult> JoinEvent(JoinEventModel joinEventModel)
     {
-
         var RequestJoinEvent = await _eventService.JoinEvent(joinEventModel);
         return RedirectToAction("explore");
     }
