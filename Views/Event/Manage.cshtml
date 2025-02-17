@@ -17,6 +17,12 @@
         CurrentParticipant = Model.CurrentParticipant,
         Cost = Model.Cost
     };
+
+    var totalRegisteredParticipant = Model.AnswerSet.Count;
+
+    var confirmedParticipantCount = Model.ConfirmedParticipant.Count;
+    var awaitingConfirmationParticipantCount = Model.AwaitingConfirmationParticipant.Count;
+    var totalInvitedParticipant = confirmedParticipantCount + awaitingConfirmationParticipantCount;
 }
 
 @section head {
@@ -49,7 +55,7 @@
         </div>
 
         <div class="questions">
-            <h3>Questions for Participants 📝</h3>
+            <h3>📝 Questions for Participants</h3>
             <description>These are the questions that participants will need to answer when they register for your event. you cannot add, edit or remove once the event is created.</description>
             <div class="question-container">
                 <ul class="question">
@@ -63,7 +69,7 @@
 
         <div class="registrants">
             <div class="registered-participants">
-                <h3>Registered Participants 🛫</h3>
+                <h3>🛫 Registered Participants (@totalRegisteredParticipant) </h3>
                 <description>The following individuals have requested to participate in your event. Please take the time to review their responses to your questions.</description>
                 @if (Model.AnswerSet.Any())
                 {
@@ -72,7 +78,7 @@
                         {
                             var collapseId = "collapse_" + participant.User.UserId; // Unique ID for each dropdown
                             
-                            <div class="registrant">
+                            <div class="registrant-card">
                                 <div class="registrant-header" onclick="toggleDropdown('@collapseId')">
                                     <img src="@participant.User.ProfileImageUrl" alt="Profile" class="profile-img">
                                     <span class="registrant-name">
@@ -81,7 +87,7 @@
                                             var status = participant.Status switch
                                             {
                                                 "pending" => "status-pending",
-                                                "await-confirmation" => "status-await-confirmation",
+                                                "awaiting-confirmation" => "status-await-confirmation",
                                                 "rejected" => "status-rejected",
                                                 "confirmed" => "status-confirmed",
                                                 _ => "status-pending"
@@ -99,8 +105,8 @@
                                         @foreach (var answer in participant.RegistrationAnswers)
                                         {
                                             <div class="form-group">
-                                                <label for="Email">@answer.Question</label>
-                                                <input class="form-control disabled-input" value="@answer.Answer" disabled />
+                                                <label for="Question">@answer.Question</label>
+                                                <textarea class="form-control disabled-input" value="@answer.Answer" disabled>@answer.Answer</textarea>
                                             </div>
                                         }
                                     </div>
@@ -133,9 +139,44 @@
                 }
             </div>
 
+            @* this is mockup for invited participants PLEASE FIX *@
             <div class="selected-participants">
-                <h3>Invited participants (0/@Model.MaxParticipant) ✅</h3>
+                <h3>Invited participants (@totalInvitedParticipant/@Model.MaxParticipant) 💌</h3>
                 <description>These are people your have been selected and invited.</description>
+                <div class="confirmed-participants">
+                    <h4>✅ Confirmed (@confirmedParticipantCount)</h4>
+                    <hr>
+                    <div class="registrant-list">
+                        @foreach (var confirmedParticipant in Model.ConfirmedParticipant)
+                        {
+                            <a href="/user/@confirmedParticipant.Username" target="_blank">
+                                <div class="registrant">
+                                    <img src="@confirmedParticipant.ProfileImageUrl" alt="Profile" class="profile-img">
+                                    <span class="registrant-name">
+                                        <strong>@confirmedParticipant.DisplayName</strong> (@confirmedParticipant.Username)
+                                    </span>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </div>
+                <div class="await-confirmation">
+                    <h4>📨 Awaiting Confirmation (@awaitingConfirmationParticipantCount)</h4>
+                    <hr>
+                    <div class="registrant-list">
+                        @foreach (var awaitingParticipant in Model.AwaitingConfirmationParticipant)
+                        {
+                            <a href="/user/@awaitingParticipant.Username" target="_blank">
+                                <div class="registrant">
+                                    <img src="@awaitingParticipant.ProfileImageUrl" alt="Profile" class="profile-img">
+                                    <span class="registrant-name">
+                                        <strong>@awaitingParticipant.DisplayName</strong> (@awaitingParticipant.Username)
+                                    </span>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                <div>
             </div>
         </div>
     </div>

@@ -4,13 +4,14 @@
     justify-content: flex-start;
     margin-top: 4rem;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    margin-bottom: 2rem;
     width: 100%;
 }
 
 .content {
     width: 90%;
-    max-width: 1000px;
+    max-width: 1200px;
 }
 
 .control {
@@ -105,9 +106,7 @@ ul {
 
 .registrants-container {
     width: 100%;
-    max-width: 600px;
-    margin: 20px auto;
-    font-family: Arial, sans-serif;
+    margin-top: 1rem;
 }
 
 .registrants {
@@ -134,22 +133,40 @@ ul {
 .registrants {
     display: flex;
     flex-direction: row;
-    gap: 10%;
+    gap: 5%;
 }
 
 .registered-participants {
-    flex: 0 0 50%;
+    flex: 0 0 65%;
     display: flex;
     flex-direction: column;
 }
 
 .selected-participants {
-    flex: 0 0 40%;
+    flex: 0 0 30%;
     display: flex;
     flex-direction: column;
 }
 
-.registrant {
+.selected-participants * h4 {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.selected-participants * hr {
+    margin: 0.5rem 0;
+    border: 0;
+    border-top: 1px solid #ccc;
+}
+
+.confirmed-participants,
+.await-confirmation {
+    display: flex;
+    flex-direction: column;
+    margin-top: 2rem;
+}
+
+.registrant-card {
     border: 1px solid #ccc;
     border-radius: 8px;
     margin-bottom: 10px;
@@ -214,12 +231,14 @@ ul {
     color: #555;
 }
 
-.form-group input {
+.form-group textarea {
+    field-sizing: content;
     padding: 0.5rem;
     border: 1px solid #000;
     border-radius: 5px;
 
     text-wrap: wrap;
+    resize: none;
 
     font-size: 1rem;
 }
@@ -286,6 +305,30 @@ ul {
     }
     background-color: #ff0000;
     color: white;
+}
+
+.registrant-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.registrant-list .registrant-name {
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: normal;
+}
+
+.registrant {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.registrant img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
 }
 
 @media (max-width: 768px) {

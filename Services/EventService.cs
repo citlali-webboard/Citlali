@@ -474,6 +474,8 @@ public class EventService(Client supabaseClient, UserService userService)
         var questionLookup = eventQuestions.ToDictionary(q => q.EventQuestionId, q => q.Question);
 
         var answerSet = new List<EventManagementAnswerCollection>();
+        var ConfirmedParticipant = new List<BriefUser>();
+        var AwaitingConfirmationParticipant = new List<BriefUser>();
 
         foreach (var registrant in registrants)
         {
@@ -487,6 +489,27 @@ public class EventService(Client supabaseClient, UserService userService)
             if (registration == null) continue;
 
             var registrationId = registration.RegistrationId;
+
+            if (registration.Status == "confirmed")
+            {
+                ConfirmedParticipant.Add(new BriefUser
+                {
+                    UserId = registrant.UserId,
+                    Username = registrant.Username,
+                    ProfileImageUrl = registrant.ProfileImageUrl,
+                    DisplayName = registrant.DisplayName
+                });
+            }
+            else if (registration.Status == "awaiting-confirmation")
+            {
+                AwaitingConfirmationParticipant.Add(new BriefUser
+                {
+                    UserId = registrant.UserId,
+                    Username = registrant.Username,
+                    ProfileImageUrl = registrant.ProfileImageUrl,
+                    DisplayName = registrant.DisplayName
+                });
+            }
             
             var answers = (await _supabaseClient
                 .From<RegistrationAnswer>()
@@ -532,7 +555,9 @@ public class EventService(Client supabaseClient, UserService userService)
             EventDate = ev.EventDate,
             PostExpiryDate = ev.PostExpiryDate,
             Questions = questionList,
-            AnswerSet = answerSet
+            AnswerSet = answerSet,
+            ConfirmedParticipant = ConfirmedParticipant, 
+            AwaitingConfirmationParticipant = AwaitingConfirmationParticipant
         };
     }
 
