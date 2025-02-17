@@ -120,11 +120,15 @@ public class EventController : Controller
     {
         try
         {
-            var events = await _eventService.GetPaginatedEvents((page - 1) * pageSize, (page * pageSize) - 1);
+            var eventsTask = _eventService.GetPaginatedEvents((page - 1) * pageSize, (page * pageSize) - 1);
+            var tagsTask = _eventService.GetTags();
+            await Task.WhenAll(eventsTask, tagsTask);
+            var events = await eventsTask;
+            var tags = (await tagsTask).ToArray();
+
             
             List<Task<EventBriefCardData>> briefCardDataTasks = events.ConvertAll(_eventService.EventToBriefCard);
             var briefCardData = await Task.WhenAll(briefCardDataTasks);
-            var tags = (await _eventService.GetTags()).ToArray();
 
             var model = new EventExploreViewModel
             {
