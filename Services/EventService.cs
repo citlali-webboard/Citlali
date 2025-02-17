@@ -202,12 +202,36 @@ public class EventService(Client supabaseClient, UserService userService)
         return questions;
     }
 
-    public async Task<EventDetailViewModel> GetEventDetail(Guid id)
+    public async Task<EventDetailViewModel> GetEventDetailPage(Guid eventId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+            return await GetEventDetail(eventId, null);
+        
+        var userId = Guid.Parse(currentUser.Id ?? "");
+
+        return await GetEventDetail(eventId, userId);
+    }
+
+
+    public async Task<EventDetailViewModel> GetEventDetail(Guid id, Guid? userId)
     {
         var citlaliEvent = await GetEventById(id) ?? throw new Exception("Event not found");
         var tag = await GetTagById(citlaliEvent.EventCategoryTagId);
         var location = await GetLocationTagById(citlaliEvent.EventLocationTagId);
         var creator = await _userService.GetUserByUserId(citlaliEvent.CreatorUserId) ?? throw new Exception("Creator not found");
+
+        bool isOwner = userId.HasValue && userId.Value == citlaliEvent.CreatorUserId;
+        bool isRegistered = userId.HasValue && await IsUserRegistered(id, userId.Value);
+
+        if (isOwner)
+        {
+            throw new JoinOwnerException(); // Redirect to "manage" page
+        }
+        if (isRegistered)
+        {
+            throw new UserAlreadyRegisteredException(); // Redirect to "status" page
+        }
 
         var eventDetailCardData = new EventDetailCardData
         {
@@ -231,12 +255,11 @@ public class EventService(Client supabaseClient, UserService userService)
             EventId = citlaliEvent.EventId
         };
 
-        var eventDetailViewModel = new EventDetailViewModel
+        return new EventDetailViewModel
         {
             EventDetailCardData = eventDetailCardData,
             EventFormDto = eventFormDto
         };
-        return eventDetailViewModel;
     }
 
     //JoinEvent
