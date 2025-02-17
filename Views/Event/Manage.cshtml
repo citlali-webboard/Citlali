@@ -23,40 +23,96 @@
     <link rel="stylesheet" href="Manage.cshtml.css" asp-append-version="true" />
 }
 
-<div class="container mt-4">
-    <partial name="_EventDetailCard" model=@eventDetailCardData />
-
-    <h3 class="mt-4">Registered Participants</h3>
-    @if (Model.AnswerSet.Any())
-    {
-        <div class="registrants-container">
-            @foreach (var participant in Model.AnswerSet)
-            {
-                var collapseId = "collapse_" + participant.User.UserId; // Unique ID for each dropdown
-                
-                <div class="registrant">
-                    <div class="registrant-header" onclick="toggleDropdown('@collapseId')">
-                        <img src="@participant.User.ProfileImageUrl" alt="Profile" class="profile-img">
-                        <span class="registrant-name">@participant.User.DisplayName (@participant.User.Username)</span>
-                        <span class="dropdown-icon">▼</span>
-                    </div>
-                    <div class="registrant-details" id="@collapseId">
-                        <p><strong>Answers:</strong></p>
-                        <ul>
-                            @foreach (var answer in participant.RegistrationAnswers)
-                            {
-                                <li><strong>@answer.Question:</strong> @answer.Answer</li>
-                            }
-                        </ul>
-                    </div>
-                </div>
-            }
+<div class="center-wrapper">
+    <div class="content">
+        <div class="event-detail">
+            <partial name="_EventDetailCard" model=@eventDetailCardData />
+            <div class="control">
+                <a class="action-button">
+                    <span>
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Archive>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                    </span>
+                    <span>
+                    Archive this event
+                    </span>
+                </a>
+                <a class="action-button danger">
+                    <span>
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                    </span>
+                    <span>
+                    Delete event
+                    </span>
+                </a>
+            </div>
         </div>
-    }
-    else
-    {
-        <p class="text-muted">No participants have registered yet.</p>
-    }
+
+        <div class="registrants">
+            <div class="registered-participants">
+                <h3>Registered Participants 🛫</h3>
+                <description>The following individuals have requested to participate in your event. Please take the time to review their responses to your questions.</description>
+                @if (Model.AnswerSet.Any())
+                {
+                    <div class="registrants-container">
+                        @foreach (var participant in Model.AnswerSet)
+                        {
+                            var collapseId = "collapse_" + participant.User.UserId; // Unique ID for each dropdown
+                            
+                            <div class="registrant">
+                                <div class="registrant-header" onclick="toggleDropdown('@collapseId')">
+                                    <img src="@participant.User.ProfileImageUrl" alt="Profile" class="profile-img">
+                                    <span class="registrant-name">
+                                        @participant.User.DisplayName (@participant.User.Username)
+                                        <span class="status-circle status-confirmed"></span>
+                                    </span>
+                                    
+                                    <span class="dropdown-icon">▼</span>
+                                </div>
+                                <div class="registrant-details" id="@collapseId">
+                                    <div class="answer-wrapper">
+                                        @foreach (var answer in participant.RegistrationAnswers)
+                                        {
+                                            <div class="form-group">
+                                                <label for="Email">@answer.Question</label>
+                                                <input class="form-control disabled-input" value="@answer.Answer" disabled />
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="button-group">
+                                        <a class="action-button approve-btn">
+                                            <span>
+                                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Add>>(RenderMode.ServerPrerendered, new { Color = Color.Success }))
+                                            </span>
+                                            <span>
+                                                Approve
+                                            </span>
+                                        </a>
+                                        <a class="action-button reject-btn">
+                                            <span>
+                                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                                            </span>
+                                            <span>
+                                                Reject
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">No participants have registered yet.</p>
+                }
+            </div>
+
+            <div class="selected-participants">
+                <h3>Invited participants (0/@Model.MaxParticipant) ✅</h3>
+                <description>These are people your have been selected and invited.</description>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
