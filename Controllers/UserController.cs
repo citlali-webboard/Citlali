@@ -150,7 +150,7 @@ public class UserController : Controller
             var eventTag = await _eventService.GetTagById(userEvent.EventCategoryTagId);
             var locationTag = await _eventService.GetLocationTagById(userEvent.EventLocationTagId);
 
-            var currentParticipant = (await _eventService.GetRegistrantsByEventId(userEvent.EventId)).Count;
+            var currentParticipant = await _eventService.GetRegistrationCountByEventId(userEvent.EventId);
 
             userEventBriefCards.Add(new EventBriefCardData
             {

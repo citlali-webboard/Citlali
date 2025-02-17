@@ -372,6 +372,18 @@ public class EventService(Client supabaseClient, UserService userService)
         return registrants;
     }
 
+    public async Task<int> GetRegistrationCountByEventId(Guid eventId)
+    {
+        var response = await _supabaseClient
+            .Rpc("count_participants", new Dictionary<string, object>
+            {
+                { "event_uuid", eventId }
+            });
+
+
+        return response.Content != null ? int.Parse(response.Content) : 0;
+    }
+
     public async Task<bool> IsUserRegistered(Guid eventId, Guid userId)
     {
         var response = await _supabaseClient

@@ -214,7 +214,7 @@ public class Registration : BaseModel
     public Guid EventId { get; set; } = new();
 
     [Column("Status")]
-    public string Status { get; set; } = "xxxx";
+    public string Status { get; set; } = "pending";
 
     [Column("CreatedAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
