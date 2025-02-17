@@ -134,6 +134,11 @@ public class EventController : Controller
             {
                 return RedirectToAction("manage", new { eventId = id });
             }
+
+            if (citlaliEvent == null || citlaliEvent.Deleted) {
+                TempData["Error"] = "Event not found or deleted";
+                return RedirectToAction("explore");
+            }
             
             EventDetailViewModel eventDetailViewModel = await _eventService.GetEventDetail(Guid.Parse(id));
 

@@ -48,6 +48,19 @@
             </div>
         </div>
 
+        <div class="questions">
+            <h3>Questions for Participants 📝</h3>
+            <description>These are the questions that participants will need to answer when they register for your event. you cannot add, edit or remove once the event is created.</description>
+            <div class="question-container">
+                <ul class="question">
+                    @foreach (var question in Model.Questions)
+                    {
+                        <li for="Email">@question.Question</li>
+                    }
+                </ul>
+            </div>
+        </div>
+
         <div class="registrants">
             <div class="registered-participants">
                 <h3>Registered Participants 🛫</h3>

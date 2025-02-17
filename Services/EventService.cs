@@ -137,6 +137,7 @@ public class EventService(Client supabaseClient, UserService userService)
         var response = await _supabaseClient
             .From<Event>()
             .Filter("CreatorUserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
+            .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
             .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
             .Get();
 
@@ -508,6 +509,13 @@ public class EventService(Client supabaseClient, UserService userService)
             });
         }
 
+        var questionList = questionLookup.Select(q => new QuestionViewModel
+            {
+                EventQuestionId = q.Key,
+                Question = q.Value,
+                Answer = ""
+            }).ToList();
+
         return new EventManagementViewModel
         {
             EventId = ev.EventId,
@@ -523,6 +531,7 @@ public class EventService(Client supabaseClient, UserService userService)
             Cost = ev.Cost,
             EventDate = ev.EventDate,
             PostExpiryDate = ev.PostExpiryDate,
+            Questions = questionList,
             AnswerSet = answerSet
         };
     }

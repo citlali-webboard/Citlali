@@ -242,6 +242,7 @@ public class RegistrationAnswer : BaseModel
 
 public class EventManagementViewModel : EventBriefCardData 
 {
+    public List<QuestionViewModel> Questions { get; set; } = [];
     public List<EventManagementAnswerCollection> AnswerSet { get; set; } = [];
 }
 
