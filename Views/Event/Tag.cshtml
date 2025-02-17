@@ -31,7 +31,7 @@
                 {
                     @if (tag.TagId == Model.TagId)
                     {
-                        <a href="/event/tag/@tag.TagId">
+                        <a href="/event/explore">
                             <span class="tag explore-tag">
                                 <span>@tag.TagEmoji</span>
                                 <span>@tag.TagName</span>
@@ -54,7 +54,7 @@
             @for (var i = 0; i < Model.EventBriefCardDatas.Length; i++)
             {
                 <div>
-                    <a href="../.."><partial name="_EventBriefCard" model=@Model.EventBriefCardDatas[i] /></a>
+                    <partial name="_EventBriefCard" model=@Model.EventBriefCardDatas[i] />
                 </div>
             }
         </div>
