@@ -1,5 +1,10 @@
 @model Citlali.Models.EventDetailViewModel;
 
+@{
+    ViewData["ogTitle"] = Model.EventDetailCardData.EventTitle + " • Citlali";
+    ViewData["ogDescription"] = Model.EventDetailCardData.EventDescription.Length > 100 ? Model.EventDetailCardData.EventDescription.Substring(0, 100) + "..." : Model.EventDetailCardData.EventDescription;
+}
+
 @section head {
     <link rel="stylesheet" href="~/css/Form.css" asp-append-version="true" />
 }

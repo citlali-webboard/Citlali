@@ -1,6 +1,17 @@
-@* @model Citlali.Models.NavModel; *@
+
 @{
-    var profileImageUrl = Context.Request.Cookies["profileImageUrl"] ?? "";
+    var accessToken = Context.Request.Cookies["accessToken"];
+    var refreshToken = Context.Request.Cookies["refreshToken"];
+    var profileImageUrl = Context.Request.Cookies["profileImageUrl"];
+
+    bool IsAuthenticated = !string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken);
+
+    if (string.IsNullOrEmpty(profileImageUrl))
+    {
+        profileImageUrl = ViewData["DefaultProfileImage"] as string;
+    }
+    var timestamp = DateTime.Now.Ticks;
+    profileImageUrl = $"{profileImageUrl}?v={timestamp}";
 }
 
 <nav>
@@ -58,22 +69,31 @@
         </li>
       </a>
 
-      <a href="/user">
-        @* Profile *@
-        <li>
-          <div class="profile-placeholder">
-            <img src=@profileImageUrl alt="">
-          </div>
+      <div class="profile-container">
+        @if (IsAuthenticated)
+        {
+          @* Profile *@
+          <li>
+            <div class="profile-placeholder">
+              <img src=@profileImageUrl alt="">
+            </div>
 
-          @* Dropdown *@
-          <div class="profile-dropdown">
-            <a href="../User/Profile" class="dropdown-item">User Profile</a>
-          </div>
-        </li>
-      </a>
-      <form asp-controller="Auth" asp-action="SignOut" method="post">
-        <button type="submit" class="dropdown-item">Sign Out</button>
-      </form>
+            @* Dropdown *@
+            <div class="profile-dropdown">
+              <a href="/user" class="dropdown-item">User Profile</a>
+              <form asp-controller="Auth" asp-action="SignOut" method="post">
+                <button type="submit" class="dropdown-item">Sign Out</button>
+              </form>
+            </div>
+          </li>
+        }
+        else
+        {
+          <li>
+            <a href="/Auth/SignIn" class="signin-btn">Sign In</a>
+          </li>
+        }
+      </div>
 
     </div>
   </ul>
