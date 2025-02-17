@@ -128,28 +128,20 @@ public class EventController : Controller
                 throw new Exception("Invalid Event id");
             }
 
-            var currentUser = _supabaseClient.Auth.CurrentUser;
-            var citlaliEvent = await _eventService.GetEventById(Guid.Parse(id));
-            if (citlaliEvent == null || citlaliEvent.Deleted) {
-                TempData["Error"] = "Event not found or deleted";
-                return RedirectToAction("explore");
-            }
-
-            if (currentUser != null && currentUser.Id != null && citlaliEvent != null && currentUser.Id == citlaliEvent.CreatorUserId.ToString())
-            {
-                return RedirectToAction("manage", new { eventId = id });
-            }
-
-            if (await _eventService.IsUserRegistered(Guid.Parse(id), Guid.Parse(currentUser.Id)))
-            {
-                return RedirectToAction("status", new { eventId = id });
-            }
-
-            
-            EventDetailViewModel eventDetailViewModel = await _eventService.GetEventDetail(Guid.Parse(id));
+            EventDetailViewModel eventDetailViewModel = await _eventService.GetEventDetailPage(Guid.Parse(id));
 
             return View(eventDetailViewModel);
-
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["Error"] = "Event not found";
+            return RedirectToAction("explore");
+        }
+        catch (JoinOwnerException) {
+            return RedirectToAction("manage", new { eventId = id });
+        }
+        catch (UserAlreadyRegisteredException) {
+            return RedirectToAction("status", new { eventId = id });
         }
         catch (Exception e)
         {
