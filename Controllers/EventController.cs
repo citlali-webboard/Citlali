@@ -16,12 +16,14 @@ public class EventController : Controller
     private readonly ILogger<EventController> _logger;
     private readonly EventService _eventService;
     private readonly UserService _userService;
+    private readonly Supabase.Client _supabaseClient;
 
-    public EventController(ILogger<EventController> logger, EventService eventService, UserService userService)
+    public EventController(ILogger<EventController> logger, EventService eventService, UserService userService, Supabase.Client supabaseClient)
     {
         _logger = logger;
         _eventService = eventService;
         _userService = userService;
+        _supabaseClient = supabaseClient;
     }
 
     [HttpGet("")]
@@ -95,7 +97,15 @@ public class EventController : Controller
                 throw new Exception("Invalid Event id");
             }
 
+            var currentUser = _supabaseClient.Auth.CurrentUser;
+            var citlaliEvent = await _eventService.GetEventById(Guid.Parse(id));
+            if (currentUser != null && currentUser.Id != null && citlaliEvent != null && currentUser.Id == citlaliEvent.CreatorUserId.ToString())
+            {
+                return RedirectToAction("manage", new { eventId = id });
+            }
+            
             EventDetailViewModel eventDetailViewModel = await _eventService.GetEventDetail(Guid.Parse(id));
+
             return View(eventDetailViewModel);
 
         }
