@@ -63,7 +63,7 @@ public class EventService(Client supabaseClient, UserService userService)
 
     public async Task<Event> CreateEvent(CreateEventViewModel createEventViewModel)
     {
-        var supabaseUser = _supabaseClient.Auth.CurrentUser;
+        var supabaseUser = _userService.CurrentSession.User;
         if (supabaseUser == null)
         {
             throw new Exception("User not authenticated");
@@ -106,7 +106,7 @@ public class EventService(Client supabaseClient, UserService userService)
 
     public async Task<bool> DeleteEvent(Guid eventId)
     {
-        var supabaseUser = _supabaseClient.Auth.CurrentUser;
+        var supabaseUser = _userService.CurrentSession.User;
         if (supabaseUser == null)
         {
             throw new UnauthorizedAccessException("User not authenticated");
@@ -204,7 +204,7 @@ public class EventService(Client supabaseClient, UserService userService)
 
     public async Task<EventDetailViewModel> GetEventDetailPage(Guid eventId)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
             return await GetEventDetail(eventId, null);
         
@@ -265,7 +265,7 @@ public class EventService(Client supabaseClient, UserService userService)
     //JoinEvent
     public async Task<Registration> JoinEvent(JoinEventModel joinEventModel)
     {
-        var supabaseUser = _supabaseClient.Auth.CurrentUser ?? throw new Exception("User not authenticated");
+        var supabaseUser = _userService.CurrentSession.User ?? throw new Exception("User not authenticated");
         Guid userId = Guid.Parse(supabaseUser.Id ?? "");
         Guid EventID = joinEventModel.EventId;
 
@@ -495,7 +495,7 @@ public class EventService(Client supabaseClient, UserService userService)
 
     public async Task<EventManagementViewModel> GetEventManagement(Guid eventId)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser 
+        var currentUser = _userService.CurrentSession.User 
                         ?? throw new UnauthorizedAccessException("User not authenticated");
 
         var user = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id))
@@ -629,7 +629,7 @@ public class EventService(Client supabaseClient, UserService userService)
 
     public async Task<EventStatusViewModel> GetEventStatus(Guid eventId)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser 
+        var currentUser = _userService.CurrentSession.User 
                         ?? throw new UnauthorizedAccessException("User not authenticated");
         var user = _userService.GetUserByUserId(Guid.Parse(currentUser.Id))
                 ?? throw new UnauthorizedAccessException("User not found");
