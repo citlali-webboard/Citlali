@@ -2,7 +2,7 @@
 
 @{
     ViewData["ogTitle"] = Model.EventDetailCardData.EventTitle + " • Citlali";
-    ViewData["ogDescription"] = Model.EventDetailCardData.EventDescription.Length > 100 ? Model.EventDetailCardData.EventDescription.Substring(0, 100) + "..." : Model.EventDetailCardData.EventDescription;
+    ViewData["ogDescription"] = Model.EventDetailCardData.EventDescription != null ? (Model.EventDetailCardData.EventDescription.Length > 100 ? Model.EventDetailCardData.EventDescription.Substring(0, 100) + "..." : Model.EventDetailCardData.EventDescription) : "";
 }
 
 @section head {

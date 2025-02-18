@@ -14,7 +14,9 @@
   ViewBag.profileImageUrl = Model.ProfileImageUrl ?? "";
 
   ViewData["ogTitle"] = Model.DisplayName + " • Citlali";
-  ViewData["ogDescription"] = Model.UserBio.Length > 100 ? Model.UserBio.Substring(0, 100) + "..." : Model.UserBio;
+
+
+  ViewData["ogDescription"] = Model.UserBio != null ? (Model.UserBio.Length > 100 ? Model.UserBio.Substring(0, 100) + "..." : Model.UserBio) : "";
   ViewData["ogImage"] = Model.ProfileImageUrl;
 }
 

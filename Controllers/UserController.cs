@@ -27,7 +27,7 @@ public class UserController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null || currentUser.Id == null)
         {
             return RedirectToAction("explore", "event");
@@ -48,7 +48,7 @@ public class UserController : Controller
     [Authorize]
     public async Task<IActionResult> Onboarding()
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
         {
             return RedirectToAction("SignIn", "Auth");
@@ -134,34 +134,11 @@ public class UserController : Controller
             return Content("User not found.");
         }
 
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
 
-        var userEvents = await _eventService.GetEventsByUserId(user.UserId);
-        var userEventBriefCards = new List<EventBriefCardData>();
-        foreach (var userEvent in userEvents)
-        {
-            var creator = await _userService.GetUserByUserId(userEvent.CreatorUserId);
-            if (creator == null)
-            {
-                continue;
-            }
-
-            var eventTag = await _eventService.GetTagById(userEvent.EventCategoryTagId);
-            var locationTag = await _eventService.GetLocationTagById(userEvent.EventLocationTagId);
-
-
-            userEventBriefCards.Add(new EventBriefCardData
-            {
-                EventId = userEvent.EventId,
-                EventTitle = userEvent.EventTitle,
-                EventDescription = userEvent.EventDescription,
-                CreatorDisplayName = creator.DisplayName,
-                CreatorProfileImageUrl = creator.ProfileImageUrl,
-                EventCategoryTag = eventTag ?? new EventCategoryTag(),
-                LocationTag = locationTag ?? new LocationTag()
-            });
-        }
+        var events = await _eventService.GetEventsByUserId(user.UserId);
+        var userEventBriefCards = (await _eventService.EventsToBriefCardArray(events)).ToList();
 
         var userViewModel = new UserViewModel
         {
