@@ -29,6 +29,7 @@ builder.Services.AddSingleton(configuration);
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<EventService>();
+builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<UtilitiesService>();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllersWithViews();

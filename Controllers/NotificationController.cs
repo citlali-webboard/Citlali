@@ -8,16 +8,35 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using System.Runtime.InteropServices.Marshalling;
 
+
 namespace Citlali.Controllers;
 
 [Route("notification")]
 public class NotificationController : Controller
 {
 
-    [HttpGet("")]
-    public IActionResult Index()
+    private readonly NotificationService _notificationService;
+
+    private readonly ILogger<EventController> _logger;
+
+    public NotificationController(NotificationService notificationService, ILogger<EventController> logger)
     {
-        return View();
+        _notificationService = notificationService;
+        _logger = logger;
+    }
+
+    [HttpGet("")]
+    public async Task<IActionResult> Index()
+    {
+        List<NotificationModel> notifications = await _notificationService.GetNotifications();
+        
+        var notificationViewModel = new NotificationViewModel
+        {
+            Notifications = notifications
+        };
+        
+
+        return View(notificationViewModel);
     }
 
     [HttpGet("detail/{id}")]
@@ -25,5 +44,5 @@ public class NotificationController : Controller
     {
         return View();
     }
-    
+
 }

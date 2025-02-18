@@ -35,7 +35,10 @@ public class Notification : BaseModel
 
 public class NotificationModel{
     public Guid NotificationId { get; set; } = new();
-    public Guid FromUserId { get; set; } = new();
+    public Guid SourceUserId { get; set; } = new();
+    public string SourceUsername { get; set; } = "";
+    public string SourceDisplayName { get; set; } = "";
+    public string SourceProfileImageUrl { get; set; } = "";
     public bool Read { get; set; } = false;
     public string Title { get; set; } = "Title";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -49,5 +52,5 @@ public class NotificationDetailModel : NotificationModel
 
 public class NotificationViewModel 
 {
-    List<NotificationModel> Notifications { get; set; } = [new(), new()];
+    public List<NotificationModel> Notifications { get; set; } = [new(), new()];
 }
