@@ -11,6 +11,7 @@ public class UserService
     private readonly Client _supabaseClient;
     private readonly Configuration _configuration;
     private readonly UtilitiesService _utilityService;
+    public Supabase.Gotrue.Session CurrentSession { get;set; } = new Supabase.Gotrue.Session();
 
     private readonly List<string> reservedUsernames = new List<string> {
         "admin",
@@ -35,7 +36,7 @@ public class UserService
     /// </returns>
     /// </summary>
     public async Task<bool> RedirectToOnboarding() {
-        var id = _supabaseClient.Auth.CurrentUser?.Id;
+        var id = CurrentSession.User?.Id;
         if (string.IsNullOrEmpty(id)) {
             return false;
         }
@@ -100,7 +101,7 @@ public class UserService
 
     public async Task<User> EditUser(UserOnboardingDto userOnboardingDto)
     {
-        var supabaseUser = _supabaseClient.Auth.CurrentUser;
+        var supabaseUser = CurrentSession.User;
         string profileImageUrl = _configuration.User.DefaultProfileImage;
 
         if (supabaseUser?.Id == null || supabaseUser?.Email == null)

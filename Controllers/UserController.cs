@@ -27,7 +27,7 @@ public class UserController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null || currentUser.Id == null)
         {
             return RedirectToAction("explore", "event");
@@ -48,7 +48,7 @@ public class UserController : Controller
     [Authorize]
     public async Task<IActionResult> Onboarding()
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
         {
             return RedirectToAction("SignIn", "Auth");
@@ -134,7 +134,7 @@ public class UserController : Controller
             return Content("User not found.");
         }
 
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
 
         var events = await _eventService.GetEventsByUserId(user.UserId);

@@ -46,7 +46,7 @@ public class AuthController : Controller
 
     public IActionResult SignIn()
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser != null)
         {
             return RedirectToAction("Index", "User");
