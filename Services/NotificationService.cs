@@ -64,4 +64,58 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         return notifications;
     }
+
+    //GetNotificationDetails
+    public async Task<NotificationDetailModel> GetNotificationDetails(Guid notificationId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            throw new Exception("User is not authenticated.");
+        }
+
+        Guid userId = Guid.Parse(currentUser.Id ?? "");
+
+        var response = await _supabaseClient
+            .From<Notification>()
+            .Select("FromUserId, ToUserId, Title, Message, CreatedAt, Url")
+            .Filter("NotificationId", Supabase.Postgrest.Constants.Operator.Equals, notificationId.ToString())
+            .Get();
+
+        if (response.Model == null)
+        {
+            throw new Exception("Failed to get notification details.");
+        }
+
+        if (userId != response.Model.ToUserId)
+        {
+            throw new Exception("User is not authorized to view notification details.");
+        }
+
+        // set notification as read
+        await _supabaseClient
+            .From<Notification>()
+            .Where(x => x.Read == false)
+            .Set(x => x.Read, true)
+            .Update();
+
+        var notification = response.Model;
+
+        var FromUser = await _userService.GetUserByUserId(notification.FromUserId) ?? new User();
+
+        var notificationDetails = new NotificationDetailModel
+        {
+            Message = notification.Message,
+            Url = notification.Url,
+            Title = notification.Title, 
+            SourceUserId = notification.FromUserId,
+            SourceUsername = FromUser.Username,
+            SourceDisplayName = FromUser.DisplayName,
+            SourceProfileImageUrl = FromUser.ProfileImageUrl,
+            Read = notification.Read,
+            CreatedAt = notification.CreatedAt
+        };
+
+        return notificationDetails;
+    }
 }

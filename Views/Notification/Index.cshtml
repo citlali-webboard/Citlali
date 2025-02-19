@@ -4,12 +4,25 @@
     ViewData["Title"] = "Notification";
 }
 
-@for (var i = 0; i < Model.Notifications.Count ; i++)
-{
-    //test display all notification
-    <div>
-        <img src="@Model.Notifications[i].SourceProfileImageUrl" alt="">
-        <h2>@Model.Notifications[i].SourceDisplayName</h2>
+<div class="container">
+    </div>
+    <div class="notification-container">
+        @for (var i = 0; i < Model.Notifications.Count; i++)
+        {
+            <div class="notification-card" data-id="@Model.Notifications[i].NotificationId">
+                <div class="notification-card-source-user">
+                    <img src="@Model.Notifications[i].SourceProfileImageUrl" alt="">
+                    <h2>@Model.Notifications[i].SourceDisplayName</h2> 
+                </div>
+                <p class="title">@Model.Notifications[i].Title</p>
+            </div>
+        }
     </div>
 
+    <div class="notification-detail">
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/Notification/notification.js"></script>
 }

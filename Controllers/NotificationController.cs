@@ -39,10 +39,34 @@ public class NotificationController : Controller
         return View(notificationViewModel);
     }
 
-    [HttpGet("detail/{id}")]
-    public IActionResult Detail(string id)
-    {
-        return View();
-    }
 
+    [HttpGet("detail/{id}")]
+    public async Task<IActionResult> GetNotificationDetails(string id)
+    {
+        try{
+
+            NotificationDetailModel notificationDetail = await _notificationService.GetNotificationDetails(Guid.Parse(id));
+
+            var dtoNotificationDetails = new  Dictionary<string, string>
+            {
+                { "id", id},
+                { "title", notificationDetail.Title },
+                { "message", notificationDetail.Message },
+                { "url", notificationDetail.Url },
+                { "createdAt", notificationDetail.CreatedAt.ToString() },
+                { "read", notificationDetail.Read.ToString() },
+                { "sourceUsername", notificationDetail.SourceUsername },
+                { "sourceDisplayName", notificationDetail.SourceDisplayName },
+                { "sourceProfileImageUrl", notificationDetail.SourceProfileImageUrl },
+            };
+
+            return Json(dtoNotificationDetails); 
+
+        }catch(Exception ex){
+            Console.WriteLine(ex.Message);
+            TempData["error"] = ex.Message;
+            return RedirectToAction("Index");
+        }
+
+    }
 }
