@@ -185,7 +185,6 @@ public class EventService(Client supabaseClient, UserService userService)
         var invitedRegistrantCount = await _supabaseClient
             .From<Registration>()
             .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
-            .Filter("UserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
             .Filter("Status", Supabase.Postgrest.Constants.Operator.In, new[] { "awaiting-confirmation", "confirmed" })
             .Count(Supabase.Postgrest.Constants.CountType.Exact);
 
