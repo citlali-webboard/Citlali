@@ -5,72 +5,142 @@
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+}
+
+.status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .status-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 10px;
+    font-size: 1.5rem;
+    font-weight: 600;
 }
 
-.status-subtitle {
-    font-size: 18px;
+.status-description {
+    font-size: 1rem;
+    text-align: center;
     color: #666;
-    margin-bottom: 20px;
+
+    text-wrap: balance;
 }
 
-.event-detail {
-    margin-top: 2rem;
+.status-symbol {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    width: 150px;
+    max-width: 80vh;
+    max-height: auto;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    margin-bottom: 2rem;
 }
 
-.status-info {
-    font-size: 16px;
-    color: #444;
+.status-symbol svg {
+    width: 50%;
+    height: 50%;
 }
 
-.request-time {
+.status-symbol.pending {
+    background-color: #f0ad4e;
+}
+
+.status-symbol.await-confirmation {
+    background-color: #5bc0de;
+}
+
+.status-symbol.confirmed {
+    background-color: #22bb33;
+}
+
+.status-symbol.rejected  {
+    background-color: #bb2124;
+}
+
+.action-button {
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem; 
+    
+    padding: 0.3rem 2rem; 
+    
+    border: 1px solid #000;
+    border-radius: 20px;
+    
+    font-size: 0.8rem;
+    text-decoration: none;
+    color: #000;
+    white-space: nowrap;
+    
     margin-top: 1rem;
-    font-weight: bold;
-    text-align: center;
-    color: #777;
 }
 
-.request-time span {
-    font-weight: normal;
-    color: #333;
+.action-button:hover {
+    cursor: pointer;
 }
 
-/* Status Messages */
-.status-message {
-    margin-top: 15px;
-    padding: 12px;
-    border-radius: 6px;
-    font-weight: bold;
-    text-align: center;
+.action-button.confirm-button {
+    fill: #22bb33 !important;
+    color: #22bb33;
+    border-color: #22bb33;
 }
 
-/* Status-Specific Styles */
-.status-message.pending {
-    background: #ffefa0;
-    color: #8a6d3b;
-    border: 1px solid #d2a63e;
+.action-button.confirm-button:hover {
+    background-color: #22bb33;
+    color: white;
+    fill: white !important;
 }
 
-.status-message.awaiting-confirmation {
-    background: #d0ebff;
-    color: #004085;
-    border: 1px solid #6cb2eb;
+.action-button.cancel-button {
+    fill: #bb2124 !important;
+    color: #bb2124;
+    border-color: #bb2124;
 }
 
-.status-message.rejected {
-    background: #ffbdbd;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+.action-button.cancel-button:hover {
+    background-color: #bb2124;
+    color: white;
+    fill: white !important;
 }
 
-.status-message.confirmed {
-    background: #c3fdb8;
-    color: #155724;
-    border: 1px solid #7bc47f;
+#back-button {
+    align-self: self-start;
 }
+
+.action-button.back-button {
+    margin: 0;
+    fill: #000 !important;
+    color: #000;
+    border-color: #000;
+}
+
+.action-button.back-button:hover {
+    background-color: #000;
+    color: white;
+    fill: white !important;
+}
+
+.event-wrapper {
+    width: 90%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.join-time {
+    font-size: 0.8rem;
+    color: #666;
+}
+
