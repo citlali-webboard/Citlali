@@ -263,6 +263,7 @@ ul {
     background-color: #00cc00;
 }
 
+.status-circle.status-rejected-invitation,
 .status-circle.status-rejected {
     background-color: #ff0000;
 }

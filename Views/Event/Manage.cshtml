@@ -115,6 +115,7 @@
                                                 "awaiting-confirmation" => "status-await-confirmation",
                                                 "rejected" => "status-rejected",
                                                 "confirmed" => "status-confirmed",
+                                                "rejected-invitation" => "status-rejected-invitation",
                                                 _ => "status-pending"
                                             };
                                         }
@@ -145,7 +146,7 @@
                                                         @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Add>>(RenderMode.ServerPrerendered, new { Color = Color.Success }))
                                                     </span>
                                                     <span>
-                                                        Approve
+                                                        Invite
                                                     </span>
                                                 </button>
                                             </form>
