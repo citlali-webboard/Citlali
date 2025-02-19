@@ -767,6 +767,28 @@ public class EventService(Client supabaseClient, UserService userService)
         
     }
 
+    //CancelRegistration
+    public async Task<bool> CancelRegistration(Guid eventId)
+    {
+        var supabaseUser = _userService.CurrentSession.User 
+                        ?? throw new UnauthorizedAccessException("User not authenticated");
+        var userId = Guid.Parse(supabaseUser.Id);
+
+        var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
+                ?? throw new KeyNotFoundException("Registration not found");
+
+        if (registration.Status == "confirmed") // if user has been confirmed
+            throw new Exception("Cannot cancel registration after confirmation");
+        
+        await _supabaseClient
+            .From<Registration>()
+            .Where(row => row.RegistrationId == registration.RegistrationId)  
+            .Set(row => row.Status, "rejected-invitation")
+            .Update();
+
+        return true;
+    }
+
 }
 
 public class UserAlreadyRegisteredException : Exception

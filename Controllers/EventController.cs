@@ -447,7 +447,28 @@ public class EventController : Controller
         }
         catch (UnauthorizedAccessException)
         {
-            TempData["Error"] = "You are not authorized to rejects users to this event";
+            TempData["Error"] = "You are not authorized to rejects users to this event"; 
+            return RedirectToAction("explore");
+        }
+    }
+
+    [HttpPost("CancelRegistration")]
+    [Authorize]
+    public async Task<IActionResult> CancelRegistration(string eventId)
+    {
+        try
+        {
+            if (!Guid.TryParse(eventId, out _))
+            {
+                throw new Exception("Invalid Event id");
+            }
+
+            await _eventService.CancelRegistration(Guid.Parse(eventId));
+            return RedirectToAction("status", new { eventId = eventId });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "You are not authorized to cancel this registration";
             return RedirectToAction("explore");
         }
         catch (KeyNotFoundException)
