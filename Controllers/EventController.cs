@@ -464,7 +464,7 @@ public class EventController : Controller
             }
 
             await _eventService.CancelRegistration(Guid.Parse(eventId));
-            return RedirectToAction("status", new { eventId = eventId });
+            return RedirectToAction("detail", new { id = eventId });
         }
         catch (UnauthorizedAccessException)
         {

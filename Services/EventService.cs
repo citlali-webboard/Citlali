@@ -783,8 +783,7 @@ public class EventService(Client supabaseClient, UserService userService)
         await _supabaseClient
             .From<Registration>()
             .Where(row => row.RegistrationId == registration.RegistrationId)  
-            .Set(row => row.Status, "rejected-invitation")
-            .Update();
+            .Delete();
 
         return true;
     }
