@@ -62,26 +62,35 @@
         </div>
         <h1 class="status-title">@statusTitle</h1>
         <p class="status-description">@statusDescription</p>
-        @if (eventStatus == "await-confirmation")
-        {
-            <form asp-action="Confirm" asp-controller="Event" method="post">
-                <input type="hidden" name="eventId" value="@Model.EventDetailCardData.EventId" />
-                <button type="submit" class="action-button confirm-button">
-                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Checkmark>>(RenderMode.ServerPrerendered, new { Color = Color.Success }))
-                    Confirm Invitation
-                </button>
-            </form>
-        }
-        @if (eventStatus == "pending")
-        {
-            <form asp-action="Cancel" asp-controller="Event" method="post" onsubmit="return confirm('Are you sure you want to cancel your request?');">
-                <input type="hidden" name="eventId" value="@Model.EventDetailCardData.EventId" />
-                <button type="submit" class="action-button cancel-button">
-                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.CalendarCancel>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
-                    Cancel Request
-                </button>
-            </form>
-        }
+        <div class="button-group">
+            @if (eventStatus == "await-confirmation")
+            {
+                <form asp-action="Cancel" asp-controller="Event" method="post" onsubmit="return confirm('Are you sure to reject-btn this invitation?');">
+                    <input type="hidden" name="eventId" value="@Model.EventDetailCardData.EventId" />
+                    <button type="submit" class="action-button cancel-button">
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.CalendarCancel>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                        Reject Invitation
+                    </button>
+                </form>
+                <form asp-action="Confirm" asp-controller="Event" method="post">
+                    <input type="hidden" name="eventId" value="@Model.EventDetailCardData.EventId" />
+                    <button type="submit" class="action-button confirm-button">
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Checkmark>>(RenderMode.ServerPrerendered, new { Color = Color.Success }))
+                        Confirm Invitation
+                    </button>
+                </form>
+            }
+            @if (eventStatus == "pending")
+            {
+                <form asp-action="Cancel" asp-controller="Event" method="post" onsubmit="return confirm('Are you sure you want to cancel your request?');">
+                    <input type="hidden" name="eventId" value="@Model.EventDetailCardData.EventId" />
+                    <button type="submit" class="action-button cancel-button">
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.CalendarCancel>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                        Cancel Request
+                    </button>
+                </form>
+            }
+        </div>
     </div>
     <div class="event-wrapper">
         <partial name="_EventDetailCard" model=@Model.EventDetailCardData />

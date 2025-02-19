@@ -144,3 +144,8 @@
     color: #666;
 }
 
+.button-group {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
