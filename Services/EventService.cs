@@ -182,9 +182,20 @@ public class EventService(Client supabaseClient, UserService userService)
             throw new UnauthorizedAccessException("User not authorized to invite to this event");
         }
 
+        var invitedRegistrantCount = await _supabaseClient
+            .From<Registration>()
+            .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
+            .Filter("UserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
+            .Filter("Status", Supabase.Postgrest.Constants.Operator.In, new[] { "awaiting-confirmation", "confirmed" })
+            .Count(Supabase.Postgrest.Constants.CountType.Exact);
+
         var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
             ?? throw new KeyNotFoundException("Registration not found");
 
+        if (invitedRegistrantCount >= eventToInvite.MaxParticipant)
+        {
+            throw new MaximumInvitationExceedException();
+        }
 
         await _supabaseClient
             .From<Registration>()
@@ -785,5 +796,15 @@ public class JoinOwnerException : Exception
     public JoinOwnerException(string message) : base(message) { }
 
     public JoinOwnerException(string message, Exception innerException) 
+        : base(message, innerException) { }
+}
+
+public class MaximumInvitationExceedException : Exception
+{
+    public MaximumInvitationExceedException() : base("Maximum invitation has been exceeded.") { }
+
+    public MaximumInvitationExceedException(string message) : base(message) { }
+
+    public MaximumInvitationExceedException(string message, Exception innerException) 
         : base(message, innerException) { }
 }

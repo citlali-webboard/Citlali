@@ -426,6 +426,10 @@ public class EventController : Controller
             TempData["Error"] = "Event not found";
             return RedirectToAction("explore");
         }
+        catch (MaximumInvitationExceedException) {
+            TempData["Error"] = "Maximum invitation exceed";
+            return RedirectToAction("manage", new { eventId = eventId });
+        }
         catch (Exception e)
         {
             TempData["Error"] = e.Message;
