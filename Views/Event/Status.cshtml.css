@@ -53,7 +53,7 @@
     background-color: #f0ad4e;
 }
 
-.status-symbol.await-confirmation {
+.status-symbol.awaiting-confirmation {
     background-color: #5bc0de;
 }
 
@@ -61,6 +61,7 @@
     background-color: #22bb33;
 }
 
+.status-symbol.rejected-invitation, 
 .status-symbol.rejected  {
     background-color: #bb2124;
 }

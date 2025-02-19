@@ -22,6 +22,7 @@
 
     var confirmedParticipantCount = Model.ConfirmedParticipant.Count;
     var awaitingConfirmationParticipantCount = Model.AwaitingConfirmationParticipant.Count;
+    var rejectedConfirmationParticipantCount = Model.RejectedConfirmationParticipant.Count;
     var totalInvitedParticipant = confirmedParticipantCount + awaitingConfirmationParticipantCount;
 }
 
@@ -134,24 +135,34 @@
                                             </div>
                                         }
                                     </div>
-                                    <div class="button-group">
-                                        <a class="action-button approve-btn">
-                                            <span>
-                                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Add>>(RenderMode.ServerPrerendered, new { Color = Color.Success }))
-                                            </span>
-                                            <span>
-                                                Approve
-                                            </span>
-                                        </a>
-                                        <a class="action-button reject-btn">
-                                            <span>
-                                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
-                                            </span>
-                                            <span>
-                                                Reject
-                                            </span>
-                                        </a>
-                                    </div>
+                                    @if (participant.Status == "pending") {
+                                        <div class="button-group">
+                                            <form asp-action="Invite" asp-controller="Event" asp-route-eventId="@Model.EventId" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="userId" value="@participant.User.UserId" />
+                                                <button class="action-button approve-btn" type="submit">
+                                                    <span>
+                                                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Add>>(RenderMode.ServerPrerendered, new { Color = Color.Success }))
+                                                    </span>
+                                                    <span>
+                                                        Approve
+                                                    </span>
+                                                </button>
+                                            </form>
+                                            <form asp-action="Reject" asp-controller="Event" asp-route-eventId="@Model.EventId" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="userId" value="@participant.User.UserId" />
+                                                <button type="submit" class="action-button reject-btn">
+                                                    <span>
+                                                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                                                    </span>
+                                                    <span>
+                                                        Reject
+                                                    </span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         }
@@ -195,6 +206,23 @@
                                     <img src="@awaitingParticipant.ProfileImageUrl" alt="Profile" class="profile-img">
                                     <span class="registrant-name">
                                         <strong>@awaitingParticipant.DisplayName</strong> (@awaitingParticipant.Username)
+                                    </span>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                <div>
+                <div class="rejected-invitation">
+                    <h4>❌ Rejected (@rejectedConfirmationParticipantCount)</h4>
+                    <hr>
+                    <div class="registrant-list">
+                        @foreach (var rejectedParticipant in Model.RejectedConfirmationParticipant)
+                        {
+                            <a href="/user/@rejectedParticipant.Username" target="_blank">
+                                <div class="registrant">
+                                    <img src="@rejectedParticipant.ProfileImageUrl" alt="Profile" class="profile-img">
+                                    <span class="registrant-name">
+                                        <strong>@rejectedParticipant.DisplayName</strong> (@rejectedParticipant.Username)
                                     </span>
                                 </div>
                             </a>

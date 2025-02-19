@@ -250,6 +250,7 @@ public class EventManagementViewModel : EventBriefCardData
     public List<EventManagementAnswerCollection> AnswerSet { get; set; } = [];
     public List<BriefUser> ConfirmedParticipant { get; set; } = [];
     public List<BriefUser> AwaitingConfirmationParticipant { get; set; } = [];
+    public List<BriefUser> RejectedConfirmationParticipant { get; set; } = [];
     public string EventStatus { get; set; } = "";
 }
 

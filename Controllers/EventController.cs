@@ -408,6 +408,56 @@ public class EventController : Controller
         }
     }
 
+    [HttpPost("invite/{eventId}")]
+    [Authorize]
+    public async Task<IActionResult> Invite(string eventId, string userId)
+    {
+        try {
+            await _eventService.InviteUser(Guid.Parse(eventId), Guid.Parse(userId));
+            return RedirectToAction("manage", new { eventId = eventId });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "You are not authorized to invite users to this event";
+            return RedirectToAction("explore");
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["Error"] = "Event not found";
+            return RedirectToAction("explore");
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
+    }
+
+    [HttpPost("reject/{eventId}")]
+    [Authorize]
+    public async Task<IActionResult> Reject(string eventId, string userId)
+    {
+        try {
+            await _eventService.RejectUser(Guid.Parse(eventId), Guid.Parse(userId));
+            return RedirectToAction("manage", new { eventId = eventId });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "You are not authorized to rejects users to this event";
+            return RedirectToAction("explore");
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["Error"] = "Event not found";
+            return RedirectToAction("explore");
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

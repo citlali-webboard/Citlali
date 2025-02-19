@@ -160,7 +160,8 @@ ul {
 }
 
 .confirmed-participants,
-.await-confirmation {
+.await-confirmation,
+.rejected-invitation {
     display: flex;
     flex-direction: column;
     margin-top: 2rem;
