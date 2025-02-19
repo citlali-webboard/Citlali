@@ -43,6 +43,9 @@ public class Event : BaseModel
 
     [Column("Deleted")]
     public bool Deleted { get; set; } = false;
+
+    [Column("Status")]
+    public string Status { get; set; } = "active";
 }
 
 [Table("EVENT_QUESTION")]
@@ -247,6 +250,7 @@ public class EventManagementViewModel : EventBriefCardData
     public List<EventManagementAnswerCollection> AnswerSet { get; set; } = [];
     public List<BriefUser> ConfirmedParticipant { get; set; } = [];
     public List<BriefUser> AwaitingConfirmationParticipant { get; set; } = [];
+    public string EventStatus { get; set; } = "";
 }
 
 public class RegistrationAnswerSimplify

@@ -117,6 +117,99 @@ public class EventController : Controller
         }
     }
 
+    [HttpPost("archive/{eventId}")]
+    [Authorize]
+    public async Task<IActionResult> ArchiveEvent(string eventId)
+    {
+        try
+        {
+            if (!Guid.TryParse(eventId, out _))
+            {
+                throw new Exception("Invalid Event id");
+            }
+
+            await _eventService.ArchiveEvent(Guid.Parse(eventId));
+            return RedirectToAction("explore");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "You are not authorized to archive this event";
+            return RedirectToAction("explore");
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["Error"] = "Event not found";
+            return RedirectToAction("explore");
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
+    }
+
+    [HttpPost("/status/open/{eventId}")]
+    [Authorize]
+    public async Task<IActionResult> OpenEvent(string eventId)
+    {
+        try
+        {
+            if (!Guid.TryParse(eventId, out _))
+            {
+                throw new Exception("Invalid Event id");
+            }
+
+            await _eventService.OpenEvent(Guid.Parse(eventId));
+            return RedirectToAction("manage", new { eventId = eventId });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "You are not authorized to manage this event";
+            return RedirectToAction("explore");
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["Error"] = "Event not found";
+            return RedirectToAction("explore");
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
+    }
+
+    [HttpPost("/status/close/{eventId}")]
+    [Authorize]
+    public async Task<IActionResult> CloseEvent(string eventId)
+    {
+        try
+        {
+            if (!Guid.TryParse(eventId, out _))
+            {
+                throw new Exception("Invalid Event id");
+            }
+
+            await _eventService.CloseEvent(Guid.Parse(eventId));
+            return RedirectToAction("manage", new { eventId = eventId });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "You are not authorized to manage this event";
+            return RedirectToAction("explore");
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["Error"] = "Event not found";
+            return RedirectToAction("explore");
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
+    }
+
 
     [HttpGet("detail/{id}")]
     public async Task<IActionResult> Detail(string id)

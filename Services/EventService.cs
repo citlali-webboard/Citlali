@@ -132,6 +132,43 @@ public class EventService(Client supabaseClient, UserService userService)
         return true;
     }
 
+    public async Task<bool> SetEventStatus(Guid eventId, string status) 
+    {
+        var supabaseUser = _userService.CurrentSession.User
+            ?? throw new UnauthorizedAccessException("User not authenticated");
+
+        var eventToArchive = await GetEventById(eventId)
+            ?? throw new KeyNotFoundException("Event not found");
+
+        if (eventToArchive.CreatorUserId.ToString() != supabaseUser.Id)
+        {
+            throw new UnauthorizedAccessException("User not authorized to archive this event");
+        }
+
+        await _supabaseClient
+            .From<Event>()
+            .Where(row => row.EventId == eventId)
+            .Set(row => row.Status, status)
+            .Update();
+
+        return true;
+    }
+
+    public async Task<bool> ArchiveEvent(Guid eventId)
+    {
+        return await SetEventStatus(eventId, "archived");
+    }
+
+    public async Task<bool> OpenEvent(Guid eventId)
+    {
+        return await SetEventStatus(eventId, "active");
+    }
+
+    public async Task<bool> CloseEvent(Guid eventId)
+    {
+        return await SetEventStatus(eventId, "closed");
+    }
+
     public async Task<List<Event>> GetEventsByUserId(Guid userId)
     {
         var response = await _supabaseClient
@@ -609,6 +646,7 @@ public class EventService(Client supabaseClient, UserService userService)
             Cost = ev.Cost,
             EventDate = ev.EventDate,
             PostExpiryDate = ev.PostExpiryDate,
+            EventStatus = ev.Status,
             Questions = questionList,
             AnswerSet = answerSet,
             ConfirmedParticipant = ConfirmedParticipant, 

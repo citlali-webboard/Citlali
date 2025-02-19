@@ -331,6 +331,28 @@ ul {
     border-radius: 50%;
 }
 
+.event-status {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+}
+
+.status-circle {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.status-circle.active {
+    background-color: #00cc00;
+}
+
+.status-circle.closed {
+    background-color: #333;
+}
+
 @media (max-width: 768px) {
     .registrants {
         display: flex;
