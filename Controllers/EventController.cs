@@ -483,6 +483,74 @@ public class EventController : Controller
         }
     }
 
+    //RejectedInvitation
+    [HttpPost("RejectedInvitation")]
+    [Authorize]
+    public async Task<IActionResult> RejectedInvitation(string eventId)
+    {
+        try
+        {
+            if (!Guid.TryParse(eventId, out _))
+            {
+                throw new Exception("Invalid Event id");
+            }
+
+            await _eventService.RejectedInvitation(Guid.Parse(eventId));
+            return RedirectToAction("status", new { eventId = eventId });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "You are not authorized to reject this invitation";
+            return RedirectToAction("explore");
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["Error"] = "Event not found";
+            return RedirectToAction("explore");
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
+    }
+
+
+    //Confirmed
+    [HttpPost("Confirmed")]
+    [Authorize]
+    public async Task<IActionResult> Confirmed(string eventId)
+    {
+        try
+        {
+            if (!Guid.TryParse(eventId, out _))
+            {
+                throw new Exception("Invalid Event id");
+            }
+
+            await _eventService.ConfirmRegistration(Guid.Parse(eventId));
+            return RedirectToAction("status", new { eventId = eventId });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "You are not authorized to confirm this invitation";
+            return RedirectToAction("explore");
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["Error"] = "Event not found";
+            return RedirectToAction("explore");
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
+    }
+
+
+
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

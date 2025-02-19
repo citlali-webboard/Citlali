@@ -785,9 +785,54 @@ public class EventService(Client supabaseClient, UserService userService)
             .Where(row => row.RegistrationId == registration.RegistrationId)  
             .Delete();
 
+
         return true;
     }
 
+    //RejectedInvitation
+    public async Task<bool> RejectedInvitation(Guid eventId)
+    {
+        var supabaseUser = _userService.CurrentSession.User 
+                        ?? throw new UnauthorizedAccessException("User not authenticated");
+        var userId = Guid.Parse(supabaseUser.Id);
+
+        var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
+                ?? throw new KeyNotFoundException("Registration not found");
+
+        if (registration.Status != "awaiting-confirmation") // if user has been confirmed
+            throw new Exception("You cannot reject this invitation");
+        
+        await _supabaseClient
+            .From<Registration>()
+            .Where(row => row.RegistrationId == registration.RegistrationId)  
+            .Set(row => row.Status, "rejected-invitation")
+            .Update();
+
+
+        return true;
+    }
+
+    //ConfirmRegistration
+    public async Task<bool> ConfirmRegistration(Guid eventId)
+    {
+        var supabaseUser = _userService.CurrentSession.User 
+                        ?? throw new UnauthorizedAccessException("User not authenticated");
+        var userId = Guid.Parse(supabaseUser.Id);
+
+        var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
+                ?? throw new KeyNotFoundException("Registration not found");
+
+        if (registration.Status != "awaiting-confirmation") 
+            throw new Exception("You cannot confirm this registration");
+        
+        await _supabaseClient
+            .From<Registration>()
+            .Where(row => row.RegistrationId == registration.RegistrationId)  
+            .Set(row => row.Status, "confirmed")
+            .Update();
+
+        return true;
+    }
 }
 
 public class UserAlreadyRegisteredException : Exception
