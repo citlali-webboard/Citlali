@@ -355,6 +355,14 @@ ul {
     background-color: #333;
 }
 
+.visit-profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+    margin-bottom: 1rem;
+}
+
 @media (max-width: 768px) {
     .registrants {
         display: flex;

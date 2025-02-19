@@ -127,6 +127,10 @@
                                     </span>
                                 </div>
                                 <div class="registrant-details" id="@collapseId">
+                                    <a href="/user/@participant.User.Username" class="action-button visit-profile-btn" target="_blank">
+                                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Open>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+                                        Visit Profile
+                                    </a>
                                     <div class="answer-wrapper">
                                         @foreach (var answer in participant.RegistrationAnswers)
                                         {
