@@ -717,6 +717,7 @@ public class EventService(Client supabaseClient, UserService userService)
             EventDate = ev.EventDate,
             PostExpiryDate = ev.PostExpiryDate,
             EventStatus = ev.Status,
+            CreatedAt = ev.CreatedAt,
             Questions = questionList,
             AnswerSet = answerSet,
             ConfirmedParticipant = ConfirmedParticipant,
