@@ -108,3 +108,67 @@
 a {
   display: block;
 }
+
+@media screen and (max-width: 768px) {
+  .card {
+    padding: 0.5rem;
+  }
+
+  .header-data {
+    margin-bottom: 0.5rem;
+  }
+
+  .creator img {
+    height: 1.5rem;
+  }
+
+  .creator span {
+    font-size: 0.7rem;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .created-time {
+    font-size: 0.6rem;
+  }
+
+  .location {
+    font-size: 0.6rem;
+  }
+
+  .participant img {
+    height: 1.5rem;
+  }
+
+  .participant span {
+    font-size: 0.7rem;
+  }
+
+  .card-title {
+    gap: 0.5rem;
+  }
+
+  .tag {
+    font-size: 0.6rem;
+    padding: 2px 4px;
+  }
+
+  .event-title {
+    font-size: 1.2rem;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .description {
+    max-width: 80%;
+    font-size: 0.6rem;
+  }
+  
+}

@@ -337,6 +337,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             throw new UserAlreadyRegisteredException(); // Redirect to "status" page
         }
 
+        var currentParticipant = await GetRegistrationCountByEventId(citlaliEvent.EventId);
+
         var eventDetailCardData = new EventDetailCardData
         {
             EventId = citlaliEvent.EventId,
@@ -344,6 +346,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             EventDescription = citlaliEvent.EventDescription,
             EventCategoryTag = tag ?? new(),
             LocationTag = location ?? new(),
+            CurrentParticipant = currentParticipant,
             MaxParticipant = citlaliEvent.MaxParticipant,
             Cost = citlaliEvent.Cost,
             EventDate = citlaliEvent.EventDate,

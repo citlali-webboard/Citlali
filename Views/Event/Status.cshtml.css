@@ -150,3 +150,33 @@
     flex-direction: row;
     gap: 1rem;
 }
+
+@media screen and (max-width: 768px) {
+    .status-page {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        width: 100%;
+        height: 100%;
+    }
+
+    .status-symbol {
+        width: 100px;
+    }
+
+    .status-title {
+        font-size: 1.2rem;
+    }
+
+    .status-description {
+        font-size: 0.8rem;
+    }
+
+    .action-button {
+        padding: 0.3rem 1rem;
+        font-size: 0.7rem;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+}
