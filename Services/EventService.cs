@@ -204,7 +204,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.Status, "awaiting-confirmation")
             .Update();
 
-        await _notificationService.CreateNotification(Guid.Parse(supabaseUser.Id), "Congratulation 🎉", "You have been invited to an event", $"/event/status/{eventId}");
+        await _notificationService.CreateNotification(userId, "Congratulation 🎉", "You have been invited to an event", $"/event/status/{eventId}");
 
         return true;
     }
