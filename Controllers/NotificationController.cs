@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using System.Runtime.InteropServices.Marshalling;
+using System.Net.WebSockets;
 
 
 namespace Citlali.Controllers;
@@ -30,16 +31,32 @@ public class NotificationController : Controller
     public async Task<IActionResult> Index()
     {
         List<NotificationModel> notifications = await _notificationService.GetNotifications();
-        
+
         var notificationViewModel = new NotificationViewModel
         {
             Notifications = notifications
         };
-        
+
 
         return View(notificationViewModel);
     }
-    
+
+    [HttpGet("realtime")]
+    // [Authorize]
+    public async Task Realtime()
+    {
+        if (HttpContext.WebSockets.IsWebSocketRequest)
+        {
+            using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+            var token = HttpContext.Request.Cookies;
+            await _notificationService.Realtime(webSocket);
+        }
+        else
+        {
+            HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+        }
+    }
+
     [HttpGet("detail/{id}")]
     [Authorize]
     public async Task<IActionResult> GetNotificationDetails(string id)
@@ -66,13 +83,12 @@ public class NotificationController : Controller
                 { "sourceProfileImageUrl", notificationDetail.SourceProfileImageUrl },
             };
 
-            return Json(dtoNotificationDetails); 
+            return Json(dtoNotificationDetails);
 
         }catch(Exception ex){
             Console.WriteLine(ex.Message);
             TempData["error"] = ex.Message;
             return RedirectToAction("Index");
         }
-
     }
 }

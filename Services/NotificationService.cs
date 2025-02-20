@@ -2,6 +2,8 @@ using Supabase;
 using Citlali.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using System.Net.WebSockets;
+using System.Text;
 
 // using Supabase.Gotrue;
 
@@ -107,7 +109,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
         {
             Message = notification.Message,
             Url = notification.Url,
-            Title = notification.Title, 
+            Title = notification.Title,
             SourceUserId = notification.FromUserId,
             SourceUsername = FromUser.Username,
             SourceDisplayName = FromUser.DisplayName,
@@ -125,7 +127,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
          var supabaseUser = _userService.CurrentSession.User
             ?? throw new UnauthorizedAccessException("User not authenticated");
-        
+
         var fromUserId = Guid.Parse(supabaseUser.Id ?? "");
 
         if (fromUserId == Guid.Empty || toUserId == Guid.Empty)
@@ -156,5 +158,23 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
 
         return true;
+    }
+
+    public async Task Realtime(WebSocket webSocket) {
+        var buffer = new byte[1024 * 4];
+        WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+
+        // Save the first message as a token
+        var token = Encoding.UTF8.GetString(buffer, 0, result.Count);
+        Console.WriteLine($"Token received: {token}");
+
+        while (!result.CloseStatus.HasValue)
+        {
+            var serverMsg = Encoding.UTF8.GetBytes($"Server: {Encoding.UTF8.GetString(buffer, 0, result.Count)}");
+            await webSocket.SendAsync(new ArraySegment<byte>(serverMsg, 0, serverMsg.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
+
+            result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+        }
+        await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
     }
 }
