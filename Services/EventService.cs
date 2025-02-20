@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Citlali.Services;
 
-public class EventService(Client supabaseClient, UserService userService, Notification notification)
+public class EventService(Client supabaseClient, UserService userService, NotificationService notificationService)
 {
     private readonly Client _supabaseClient = supabaseClient;
     private readonly UserService _userService = userService;
 
-    private readonly Notification _notificationService = notification;
+    private readonly NotificationService _notificationService = notificationService;
     // CreateEvent 
 
     public async Task<List<Tag>> GetTags()

@@ -20,12 +20,13 @@ public class EventController : Controller
     private readonly Supabase.Client _supabaseClient;
 
 
-    public EventController(ILogger<EventController> logger, EventService eventService, UserService userService, Supabase.Client supabaseClient)
+    public EventController(ILogger<EventController> logger, EventService eventService, UserService userService, Supabase.Client supabaseClient, NotificationService notificationService)
     {
         _logger = logger;
         _eventService = eventService;
         _userService = userService;
         _supabaseClient = supabaseClient;
+        _notificationService = notificationService;
     }
 
     [HttpGet("")]
