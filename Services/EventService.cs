@@ -129,6 +129,104 @@ public class EventService(Client supabaseClient, UserService userService)
         return true;
     }
 
+    public async Task<bool> SetEventStatus(Guid eventId, string status)
+    {
+        var supabaseUser = _userService.CurrentSession.User
+            ?? throw new UnauthorizedAccessException("User not authenticated");
+
+        var eventToArchive = await GetEventById(eventId)
+            ?? throw new KeyNotFoundException("Event not found");
+
+        if (eventToArchive.CreatorUserId.ToString() != supabaseUser.Id)
+        {
+            throw new UnauthorizedAccessException("User not authorized to archive this event");
+        }
+
+        await _supabaseClient
+            .From<Event>()
+            .Where(row => row.EventId == eventId)
+            .Set(row => row.Status, status)
+            .Update();
+
+        return true;
+    }
+
+    public async Task<bool> ArchiveEvent(Guid eventId)
+    {
+        return await SetEventStatus(eventId, "archived");
+    }
+
+    public async Task<bool> OpenEvent(Guid eventId)
+    {
+        return await SetEventStatus(eventId, "active");
+    }
+
+    public async Task<bool> CloseEvent(Guid eventId)
+    {
+        return await SetEventStatus(eventId, "closed");
+    }
+
+    public async Task<bool> InviteUser(Guid eventId, Guid userId)
+    {
+        var supabaseUser = _userService.CurrentSession.User
+            ?? throw new UnauthorizedAccessException("User not authenticated");
+
+        var eventToInvite = await GetEventById(eventId)
+            ?? throw new KeyNotFoundException("Event not found");
+
+        if (eventToInvite.CreatorUserId.ToString() != supabaseUser.Id)
+        {
+            throw new UnauthorizedAccessException("User not authorized to invite to this event");
+        }
+
+        var invitedRegistrantCount = await _supabaseClient
+            .From<Registration>()
+            .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
+            .Filter("Status", Supabase.Postgrest.Constants.Operator.In, new[] { "awaiting-confirmation", "confirmed" })
+            .Count(Supabase.Postgrest.Constants.CountType.Exact);
+
+        var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
+            ?? throw new KeyNotFoundException("Registration not found");
+
+        if (invitedRegistrantCount >= eventToInvite.MaxParticipant)
+        {
+            throw new MaximumInvitationExceedException();
+        }
+
+        await _supabaseClient
+            .From<Registration>()
+            .Where(row => row.RegistrationId == registration.RegistrationId)
+            .Set(row => row.Status, "awaiting-confirmation")
+            .Update();
+
+        return true;
+    }
+
+    public async Task<bool> RejectUser(Guid eventId, Guid userId)
+    {
+        var supabaseUser = _userService.CurrentSession.User
+            ?? throw new UnauthorizedAccessException("User not authenticated");
+
+        var eventToInvite = await GetEventById(eventId)
+            ?? throw new KeyNotFoundException("Event not found");
+
+        if (eventToInvite.CreatorUserId.ToString() != supabaseUser.Id)
+        {
+            throw new UnauthorizedAccessException("User not authorized to reject to this event");
+        }
+
+        var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
+            ?? throw new KeyNotFoundException("Registration not found");
+
+        await _supabaseClient
+            .From<Registration>()
+            .Where(row => row.RegistrationId == registration.RegistrationId)
+            .Set(row => row.Status, "rejected")
+            .Update();
+
+        return true;
+    }
+
     public async Task<List<Event>> GetEventsByUserId(Guid userId)
     {
         var response = await _supabaseClient
@@ -391,21 +489,22 @@ public class EventService(Client supabaseClient, UserService userService)
         var currentParticipant = await GetRegistrationCountByEventId(citlaliEvent.EventId);
 
         return new EventDetailCardData
-        {
-            EventId = citlaliEvent.EventId,
-            EventTitle = citlaliEvent.EventTitle,
-            EventDescription = citlaliEvent.EventDescription,
-            CreatorDisplayName = creator.DisplayName,
-            CreatorProfileImageUrl = creator.ProfileImageUrl,
-            LocationTag = locationTag,
-            EventCategoryTag = categoryTag,
-            CurrentParticipant = currentParticipant,
-            MaxParticipant = citlaliEvent.MaxParticipant,
-            Cost = citlaliEvent.Cost,
-            EventDate = citlaliEvent.EventDate,
-            PostExpiryDate = citlaliEvent.PostExpiryDate,
-            CreatedAt = citlaliEvent.CreatedAt,
-        };
+            {
+                EventId = citlaliEvent.EventId,
+                EventTitle = citlaliEvent.EventTitle,
+                EventDescription = citlaliEvent.EventDescription,
+                CreatorUsername = creator.Username,
+                CreatorDisplayName = creator.DisplayName,
+                CreatorProfileImageUrl = creator.ProfileImageUrl,
+                LocationTag = locationTag,
+                EventCategoryTag = categoryTag,
+                CurrentParticipant = currentParticipant,
+                MaxParticipant = citlaliEvent.MaxParticipant,
+                Cost = citlaliEvent.Cost,
+                EventDate = citlaliEvent.EventDate,
+                PostExpiryDate = citlaliEvent.PostExpiryDate,
+                CreatedAt = citlaliEvent.CreatedAt,
+            };
     }
 
     public async Task<EventBriefCardData[]> EventsToBriefCardArray(List<Event> citlaliEvents)
@@ -535,6 +634,7 @@ public class EventService(Client supabaseClient, UserService userService)
         var answerSet = new List<EventManagementAnswerCollection>();
         var ConfirmedParticipant = new List<BriefUser>();
         var AwaitingConfirmationParticipant = new List<BriefUser>();
+        var RejectedConfirmationParticipant = new List<BriefUser>();
 
         foreach (var registrant in registrants)
         {
@@ -613,6 +713,7 @@ public class EventService(Client supabaseClient, UserService userService)
             Cost = ev.Cost,
             EventDate = ev.EventDate,
             PostExpiryDate = ev.PostExpiryDate,
+            EventStatus = ev.Status,
             Questions = questionList,
             AnswerSet = answerSet,
             ConfirmedParticipant = ConfirmedParticipant,
@@ -658,6 +759,72 @@ public class EventService(Client supabaseClient, UserService userService)
 
     }
 
+    //CancelRegistration
+    public async Task<bool> CancelRegistration(Guid eventId)
+    {
+        var supabaseUser = _userService.CurrentSession.User
+                        ?? throw new UnauthorizedAccessException("User not authenticated");
+        var userId = Guid.Parse(supabaseUser.Id);
+
+        var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
+                ?? throw new KeyNotFoundException("Registration not found");
+
+        if (registration.Status == "confirmed") // if user has been confirmed
+            throw new Exception("Cannot cancel registration after confirmation");
+
+        await _supabaseClient
+            .From<Registration>()
+            .Where(row => row.RegistrationId == registration.RegistrationId)
+            .Delete();
+
+
+        return true;
+    }
+
+    //RejectedInvitation
+    public async Task<bool> RejectedInvitation(Guid eventId)
+    {
+        var supabaseUser = _userService.CurrentSession.User
+                        ?? throw new UnauthorizedAccessException("User not authenticated");
+        var userId = Guid.Parse(supabaseUser.Id);
+
+        var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
+                ?? throw new KeyNotFoundException("Registration not found");
+
+        if (registration.Status != "awaiting-confirmation") // if user has been confirmed
+            throw new Exception("You cannot reject this invitation");
+
+        await _supabaseClient
+            .From<Registration>()
+            .Where(row => row.RegistrationId == registration.RegistrationId)
+            .Set(row => row.Status, "rejected-invitation")
+            .Update();
+
+
+        return true;
+    }
+
+    //ConfirmRegistration
+    public async Task<bool> ConfirmRegistration(Guid eventId)
+    {
+        var supabaseUser = _userService.CurrentSession.User
+                        ?? throw new UnauthorizedAccessException("User not authenticated");
+        var userId = Guid.Parse(supabaseUser.Id);
+
+        var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
+                ?? throw new KeyNotFoundException("Registration not found");
+
+        if (registration.Status != "awaiting-confirmation")
+            throw new Exception("You cannot confirm this registration");
+
+        await _supabaseClient
+            .From<Registration>()
+            .Where(row => row.RegistrationId == registration.RegistrationId)
+            .Set(row => row.Status, "confirmed")
+            .Update();
+
+        return true;
+    }
 }
 
 public class UserAlreadyRegisteredException : Exception
@@ -687,5 +854,15 @@ public class JoinOwnerException : Exception
     public JoinOwnerException(string message) : base(message) { }
 
     public JoinOwnerException(string message, Exception innerException)
+        : base(message, innerException) { }
+}
+
+public class MaximumInvitationExceedException : Exception
+{
+    public MaximumInvitationExceedException() : base("Maximum invitation has been exceeded.") { }
+
+    public MaximumInvitationExceedException(string message) : base(message) { }
+
+    public MaximumInvitationExceedException(string message, Exception innerException)
         : base(message, innerException) { }
 }
