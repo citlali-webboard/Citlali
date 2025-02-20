@@ -203,7 +203,9 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "awaiting-confirmation")
             .Update();
-            
+
+        await _notificationService.CreateNotification(Guid.Parse(supabaseUser.Id), "Congratulation 🎉", "You have been invited to an event", $"/event/status/{eventId}");
+
         return true;
     }
 
@@ -228,6 +230,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "rejected")
             .Update();
+
+        await _notificationService.CreateNotification(userId, "Sorry 😢", "Your invitation has been rejected", $"/event/status/{eventId}");
 
         return true;
     }

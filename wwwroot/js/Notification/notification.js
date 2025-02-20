@@ -28,8 +28,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.querySelector("#content-body").innerHTML = data.message;
                     document.querySelector("#source-name").innerHTML = `${data.sourceDisplayName}(${data.sourceUsername})`
                     document.querySelector("#create-at").href = data.createdAt;
-                    let source_img = document.querySelector("#source-img");
-                    source_img.src = data.sourceProfileImageUrl; 
+                    let source_img = document.querySelectorAll("#source-img");
+                    console.log(data.sourceProfileImageUrl);
+                    source_img[0].setAttribute('src', data.sourceProfileImageUrl);
+                    console.log(source_img[0]); 
 
                     //set the card as read and cannot hover
                     card.classList.add("read");
@@ -39,6 +41,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     
                     //set default-notification hidden
                     document.querySelector("#default-notification").classList.add("hidden");
+
+
+                    //set iframe src
+                    // document.querySelector("#iframe").src = ; 
                 }
             }
             xmlhttp.send();

@@ -416,7 +416,6 @@ public class EventController : Controller
     public async Task<IActionResult> Invite(string eventId, string userId)
     {
         try {
-            await _notificationService.CreateNotification(Guid.Parse(userId), "Congratulation 🎉", "You have been invited to an event", $"/event/status/{eventId}");
             await _eventService.InviteUser(Guid.Parse(eventId), Guid.Parse(userId));
             
             return RedirectToAction("manage", new { eventId = eventId });

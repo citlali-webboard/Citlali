@@ -27,7 +27,7 @@ public class Notification : BaseModel
     public string Message { get; set; } = "Message";
 
     [Column("Url")]
-    public string Url { get; set; } = ""; // Url able to be null or ""
+    public string Url { get; set; } = "test"; // Url able to be null or ""
 
     [Column("CreatedAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

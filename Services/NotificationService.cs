@@ -16,7 +16,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
     //GetNotifications
     public async Task<List<NotificationModel>> GetNotifications()
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
         {
             throw new Exception("User is not authenticated.");
@@ -123,7 +123,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
     public async Task<bool> CreateNotification(Guid toUserId, string title, string message, string url)
     {
 
-        var supabaseUser = _userService.CurrentSession.User
+         var supabaseUser = _userService.CurrentSession.User
             ?? throw new UnauthorizedAccessException("User not authenticated");
         
         var fromUserId = Guid.Parse(supabaseUser.Id ?? "");
