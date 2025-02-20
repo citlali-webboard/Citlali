@@ -356,6 +356,11 @@ public class EventController : Controller
     {
         try
         {
+            if (!Guid.TryParse(eventId, out _))
+            {
+                throw new Exception("Invalid Event id");
+            }
+
             var eventManagementViewModel = await _eventService.GetEventManagement(Guid.Parse(eventId));
             return View(eventManagementViewModel);
         }
