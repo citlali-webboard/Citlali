@@ -371,6 +371,11 @@ public class EventService(Client supabaseClient, UserService userService)
         var supabaseUser = _userService.CurrentSession.User ?? throw new Exception("User not authenticated");
         Guid userId = Guid.Parse(supabaseUser.Id ?? throw new Exception("User ID not found"));
         Guid EventId = joinEventModel.EventId;
+        var citlaliEvent = await GetEventById(EventId);
+
+        if (citlaliEvent.Status == "closed")
+            throw new EventClosedException();
+
         var eventQuestionsTask = _supabaseClient
             .From<EventQuestion>()
             .Where(x => x.EventId == joinEventModel.EventId)
@@ -874,5 +879,15 @@ public class MaximumInvitationExceedException : Exception
     public MaximumInvitationExceedException(string message) : base(message) { }
 
     public MaximumInvitationExceedException(string message, Exception innerException)
+        : base(message, innerException) { }
+}
+
+public class EventClosedException : Exception
+{
+    public EventClosedException() : base("Event have been closed.") { }
+
+    public EventClosedException(string message) : base(message) { }
+
+    public EventClosedException(string message, Exception innerException)
         : base(message, innerException) { }
 }

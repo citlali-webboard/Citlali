@@ -247,8 +247,14 @@ public class EventController : Controller
     [Authorize]
     public async Task<IActionResult> JoinEvent(JoinEventModel joinEventModel)
     {
-        var RequestJoinEvent = await _eventService.JoinEvent(joinEventModel);
-        return RedirectToAction("status", new { eventId = joinEventModel.EventId });
+        try {
+            var RequestJoinEvent = await _eventService.JoinEvent(joinEventModel);
+            return RedirectToAction("status", new { eventId = joinEventModel.EventId });
+        }
+        catch (EventClosedException) {
+            return RedirectToAction("detail", new { eventId = joinEventModel.EventId });
+
+        }
     }
 
 
