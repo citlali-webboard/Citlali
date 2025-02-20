@@ -318,6 +318,7 @@ public class EventService(Client supabaseClient, UserService userService)
 
         bool isOwner = userId.HasValue && userId.Value == citlaliEvent.CreatorUserId;
         bool isRegistered = userId.HasValue && await IsUserRegistered(id, userId.Value);
+        bool isClosed = citlaliEvent.Status == "closed";
 
         if (isOwner)
         {
@@ -327,6 +328,8 @@ public class EventService(Client supabaseClient, UserService userService)
         {
             throw new UserAlreadyRegisteredException(); // Redirect to "status" page
         }
+        if (isRegistered && isClosed) 
+            throw new UserAlreadyRegisteredException();
 
         var currentParticipant = await GetRegistrationCountByEventId(citlaliEvent.EventId);
 
@@ -355,6 +358,8 @@ public class EventService(Client supabaseClient, UserService userService)
 
         return new EventDetailViewModel
         {
+            IsClosed = isClosed,
+            IsUserRegistered = isRegistered,
             EventDetailCardData = eventDetailCardData,
             EventFormDto = eventFormDto
         };
