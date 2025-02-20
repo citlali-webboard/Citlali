@@ -4,22 +4,62 @@
     ViewData["Title"] = "Notification";
 }
 
+@section head {
+    <link rel="stylesheet" href="~/css/notification.css" asp-append-version="true" />
+}
+
 <div class="container">
-    </div>
     <div class="notification-container">
         @for (var i = 0; i < Model.Notifications.Count; i++)
         {
-            <div class="notification-card" data-id="@Model.Notifications[i].NotificationId">
-                <div class="notification-card-source-user">
-                    <img src="@Model.Notifications[i].SourceProfileImageUrl" alt="">
-                    <h2>@Model.Notifications[i].SourceDisplayName</h2> 
+            @if(Model.Notifications[i].Read){
+                <div class="notification-card read" data-id="@Model.Notifications[i].NotificationId">
+                    <div class="notification-card-source-user">
+                        <img src="@Model.Notifications[i].SourceProfileImageUrl" alt="">
+                        <div>
+                            <div id="title">@Model.Notifications[i].Title</div>
+                            <div id="display-name">@Model.Notifications[i].SourceDisplayName</div> 
+                        </div>
+                    </div>
+                    <div class="notification-time"> 1 day ago </div>
                 </div>
-                <p class="title">@Model.Notifications[i].Title</p>
-            </div>
+            }
+            else{
+                <div class="notification-card" data-id="@Model.Notifications[i].NotificationId">
+                    <div class="notification-card-source-user">
+                        <img src="@Model.Notifications[i].SourceProfileImageUrl" alt="">
+                        <div>
+                            <div id="title">@Model.Notifications[i].Title</div>
+                            <div id="display-name">@Model.Notifications[i].SourceDisplayName</div> 
+                        </div>
+                    </div>
+                    <div class="notification-time"> 1 day ago </div>
+                </div>
+            }
         }
     </div>
 
-    <div class="notification-detail">
+    <div id="default-notification" class="default-notification">
+        <div class="default-notification-text">Click on notification to check messages !
+
+ </div>
+    </div>
+
+    <div id="notification-detail" class="notification-detail hidden">
+        <div class="header">
+            <div id="source-img" class="source-img"> <img src="@Model.Notifications[0].SourceProfileImageUrl" alt="SourceProfileImage"></div>
+            @* show displayname(username) *@
+            <div class="source-info">
+                <div id="source-name" class="source-name"> Displayname(username)</div>
+                <div id="create-at" class="create-at">@Model.Notifications[0].CreatedAt </div>
+            </div>
+                
+        </div>
+        <hr>
+        <div class="content">
+            <div id="content-title" class="content-title"> Title</div>
+            <div id="content-body" class="content-body"> Body</div>
+        </div>
     </div>
 </div>
 

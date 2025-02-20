@@ -1,0 +1,145 @@
+.notification-card img{
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+}
+
+.container{
+    width: 80vw;
+    height: 70vh;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    margin-top: 3rem;
+    gap: 2rem;
+}
+
+.notification-container{
+    width: 30%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+    height: 100%;
+}
+.notification-card{
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+    padding: 8px 12px 8px 12px;  
+    border-radius: 8px;
+
+}
+
+.notification-card:hover{
+    cursor: pointer;
+    background-color: #e7e7e7;
+}
+
+.notification-card-source-user{
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+}
+
+#title{
+    justify-self: flex-end;
+    font-weight: bold;
+    opacity: 0.8;
+}
+
+#display-name{
+    opacity: 0.5;
+}
+
+.notification-detail{
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    width: 40%;
+    height: 100%;
+}
+
+.default-notification{
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    width: 40%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.notification-detail .header{
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    margin: 8px 10px 8px 10px;
+}
+.notification-detail .header .source-img img{
+    height: 75px;
+    width: 75px;
+    border-radius: 50%;
+}
+
+.notification-detail .header .source-info{
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    justify-content: center;
+    align-items: center;
+}
+
+.notification-detail .header .source-info .source-name{
+    font-size: 1rem;
+    margin-left: 1rem;
+    align-self: center;
+    opacity: 1;
+} 
+
+.notification-detail .header .source-info .create-at{
+    font-size: 0.7rem;
+    margin-left: 1rem;
+    align-self: center;
+    opacity: 0.6;
+}
+
+.notification-detail .content{
+    margin: 10px 15px 10px 15px;
+    padding: 5px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: start;
+    align-items: center;
+}
+
+.notification-detail .content .content-title{
+    font-size: 1.3rem;
+    font-weight: bold;
+    opacity: 1;
+}
+
+.notification-detail .content .content-body{
+    font-size: 1rem;
+    opacity: 0.8;
+    align-self: flex-start;
+}
+
+
+.read{
+    background-color: #d2d1d1;
+}
+
+.read:hover{
+    background-color: #d2d1d1;
+}
+
+
+.hidden{
+    display: none;
+}
