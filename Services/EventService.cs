@@ -10,7 +10,6 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 {
     private readonly Client _supabaseClient = supabaseClient;
     private readonly UserService _userService = userService;
-
     private readonly NotificationService _notificationService = notificationService;
     // CreateEvent 
 
@@ -204,7 +203,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.Status, "awaiting-confirmation")
             .Update();
 
-        await _notificationService.CreateNotification(userId, "Congratulation 🎉", "You have been invited to an event", $"/event/status/{eventId}");
+        await _notificationService.CreateNotification(userId, "Congratulation 🎉", "You have been invited to an event", $"/event/detail/{eventId}");
 
         return true;
     }
@@ -231,7 +230,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.Status, "rejected")
             .Update();
 
-        await _notificationService.CreateNotification(userId, "Sorry 😢", "Your invitation has been rejected", $"/event/status/{eventId}");
+        await _notificationService.CreateNotification(userId, "Sorry 😢", "Your invitation has been rejected", $"/event/detail/{eventId}");
 
         return true;
     }
@@ -412,6 +411,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                 .From<RegistrationAnswer>()
                 .Insert(newRegistrationAnswers);
         }
+
+        await _notificationService.CreateNotification(newRegistration.UserId, "Congratulation 🎉", "You have successfully registered to an event", $"/event/detail/{EventID}");
 
         return newRegistration;
     }
