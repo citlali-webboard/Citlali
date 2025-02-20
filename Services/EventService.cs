@@ -638,6 +638,7 @@ public class EventService(Client supabaseClient, UserService userService)
         var ConfirmedParticipant = new List<BriefUser>();
         var AwaitingConfirmationParticipant = new List<BriefUser>();
         var RejectedConfirmationParticipant = new List<BriefUser>();
+        var currentParticipantCount = await GetRegistrationCountByEventId(ev.EventId);
 
         foreach (var registrant in registrants)
         {
@@ -711,7 +712,7 @@ public class EventService(Client supabaseClient, UserService userService)
             CreatorProfileImageUrl = user.ProfileImageUrl,
             LocationTag = locationTag,
             EventCategoryTag = eventCategoryTag,
-            CurrentParticipant = registrants.Count,
+            CurrentParticipant = currentParticipantCount,
             MaxParticipant = ev.MaxParticipant,
             Cost = ev.Cost,
             EventDate = ev.EventDate,
