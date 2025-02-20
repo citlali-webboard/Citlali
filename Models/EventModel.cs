@@ -123,7 +123,7 @@ public class QuestionViewModel
 {
     public Guid EventQuestionId { get; set; }
     public string Question { get; set; } = "";
-    [Required(ErrorMessage = "This field is required")]
+    // [Required(ErrorMessage = "This field is required")]
 
     public string Answer { get; set; } = "";
 }
