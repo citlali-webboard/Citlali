@@ -407,12 +407,10 @@ public class EventService(Client supabaseClient, UserService userService)
                 Answer = question.Answer
             });
 
-        if (newRegistrationAnswers.Count > 0) {
             await _supabaseClient
                 .From<RegistrationAnswer>()
                 .Insert(newRegistrationAnswers);
         }
-
         return newRegistration;
     }
 
