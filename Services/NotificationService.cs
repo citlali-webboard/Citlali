@@ -118,4 +118,43 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         return notificationDetails;
     }
+
+    //Create Notification with title and message
+    public async Task<bool> CreateNotification(Guid toUserId, string title, string message, string url)
+    {
+
+        var supabaseUser = _userService.CurrentSession.User
+            ?? throw new UnauthorizedAccessException("User not authenticated");
+        
+        var fromUserId = Guid.Parse(supabaseUser.Id ?? "");
+
+        if (fromUserId == Guid.Empty || toUserId == Guid.Empty)
+        {
+            throw new Exception("Invalid user id.");
+        }
+
+        if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(message))
+        {
+            throw new Exception("Title and message are required.");
+        }
+
+        var notification = new Notification
+        {
+            NotificationId = Guid.NewGuid(),
+            FromUserId = fromUserId,
+            ToUserId = toUserId,
+            Title = title,
+            Message = message,
+            Url = url,
+            CreatedAt = DateTime.UtcNow,
+            Read = false
+        };
+
+        await _supabaseClient
+            .From<Notification>()
+            .Insert(notification);
+
+
+        return true;
+    }
 }

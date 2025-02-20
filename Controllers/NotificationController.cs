@@ -26,6 +26,7 @@ public class NotificationController : Controller
     }
 
     [HttpGet("")]
+    [Authorize]
     public async Task<IActionResult> Index()
     {
         List<NotificationModel> notifications = await _notificationService.GetNotifications();
@@ -38,12 +39,18 @@ public class NotificationController : Controller
 
         return View(notificationViewModel);
     }
-
-
+    
     [HttpGet("detail/{id}")]
+    [Authorize]
     public async Task<IActionResult> GetNotificationDetails(string id)
     {
         try{
+
+           if (!Guid.TryParse(id, out _))
+            {
+                throw new Exception("Invalid notification id.");
+            }
+
 
             NotificationDetailModel notificationDetail = await _notificationService.GetNotificationDetails(Guid.Parse(id));
 
@@ -52,7 +59,6 @@ public class NotificationController : Controller
                 { "id", id},
                 { "title", notificationDetail.Title },
                 { "message", notificationDetail.Message },
-                { "url", notificationDetail.Url },
                 { "createdAt", notificationDetail.CreatedAt.ToString() },
                 { "read", notificationDetail.Read.ToString() },
                 { "sourceUsername", notificationDetail.SourceUsername },

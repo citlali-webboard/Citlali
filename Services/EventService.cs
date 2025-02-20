@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Citlali.Services;
 
-public class EventService(Client supabaseClient, UserService userService)
+public class EventService(Client supabaseClient, UserService userService, Notification notification)
 {
     private readonly Client _supabaseClient = supabaseClient;
     private readonly UserService _userService = userService;
+
+    private readonly Notification _notificationService = notification;
     // CreateEvent 
 
     public async Task<List<Tag>> GetTags()
@@ -201,7 +203,7 @@ public class EventService(Client supabaseClient, UserService userService)
             .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "awaiting-confirmation")
             .Update();
-
+            
         return true;
     }
 

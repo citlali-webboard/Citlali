@@ -16,7 +16,9 @@ public class EventController : Controller
     private readonly ILogger<EventController> _logger;
     private readonly EventService _eventService;
     private readonly UserService _userService;
+    private readonly NotificationService _notificationService;
     private readonly Supabase.Client _supabaseClient;
+
 
     public EventController(ILogger<EventController> logger, EventService eventService, UserService userService, Supabase.Client supabaseClient)
     {
@@ -413,7 +415,9 @@ public class EventController : Controller
     public async Task<IActionResult> Invite(string eventId, string userId)
     {
         try {
+            await _notificationService.CreateNotification(Guid.Parse(userId), "Congratulation 🎉", "You have been invited to an event", $"/event/status/{eventId}");
             await _eventService.InviteUser(Guid.Parse(eventId), Guid.Parse(userId));
+            
             return RedirectToAction("manage", new { eventId = eventId });
         }
         catch (UnauthorizedAccessException)
