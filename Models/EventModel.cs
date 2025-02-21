@@ -43,6 +43,9 @@ public class Event : BaseModel
 
     [Column("Deleted")]
     public bool Deleted { get; set; } = false;
+
+    [Column("Status")]
+    public string Status { get; set; } = "active";
 }
 
 [Table("EVENT_QUESTION")]
@@ -100,12 +103,14 @@ public class EventDetailCardData : EventBriefCardData
 public class EventFormDto
 {
     public Guid EventId { get; set; } = new();
+    public bool IsClosed { get; set; } = false;
     public List<QuestionViewModel> Questions { get; set; } = [];
 }
 
 public class EventDetailViewModel
 {
     public bool IsUserRegistered { get; set; } = false;
+    public bool IsClosed { get; set; } = true;
     public EventDetailCardData EventDetailCardData { get; set; } = new();
     public EventFormDto EventFormDto { get; set; } = new();
 }
@@ -120,7 +125,7 @@ public class QuestionViewModel
 {
     public Guid EventQuestionId { get; set; }
     public string Question { get; set; } = "";
-    [Required(ErrorMessage = "This field is required")]
+    // [Required(ErrorMessage = "This field is required")]
 
     public string Answer { get; set; } = "";
 }
@@ -247,6 +252,8 @@ public class EventManagementViewModel : EventBriefCardData
     public List<EventManagementAnswerCollection> AnswerSet { get; set; } = [];
     public List<BriefUser> ConfirmedParticipant { get; set; } = [];
     public List<BriefUser> AwaitingConfirmationParticipant { get; set; } = [];
+    public List<BriefUser> RejectedConfirmationParticipant { get; set; } = [];
+    public string EventStatus { get; set; } = "";
 }
 
 public class RegistrationAnswerSimplify
