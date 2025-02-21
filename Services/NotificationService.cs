@@ -162,19 +162,28 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
     public async Task Realtime(WebSocket webSocket) {
         var buffer = new byte[1024 * 4];
-        WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
 
-        // Save the first message as a token
-        var token = Encoding.UTF8.GetString(buffer, 0, result.Count);
-        Console.WriteLine($"Token received: {token}");
-
-        while (!result.CloseStatus.HasValue)
+        try
         {
-            var serverMsg = Encoding.UTF8.GetBytes($"Server: {Encoding.UTF8.GetString(buffer, 0, result.Count)}");
-            await webSocket.SendAsync(new ArraySegment<byte>(serverMsg, 0, serverMsg.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
+            WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            var tokens = Encoding.UTF8.GetString(buffer, 0, result.Count).Split(";", 2);
 
-            result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            _userService.CurrentSession = await _supabaseClient.Auth.SetSession(tokens[0], tokens[1]);
+            var emailMessage = Encoding.UTF8.GetBytes($"User email: {_userService.CurrentSession.User?.Email}");
+            await webSocket.SendAsync(new ArraySegment<byte>(emailMessage), WebSocketMessageType.Text, true, CancellationToken.None);
+
+            while (_userService.CurrentSession.User != null)
+            {
+                var serverMsg = Encoding.UTF8.GetBytes($"Server: {Encoding.UTF8.GetString(buffer, 0, result.Count)}");
+                await webSocket.SendAsync(new ArraySegment<byte>(serverMsg, 0, serverMsg.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
+
+                result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            }
+            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
         }
-        await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+        catch (Exception)
+        {
+            throw;
+        }
     }
 }
