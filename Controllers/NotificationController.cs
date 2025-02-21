@@ -41,7 +41,7 @@ public class NotificationController : Controller
         return View(notificationViewModel);
     }
 
-    [HttpGet("realtime")]
+    [Route("realtime")]
     // [Authorize]
     public async Task Realtime()
     {
