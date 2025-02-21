@@ -33,6 +33,12 @@
 
 <div class="center-wrapper">
     <div class="content">
+
+        <div class="broadcast-popup">
+            
+        </div>
+
+
         <div class="event-detail">
             <partial name="_EventDetailCard" model=@eventDetailCardData />
             <div class="control">
@@ -193,7 +199,17 @@
                 <h3>Invited participants (@totalInvitedParticipant/@Model.MaxParticipant) 💌</h3>
                 <description>These are people your have been selected and invited.</description>
                 <div class="confirmed-participants">
-                    <h4>✅ Confirmed (@confirmedParticipantCount)</h4>
+                    <div class="confirm-text-header">
+                        <h4>✅ Confirmed (@confirmedParticipantCount)</h4>
+                        <button onclick="openBroadcastPopup()" class="action-button">
+                            <span>
+                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                            </span> 
+                            <span>
+                                Broadcast
+                            </span>
+                        </button>
+                    </div>
                     <hr>
                     <div class="registrant-list">
                         @foreach (var confirmedParticipant in Model.ConfirmedParticipant)
@@ -252,5 +268,10 @@
     function toggleDropdown(id) {
         var element = document.getElementById(id);
         element.style.display = (element.style.display === "block") ? "none" : "block";
+    }
+
+    function openBroadcastPopup() {
+        var popup = document.querySelector('.broadcast-popup');
+        popup.style.display = 'block';
     }
 </script>

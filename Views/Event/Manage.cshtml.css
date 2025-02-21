@@ -363,6 +363,16 @@ ul {
     margin-bottom: 1rem;
 }
 
+.confirm-text-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.broadcast-popup {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .registrants {
         display: flex;
