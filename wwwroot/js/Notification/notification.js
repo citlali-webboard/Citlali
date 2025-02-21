@@ -1,55 +1,153 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // Select all notification cards
+var isMobile = window.matchMedia("(max-width: 768px)").matches; // Check if the screen is less than 768px
+
+window.matchMedia("(max-width: 768px)").addEventListener("change", function (e) {
+    if (e.matches) { // e.matches is true if the media query is true (less than 768px)
+        console.log("less than 768px");
+        isMobile = true;
+        setting_mobile();
+    } else {
+        console.log("more than 768px");
+        isMobile = false;
+        setting_desktop();
+    }
+});
+
+
+function setting_desktop() {
     var notificationCards = document.querySelectorAll(".notification-card");
 
-    console.log(notificationCards);
-    
-    // Add click event listener to each card
     notificationCards.forEach(function (card) {
-        card.addEventListener("click", function () {
-            let  CardId = card.getAttribute("data-id");
-            console.log(CardId);
+        // Clear any previous event listener
+        card.removeEventListener("click", handleDesktopClick);
+        card.removeEventListener("click", handleMobileClick);
 
-            // Create new XMLHttpRequest object
-            let xmlhttp = new XMLHttpRequest();
+        // set container-detail-mobile to hidden 
+        card.nextSibling.classList.add("hidden");
 
-            //self + notification/detail/ + CardId
-            let URL = window.location.href + "/detail/" + CardId;
-            console.log(URL);
-            xmlhttp.open("GET", URL , true);
+        //set default notification 
+        document.querySelector("#notification-detail").classList.add("hidden");
+        document.querySelector("#default-notification").classList.remove("hidden");
 
-            xmlhttp.onreadystatechange = function () {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) { // readyState 4 means the operation is complete and status 200 means the request is successful
-                    console.log(xmlhttp.responseText);
-                    let data = JSON.parse(xmlhttp.responseText);
-                    console.log(data);
-
-                    // set details 
-                    document.querySelector("#content-title").innerHTML = data.title;
-                    document.querySelector("#content-body").innerHTML = data.message;
-                    document.querySelector("#source-name").innerHTML = `${data.sourceDisplayName}(${data.sourceUsername})`
-                    document.querySelector("#create-at").href = data.createdAt;
-                    let source_img = document.querySelectorAll("#source-img");
-                    console.log(data.sourceProfileImageUrl);
-                    source_img[0].setAttribute('src', data.sourceProfileImageUrl);
-                    console.log(source_img[0]); 
-
-                    //set the card as read and cannot hover
-                    card.classList.add("read");
-
-                    //remove hidden from detail 
-                    document.querySelector("#notification-detail").classList.remove("hidden");
-                    
-                    //set default-notification hidden
-                    document.querySelector("#default-notification").classList.add("hidden");
-
-
-                    //set iframe src
-                    // document.querySelector("#iframe").src = ; 
-                }
-            }
-            xmlhttp.send();
-
-        });
+        // Add click event listener to each card
+        card.addEventListener("click", handleDesktopClick);
     });
-});
+}
+
+function handleDesktopClick() {
+    let Card = this;
+    let CardId = Card.getAttribute("data-id");
+    console.log(CardId);
+
+    // Create new XMLHttpRequest object
+    let xmlhttp = new XMLHttpRequest();
+    let URL = window.location.href + "/detail/" + CardId;
+    console.log(URL);
+    xmlhttp.open("GET", URL, true);
+
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            console.log(xmlhttp.responseText);
+            var data = JSON.parse(xmlhttp.responseText);
+            console.log(data);
+
+            // Set details
+            document.querySelector("#content-title").innerHTML = data.title;
+            document.querySelector("#content-body").innerHTML = data.message;
+            document.querySelector("#source-name").innerHTML = `${data.sourceDisplayName}(${data.sourceUsername})`;
+            document.querySelector("#create-at").href = data.createdAt;
+
+            let source_img = document.querySelector("#source-img");
+
+            source_img.src = data.sourceProfileImageUrl;
+
+            // Mark the card as read and disable hover
+            Card.classList.add("read");
+
+            // Show details and hide default notification
+            document.querySelector("#notification-detail").classList.remove("hidden");
+            document.querySelector("#default-notification").classList.add("hidden");
+        }
+    };
+    xmlhttp.send();
+}
+
+function setting_mobile() {
+
+    var notificationCards = document.querySelectorAll(".notification-card");
+
+    notificationCards.forEach(function (card) {
+        // Remove any previous event listener
+        card.removeEventListener("click", handleDesktopClick);
+        card.removeEventListener("click", handleMobileClick);
+
+        card.addEventListener("click", handleMobileClick);
+    });
+}
+
+function handleMobileClick() {
+    console.log("mobile");
+
+    let Card = this;
+    let CardId = Card.getAttribute("data-id");
+    console.log(CardId);
+
+    // Create new XMLHttpRequest object
+    let xmlhttp = new XMLHttpRequest();
+    let URL = window.location.href + "/detail/" + CardId;
+    xmlhttp.open("GET", URL, true);
+
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            var data = JSON.parse(xmlhttp.responseText);
+            console.log(data);
+        }
+
+        let url = window.location.href;
+        let root_url = url.split("/Notification")[0];
+        let preview_url = root_url + data.url;
+        console.log(preview_url);
+
+        //if the card is not contain the name "clicked"
+        if (Card.getAttribute("name") != "clicked") {
+            Card.setAttribute("name", "clicked");
+            // create new div below the card
+            let container_detail_mobile = document.createElement("div");
+            container_detail_mobile.classList.add("container-detail-mobile");
+
+            let title_detail_mobile = document.createElement("div");
+            title_detail_mobile.innerHTML = data.title;
+            title_detail_mobile.classList.add("title-detail-mobile");
+
+            let message_detail_mobile = document.createElement("div");
+            message_detail_mobile.innerHTML = data.message;
+            message_detail_mobile.classList.add("message-detail-mobile");
+
+            let preview_url_detail_mobile = document.createElement("a");
+            preview_url_detail_mobile.innerHTML = "Preview";
+            preview_url_detail_mobile.href = preview_url;
+            preview_url_detail_mobile.classList.add("preview-url-detail-mobile");
+
+            container_detail_mobile.appendChild(title_detail_mobile);
+            container_detail_mobile.appendChild(message_detail_mobile);
+            container_detail_mobile.appendChild(preview_url_detail_mobile);
+
+
+
+            Card.after(container_detail_mobile);
+
+        }
+        else{
+            // hidden the div below the card
+            console.log("hidden");
+            Card.nextElementSibling.classList.toggle("hidden");
+        }
+    };
+    xmlhttp.send();
+}
+
+
+if (isMobile) {
+    setting_mobile();
+} else {
+    setting_desktop();
+}
