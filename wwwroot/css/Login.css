@@ -75,6 +75,12 @@ h2 {
     color: #333333;
 }
 
+h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #333333;
+}
+
 .form-group {
     display: flex;
     width: 100%;
