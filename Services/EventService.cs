@@ -64,13 +64,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
     public async Task<Event> CreateEvent(CreateEventViewModel createEventViewModel)
     {
-        var supabaseUser = _userService.CurrentSession.User;
-        if (supabaseUser == null)
-        {
-            throw new Exception("User not authenticated");
-        }
-
-        Guid userId = Guid.Parse(supabaseUser.Id ?? "");
+        var supabaseUser = _userService.CurrentSession.User ?? throw new Exception("User not authenticated");
+        Guid userId = Guid.Parse(supabaseUser.Id ?? throw new Exception("User ID not found"));
 
         Guid eventId = Guid.NewGuid();
         var modelEvent = new Event
@@ -86,21 +81,23 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             EventDate = createEventViewModel.EventDate,
             PostExpiryDate = createEventViewModel.PostExpiryDate,
         };
-
-        List<EventQuestion> eventQuestions = createEventViewModel.Questions.ConvertAll(question => new EventQuestion
-        {
-            EventQuestionId = Guid.NewGuid(),
-            EventId = eventId,
-            Question = question,
-        });
-
         await _supabaseClient
             .From<Event>()
             .Insert(modelEvent);
 
-        await _supabaseClient
-            .From<EventQuestion>()
-            .Insert(eventQuestions);
+        if (createEventViewModel.Questions.Count > 0)
+        {
+            List<EventQuestion> eventQuestions = createEventViewModel.Questions.ConvertAll(question => new EventQuestion
+            {
+                EventQuestionId = Guid.NewGuid(),
+                EventId = eventId,
+                Question = question,
+            });
+
+            await _supabaseClient
+                .From<EventQuestion>()
+                .Insert(eventQuestions);
+        }
 
         return modelEvent;
     }
@@ -133,7 +130,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return true;
     }
 
-    public async Task<bool> SetEventStatus(Guid eventId, string status) 
+    public async Task<bool> SetEventStatus(Guid eventId, string status)
     {
         var supabaseUser = _userService.CurrentSession.User
             ?? throw new UnauthorizedAccessException("User not authenticated");
@@ -310,7 +307,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
             return await GetEventDetail(eventId, null);
-        
+
         var userId = Guid.Parse(currentUser.Id ?? "");
 
         return await GetEventDetail(eventId, userId);
@@ -326,6 +323,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         bool isOwner = userId.HasValue && userId.Value == citlaliEvent.CreatorUserId;
         bool isRegistered = userId.HasValue && await IsUserRegistered(id, userId.Value);
+        bool isClosed = citlaliEvent.Status == "closed";
 
         if (isOwner)
         {
@@ -335,6 +333,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         {
             throw new UserAlreadyRegisteredException(); // Redirect to "status" page
         }
+        if (isRegistered && isClosed) 
+            throw new UserAlreadyRegisteredException();
 
         var currentParticipant = await GetRegistrationCountByEventId(citlaliEvent.EventId);
 
@@ -363,6 +363,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         return new EventDetailViewModel
         {
+            IsClosed = isClosed,
+            IsUserRegistered = isRegistered,
             EventDetailCardData = eventDetailCardData,
             EventFormDto = eventFormDto
         };
@@ -372,25 +374,32 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     public async Task<Registration> JoinEvent(JoinEventModel joinEventModel)
     {
         var supabaseUser = _userService.CurrentSession.User ?? throw new Exception("User not authenticated");
-        Guid userId = Guid.Parse(supabaseUser.Id ?? "");
-        Guid EventID = joinEventModel.EventId;
+        Guid userId = Guid.Parse(supabaseUser.Id ?? throw new Exception("User ID not found"));
+        Guid EventId = joinEventModel.EventId;
+        var citlaliEvent = await GetEventById(EventId);
 
-        if (await IsUserRegistered(EventID, userId))
+        if (citlaliEvent.Status == "closed")
+            throw new EventClosedException();
+
+        var eventQuestionsTask = _supabaseClient
+            .From<EventQuestion>()
+            .Where(x => x.EventId == joinEventModel.EventId)
+            .Get();
+
+        if (await IsUserRegistered(EventId, userId))
         {
             throw new UserAlreadyRegisteredException();
         }
 
-        if (userId == (await GetEventById(EventID))?.CreatorUserId)
+        if (userId == (await GetEventById(EventId))?.CreatorUserId)
         {
             throw new JoinOwnerException();
         }
 
-        var QuestionsList = joinEventModel.EventFormDto.Questions;
-
         var newRegistration = new Registration
         {
             RegistrationId = Guid.NewGuid(),
-            EventId = EventID,
+            EventId = EventId,
             UserId = userId,
         };
 
@@ -398,21 +407,27 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .From<Registration>()
             .Insert(newRegistration);
 
-        List<RegistrationAnswer> newRegistrationAnswers = QuestionsList.ConvertAll(question => new RegistrationAnswer
+        var eventQuestions = await eventQuestionsTask;
+        if (eventQuestions.Models.Count > 0)
         {
-            RegistrationAnswerId = Guid.NewGuid(),
-            RegistrationId = newRegistration.RegistrationId,
-            EventQuestionId = question.EventQuestionId,
-            Answer = question.Answer
-        });
+            var QuestionsList = joinEventModel.EventFormDto.Questions
+                .Where(qvm => eventQuestions.Models.Any(eq => eq.EventQuestionId == qvm.EventQuestionId))
+                .ToList();
 
-        if (newRegistrationAnswers.Count > 0) {
+            List<RegistrationAnswer> newRegistrationAnswers = QuestionsList.ConvertAll(question => new RegistrationAnswer
+            {
+                RegistrationAnswerId = Guid.NewGuid(),
+                RegistrationId = newRegistration.RegistrationId,
+                EventQuestionId = question.EventQuestionId,
+                Answer = question.Answer
+            });
+
             await _supabaseClient
                 .From<RegistrationAnswer>()
                 .Insert(newRegistrationAnswers);
         }
 
-        await _notificationService.CreateNotification(newRegistration.UserId, "Congratulation 🎉", "You have successfully registered to an event", $"/event/detail/{EventID}");
+        await _notificationService.CreateNotification(newRegistration.UserId, "Congratulation 🎉", "You have successfully registered to an event", $"/event/detail/{EventId}");
 
         return newRegistration;
     }
@@ -464,21 +479,21 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var currentParticipant = await GetRegistrationCountByEventId(citlaliEvent.EventId);
 
         return new EventBriefCardData
-            {
-                EventId = citlaliEvent.EventId,
-                EventTitle = citlaliEvent.EventTitle,
-                EventDescription = citlaliEvent.EventDescription,
-                CreatorDisplayName = creator.DisplayName,
-                CreatorProfileImageUrl = creator.ProfileImageUrl,
-                LocationTag = locationTag,
-                EventCategoryTag = categoryTag,
-                CurrentParticipant = currentParticipant,
-                MaxParticipant = citlaliEvent.MaxParticipant,
-                Cost = citlaliEvent.Cost,
-                EventDate = citlaliEvent.EventDate,
-                PostExpiryDate = citlaliEvent.PostExpiryDate,
-                CreatedAt = citlaliEvent.CreatedAt,
-            };
+        {
+            EventId = citlaliEvent.EventId,
+            EventTitle = citlaliEvent.EventTitle,
+            EventDescription = citlaliEvent.EventDescription,
+            CreatorDisplayName = creator.DisplayName,
+            CreatorProfileImageUrl = creator.ProfileImageUrl,
+            LocationTag = locationTag,
+            EventCategoryTag = categoryTag,
+            CurrentParticipant = currentParticipant,
+            MaxParticipant = citlaliEvent.MaxParticipant,
+            Cost = citlaliEvent.Cost,
+            EventDate = citlaliEvent.EventDate,
+            PostExpiryDate = citlaliEvent.PostExpiryDate,
+            CreatedAt = citlaliEvent.CreatedAt,
+        };
     }
 
     public async Task<EventDetailCardData> EventToDetailCard(Event citlaliEvent)
@@ -512,7 +527,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                 CreatedAt = citlaliEvent.CreatedAt,
             };
     }
-    
+
     public async Task<EventBriefCardData[]> EventsToBriefCardArray(List<Event> citlaliEvents)
     {
         List<Task<EventBriefCardData>> briefCardDataTasks = citlaliEvents.ConvertAll(EventToBriefCard);
@@ -606,11 +621,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
     public async Task<EventManagementViewModel> GetEventManagement(Guid eventId)
     {
-        var currentUser = _userService.CurrentSession.User 
+        var currentUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
 
-        var user = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id))
-                ?? throw new UnauthorizedAccessException("User not found");
+        var user = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id ?? throw new UnauthorizedAccessException("User not found")));
 
         var ev = await GetEventById(eventId)
                 ?? throw new KeyNotFoundException("Event not found");
@@ -629,7 +643,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var locationTag = locationTagTask.Result ?? new LocationTag();
         var eventCategoryTag = eventCategoryTagTask.Result ?? new EventCategoryTag();
         var registrants = registrantsTask.Result;
-        
+
         var eventQuestions = (await _supabaseClient
             .From<EventQuestion>()
             .Select("*")
@@ -642,6 +656,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var ConfirmedParticipant = new List<BriefUser>();
         var AwaitingConfirmationParticipant = new List<BriefUser>();
         var RejectedConfirmationParticipant = new List<BriefUser>();
+        var currentParticipantCount = await GetRegistrationCountByEventId(ev.EventId);
 
         foreach (var registrant in registrants)
         {
@@ -676,17 +691,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                     DisplayName = registrant.DisplayName
                 });
             }
-            else if (registration.Status == "rejected-invitation")
-            {
-                RejectedConfirmationParticipant.Add(new BriefUser
-                {
-                    UserId = registrant.UserId,
-                    Username = registrant.Username,
-                    ProfileImageUrl = registrant.ProfileImageUrl,
-                    DisplayName = registrant.DisplayName
-                });
-            }
-            
+
             var answers = (await _supabaseClient
                 .From<RegistrationAnswer>()
                 .Select("*")
@@ -709,11 +714,11 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         }
 
         var questionList = questionLookup.Select(q => new QuestionViewModel
-            {
-                EventQuestionId = q.Key,
-                Question = q.Value,
-                Answer = ""
-            }).ToList();
+        {
+            EventQuestionId = q.Key,
+            Question = q.Value,
+            Answer = ""
+        }).ToList();
 
         return new EventManagementViewModel
         {
@@ -725,17 +730,17 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             CreatorProfileImageUrl = user.ProfileImageUrl,
             LocationTag = locationTag,
             EventCategoryTag = eventCategoryTag,
-            CurrentParticipant = registrants.Count,
+            CurrentParticipant = currentParticipantCount,
             MaxParticipant = ev.MaxParticipant,
             Cost = ev.Cost,
             EventDate = ev.EventDate,
             PostExpiryDate = ev.PostExpiryDate,
             EventStatus = ev.Status,
+            CreatedAt = ev.CreatedAt,
             Questions = questionList,
             AnswerSet = answerSet,
-            ConfirmedParticipant = ConfirmedParticipant, 
-            AwaitingConfirmationParticipant = AwaitingConfirmationParticipant,
-            RejectedConfirmationParticipant = RejectedConfirmationParticipant
+            ConfirmedParticipant = ConfirmedParticipant,
+            AwaitingConfirmationParticipant = AwaitingConfirmationParticipant
         };
     }
 
@@ -753,35 +758,34 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
     public async Task<EventStatusViewModel> GetEventStatus(Guid eventId)
     {
-        var currentUser = _userService.CurrentSession.User 
+        var currentUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
-        var user = _userService.GetUserByUserId(Guid.Parse(currentUser.Id))
-                ?? throw new UnauthorizedAccessException("User not found");
+        var user = _userService.GetUserByUserId(Guid.Parse(currentUser.Id ?? throw new UnauthorizedAccessException("User not found")));
         var ev = await GetEventById(eventId)
                 ?? throw new KeyNotFoundException("Event not found");
 
-        if (ev.CreatorUserId.ToString() == currentUser.Id) 
+        if (ev.CreatorUserId.ToString() == currentUser.Id)
             throw new JoinOwnerException("Owner cannot join their own event.");
-        
-        if (!await IsUserRegistered(eventId, Guid.Parse(currentUser.Id))) 
+
+        if (!await IsUserRegistered(eventId, Guid.Parse(currentUser.Id)))
             throw new UserHasNotRegisteredException("User has not registered to this event.");
-        
+
         var registration = await GetRegistrationByEventIdAndUserId(eventId, Guid.Parse(currentUser.Id))
                 ?? throw new KeyNotFoundException("Registration not found");
-        
+
         return new EventStatusViewModel
         {
             Status = registration.Status,
             RegistrationTime = registration.CreatedAt,
             EventDetailCardData = await EventToDetailCard(ev),
         };
-        
+
     }
 
     //CancelRegistration
     public async Task<bool> CancelRegistration(Guid eventId)
     {
-        var supabaseUser = _userService.CurrentSession.User 
+        var supabaseUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
         var userId = Guid.Parse(supabaseUser.Id);
 
@@ -790,10 +794,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         if (registration.Status == "confirmed") // if user has been confirmed
             throw new Exception("Cannot cancel registration after confirmation");
-        
+
         await _supabaseClient
             .From<Registration>()
-            .Where(row => row.RegistrationId == registration.RegistrationId)  
+            .Where(row => row.RegistrationId == registration.RegistrationId)
             .Delete();
 
 
@@ -803,7 +807,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     //RejectedInvitation
     public async Task<bool> RejectedInvitation(Guid eventId)
     {
-        var supabaseUser = _userService.CurrentSession.User 
+        var supabaseUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
         var userId = Guid.Parse(supabaseUser.Id);
 
@@ -812,10 +816,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         if (registration.Status != "awaiting-confirmation") // if user has been confirmed
             throw new Exception("You cannot reject this invitation");
-        
+
         await _supabaseClient
             .From<Registration>()
-            .Where(row => row.RegistrationId == registration.RegistrationId)  
+            .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "rejected-invitation")
             .Update();
 
@@ -826,19 +830,19 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     //ConfirmRegistration
     public async Task<bool> ConfirmRegistration(Guid eventId)
     {
-        var supabaseUser = _userService.CurrentSession.User 
+        var supabaseUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
         var userId = Guid.Parse(supabaseUser.Id);
 
         var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
                 ?? throw new KeyNotFoundException("Registration not found");
 
-        if (registration.Status != "awaiting-confirmation") 
+        if (registration.Status != "awaiting-confirmation")
             throw new Exception("You cannot confirm this registration");
-        
+
         await _supabaseClient
             .From<Registration>()
-            .Where(row => row.RegistrationId == registration.RegistrationId)  
+            .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "confirmed")
             .Update();
 
@@ -852,7 +856,7 @@ public class UserAlreadyRegisteredException : Exception
 
     public UserAlreadyRegisteredException(string message) : base(message) { }
 
-    public UserAlreadyRegisteredException(string message, Exception innerException) 
+    public UserAlreadyRegisteredException(string message, Exception innerException)
         : base(message, innerException) { }
 }
 
@@ -862,7 +866,7 @@ public class UserHasNotRegisteredException : Exception
 
     public UserHasNotRegisteredException(string message) : base(message) { }
 
-    public UserHasNotRegisteredException(string message, Exception innerException) 
+    public UserHasNotRegisteredException(string message, Exception innerException)
         : base(message, innerException) { }
 }
 
@@ -872,7 +876,7 @@ public class JoinOwnerException : Exception
 
     public JoinOwnerException(string message) : base(message) { }
 
-    public JoinOwnerException(string message, Exception innerException) 
+    public JoinOwnerException(string message, Exception innerException)
         : base(message, innerException) { }
 }
 
@@ -882,6 +886,16 @@ public class MaximumInvitationExceedException : Exception
 
     public MaximumInvitationExceedException(string message) : base(message) { }
 
-    public MaximumInvitationExceedException(string message, Exception innerException) 
+    public MaximumInvitationExceedException(string message, Exception innerException)
+        : base(message, innerException) { }
+}
+
+public class EventClosedException : Exception
+{
+    public EventClosedException() : base("Event have been closed.") { }
+
+    public EventClosedException(string message) : base(message) { }
+
+    public EventClosedException(string message, Exception innerException)
         : base(message, innerException) { }
 }

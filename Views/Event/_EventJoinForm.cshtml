@@ -2,25 +2,45 @@
 
 <div class="event-form detail-column">
     <form class="form-form" asp-action="Join" style="width: 100%;" method="post" enctype="multipart/form-data">
-        <h1>Just a few quick questions 💬</h1>
-        <p>Help the event creator get to know you better!</p>
-        <div class="form-data">
-            <input type="hidden" name="EventId" value="@Model.EventId" />
-            @for (var i = 0; i < Model.Questions.Count; i++)
-            {
-                <div class="form-group">
-                    <label for="Questions_@(i)__Answer">@Model.Questions[i].Question</label>
-                    <input type="hidden" name="EventFormDto.Questions[@i].EventQuestionId" value="@Model.Questions[i].EventQuestionId" />
-                    <input name="EventFormDto.Questions[@i].Answer" class="form-control" id="Questions_@(i)__Answer" />
-                    <span asp-validation-for="Questions[@i].Answer" class="text-danger"></span>
+        @{
+            if (Model.Questions.Count > 0) {
+                if (Model.IsClosed == false) {
+                    <h1>Just a few quick questions 💬</h1>
+                    <p>Help the event creator get to know you better!</p>
+                }
+                else {
+                    <h1>Event have been closed 😭</h1>
+                    <p>We’re sorry, but this event has been closed by the owner. Don’t worry—there will be more opportunities in the future.</p>
+                }
+                <div class="form-data">
+                    @for (var i = 0; i < Model.Questions.Count; i++)
+                    {
+                        <div class="form-group">
+                            <label for="Questions_@(i)__Answer">@Model.Questions[i].Question</label>
+                            <input type="hidden" name="EventFormDto.Questions[@i].EventQuestionId" value="@Model.Questions[i].EventQuestionId" />
+                            @if (Model.IsClosed == false) {
+                                <input name="EventFormDto.Questions[@i].Answer" class="form-control" id="Questions_@(i)__Answer"/>
+                            }
+                            else {
+                                <input class="form-control" disabled />
+                            }
+                            <span asp-validation-for="Questions[@i].Answer" class="text-danger"></span>
+                        </div>
+                    }
                 </div>
+            } else {
+                <h1>Request to join the event! 🛫</h1>
+                <p>The event creator didn't ask any questions!</p>
             }
-        </div>
+        }
+        <input type="hidden" name="EventId" value="@Model.EventId" />
         <div class="justify-flex-end">
-            <button class="form-submit" type="submit">
-                Request to join
-                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.AirplaneTakeOff>>(RenderMode.ServerPrerendered, new { Color = Color.Lightweight}))
-            </button>
+            @if (Model.IsClosed == false) {
+                <button class="form-submit" type="submit">
+                    Request to join
+                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.AirplaneTakeOff>>(RenderMode.ServerPrerendered, new { Color = Color.Lightweight}))
+                </button>
+            }
         </div>
     </form>
 </div>
