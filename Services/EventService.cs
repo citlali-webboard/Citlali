@@ -631,6 +631,8 @@ public class EventService(Client supabaseClient, UserService userService)
                         ?? throw new UnauthorizedAccessException("User not authenticated");
 
         var user = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id ?? throw new UnauthorizedAccessException("User not found")));
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
 
         var ev = await GetEventById(eventId)
                 ?? throw new KeyNotFoundException("Event not found");
@@ -793,7 +795,10 @@ public class EventService(Client supabaseClient, UserService userService)
     {
         var supabaseUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
-        var userId = Guid.Parse(supabaseUser.Id);
+        if (supabaseUser == null)
+            throw new UnauthorizedAccessException("User not authenticated");
+        
+        var userId = Guid.Parse(supabaseUser.Id ?? throw new UnauthorizedAccessException("User ID not found"));
 
         var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
                 ?? throw new KeyNotFoundException("Registration not found");
@@ -815,7 +820,10 @@ public class EventService(Client supabaseClient, UserService userService)
     {
         var supabaseUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
-        var userId = Guid.Parse(supabaseUser.Id);
+        if (supabaseUser == null)
+            throw new UnauthorizedAccessException("User not authenticated");
+        
+        var userId = Guid.Parse(supabaseUser.Id ?? throw new UnauthorizedAccessException("User ID not found"));
 
         var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
                 ?? throw new KeyNotFoundException("Registration not found");
@@ -838,7 +846,10 @@ public class EventService(Client supabaseClient, UserService userService)
     {
         var supabaseUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
-        var userId = Guid.Parse(supabaseUser.Id);
+        if (supabaseUser == null)
+            throw new UnauthorizedAccessException("User not authenticated");
+        
+        var userId = Guid.Parse(supabaseUser.Id ?? throw new UnauthorizedAccessException("User ID not found"));
 
         var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
                 ?? throw new KeyNotFoundException("Registration not found");
