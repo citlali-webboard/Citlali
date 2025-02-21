@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 // using Supabase.Gotrue;
 
@@ -125,8 +127,8 @@ public class NotificationService(Client supabaseClient, UserService userService)
     public async Task<bool> CreateNotification(Guid toUserId, string title, string message, string url)
     {
 
-         var supabaseUser = _userService.CurrentSession.User
-            ?? throw new UnauthorizedAccessException("User not authenticated");
+        var supabaseUser = _userService.CurrentSession.User
+           ?? throw new UnauthorizedAccessException("User not authenticated");
 
         var fromUserId = Guid.Parse(supabaseUser.Id ?? "");
 
@@ -160,7 +162,24 @@ public class NotificationService(Client supabaseClient, UserService userService)
         return true;
     }
 
-    public async Task Realtime(WebSocket webSocket) {
+    public async Task<NotificationModel> NotificationRowToModel (Notification notificationRow) {
+        var sourceUser = await _userService.GetUserByUserId(notificationRow.FromUserId) ?? throw new Exception("Source user not found");
+
+        return new NotificationModel
+        {
+            NotificationId = notificationRow.NotificationId,
+            SourceUserId = notificationRow.FromUserId,
+            SourceUsername = sourceUser.Username,
+            SourceDisplayName = sourceUser.DisplayName,
+            SourceProfileImageUrl = sourceUser.ProfileImageUrl,
+            Read = notificationRow.Read,
+            Title = notificationRow.Title,
+            CreatedAt = notificationRow.CreatedAt
+        };
+    }
+
+    public async Task Realtime(WebSocket webSocket)
+    {
         var buffer = new byte[1024 * 4];
 
         try
@@ -169,21 +188,41 @@ public class NotificationService(Client supabaseClient, UserService userService)
             var tokens = Encoding.UTF8.GetString(buffer, 0, result.Count).Split(";", 2);
 
             _userService.CurrentSession = await _supabaseClient.Auth.SetSession(tokens[0], tokens[1]);
-            var emailMessage = Encoding.UTF8.GetBytes($"User email: {_userService.CurrentSession.User?.Email}");
-            await webSocket.SendAsync(new ArraySegment<byte>(emailMessage), WebSocketMessageType.Text, true, CancellationToken.None);
+            var userId = Guid.Parse(_userService.CurrentSession.User?.Id ?? throw new Exception("User ID is not found"));
 
-            while (_userService.CurrentSession.User != null)
+            var realtimeChannel = _supabaseClient
+                .From<Notification>()
+                .On(Supabase.Realtime.PostgresChanges.PostgresChangesOptions.ListenType.Inserts, async (sender, change) =>
+                {
+                    var row = change.Model<Notification>() ?? throw new Exception("Unable to get notification row from db");
+                    if (row.ToUserId != userId) return;
+
+                    var model = await NotificationRowToModel(row);
+                    var json = JsonSerializer.Serialize(model);
+
+                    var message = Encoding.UTF8.GetBytes(json);
+                    await webSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Text, true, CancellationToken.None);
+                });
+
+            Console.WriteLine("Subscribed to Realtime channel");
+
+            var message = Encoding.UTF8.GetBytes("Listening for inserts");
+            await webSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Text, true, CancellationToken.None);
+            Console.WriteLine(_supabaseClient.Realtime.Subscriptions);
+
+            while (webSocket.State == WebSocketState.Open)
             {
-                var serverMsg = Encoding.UTF8.GetBytes($"Server: {Encoding.UTF8.GetString(buffer, 0, result.Count)}");
-                await webSocket.SendAsync(new ArraySegment<byte>(serverMsg, 0, serverMsg.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
-
                 result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                if (result.MessageType == WebSocketMessageType.Close)
+                {
+                    await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+                }
             }
-            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            // Log the exception or handle it as needed
+            Console.WriteLine($"Exception: {ex.Message}");
         }
     }
 }
