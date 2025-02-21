@@ -101,6 +101,20 @@ public class EventService(Client supabaseClient, UserService userService)
         return modelEvent;
     }
 
+    public async Task<bool> CloseEventWhenMaxParticipant(Guid eventId)
+    {
+        var eventToClose = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
+
+        await _supabaseClient
+            .From<Event>()
+            .Where(row => row.EventId == eventId)
+            .Set(row => row.Status, "closed")
+            .Update();
+
+        return true;
+        
+    }
+
     public async Task<bool> DeleteEvent(Guid eventId)
     {
         var supabaseUser = _userService.CurrentSession.User;
@@ -838,6 +852,13 @@ public class EventService(Client supabaseClient, UserService userService)
             .Set(row => row.Status, "confirmed")
             .Update();
 
+        var currentParticipant = await GetRegistrationCountByEventId(eventId);
+        var MaxParticipant = (await GetEventById(eventId))?.MaxParticipant ?? 0;
+
+        if (currentParticipant >= MaxParticipant){
+            await CloseEventWhenMaxParticipant(eventId);
+        }
+        
         return true;
     }
 }
