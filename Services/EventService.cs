@@ -380,7 +380,9 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             throw new UserAlreadyRegisteredException();
         }
 
-        if (userId == (await GetEventById(EventID))?.CreatorUserId)
+        var Event = await GetEventById(EventID) ?? throw new KeyNotFoundException("Event not found");
+
+        if (userId == Event.CreatorUserId)
         {
             throw new JoinOwnerException();
         }
@@ -412,7 +414,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                 .Insert(newRegistrationAnswers);
         }
 
-        await _notificationService.CreateNotification(newRegistration.UserId, "Congratulation 🎉", "You have successfully registered to an event", $"/event/detail/{EventID}");
+        await _notificationService.CreateNotification(Event.CreatorUserId, "New join request 🙋🏻", "New user has joined your event", $"/event/detail/{EventID}");
 
         return newRegistration;
     }
