@@ -69,7 +69,7 @@
         <div class="button-group">
             @if (eventStatus == "awaiting-confirmation")
             {
-                <form asp-action="RejectedInvitation" asp-controller="Event" method="post" onsubmit="return confirm('Are you sure to reject-btn this invitation?');">
+                <form asp-action="RejectedInvitation" asp-controller="Event" method="post" onsubmit="return confirm('Are you sure to reject this invitation?');">
                     <input type="hidden" name="eventId" value="@Model.EventDetailCardData.EventId" />
                     <button type="submit" class="action-button cancel-button">
                         @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.CalendarCancel>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
