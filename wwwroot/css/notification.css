@@ -177,3 +177,53 @@ main .notification-container{
 .hidden{
     display: none;
 }
+
+@media screen and (max-width: 768px){
+    .container{
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .notification-container{
+        width: 100%;
+    }
+    
+    .default-notification,
+    .notification-detail{
+        display: none;
+
+    }
+
+    .notification-card{
+        width: 100%;
+    }
+    
+    .container-detail-mobile{
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+        padding: 3px 6px 3px 6px;
+        margin-bottom: 1rem;
+    }
+
+    .title-detail-mobile{
+        font-size: 1.5rem;
+        font-weight: bold;
+        opacity: 1;
+    }
+
+    .message-detail-mobile{
+        font-size: 1rem;
+        opacity: 0.8;
+    }
+
+    .preview-detail-mobile{
+        font-size: 0.8rem;
+        opacity: 0.6;
+    }
+
+    .hidden{
+        display: none;
+    }
+}
