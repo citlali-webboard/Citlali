@@ -1,29 +1,50 @@
 .notification-card img{
-    height: 50px;
+    /* height: 50px;
     width: 50px;
-    border-radius: 50%;
+    border-radius: 50%; */
 }
 
 .container{
-    width: 80vw;
-    height: 70vh;
-    margin: 0 auto;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex-direction: row;
-    margin-top: 3rem;
-    gap: 2rem;
+    width: 60vw;
 }
 
-.notification-container{
-    width: 30%;
+header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    margin: 0.5rem 0.5rem 0.75rem 0.5rem;
+    width: 100%;
+    margin-top: 10%;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    opacity: 0.8;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    column-gap: 1.5rem;
+    width: 100%;
+}
+
+main .notification-container{
+    width: 50%;
     max-width: 400px;
     display: flex;
     flex-direction: column;
-    row-gap: 10px;
+    row-gap: 0.55rem;
     height: 100%;
 }
+
 .notification-card{
     width: 100%;
     max-width: 600px;
@@ -31,9 +52,15 @@
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
-    padding: 8px 12px 8px 12px;  
+    padding: 0.5rem 0.75rem 0.5rem 0.75rem;
     border-radius: 8px;
+    position: relative;
+}
 
+.notification-time {
+    position: absolute;
+    bottom: 10%;
+    right: 3%;
 }
 
 .notification-card:hover{
@@ -44,11 +71,17 @@
 .notification-card-source-user{
     display: flex;
     align-items: center;
-    column-gap: 8px;
+    column-gap: 0.5rem;
+}
+
+.notification-card-source-user img {
+    height: auto;
+    width: 3rem;
+    border-radius: 50%;
 }
 
 #title{
-    justify-self: flex-end;
+    justify-self: flex-start;
     font-weight: bold;
     opacity: 0.8;
 }
@@ -57,23 +90,24 @@
     opacity: 0.5;
 }
 
-.notification-detail{
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
-    border-radius: 12px;
-    width: 40%;
-    height: 100%;
-}
 
 .default-notification{
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
     border-radius: 12px;
-    width: 40%;
+    width: 50%;
     height: 100%;
+    padding: 5rem;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
+.notification-detail{
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    width: 50%;
+    height: 100%;
+}
 .notification-detail .header{
     display: flex;
     justify-content: center;

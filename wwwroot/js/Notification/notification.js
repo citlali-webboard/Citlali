@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             xmlhttp.onreadystatechange = function () {
                 if (xmlhttp.readyState == 4 && xmlhttp.status == 200) { // readyState 4 means the operation is complete and status 200 means the request is successful
+                    console.log(xmlhttp.responseText);
                     let data = JSON.parse(xmlhttp.responseText);
                     console.log(data);
 

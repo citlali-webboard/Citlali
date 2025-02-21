@@ -47,7 +47,10 @@ public class NotificationModel{
 public class NotificationDetailModel : NotificationModel
 {
     public string Message { get; set; } = "Message";
-    public string Url { get; set; } = ""; // Url able to be null or ""
+    public string Url { get; set; } = ""; 
+    public string UrlTitle { get; set; } = "";
+    public string UrlDescription { get; set; } = "";
+    public string UrlImage { get; set; } = "https://img.4gamers.com.tw/ckfinder-th/image2/auto/2025-01/Citlali_Introduction_Banner-250102-181140.png?versionId=r4yCiZ0mpYQb4la101fQUFNeaAW0mcgl";
 }
 
 public class NotificationViewModel 

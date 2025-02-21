@@ -18,12 +18,15 @@ public class NotificationController : Controller
 
     private readonly NotificationService _notificationService;
 
+    private readonly EventService _eventService;
+
     private readonly ILogger<EventController> _logger;
 
-    public NotificationController(NotificationService notificationService, ILogger<EventController> logger)
+    public NotificationController(NotificationService notificationService, ILogger<EventController> logger,EventService eventService )
     {
         _notificationService = notificationService;
         _logger = logger;
+        _eventService = eventService;
     }
 
     [HttpGet("")]
@@ -71,6 +74,12 @@ public class NotificationController : Controller
 
             NotificationDetailModel notificationDetail = await _notificationService.GetNotificationDetails(Guid.Parse(id));
 
+            Console.WriteLine(notificationDetail.Url);
+            var EventId = Guid.Parse(notificationDetail.Url.Split("/").Last());
+            Console.WriteLine(EventId);
+
+            var Event = await _eventService.GetEventById(EventId) ?? new Event();
+
             var dtoNotificationDetails = new  Dictionary<string, string>
             {
                 { "id", id},
@@ -81,7 +90,13 @@ public class NotificationController : Controller
                 { "sourceUsername", notificationDetail.SourceUsername },
                 { "sourceDisplayName", notificationDetail.SourceDisplayName },
                 { "sourceProfileImageUrl", notificationDetail.SourceProfileImageUrl },
+                { "url", notificationDetail.Url },
+                { "urlTitle", Event.EventTitle },
+                { "urlDescription", Event.EventDescription },
+                { "urlImage", notificationDetail.UrlImage }
             };
+
+            Console.WriteLine(Json(dtoNotificationDetails));
 
             return Json(dtoNotificationDetails);
 

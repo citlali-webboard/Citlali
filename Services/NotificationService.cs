@@ -110,14 +110,14 @@ public class NotificationService(Client supabaseClient, UserService userService)
         var notificationDetails = new NotificationDetailModel
         {
             Message = notification.Message,
-            Url = notification.Url,
             Title = notification.Title,
             SourceUserId = notification.FromUserId,
             SourceUsername = FromUser.Username,
             SourceDisplayName = FromUser.DisplayName,
             SourceProfileImageUrl = FromUser.ProfileImageUrl,
             Read = notification.Read,
-            CreatedAt = notification.CreatedAt
+            CreatedAt = notification.CreatedAt,
+            Url = notification.Url
         };
 
         return notificationDetails;
