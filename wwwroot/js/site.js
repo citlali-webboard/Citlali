@@ -8,6 +8,24 @@ document.addEventListener("DOMContentLoaded", function () {
     let hideTimeout;
     let isDropdownOpen = false;
 
+
+    // Set number of notifications on navbar
+    // if have a cookie named count_notifications
+    if (document.cookie.indexOf("count_notifications") >= 0)
+    {
+        // get value of cookie name count_notifications
+        let count = document.cookie.replace(/(?:(?:^|.*;\s*)count_notifications\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+        let notificationIcon = document.getElementById("notification-icon");
+        let div_count_notifications = document.createElement("div");
+        div_count_notifications.classList.add("count-notifications");
+        div_count_notifications.innerHTML = count;
+        
+        notificationIcon.appendChild(div_count_notifications);
+    }
+
+    let notificationIcon = document.getElementById("notification-icon");
+    
+
     function isMobileDevice() {
         return window.matchMedia("(max-width: 768px)").matches;
     }
@@ -76,5 +94,27 @@ document.addEventListener("DOMContentLoaded", function () {
         hideTimeout = setTimeout(hideDropdown, 200);
     }
 });
+
+var socket = new WebSocket("ws://localhost:5112/notification/realtime");
+
+socket.onopen = function () {
+    console.log("Connected to the server");
+}
+
+socket.onmessage = function (e){
+    console.log("Message received: " + e.data);
+}
+
+socket.onerror = function (error){
+    console.log(error);
+}
+
+socket.onclose = function (){
+    console.log("Connection closed");
+}
+
+
+
+
 
 

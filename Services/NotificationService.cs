@@ -213,6 +213,9 @@ public class NotificationService(Client supabaseClient, UserService userService)
             while (webSocket.State == WebSocketState.Open)
             {
                 result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+
+                Console.WriteLine("result.MessageType: " + result.MessageType);
+
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
                     await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);

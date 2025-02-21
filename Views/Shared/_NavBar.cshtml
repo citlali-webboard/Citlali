@@ -52,7 +52,7 @@
       <a href="/Notification">
         @* Notification *@
         <li class="tooltip">
-          <span>
+          <span id="notification-icon">
             @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
           </span>
           <p class="tooltip-text">Notification</p>
