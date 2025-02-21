@@ -170,6 +170,22 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return await SetEventStatus(eventId, "closed");
     }
 
+    public async Task<Guid> GetCreatorEventIdByEventId(Guid eventId)
+    {
+        var response = await _supabaseClient
+            .From<Event>()
+            .Select("CreatorUserId")
+            .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
+            .Single();
+
+        if (response == null)
+        {
+            throw new KeyNotFoundException("Event not found");
+        }
+        
+        return response.CreatorUserId;
+    }
+
     public async Task<bool> InviteUser(Guid eventId, Guid userId)
     {
         var supabaseUser = _userService.CurrentSession.User
@@ -821,6 +837,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.Status, "rejected-invitation")
             .Update();
 
+        var CreatorUserId = await GetCreatorEventIdByEventId(eventId);
+
+        await _notificationService.CreateNotification(CreatorUserId, "Rejected ❌", "Your invitation has been rejected", $"/event/detail/{eventId}");
+
 
         return true;
     }
@@ -843,6 +863,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Where(row => row.RegistrationId == registration.RegistrationId)  
             .Set(row => row.Status, "confirmed")
             .Update();
+
+        var CreatorUserId = await GetCreatorEventIdByEventId(eventId);
+
+        await _notificationService.CreateNotification(CreatorUserId, "Confirmed ✅", "Your invitation has been confirmed", $"/event/detail/{eventId}");
 
         return true;
     }
