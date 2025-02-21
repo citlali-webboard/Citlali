@@ -22,3 +22,18 @@ function shareEvent(title, eventId) {
         });
     }
 }
+
+function toggleDropdown(id) {
+    var element = document.getElementById(id);
+    element.style.display = (element.style.display === "block") ? "none" : "block";
+}
+
+function openBroadcastPopup() {
+    var popup = document.querySelector('.broadcast-popup');
+    popup.style.display = 'block';
+}
+
+function closeDialog() {
+    var popup = document.querySelector('.broadcast-popup');
+    popup.style.display = 'none';
+}
