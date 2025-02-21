@@ -279,7 +279,7 @@ public class AuthController : Controller
         {
             Console.WriteLine(ex.Message);
             TempData["Error"] = ex.Message;
-            return RedirectToAction("ForgotPassword");
+            return RedirectToAction("ResetPassword");
         }
     }
 }
