@@ -61,7 +61,7 @@ function handleDesktopClick() {
 
             // Set details
             document.querySelector("#content-title").innerHTML = data.title;
-            document.querySelector("#content-body").innerHTML = data.message;
+            // document.querySelector("#content-body").innerHTML = data.message;
             document.querySelector("#source-name").innerHTML = `${data.sourceDisplayName}(${data.sourceUsername})`;
             document.querySelector("#create-at").href = data.createdAt;
 
@@ -69,8 +69,42 @@ function handleDesktopClick() {
 
             source_img.src = data.sourceProfileImageUrl;
 
+            
             // Mark the card as read and disable hover
             Card.classList.add("read");
+
+            let contentContainer = document.querySelector("#notification-detail .content div");
+
+            if (data.url) {
+                // ถ้า notification มี URL ให้แสดงเป็น card คล้าย GitHub Link Embed
+                contentContainer.innerHTML = `
+                <p>${data.title}</p>
+                <p>${data.message}</p>
+                <div class="preview-card">
+                    <p class="app-name">Citlali 🩷</p>
+                    <div class="preview-card-topic">
+                        <h1>${data.urlTitle}</h1>
+                        <p>${data.urlDescription}</p>
+                    </div>
+                    
+                    <a class="preview-link" href="${data.url}">${data.url}</a>
+                    
+                    <a href="${data.url}" target="">
+                        <div style="border-radius: 8px; overflow: hidden; margin-top: 10px;">
+                            <img src="${data.urlImage}" style="max-width: 100%; height: auto;">
+                        </div>
+                    </a>
+                </div>
+
+                `;
+            } else {
+                // ถ้าไม่มี URL แสดงเป็นข้อความปกติ
+                contentContainer.innerHTML = `
+                    <h2>${data.title}</h2>
+                    <p>${data.message}</p>
+                    ${data.imageUrl ? `<img src="${data.imageUrl}" width="100%" height="auto" />` : ""}
+                `;
+            }
 
             // Show details and hide default notification
             document.querySelector("#notification-detail").classList.remove("hidden");
