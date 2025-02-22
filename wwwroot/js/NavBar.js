@@ -20,6 +20,7 @@ function GetNumberNotification() {
 }
 
 function SetNumberNotification(number) {
+  if(number > 99){ number = "99+"; }
   let notificationIcon = document.getElementById("notification-icon");
 
   let countNotificationsBadge = document.querySelectorAll(".count-notifications");
@@ -42,7 +43,10 @@ function incrementUnreadNotification() {
 }
 
 function decrementUnreadNotification() {
-  numberOfNotification -= 1;
+  if(numberOfNotification > 0){
+    numberOfNotification -= 1;
+  }
+
   SetNumberNotification(numberOfNotification);
 }
 
