@@ -27,7 +27,6 @@
                                     <img src=@registration.CreatorProfileImageUrl alt="Creator" />
                                     <span id="creator-display-name">@registration.CreatorDisplayName</span>
                                 </span>
-                                <span id="created-time">2:39 PM • 2/20/2025</span>
                                 <span class="location">
                                     @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Location>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
                                     @registration.LocationTag.LocationTagName

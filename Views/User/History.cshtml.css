@@ -89,11 +89,6 @@
     font-size: 1rem;
 }
 
-#created-time {
-    font-size: 0.8rem;
-    color: #666;
-}
-
 .location {
     display: flex;
     flex-direction: row;
@@ -302,10 +297,6 @@
         text-wrap: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-    }
-
-    #created-time {
-        display: none;
     }
 
     #creator-display-name {
