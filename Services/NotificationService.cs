@@ -190,7 +190,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
             _userService.CurrentSession = await _supabaseClient.Auth.SetSession(tokens[0], tokens[1]);
             var userId = Guid.Parse(_userService.CurrentSession.User?.Id ?? throw new Exception("User ID is not found"));
 
-            var realtimeChannel = _supabaseClient
+            var realtimeChannel = await _supabaseClient
                 .From<Notification>()
                 .On(Supabase.Realtime.PostgresChanges.PostgresChangesOptions.ListenType.Inserts, async (sender, change) =>
                 {
@@ -201,13 +201,19 @@ public class NotificationService(Client supabaseClient, UserService userService)
                     var json = JsonSerializer.Serialize(model);
 
                     var message = Encoding.UTF8.GetBytes(json);
-                    await webSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Text, true, CancellationToken.None);
+                    if (webSocket.State == WebSocketState.Open)
+                    {
+                        await webSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Text, true, CancellationToken.None);
+                    }
                 });
 
             Console.WriteLine("Subscribed to Realtime channel");
 
-            var message = Encoding.UTF8.GetBytes("Listening for inserts");
-            await webSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Text, true, CancellationToken.None);
+            var initialMessage = Encoding.UTF8.GetBytes("Listening for inserts");
+            if (webSocket.State == WebSocketState.Open)
+            {
+                await webSocket.SendAsync(new ArraySegment<byte>(initialMessage), WebSocketMessageType.Text, true, CancellationToken.None);
+            }
             Console.WriteLine(_supabaseClient.Realtime.Subscriptions);
 
             while (webSocket.State == WebSocketState.Open)
@@ -218,7 +224,11 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+                    if (result.CloseStatus.HasValue)
+                    {
+                        await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+                    }
+                    realtimeChannel.Unsubscribe();
                 }
             }
         }
