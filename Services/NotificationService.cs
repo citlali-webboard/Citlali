@@ -80,41 +80,38 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         Guid userId = Guid.Parse(currentUser.Id ?? "");
 
-        var response = await _supabaseClient
+        var notification = await _supabaseClient
             .From<Notification>()
             .Select("FromUserId, ToUserId, Title, Message, CreatedAt, Url")
             .Filter("NotificationId", Supabase.Postgrest.Constants.Operator.Equals, notificationId.ToString())
-            .Get();
+            .Single();
 
-        if (response.Model == null)
+        if (notification == null)
         {
             throw new Exception("Failed to get notification details.");
         }
 
-        if (userId != response.Model.ToUserId)
+        if (userId != notification.ToUserId)
         {
             throw new Exception("User is not authorized to view notification details.");
         }
 
-        // set notification as read
-        await _supabaseClient
-            .From<Notification>()
-            .Where(x => x.Read == false)
-            .Set(x => x.Read, true)
-            .Update();
+        notification.Read = true;
+        var modelUpdateTask = notification.Update<Notification>();
+        var fromUserTask = _userService.GetUserByUserId(notification.FromUserId);
 
-        var notification = response.Model;
+        await Task.WhenAll(modelUpdateTask, fromUserTask);
 
-        var FromUser = await _userService.GetUserByUserId(notification.FromUserId) ?? new User();
+        var fromUser = await fromUserTask ?? new User();
 
         var notificationDetails = new NotificationDetailModel
         {
             Message = notification.Message,
             Title = notification.Title,
             SourceUserId = notification.FromUserId,
-            SourceUsername = FromUser.Username,
-            SourceDisplayName = FromUser.DisplayName,
-            SourceProfileImageUrl = FromUser.ProfileImageUrl,
+            SourceUsername = fromUser.Username,
+            SourceDisplayName = fromUser.DisplayName,
+            SourceProfileImageUrl = fromUser.ProfileImageUrl,
             Read = notification.Read,
             CreatedAt = notification.CreatedAt,
             Url = notification.Url
@@ -189,7 +186,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
         return response.Models.Count;
     }
 
-    
+
     public async Task<NotificationModel> NotificationRowToModel (Notification notificationRow) {
         var sourceUser = await _userService.GetUserByUserId(notificationRow.FromUserId) ?? throw new Exception("Source user not found");
 
