@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using System.Runtime.InteropServices.Marshalling;
-using System.Runtime.CompilerServices;
+using System.Net.WebSockets;
 
 
 namespace Citlali.Controllers;
@@ -34,16 +34,60 @@ public class NotificationController : Controller
     public async Task<IActionResult> Index()
     {
         List<NotificationModel> notifications = await _notificationService.GetNotifications();
-        
+
         var notificationViewModel = new NotificationViewModel
         {
             Notifications = notifications
         };
-        
+
 
         return View(notificationViewModel);
     }
-    
+
+    [Route("realtime")]
+    // [Authorize]
+    public async Task Realtime()
+    {
+        if (HttpContext.WebSockets.IsWebSocketRequest)
+        {
+            using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+            var token = HttpContext.Request.Cookies;
+            await _notificationService.Realtime(webSocket);
+
+            Console.WriteLine("Websocket connecteds");
+        }
+        else
+        {
+            HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+        }
+    }
+
+    [HttpGet("count")]
+    [Authorize]
+    public async Task<IActionResult> GetNotificationCount()
+    {
+        try
+        {
+
+           int notificationsNumber = await _notificationService.GetUnreadNotificationsNumber();
+
+            Console.WriteLine("Unread Notifications: " + notificationsNumber);
+
+            var dataDto = new Dictionary<string, int>
+            {
+                { "unreadNotifications", notificationsNumber }
+            };
+
+            return Json(dataDto);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            TempData["error"] = ex.Message;
+            return RedirectToAction("Index");
+        }
+    }
+
     [HttpGet("detail/{id}")]
     [Authorize]
     public async Task<IActionResult> GetNotificationDetails(string id)
@@ -57,7 +101,7 @@ public class NotificationController : Controller
 
 
             NotificationDetailModel notificationDetail = await _notificationService.GetNotificationDetails(Guid.Parse(id));
-            
+
             Console.WriteLine(notificationDetail.Url);
             var EventId = Guid.Parse(notificationDetail.Url.Split("/").Last());
             Console.WriteLine(EventId);
@@ -74,7 +118,7 @@ public class NotificationController : Controller
                 { "sourceUsername", notificationDetail.SourceUsername },
                 { "sourceDisplayName", notificationDetail.SourceDisplayName },
                 { "sourceProfileImageUrl", notificationDetail.SourceProfileImageUrl },
-                { "url", notificationDetail.Url }, 
+                { "url", notificationDetail.Url },
                 { "urlTitle", Event.EventTitle },
                 { "urlDescription", Event.EventDescription },
                 { "urlImage", notificationDetail.UrlImage }
@@ -82,13 +126,12 @@ public class NotificationController : Controller
 
             Console.WriteLine(Json(dtoNotificationDetails));
 
-            return Json(dtoNotificationDetails); 
+            return Json(dtoNotificationDetails);
 
         }catch(Exception ex){
             Console.WriteLine(ex.Message);
             TempData["error"] = ex.Message;
             return RedirectToAction("Index");
         }
-
     }
 }

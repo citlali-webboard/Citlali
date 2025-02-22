@@ -2,6 +2,10 @@ using Supabase;
 using Citlali.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 // using Supabase.Gotrue;
 
@@ -76,41 +80,43 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         Guid userId = Guid.Parse(currentUser.Id ?? "");
 
-        var response = await _supabaseClient
+        var notification = await _supabaseClient
             .From<Notification>()
             .Select("FromUserId, ToUserId, Title, Message, CreatedAt, Url")
             .Filter("NotificationId", Supabase.Postgrest.Constants.Operator.Equals, notificationId.ToString())
-            .Get();
+            .Single();
 
-        if (response.Model == null)
+        if (notification == null)
         {
             throw new Exception("Failed to get notification details.");
         }
 
-        if (userId != response.Model.ToUserId)
+        if (userId != notification.ToUserId)
         {
             throw new Exception("User is not authorized to view notification details.");
         }
 
-        // set notification as read
-        await _supabaseClient
+        notification.Read = true;
+        var modelUpdateTask = _supabaseClient
             .From<Notification>()
-            .Where(x => x.Read == false)
+            .Select("FromUserId, ToUserId, Title, Message, CreatedAt, Url")
+            .Filter("NotificationId", Supabase.Postgrest.Constants.Operator.Equals, notificationId.ToString())
             .Set(x => x.Read, true)
             .Update();
+        var fromUserTask = _userService.GetUserByUserId(notification.FromUserId);
 
-        var notification = response.Model;
+        await Task.WhenAll(modelUpdateTask, fromUserTask);
 
-        var FromUser = await _userService.GetUserByUserId(notification.FromUserId) ?? new User();
-        
+        var fromUser = await fromUserTask ?? new User();
+
         var notificationDetails = new NotificationDetailModel
         {
             Message = notification.Message,
-            Title = notification.Title, 
+            Title = notification.Title,
             SourceUserId = notification.FromUserId,
-            SourceUsername = FromUser.Username,
-            SourceDisplayName = FromUser.DisplayName,
-            SourceProfileImageUrl = FromUser.ProfileImageUrl,
+            SourceUsername = fromUser.Username,
+            SourceDisplayName = fromUser.DisplayName,
+            SourceProfileImageUrl = fromUser.ProfileImageUrl,
             Read = notification.Read,
             CreatedAt = notification.CreatedAt,
             Url = notification.Url
@@ -123,9 +129,9 @@ public class NotificationService(Client supabaseClient, UserService userService)
     public async Task<bool> CreateNotification(Guid toUserId, string title, string message, string url)
     {
 
-         var supabaseUser = _userService.CurrentSession.User
-            ?? throw new UnauthorizedAccessException("User not authenticated");
-        
+        var supabaseUser = _userService.CurrentSession.User
+           ?? throw new UnauthorizedAccessException("User not authenticated");
+
         var fromUserId = Guid.Parse(supabaseUser.Id ?? "");
 
         if (fromUserId == Guid.Empty || toUserId == Guid.Empty)
@@ -156,5 +162,110 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
 
         return true;
+    }
+
+
+    //GetUnreadNotificationsNumber
+    public async Task<int> GetUnreadNotificationsNumber()
+    {
+        var currentUser = _userService.CurrentSession.User;
+        if (currentUser == null)
+        {
+            throw new Exception("User is not authenticated.");
+        }
+
+        Guid userId = Guid.Parse(currentUser.Id ?? "");
+
+        var response = await _supabaseClient
+            .From<Notification>()
+            .Select("NotificationId")
+            .Filter("ToUserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
+            .Filter("Read", Supabase.Postgrest.Constants.Operator.Equals, "false")
+            .Get();
+
+        if (response == null)
+        {
+            throw new Exception("Failed to get notifications.");
+        }
+
+        return response.Models.Count;
+    }
+
+
+    public async Task<NotificationModel> NotificationRowToModel (Notification notificationRow) {
+        var sourceUser = await _userService.GetUserByUserId(notificationRow.FromUserId) ?? throw new Exception("Source user not found");
+
+        return new NotificationModel
+        {
+            NotificationId = notificationRow.NotificationId,
+            SourceUserId = notificationRow.FromUserId,
+            SourceUsername = sourceUser.Username,
+            SourceDisplayName = sourceUser.DisplayName,
+            SourceProfileImageUrl = sourceUser.ProfileImageUrl,
+            Read = notificationRow.Read,
+            Title = notificationRow.Title,
+            CreatedAt = notificationRow.CreatedAt
+        };
+    }
+
+    public async Task Realtime(WebSocket webSocket)
+    {
+        var buffer = new byte[1024 * 4];
+
+        try
+        {
+            WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            var tokens = Encoding.UTF8.GetString(buffer, 0, result.Count).Split(";", 2);
+
+            _userService.CurrentSession = await _supabaseClient.Auth.SetSession(tokens[0], tokens[1]);
+            var userId = Guid.Parse(_userService.CurrentSession.User?.Id ?? throw new Exception("User ID is not found"));
+
+            var realtimeChannel = await _supabaseClient
+                .From<Notification>()
+                .On(Supabase.Realtime.PostgresChanges.PostgresChangesOptions.ListenType.Inserts, async (sender, change) =>
+                {
+                    var row = change.Model<Notification>() ?? throw new Exception("Unable to get notification row from db");
+                    if (row.ToUserId != userId) return;
+
+                    var model = await NotificationRowToModel(row);
+                    var json = JsonSerializer.Serialize(model);
+
+                    var message = Encoding.UTF8.GetBytes(json);
+                    if (webSocket.State == WebSocketState.Open)
+                    {
+                        await webSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Text, true, CancellationToken.None);
+                    }
+                });
+
+            Console.WriteLine("Subscribed to Realtime channel");
+
+            var initialMessage = Encoding.UTF8.GetBytes("Listening for inserts");
+            if (webSocket.State == WebSocketState.Open)
+            {
+                await webSocket.SendAsync(new ArraySegment<byte>(initialMessage), WebSocketMessageType.Text, true, CancellationToken.None);
+            }
+            Console.WriteLine(_supabaseClient.Realtime.Subscriptions);
+
+            while (webSocket.State == WebSocketState.Open)
+            {
+                result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+
+                Console.WriteLine("result.MessageType: " + result.MessageType);
+
+                if (result.MessageType == WebSocketMessageType.Close)
+                {
+                    if (result.CloseStatus.HasValue)
+                    {
+                        await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+                    }
+                    realtimeChannel.Unsubscribe();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log the exception or handle it as needed
+            Console.WriteLine($"Exception: {ex.Message}");
+        }
     }
 }

@@ -564,6 +564,27 @@ public class EventController : Controller
     }
 
 
+    [HttpPost("Broadcast")]
+    [Authorize]
+    public async Task<IActionResult> Broadcast(string eventId, string title, string message)
+    {
+        try{
+            if (!Guid.TryParse(eventId, out _))
+            {
+                throw new Exception("Invalid Event id");
+            }
+
+            await _eventService.Broadcast(Guid.Parse(eventId), title, message);
+            
+            return RedirectToAction("manage", new { eventId = eventId });
+
+        }catch(Exception e){
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
+    }
+
+
 
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

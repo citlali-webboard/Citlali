@@ -588,6 +588,18 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return response.Content != null ? int.Parse(response.Content) : 0;
     }
 
+    public async Task<bool> UpdateEventStatus(Guid eventId)
+    {
+       var response = await _supabaseClient
+            .Rpc("update_event_status", new Dictionary<string, object>
+            {
+                { "event_uuid", eventId }
+            });
+            
+        return true;
+    }
+ 
+
     public async Task<bool> IsUserRegistered(Guid eventId, Guid userId)
     {
         var response = await _supabaseClient
@@ -869,11 +881,51 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Update();
 
         var CreatorUserId = await GetCreatorEventIdByEventId(eventId);
-
         await _notificationService.CreateNotification(CreatorUserId, "Confirmed ✅", "Your invitation has been confirmed", $"/event/detail/{eventId}");
+        
+        await UpdateEventStatus(eventId);
 
         return true;
     }
+
+
+    //GetRegistrantsConfirmedByEventId
+    public async Task<List<Registration?>> GetRegistrantsConfirmedByEventId(Guid eventId)
+    {
+        var response = await _supabaseClient
+            .From<Registration>()
+            .Select("UserId")
+            .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
+            .Filter("Status", Supabase.Postgrest.Constants.Operator.Equals, "confirmed")
+            .Get();
+
+        return response.Models ;   
+    }
+  
+
+    //Broadcast
+    public async Task<bool> Broadcast(Guid eventId, string title, string message)
+    {
+        var supabaseUser = _userService.CurrentSession.User
+                        ?? throw new UnauthorizedAccessException("User not authenticated");
+        var userId = Guid.Parse(supabaseUser.Id); 
+
+        var Event = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
+
+        if (Event.CreatorUserId.ToString() != userId.ToString())
+            throw new UnauthorizedAccessException("User not authorized to broadcast this event");
+
+        var registrants = await GetRegistrantsConfirmedByEventId(eventId);
+
+        foreach (var registrant in registrants)
+        {
+            await _notificationService.CreateNotification(registrant.UserId, title, message, $"/event/detail/{eventId}");
+        }
+
+        return true;
+        
+    }
+
 }
 
 public class UserAlreadyRegisteredException : Exception
