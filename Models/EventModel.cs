@@ -103,12 +103,14 @@ public class EventDetailCardData : EventBriefCardData
 public class EventFormDto
 {
     public Guid EventId { get; set; } = new();
+    public bool IsClosed { get; set; } = false;
     public List<QuestionViewModel> Questions { get; set; } = [];
 }
 
 public class EventDetailViewModel
 {
     public bool IsUserRegistered { get; set; } = false;
+    public bool IsClosed { get; set; } = true;
     public EventDetailCardData EventDetailCardData { get; set; } = new();
     public EventFormDto EventFormDto { get; set; } = new();
 }
