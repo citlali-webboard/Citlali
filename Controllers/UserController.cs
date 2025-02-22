@@ -125,6 +125,14 @@ public class UserController : Controller
 
     }
 
+    [HttpGet("history")]
+    [Authorize]
+    public async Task<IActionResult> History()
+    {
+        var historyList = await _eventService.GetHistory();
+        return View(historyList);
+    }
+
     [HttpGet("{username}")]
     public async Task<IActionResult> Profile(string username)
     {
