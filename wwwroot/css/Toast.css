@@ -1,0 +1,49 @@
+#toasts {
+  position: fixed;
+  right: 0.5rem;
+  top: var(--navbar-size);
+
+  width: 50%;
+  max-width: 320px;
+}
+
+.toast {
+  position: relative;
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: 1rem;
+}
+
+.toast-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: inline-block;
+
+  width: 100%;
+}
+
+.toast-close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.toast-style-neutral .toast-description {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+
+  width: 100%;
+}
+
+.toast-style-neutral {
+  background-color: var(--color-muted);
+  color: white;
+}
+
+.toast-style-destructive {
+  background-color: var(--color-destructive);
+  color: white;
+}
