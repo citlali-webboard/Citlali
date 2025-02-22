@@ -34,8 +34,7 @@ socket.onopen = (event) => {
 
 socket.onmessage = (event) => {
   const data = JSON.parse(event.data) as Notification;
-  console.log(data);
-  // use this data to do something
+  addNotificationToast(data.Title, data.SourceDisplayName, data.SourceProfileImageUrl);
 };
 
 socket.onclose = (event) => {

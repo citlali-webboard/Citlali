@@ -11,18 +11,15 @@ var refreshCookieName = "RefreshToken";
 var accessCookieValue = getCookieValue(accessCookieName);
 var refreshCookieValue = getCookieValue(refreshCookieName);
 socket.onopen = function (event) {
-    console.log(event);
+    if (!accessCookieValue || !refreshCookieValue) {
+        socket.close();
+        return;
+    }
     socket.send("".concat(accessCookieValue, ";").concat(refreshCookieValue));
 };
-
 socket.onmessage = function (event) {
-    console.log(event);
     var data = JSON.parse(event.data);
-    console.log(data);
-
-    updateRealTimeNotification();
+    addNotificationToast(data.Title, data.SourceDisplayName, data.SourceProfileImageUrl);
 };
-
 socket.onclose = function (event) {
-    console.log(event);
 };
