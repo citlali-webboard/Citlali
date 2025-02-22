@@ -62,6 +62,32 @@ public class NotificationController : Controller
         }
     }
 
+    [HttpGet("count")]
+    [Authorize]
+    public async Task<IActionResult> GetNotificationCount()
+    {
+        try
+        {
+
+           int notificationsNumber = await _notificationService.GetUnreadNotificationsNumber();
+
+            Console.WriteLine("Unread Notifications: " + notificationsNumber);
+
+            var dataDto = new Dictionary<string, int>
+            {
+                { "unreadNotifications", notificationsNumber }
+            };
+
+            return Json(dataDto);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            TempData["error"] = ex.Message;
+            return RedirectToAction("Index");
+        }
+    }
+
     [HttpGet("detail/{id}")]
     [Authorize]
     public async Task<IActionResult> GetNotificationDetails(string id)

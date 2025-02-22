@@ -162,6 +162,34 @@ public class NotificationService(Client supabaseClient, UserService userService)
         return true;
     }
 
+
+    //GetUnreadNotificationsNumber
+    public async Task<int> GetUnreadNotificationsNumber()
+    {
+        var currentUser = _userService.CurrentSession.User;
+        if (currentUser == null)
+        {
+            throw new Exception("User is not authenticated.");
+        }
+
+        Guid userId = Guid.Parse(currentUser.Id ?? "");
+
+        var response = await _supabaseClient
+            .From<Notification>()
+            .Select("NotificationId")
+            .Filter("ToUserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
+            .Filter("Read", Supabase.Postgrest.Constants.Operator.Equals, "false")
+            .Get();
+
+        if (response == null)
+        {
+            throw new Exception("Failed to get notifications.");
+        }
+
+        return response.Models.Count;
+    }
+
+    
     public async Task<NotificationModel> NotificationRowToModel (Notification notificationRow) {
         var sourceUser = await _userService.GetUserByUserId(notificationRow.FromUserId) ?? throw new Exception("Source user not found");
 

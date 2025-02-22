@@ -20,29 +20,22 @@ function setting_desktop() {
         // Clear any previous event listener
         card.removeEventListener("click", handleDesktopClick);
         card.removeEventListener("click", handleMobileClick);
-        console.log("11111");
-        // set container-detail-mobile to hidden 
-        // if (card.nextSibling != null && card.nextSibling.classList.contains("container-detail-mobile")){
-        //     card.nextSibling.classList.add("hidden");
-        // }
-
+   
         //check have name "clicked" or not
         if (card.getAttribute("name") == "clicked") {
             card.nextSibling.classList.add("hidden");
         }
 
-        console.log("222222");
         //set default notification 
         document.querySelector("#notification-detail").classList.add("hidden");
         document.querySelector("#default-notification").classList.remove("hidden");
 
-        console.log("3333333");
         // Add click event listener to each card
         card.addEventListener("click", handleDesktopClick);
     });
 }
 
-function handleDesktopClick() {
+function handleDesktopClick() {    
     let Card = this;
     let CardId = Card.getAttribute("data-id");
     console.log(CardId);
@@ -112,6 +105,9 @@ function handleDesktopClick() {
         }
     };
     xmlhttp.send();
+
+    GetNumberNotification();
+
 }
 
 function setting_mobile() {
@@ -128,8 +124,6 @@ function setting_mobile() {
 }
 
 function handleMobileClick() {
-    console.log("mobile");
-
     let Card = this;
     let CardId = Card.getAttribute("data-id");
     console.log(CardId);
@@ -186,6 +180,9 @@ function handleMobileClick() {
         }
     };
     xmlhttp.send();
+
+    GetNumberNotification();
+    // GetNumberNotification();
 }
 
 

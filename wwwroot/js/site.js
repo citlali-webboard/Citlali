@@ -23,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function () {
         notificationIcon.appendChild(div_count_notifications);
     }
 
-    let notificationIcon = document.getElementById("notification-icon");
     
 
     function isMobileDevice() {

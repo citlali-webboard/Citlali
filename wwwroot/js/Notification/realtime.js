@@ -14,11 +14,15 @@ socket.onopen = function (event) {
     console.log(event);
     socket.send("".concat(accessCookieValue, ";").concat(refreshCookieValue));
 };
+
 socket.onmessage = function (event) {
     console.log(event);
     var data = JSON.parse(event.data);
     console.log(data);
+
+    updateRealTimeNotification();
 };
+
 socket.onclose = function (event) {
     console.log(event);
 };
