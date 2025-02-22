@@ -32,7 +32,7 @@
     <meta property="og:type" content="object" />
     <meta property="og:url" content="@ogUrl" />
     <meta property="og:image" content="@ogImage" />
-    
+
     <title>@ViewData["Title"] • Citlali</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/css/TailwindDefaults.css" asp-append-version="true" />
@@ -52,7 +52,7 @@
             <button onclick="closePopup()">✖</button>
         </div>
     }
-    
+
     <div class="main-container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -63,6 +63,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/Notification/realtime.js" asp-append-version="true"></script>
     <script src="_content/Microsoft.FluentUI.AspNetCore.Components/Microsoft.FluentUI.AspNetCore.Components.lib.module.js" type="module" async></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
