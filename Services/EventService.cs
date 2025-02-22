@@ -588,6 +588,18 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return response.Content != null ? int.Parse(response.Content) : 0;
     }
 
+    public async Task<bool> UpdateEventStatus(Guid eventId)
+    {
+       var response = await _supabaseClient
+            .Rpc("update_event_status", new Dictionary<string, object>
+            {
+                { "event_uuid", eventId }
+            });
+            
+        return true;
+    }
+ 
+
     public async Task<bool> IsUserRegistered(Guid eventId, Guid userId)
     {
         var response = await _supabaseClient
@@ -869,8 +881,9 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Update();
 
         var CreatorUserId = await GetCreatorEventIdByEventId(eventId);
-
         await _notificationService.CreateNotification(CreatorUserId, "Confirmed ✅", "Your invitation has been confirmed", $"/event/detail/{eventId}");
+        
+        await UpdateEventStatus(eventId);
 
         return true;
     }
