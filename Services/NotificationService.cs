@@ -97,7 +97,12 @@ public class NotificationService(Client supabaseClient, UserService userService)
         }
 
         notification.Read = true;
-        var modelUpdateTask = notification.Update<Notification>();
+        var modelUpdateTask = _supabaseClient
+            .From<Notification>()
+            .Select("FromUserId, ToUserId, Title, Message, CreatedAt, Url")
+            .Filter("NotificationId", Supabase.Postgrest.Constants.Operator.Equals, notificationId.ToString())
+            .Set(x => x.Read, true)
+            .Update();
         var fromUserTask = _userService.GetUserByUserId(notification.FromUserId);
 
         await Task.WhenAll(modelUpdateTask, fromUserTask);
