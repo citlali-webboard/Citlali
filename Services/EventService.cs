@@ -333,7 +333,7 @@ public class EventService(Client supabaseClient, UserService userService)
         var response = await _supabaseClient
             .From<Event>()
             .Filter(row => row.Deleted, Supabase.Postgrest.Constants.Operator.Equals, "false")
-            .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.UtcNow)
+            .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
             .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
             .Range(from, to)
             .Get();
@@ -465,7 +465,7 @@ public class EventService(Client supabaseClient, UserService userService)
             .Select("*")
             .Filter("EventCategoryTagId", Supabase.Postgrest.Constants.Operator.Equals, tagId.ToString())
             .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
-            .Filter("PostExpiryDate", Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.UtcNow)
+            .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
             .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
             .Get();
 
