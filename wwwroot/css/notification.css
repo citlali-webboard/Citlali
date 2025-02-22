@@ -193,55 +193,72 @@ main .notification-container{
     display: none;
 }
 
-@media screen and (max-width: 768px){
-    /* .container{
-        flex-direction: column;
-        gap: 2rem;
+/* ---------------------------- preview-card ------------------------ */
+.preview-card {
+    background-image: linear-gradient(0deg, rgba(220, 214, 247, 1) 19%, rgba(255, 199, 199, 0) 100%);
+    box-shadow: 0 0 10px 0 rgba(220, 214, 247, 1);
+    padding: 1.5rem; 
+    border-radius: 8px; 
+    margin: 0.5rem 0;
+    width: 100%;
+    height: auto;
+}
+
+.app-name {
+    font-size: 1rem;
+}
+
+.preview-card-topic h1{
+    font-size: 1.5rem; 
+    font-weight: bold; 
+    margin: 0.5rem 0;
+}
+
+.preview-card-topic p {
+    font-size: 1rem; 
+    /* white-space: nowrap;  */
+    width: 100%; 
+    height: auto;
+    /* max-width: 400px;  */
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden; 
+    /* text-overflow: ellipsis;  */
+    
+}
+
+.preview-link {
+    font-size: 1.1rem; 
+    margin-top: 0.5rem;
+    color: blue;
+    text-decoration: underline;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden; 
+}
+/* ---------------------------- preview-card ------------------------ */
+@media screen and (min-width: 768px) {
+    .container {
+        width: 80vw;
     }
 
-    .notification-container{
-        width: 100%;
+    main .notification-container {
+        width: 80%;
+        gap: 0.3rem;
+        max-width: 380px;
     }
-    
+
     .default-notification,
-    .notification-detail{
-        display: none;
-
-    }
-
-    .notification-card{
+    .notification-detail {
         width: 100%;
     }
-    
-    .container-detail-mobile{
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
-        padding: 3px 6px 3px 6px;
-        margin-bottom: 1rem;
-    }
+}
 
-    .title-detail-mobile{
-        font-size: 1.5rem;
-        font-weight: bold;
-        opacity: 1;
-    }
 
-    .message-detail-mobile{
-        font-size: 1rem;
-        opacity: 0.8;
-    }
-
-    .preview-detail-mobile{
-        font-size: 0.8rem;
-        opacity: 0.6;
-    }
-
-    .hidden{
-        display: none;
-    } */
-
+@media screen and (max-width: 768px){
     .container {
         width: 100%;
         margin: 0 6% 0 6%;
@@ -285,9 +302,6 @@ main .notification-container{
     }
 
     .preview-card-mobile {
-        /* background-color:rgb(255, 200, 237);  */
-        /* background-image: linear-gradient(180deg, rgba(202, 222, 252, 1) 0%, rgba(255, 226, 226, 1) 100%); */
-        /* background-image: linear-gradient(0deg, rgba(220, 214, 247, 1) 18%, rgba(255, 199, 199, 1) 100%); */
         background-image: linear-gradient(0deg, rgba(220, 214, 247, 1) 19%, rgba(255, 199, 199, 0) 100%);
         padding: 1.5rem; 
         border-radius: 8px; 
@@ -364,10 +378,10 @@ main .notification-container{
     width: fit-content;
 }
 
-@media screen and (max-width: 768px){
+@media screen and (max-width: 1000px){
     .no-noti-container{
         margin-top: 20%;
-        width: 80vw;
+        width: 70vw;
         height: 40vh;
     }
 
@@ -383,51 +397,4 @@ main .notification-container{
     .no-noti-text p{
         margin: 1rem;
     }
-}
-
-/* ----------------------------have notification------------------------ */
-.preview-card {
-    background-image: linear-gradient(0deg, rgba(220, 214, 247, 1) 19%, rgba(255, 199, 199, 0) 100%);
-    padding: 1.5rem; 
-    border-radius: 8px; 
-    margin: 0.5rem 0;
-    width: 100%;
-    height: auto;
-    box-shadow: 0 0 10px 0 rgba(220, 214, 247, 1);
-}
-
-.app-name {
-    font-size: 1rem;
-}
-
-.preview-card-topic h1{
-    font-size: 1.5rem; 
-    font-weight: bold; 
-    margin: 0.5rem 0;
-}
-
-.preview-card-topic p {
-    font-size: 1rem; 
-    /* white-space: nowrap;  */
-    width: 100%; 
-    height: auto;
-    /* max-width: 400px;  */
-    margin-bottom: 1rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden; 
-    /* text-overflow: ellipsis;  */
-    
-}
-
-.preview-link {
-    font-size: 1.1rem; 
-    margin-top: 0.5rem;
-    color: blue;
-    text-decoration: underline;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden; 
 }

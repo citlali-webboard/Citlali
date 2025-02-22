@@ -77,21 +77,21 @@ function handleDesktopClick() {
                 contentContainer.innerHTML = `
                 <p>${data.title}</p>
                 <p>${data.message}</p>
-                <div class="preview-card">
-                    <p class="app-name">Citlali 🩷</p>
-                    <div class="preview-card-topic">
-                        <h1>${data.urlTitle}</h1>
-                        <p>${data.urlDescription}</p>
-                    </div>
-                    
-                    <a class="preview-link" href="${preview_url}">${preview_url}</a>
-                    
-                    <a href="${preview_url}" target="">
-                        <div style="border-radius: 8px; overflow: hidden; margin-top: 10px;">
-                            <img src="${data.urlImage}" style="max-width: 100%; height: auto;">
+                <a href="${preview_url}">
+                    <div class="preview-card">
+                        <p class="app-name">Citlali 🩷</p>
+                        <div class="preview-card-topic">
+                            <h1>${data.urlTitle}</h1>
+                            <p>${data.urlDescription}</p>
                         </div>
-                    </a>
-                </div>
+                        
+                        <a href="${preview_url}" target="">
+                            <div style="border-radius: 8px; overflow: hidden; margin-top: 10px;">
+                                <img src="${data.urlImage}" style="max-width: 100%; height: auto;">
+                            </div>
+                        </a>
+                    </div>
+                </a>
 
                 `;
             } else {
@@ -157,21 +157,21 @@ function handleMobileClick() {
                     container_detail_mobile.innerHTML = `
                         <p class="txt-over-card">${data.title}</p>
                         <p class="txt-over-card">${data.message}</p>
-                        <div class="preview-card-mobile">
-                            <p class="app-name">Citlali 🩷</p>
-                            <div class="preview-card-topic-mobile">
-                                <h1>${data.urlTitle}</h1>
-                                <p>${data.urlDescription}</p>
-                            </div>
-                            
-                            <a class="preview-link" href="${preview_url}">${preview_url}</a>
-                            
-                            <a href="${preview_url}" target="">
-                                <div style="border-radius: 8px; overflow: hidden; margin-top: 10px;">
-                                    <img src="${data.urlImage}" style="max-width: 100%; height: auto;">
+                        <a href="${preview_url}">
+                            <div class="preview-card-mobile">
+                                <p class="app-name">Citlali 🩷</p>
+                                <div class="preview-card-topic-mobile">
+                                    <h1>${data.urlTitle}</h1>
+                                    <p>${data.urlDescription}</p>
                                 </div>
-                            </a>
-                        </div>
+                                
+                                <a href="${preview_url}" target="">
+                                    <div style="border-radius: 8px; overflow: hidden; margin-top: 10px;">
+                                        <img src="${data.urlImage}" style="max-width: 100%; height: auto;">
+                                    </div>
+                                </a>
+                            </div>
+                        </a>
                     `;
                 } else {
                     // ถ้าไม่มี URL แสดงเป็นข้อความปกติ
