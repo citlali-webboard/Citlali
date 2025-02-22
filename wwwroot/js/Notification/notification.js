@@ -75,6 +75,10 @@ function handleDesktopClick() {
 
             let contentContainer = document.querySelector("#notification-detail .content div");
 
+            let url = window.location.href;
+            let root_url = url.split("/Notification")[0];
+            let preview_url = root_url + data.url;
+
             if (data.url) {
                 // ถ้า notification มี URL ให้แสดงเป็น card คล้าย GitHub Link Embed
                 contentContainer.innerHTML = `
@@ -87,9 +91,9 @@ function handleDesktopClick() {
                         <p>${data.urlDescription}</p>
                     </div>
                     
-                    <a class="preview-link" href="${data.url}">${data.url}</a>
+                    <a class="preview-link" href="${preview_url}">${preview_url}</a>
                     
-                    <a href="${data.url}" target="">
+                    <a href="${preview_url}" target="">
                         <div style="border-radius: 8px; overflow: hidden; margin-top: 10px;">
                             <img src="${data.urlImage}" style="max-width: 100%; height: auto;">
                         </div>
@@ -143,50 +147,58 @@ function handleMobileClick() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             var data = JSON.parse(xmlhttp.responseText);
             console.log(data);
-        }
 
-        let url = window.location.href;
-        let root_url = url.split("/Notification")[0];
-        let preview_url = root_url + data.url;
-        console.log(preview_url);
+            let url = window.location.href;
+            let root_url = url.split("/Notification")[0];
+            let preview_url = root_url + data.url;
+            console.log(preview_url);
 
-        //if the card is not contain the name "clicked"
-        if (Card.getAttribute("name") != "clicked") {
-            Card.setAttribute("name", "clicked");
-            // create new div below the card
-            let container_detail_mobile = document.createElement("div");
-            container_detail_mobile.classList.add("container-detail-mobile");
+            if (Card.getAttribute("name") != "clicked") {
+                Card.setAttribute("name", "clicked");
 
-            let title_detail_mobile = document.createElement("div");
-            title_detail_mobile.innerHTML = data.title;
-            title_detail_mobile.classList.add("title-detail-mobile");
+                let container_detail_mobile = document.createElement("div");
+                container_detail_mobile.classList.add("container-detail-mobile");
 
-            let message_detail_mobile = document.createElement("div");
-            message_detail_mobile.innerHTML = data.message;
-            message_detail_mobile.classList.add("message-detail-mobile");
+                if (data.url) {
+                    container_detail_mobile.innerHTML = `
+                        <p class="txt-over-card">${data.title}</p>
+                        <p class="txt-over-card">${data.message}</p>
+                        <div class="preview-card-mobile">
+                            <p class="app-name">Citlali 🩷</p>
+                            <div class="preview-card-topic-mobile">
+                                <h1>${data.urlTitle}</h1>
+                                <p>${data.urlDescription}</p>
+                            </div>
+                            
+                            <a class="preview-link" href="${preview_url}">${preview_url}</a>
+                            
+                            <a href="${preview_url}" target="">
+                                <div style="border-radius: 8px; overflow: hidden; margin-top: 10px;">
+                                    <img src="${data.urlImage}" style="max-width: 100%; height: auto;">
+                                </div>
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    // ถ้าไม่มี URL แสดงเป็นข้อความปกติ
+                    container_detail_mobile.innerHTML = `
+                        <h2>${data.title}</h2>
+                        <p>${data.message}</p>
+                        ${data.imageUrl ? `<img src="${data.imageUrl}" width="100%" height="auto" />` : ""}
+                    `;
+                }
 
-            let preview_url_detail_mobile = document.createElement("a");
-            preview_url_detail_mobile.innerHTML = "Preview";
-            preview_url_detail_mobile.href = preview_url;
-            preview_url_detail_mobile.classList.add("preview-url-detail-mobile");
-
-            container_detail_mobile.appendChild(title_detail_mobile);
-            container_detail_mobile.appendChild(message_detail_mobile);
-            container_detail_mobile.appendChild(preview_url_detail_mobile);
-
-
-
-            Card.after(container_detail_mobile);
-
-        }
-        else{
-            // hidden the div below the card
-            console.log("hidden");
-            Card.nextElementSibling.classList.toggle("hidden");
+                Card.after(container_detail_mobile);
+            } else {
+                // ถ้าคลิกซ้ำให้ซ่อน
+                console.log("hidden");
+                Card.nextElementSibling.classList.toggle("hidden");
+            }
         }
     };
     xmlhttp.send();
 }
+
 
 
 if (isMobile) {
