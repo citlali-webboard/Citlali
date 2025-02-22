@@ -4,6 +4,41 @@
     ViewData["Title"] = "Notification";
 }
 
+@functions{
+    public string GetPastRelativeTime(DateTime date){
+        const int SECOND = 1;
+        const int MINUTE = 60 * SECOND;
+        const int HOUR = 60 * MINUTE;
+        const int DAY = 24 * HOUR;
+        const int MONTH = 30 * DAY;
+
+        var diff = DateTime.Now - date;
+        var timeSpan = Math.Floor(diff.TotalSeconds);
+
+        if(timeSpan <= 0){
+            throw new InvalidDataException();
+        }
+
+        if (timeSpan < 1 * MINUTE)
+            return "a few seconds ago";
+        if (timeSpan < 2 * MINUTE)
+            return "a minute ago";
+        if (timeSpan < 1 * HOUR)
+            return $"{Math.Floor(timeSpan / MINUTE)} minutes ago";
+        if (timeSpan < 2 * HOUR)
+            return "an hour ago";
+        if (timeSpan < 1 * DAY)
+            return $"{Math.Floor(timeSpan / HOUR)} hours ago";
+        if (timeSpan < 2 * DAY)
+            return "yesterday";
+        if (timeSpan < 1 * MONTH)
+            return $"{Math.Floor(timeSpan / DAY)} days ago";
+
+
+        return date.ToString("MMM dd, yyyy");
+    }
+}
+
 @section head {
     <link rel="stylesheet" href="~/css/notification.css" asp-append-version="true" />
 }
@@ -38,7 +73,7 @@
                                     <div id="display-name">@Model.Notifications[i].SourceDisplayName</div> 
                                 </div>
                             </div>
-                            <div class="notification-time"> 1 day ago </div>
+                            <div class="notification-time"> @GetPastRelativeTime(Model.Notifications[i].CreatedAt)</div>
                         </div>
                     }
                     else{
@@ -50,7 +85,7 @@
                                     <div id="display-name">@Model.Notifications[i].SourceDisplayName</div> 
                                 </div>
                             </div>
-                            <div class="notification-time"> 1 day ago </div>
+                            <div class="notification-time"> @GetPastRelativeTime(Model.Notifications[i].CreatedAt)</div>
                         </div>
                     }
                 }
