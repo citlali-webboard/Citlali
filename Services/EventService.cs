@@ -874,6 +874,45 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         return true;
     }
+
+
+    //GetRegistrantsConfirmedByEventId
+    public async Task<List<Registration?>> GetRegistrantsConfirmedByEventId(Guid eventId)
+    {
+        var response = await _supabaseClient
+            .From<Registration>()
+            .Select("UserId")
+            .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
+            .Filter("Status", Supabase.Postgrest.Constants.Operator.Equals, "confirmed")
+            .Get();
+
+        return response.Models ;   
+    }
+  
+
+    //Broadcast
+    public async Task<bool> Broadcast(Guid eventId, string title, string message)
+    {
+        var supabaseUser = _userService.CurrentSession.User
+                        ?? throw new UnauthorizedAccessException("User not authenticated");
+        var userId = Guid.Parse(supabaseUser.Id); 
+
+        var Event = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
+
+        if (Event.CreatorUserId.ToString() != userId.ToString())
+            throw new UnauthorizedAccessException("User not authorized to broadcast this event");
+
+        var registrants = await GetRegistrantsConfirmedByEventId(eventId);
+
+        foreach (var registrant in registrants)
+        {
+            await _notificationService.CreateNotification(registrant.UserId, title, message, $"/event/detail/{eventId}");
+        }
+
+        return true;
+        
+    }
+
 }
 
 public class UserAlreadyRegisteredException : Exception
