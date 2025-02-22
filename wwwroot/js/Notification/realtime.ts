@@ -34,7 +34,7 @@ socket.onopen = (event) => {
 
 socket.onmessage = (event) => {
   const data = JSON.parse(event.data) as Notification;
-  updateRealTimeNotification();
+  incrementUnreadNotification();
   addNotificationToast(data.Title, data.SourceDisplayName, data.SourceProfileImageUrl);
 };
 

@@ -19,7 +19,7 @@ socket.onopen = function (event) {
 };
 socket.onmessage = function (event) {
     var data = JSON.parse(event.data);
-    updateRealTimeNotification();
+    incrementUnreadNotification();
     addNotificationToast(data.Title, data.SourceDisplayName, data.SourceProfileImageUrl);
 };
 socket.onclose = function (event) {

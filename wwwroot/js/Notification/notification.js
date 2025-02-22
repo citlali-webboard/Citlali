@@ -20,13 +20,13 @@ function setting_desktop() {
         // Clear any previous event listener
         card.removeEventListener("click", handleDesktopClick);
         card.removeEventListener("click", handleMobileClick);
-   
+
         //check have name "clicked" or not
         if (card.getAttribute("name") == "clicked") {
             card.nextSibling.classList.add("hidden");
         }
 
-        //set default notification 
+        //set default notification
         document.querySelector("#notification-detail").classList.add("hidden");
         document.querySelector("#default-notification").classList.remove("hidden");
 
@@ -35,7 +35,7 @@ function setting_desktop() {
     });
 }
 
-function handleDesktopClick() {    
+function handleDesktopClick() {
     let Card = this;
     let CardId = Card.getAttribute("data-id");
     console.log(CardId);
@@ -62,7 +62,7 @@ function handleDesktopClick() {
 
             source_img.src = data.sourceProfileImageUrl;
 
-            
+
             // Mark the card as read and disable hover
             Card.classList.add("read");
 
@@ -79,9 +79,9 @@ function handleDesktopClick() {
                         <h1>${data.urlTitle}</h1>
                         <p>${data.urlDescription}</p>
                     </div>
-                    
+
                     <a class="preview-link" href="${data.url}">${data.url}</a>
-                    
+
                     <a href="${data.url}" target="">
                         <div style="border-radius: 8px; overflow: hidden; margin-top: 10px;">
                             <img src="${data.urlImage}" style="max-width: 100%; height: auto;">
@@ -106,7 +106,7 @@ function handleDesktopClick() {
     };
     xmlhttp.send();
 
-    GetNumberNotification();
+    decrementUnreadNotification();
 
 }
 
@@ -181,8 +181,7 @@ function handleMobileClick() {
     };
     xmlhttp.send();
 
-    GetNumberNotification();
-    // GetNumberNotification();
+    decrementUnreadNotification();
 }
 
 
