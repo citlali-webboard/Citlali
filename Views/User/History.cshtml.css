@@ -53,8 +53,6 @@
 
 .history-card:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    translate: 0px -1px;
-    transition: all 0.2s ease-in-out;
     background-color: #f6f6f6;
 }
 
