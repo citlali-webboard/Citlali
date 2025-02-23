@@ -560,6 +560,7 @@ ul {
     text-overflow: ellipsis;
 }
 .popup-each-confirmed-participant img {
+    margin: 0 !important;
     aspect-ratio: 1/1;
     object-fit: cover;
 }
