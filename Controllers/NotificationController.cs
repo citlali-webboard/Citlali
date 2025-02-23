@@ -33,15 +33,21 @@ public class NotificationController : Controller
     [Authorize]
     public async Task<IActionResult> Index()
     {
-        List<NotificationModel> notifications = await _notificationService.GetNotifications();
+        try{
+            List<NotificationModel> notifications = await _notificationService.GetNotifications();
 
-        var notificationViewModel = new NotificationViewModel
-        {
-            Notifications = notifications
-        };
+            var notificationViewModel = new NotificationViewModel
+            {
+                Notifications = notifications
+            };
 
+            return View(notificationViewModel);
+        }catch(Exception ex){
+            Console.WriteLine(ex.Message);
+            TempData["error"] = ex.Message;
+            return RedirectToAction("event", "explore");
+        }
 
-        return View(notificationViewModel);
     }
 
     [Route("realtime")]
@@ -79,6 +85,55 @@ public class NotificationController : Controller
             };
 
             return Json(dataDto);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            TempData["error"] = ex.Message;
+            return RedirectToAction("Index");
+        }
+    }
+
+
+    [HttpPost("deleteAll")]
+    [Authorize]
+    public async Task<IActionResult> DeleteAllNotifications()
+    {
+        try
+        {
+            await _notificationService.DeleteAllNotifications();
+            return RedirectToAction("Index");
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            TempData["error"] = ex.Message;
+            return RedirectToAction("Index");
+        }
+    }
+
+
+    [HttpGet("delete/{id}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteNotification(string id)
+    {
+        try
+        {
+            if (!Guid.TryParse(id, out _))
+            {
+                throw new Exception("Invalid notification id.");
+            }
+
+            if (await _notificationService.DeleteNotification(Guid.Parse(id))){
+
+                return Json(new { success = true });
+
+            }
+
+            return Json(new { success = false });
+
+            
         }
         catch (Exception ex)
         {

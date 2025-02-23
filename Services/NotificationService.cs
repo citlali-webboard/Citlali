@@ -203,6 +203,61 @@ public class NotificationService(Client supabaseClient, UserService userService)
         return response.Models.Count;
     }
 
+    //get notificaion by id
+    public async Task<Notification> GetNotificationById(Guid notificationId)
+    {
+        var notification = await _supabaseClient
+            .From<Notification>()
+            .Filter("NotificationId", Supabase.Postgrest.Constants.Operator.Equals, notificationId.ToString())
+            .Single();
+
+        return notification ?? throw new Exception("Notification not found");
+    }
+
+    //DeleteNotification
+    public async Task<bool> DeleteNotification(Guid notificationId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            throw new Exception("User is not authenticated.");
+        }
+
+        Guid userId = Guid.Parse(currentUser.Id ?? "");
+
+        var notification = await GetNotificationById(notificationId);
+
+        if (userId != notification.ToUserId)
+        {
+            throw new Exception("User is not authorized to delete notification.");
+        }
+
+        await _supabaseClient
+            .From<Notification>()
+            .Filter("NotificationId", Supabase.Postgrest.Constants.Operator.Equals, notificationId.ToString())
+            .Delete();   
+
+        return true; 
+    }
+
+
+
+    public async Task DeleteAllNotifications()
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            throw new Exception("User is not authenticated.");
+        }
+
+        Guid userId = Guid.Parse(currentUser.Id ?? "");
+
+        await _supabaseClient
+            .From<Notification>()
+            .Filter("Read", Supabase.Postgrest.Constants.Operator.Equals, "true")
+            .Filter("ToUserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
+            .Delete();
+    }
 
     public async Task<NotificationModel> NotificationRowToModel (Notification notificationRow) {
         var sourceUser = await _userService.GetUserByUserId(notificationRow.FromUserId) ?? throw new Exception("Source user not found");
