@@ -62,9 +62,16 @@ function handleDesktopClick() {
 
             source_img.src = data.sourceProfileImageUrl;
 
+            // Decrement notification count if the card is unread
+            if (Card.classList.contains("read") == false) {
+                console.log("decrement");
+                decrementUnreadNotification();
+            }
 
             // Mark the card as read and disable hover
             Card.classList.add("read");
+            
+            
 
             let contentContainer = document.querySelector("#notification-detail .content div");
 
@@ -110,8 +117,6 @@ function handleDesktopClick() {
     };
     xmlhttp.send();
 
-    decrementUnreadNotification();
-
 }
 
 function setting_mobile() {
@@ -149,6 +154,7 @@ function handleMobileClick() {
 
             if (Card.getAttribute("name") != "clicked") {
                 Card.setAttribute("name", "clicked");
+                decrementUnreadNotification();
 
                 let container_detail_mobile = document.createElement("div");
                 container_detail_mobile.classList.add("container-detail-mobile");
@@ -192,7 +198,6 @@ function handleMobileClick() {
     };
     xmlhttp.send();
 
-    decrementUnreadNotification();
 }
 
 
