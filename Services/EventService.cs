@@ -11,7 +11,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     private readonly Client _supabaseClient = supabaseClient;
     private readonly UserService _userService = userService;
     private readonly NotificationService _notificationService = notificationService;
-    // CreateEvent 
+    // CreateEvent
 
     public async Task<List<Tag>> GetTags()
     {
@@ -179,7 +179,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         {
             throw new KeyNotFoundException("Event not found");
         }
-        
+
         return response.CreatorUserId;
     }
 
@@ -216,7 +216,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.Status, "awaiting-confirmation")
             .Update();
 
-        await _notificationService.CreateNotification(userId, "Congratulation 🎉", "You have been invited to an event", $"/event/detail/{eventId}");
+        await _notificationService.CreateNotification(userId, "Congratulations 🎉", "You have been invited to the event.", $"/event/detail/{eventId}");
 
         return true;
     }
@@ -243,7 +243,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.Status, "rejected")
             .Update();
 
-        await _notificationService.CreateNotification(userId, "Sorry 😢", "Your invitation has been rejected", $"/event/detail/{eventId}");
+        await _notificationService.CreateNotification(userId, "Sorry 😢", "Your request has been rejected.", $"/event/detail/{eventId}");
 
         return true;
     }
@@ -349,7 +349,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         {
             throw new UserAlreadyRegisteredException(); // Redirect to "status" page
         }
-        if (isRegistered && isClosed) 
+        if (isRegistered && isClosed)
             throw new UserAlreadyRegisteredException();
 
         var currentParticipant = await GetRegistrationCountByEventId(citlaliEvent.EventId);
@@ -445,7 +445,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                 .Insert(newRegistrationAnswers);
         }
 
-        await _notificationService.CreateNotification(Event.CreatorUserId, "New join request 🙋🏻", "New user has joined your event", $"/event/detail/{EventId}");
+        await _notificationService.CreateNotification(Event.CreatorUserId, "New request 🙋🏻", "A user requested to join your event.", $"/event/detail/{EventId}");
 
         return newRegistration;
     }
@@ -595,10 +595,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             {
                 { "event_uuid", eventId }
             });
-            
+
         return true;
     }
- 
+
 
     public async Task<bool> IsUserRegistered(Guid eventId, Guid userId)
     {
@@ -855,7 +855,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         var CreatorUserId = await GetCreatorEventIdByEventId(eventId);
 
-        await _notificationService.CreateNotification(CreatorUserId, "Rejected ❌", "Your invitation has been rejected", $"/event/detail/{eventId}");
+        await _notificationService.CreateNotification(CreatorUserId, "Rejected ❌", "Your invitation has been rejected.", $"/event/detail/{eventId}");
 
 
         return true;
@@ -882,7 +882,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         var CreatorUserId = await GetCreatorEventIdByEventId(eventId);
         await _notificationService.CreateNotification(CreatorUserId, "Confirmed ✅", "Your invitation has been confirmed", $"/event/detail/{eventId}");
-        
+
         await UpdateEventStatus(eventId);
 
         return true;
@@ -899,16 +899,16 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Filter("Status", Supabase.Postgrest.Constants.Operator.Equals, "confirmed")
             .Get();
 
-        return response.Models ;   
+        return response.Models ;
     }
-  
+
 
     //Broadcast
     public async Task<bool> Broadcast(Guid eventId, string title, string message)
     {
         var supabaseUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
-        var userId = Guid.Parse(supabaseUser.Id); 
+        var userId = Guid.Parse(supabaseUser.Id);
 
         var Event = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
 
@@ -923,7 +923,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         }
 
         return true;
-        
+
     }
 
 }
