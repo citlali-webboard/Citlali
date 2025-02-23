@@ -710,25 +710,25 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
             var registrationId = registration.RegistrationId;
 
+            BriefUser briefUser = new BriefUser
+            {
+                UserId = registrant.UserId,
+                Username = registrant.Username,
+                ProfileImageUrl = registrant.ProfileImageUrl,
+                DisplayName = registrant.DisplayName
+            };
+
             if (registration.Status == "confirmed")
             {
-                ConfirmedParticipant.Add(new BriefUser
-                {
-                    UserId = registrant.UserId,
-                    Username = registrant.Username,
-                    ProfileImageUrl = registrant.ProfileImageUrl,
-                    DisplayName = registrant.DisplayName
-                });
+                ConfirmedParticipant.Add(briefUser);
             }
             else if (registration.Status == "awaiting-confirmation")
             {
-                AwaitingConfirmationParticipant.Add(new BriefUser
-                {
-                    UserId = registrant.UserId,
-                    Username = registrant.Username,
-                    ProfileImageUrl = registrant.ProfileImageUrl,
-                    DisplayName = registrant.DisplayName
-                });
+                AwaitingConfirmationParticipant.Add(briefUser);
+            }
+            else if (registration.Status == "rejected-invitation")
+            {
+                RejectedConfirmationParticipant.Add(briefUser);
             }
 
             var answers = (await _supabaseClient
@@ -779,7 +779,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             Questions = questionList,
             AnswerSet = answerSet,
             ConfirmedParticipant = ConfirmedParticipant,
-            AwaitingConfirmationParticipant = AwaitingConfirmationParticipant
+            AwaitingConfirmationParticipant = AwaitingConfirmationParticipant,
+            RejectedConfirmationParticipant = RejectedConfirmationParticipant
         };
     }
 
