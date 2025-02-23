@@ -12,7 +12,6 @@ window.matchMedia("(max-width: 768px)").addEventListener("change", function (e) 
     }
 });
 
-
 function setting_desktop() {
     var notificationCards = document.querySelectorAll(".notification-card");
 
@@ -70,8 +69,6 @@ function handleDesktopClick() {
 
             // Mark the card as read and disable hover
             Card.classList.add("read");
-            
-            
 
             let contentContainer = document.querySelector("#notification-detail .content div");
 
@@ -80,34 +77,38 @@ function handleDesktopClick() {
             let preview_url = root_url + data.url;
 
             if (data.url) {
-                // ถ้า notification มี URL ให้แสดงเป็น card คล้าย GitHub Link Embed
-                contentContainer.innerHTML = `
-                <p>${data.title}</p>
-                <p>${data.message}</p>
-                <a href="${preview_url}">
-                    <div class="preview-card">
-                        <p class="app-name">Citlali 🩷</p>
-                        <div class="preview-card-topic">
-                            <h1>${data.urlTitle}</h1>
-                            <p>${data.urlDescription}</p>
-                        </div>
-                        
-                        <a href="${preview_url}" target="">
-                            <div style="border-radius: 8px; overflow: hidden; margin-top: 10px;">
-                                <img src="${data.urlImage}" style="max-width: 100%; height: auto;">
-                            </div>
-                        </a>
-                    </div>
-                </a>
 
+                let preview_card = `
+                    <p>${escapeHTML(data.title)}</p>
+                    <p>${escapeHTML(data.message)}</p>
+                    <a href="${preview_url}">
+                        <div class="preview-card">
+                            <p class="app-name">Citlali 🩷</p>
+                            <div class="preview-card-topic">
+                                <h1>${escapeHTML(data.urlTitle)}</h1>
+                                <p>${escapeHTML(data.urlDescription)}</p>
+                            </div>
+                            
+                            <a href="${preview_url}" target="">
+                                <div style="border-radius: 8px; overflow: hidden; margin-top: 10px;">
+                                    <img src="${data.urlImage}" style="max-width: 100%; height: auto;">
+                                </div>
+                            </a>
+                        </div>
+                    </a>
                 `;
+
+                contentContainer.innerHTML = preview_card;
+
             } else {
                 // ถ้าไม่มี URL แสดงเป็นข้อความปกติ
-                contentContainer.innerHTML = `
-                    <h2>${data.title}</h2>
-                    <p>${data.message}</p>
+                no_preview_card = `
+                    <h2>${escapeHTML(data.title)}</h2>
+                    <p>${escapeHTML(data.message)}</p>
                     ${data.imageUrl ? `<img src="${data.imageUrl}" width="100%" height="auto" />` : ""}
                 `;
+
+                contentContainer.innerHTML = no_preview_card;
             }
 
             // Show details and hide default notification
@@ -156,7 +157,6 @@ function handleMobileClick() {
             let root_url = url.split("/Notification")[0];
             let preview_url = root_url + data.url;
             console.log(preview_url);
-
             
             Card.setAttribute("name", "clicked");
             decrementUnreadNotification();
@@ -165,15 +165,16 @@ function handleMobileClick() {
             container_detail_mobile.classList.add("container-detail-mobile");
 
             if (data.url) {
-                container_detail_mobile.innerHTML = `
-                    <p class="txt-over-card">${data.title}</p>
-                    <p class="txt-over-card">${data.message}</p>
+
+                let preview_card_mobile = `
+                    <p class="txt-over-card">${escapeHTML(data.title)}</p>
+                    <p class="txt-over-card">${escapeHTML(data.message)}</p>
                     <a href="${preview_url}">
                         <div class="preview-card-mobile">
                             <p class="app-name">Citlali 🩷</p>
                             <div class="preview-card-topic-mobile">
-                                <h1>${data.urlTitle}</h1>
-                                <p>${data.urlDescription}</p>
+                                <h1>${escapeHTML(data.urlTitle)}</h1>
+                                <p>${escapeHTML(data.urlDescription)}</p>
                             </div>
                             
                             <a href="${preview_url}" target="">
@@ -184,13 +185,18 @@ function handleMobileClick() {
                         </div>
                     </a>
                 `;
+
+                container_detail_mobile.innerHTML = preview_card_mobile;
+
             } else {
                 // ถ้าไม่มี URL แสดงเป็นข้อความปกติ
-                container_detail_mobile.innerHTML = `
-                    <h2>${data.title}</h2>
-                    <p>${data.message}</p>
+                let no_preview_card_mobile = `
+                    <h2>${escapeHTML(data.title)}</h2>
+                    <p>${escapeHTML(data.message)}</p>
                     ${data.imageUrl ? `<img src="${data.imageUrl}" width="100%" height="auto" />` : ""}
                 `;
+
+                container_detail_mobile.innerHTML = no_preview_card_mobile;
             }
 
             Card.after(container_detail_mobile);
@@ -201,10 +207,21 @@ function handleMobileClick() {
 
 }
 
-
-
 if (isMobile) {
     setting_mobile();
 } else {
     setting_desktop();
+}
+
+// ✅ ป้องกัน XSS โดย Escape HTML
+function escapeHTML(str) {
+    return str.replace(/[&<>"']/g, function (match) {
+        return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+        }[match];
+    });
 }
