@@ -216,7 +216,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.Status, "awaiting-confirmation")
             .Update();
 
-        await _notificationService.CreateNotification(userId, "Congratulations 🎉", "You have been invited to the event.", $"/event/detail/{eventId}");
+        var notificationTitle = "You have been invited to an event! 🎉";
+        var notificationBody = $"Congratulations! Your request to join the event {eventToInvite.EventTitle} has been reviewed and accepted! To confirm or reject the invitation, please visit the event page.";
+
+        await _notificationService.CreateNotification(userId, notificationTitle, notificationBody, $"/event/detail/{eventId}");
 
         return true;
     }
@@ -243,7 +246,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.Status, "rejected")
             .Update();
 
-        await _notificationService.CreateNotification(userId, "Sorry 😢", "Your request has been rejected.", $"/event/detail/{eventId}");
+        var notificationTitle = "Your request has been rejected. ❌";
+        var notificationBody = $"We regret to inform you that your request to join the event {eventToInvite.EventTitle} has been rejected. We appreciate your understanding, but you can always try again!";
+
+        await _notificationService.CreateNotification(userId, notificationTitle, notificationBody, $"/event/detail/{eventId}");
 
         return true;
     }
@@ -445,7 +451,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                 .Insert(newRegistrationAnswers);
         }
 
-        await _notificationService.CreateNotification(Event.CreatorUserId, "New request 🙋🏻", "A user requested to join your event.", $"/event/detail/{EventId}");
+        var notificationTitle = "New joining request! 🙋🏻";
+        var notificationBody = $"A user has requested to join your event {Event.EventTitle}. Please review their request on event management page.";
+
+        await _notificationService.CreateNotification(Event.CreatorUserId, notificationTitle, notificationBody, $"/event/detail/{EventId}");
 
         return newRegistration;
     }
@@ -855,7 +864,12 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         var CreatorUserId = await GetCreatorEventIdByEventId(eventId);
 
-        await _notificationService.CreateNotification(CreatorUserId, "Rejected ❌", "Your invitation has been rejected.", $"/event/detail/{eventId}");
+        var citlaliEvent = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
+
+        var notificationTitle = "Invitation Rejected ❌";
+        var notificationBody = $"A user has rejected your invitation to the event {citlaliEvent.EventTitle}. You may invite other registrant from event management page.";
+
+        await _notificationService.CreateNotification(CreatorUserId, notificationTitle, notificationBody, $"/event/detail/{eventId}");
 
 
         return true;
@@ -881,7 +895,13 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Update();
 
         var CreatorUserId = await GetCreatorEventIdByEventId(eventId);
-        await _notificationService.CreateNotification(CreatorUserId, "Confirmed ✅", "Your invitation has been confirmed", $"/event/detail/{eventId}");
+
+        var citlaliEvent = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
+
+        var notificationTitle = "Invitation Confirmed ✅";
+        var notificationBody = $"Congratulations! A user has confirmed your invitation to the event {citlaliEvent.EventTitle}. You may view the confirmed registrants from event management page.";
+
+        await _notificationService.CreateNotification(CreatorUserId, notificationTitle, notificationBody, $"/event/detail/{eventId}");
 
         await UpdateEventStatus(eventId);
 
