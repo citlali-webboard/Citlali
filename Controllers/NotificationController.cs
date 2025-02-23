@@ -59,8 +59,6 @@ public class NotificationController : Controller
             using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
             var token = HttpContext.Request.Cookies;
             await _notificationService.Realtime(webSocket);
-
-            Console.WriteLine("Websocket connecteds");
         }
         else
         {
@@ -133,7 +131,7 @@ public class NotificationController : Controller
 
             return Json(new { success = false });
 
-            
+
         }
         catch (Exception ex)
         {

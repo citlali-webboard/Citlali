@@ -97,7 +97,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
             .Select("FromUserId, ToUserId, Title, Message, CreatedAt, Url")
             .Filter("NotificationId", Supabase.Postgrest.Constants.Operator.Equals, notificationId.ToString())
             .Single();
-        
+
 
         if (notification == null)
         {
@@ -235,9 +235,9 @@ public class NotificationService(Client supabaseClient, UserService userService)
         await _supabaseClient
             .From<Notification>()
             .Filter("NotificationId", Supabase.Postgrest.Constants.Operator.Equals, notificationId.ToString())
-            .Delete();   
+            .Delete();
 
-        return true; 
+        return true;
     }
 
 
@@ -304,20 +304,9 @@ public class NotificationService(Client supabaseClient, UserService userService)
                     }
                 });
 
-            Console.WriteLine("Subscribed to Realtime channel");
-
-            var initialMessage = Encoding.UTF8.GetBytes("Listening for inserts");
-            if (webSocket.State == WebSocketState.Open)
-            {
-                await webSocket.SendAsync(new ArraySegment<byte>(initialMessage), WebSocketMessageType.Text, true, CancellationToken.None);
-            }
-            Console.WriteLine(_supabaseClient.Realtime.Subscriptions);
-
             while (webSocket.State == WebSocketState.Open)
             {
                 result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-
-                Console.WriteLine("result.MessageType: " + result.MessageType);
 
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
@@ -331,7 +320,6 @@ public class NotificationService(Client supabaseClient, UserService userService)
         }
         catch (Exception ex)
         {
-            // Log the exception or handle it as needed
             Console.WriteLine($"Exception: {ex.Message}");
         }
     }
