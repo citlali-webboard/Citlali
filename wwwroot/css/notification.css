@@ -193,6 +193,11 @@ main .notification-container{
     display: none;
 }
 
+.title-over-card {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
 /* ---------------------------- preview-card ------------------------ */
 .preview-card {
     background-image: linear-gradient(0deg, rgba(220, 214, 247, 1) 19%, rgba(255, 199, 199, 0) 100%);
@@ -293,10 +298,19 @@ main .notification-container{
         box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
     }
 
+    .container-detail-mobile .title-over-card {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-top: 0.5rem;
+        align-self: flex-start;
+        margin-left: 2.5rem;
+        
+    }
+
     .container-detail-mobile .txt-over-card {
         font-size: 1rem;
         /* font-weight: bold; */
-        margin-top: 0.5rem;
+        margin-top: 0.3rem;
         align-self: flex-start;
         margin-left: 2.5rem;
     }

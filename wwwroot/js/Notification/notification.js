@@ -67,8 +67,6 @@ function handleDesktopClick() {
             // Mark the card as read and disable hover
             Card.classList.add("read");
 
-            let contentContainer = document.querySelector("#notification-detail .content div");
-
             let url = window.location.href;
             let root_url = window.location.origin;
             let preview_url = root_url + data.url;
@@ -80,6 +78,7 @@ function handleDesktopClick() {
                     let contentContainer = document.querySelector("#notification-detail .content div");
 
                     let titleElement = document.createElement("p");
+                    titleElement.classList.add("title-over-card");
                     titleElement.textContent = escapeHTML(data.title);
 
                     let messageElement = document.createElement("p");
@@ -220,7 +219,7 @@ function handleMobileClick() {
             container_detail_mobile.classList.add("container-detail-mobile");
 
             let titleElement = document.createElement("p");
-            titleElement.classList.add("txt-over-card");
+            titleElement.classList.add("title-over-card");
             titleElement.textContent = escapeHTML(data.title);
 
             let messageElement = document.createElement("p");
