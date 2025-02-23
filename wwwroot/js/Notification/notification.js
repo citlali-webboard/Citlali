@@ -2,11 +2,11 @@ var isMobile = window.matchMedia("(max-width: 768px)").matches; // Check if the 
 
 window.matchMedia("(max-width: 768px)").addEventListener("change", function (e) {
     if (e.matches) { // e.matches is true if the media query is true (less than 768px)
-        console.log("less than 768px");
+    
         isMobile = true;
         setting_mobile();
     } else {
-        console.log("more than 768px");
+
         isMobile = false;
         setting_desktop();
     }
@@ -37,19 +37,17 @@ function setting_desktop() {
 function handleDesktopClick() {
     let Card = this;
     let CardId = Card.getAttribute("data-id");
-    console.log(CardId);
 
     // Create new XMLHttpRequest object
     let xmlhttp = new XMLHttpRequest();
     let URL = window.location.href + "/detail/" + CardId;
-    console.log(URL);
+
     xmlhttp.open("GET", URL, true);
 
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            console.log(xmlhttp.responseText);
+
             var data = JSON.parse(xmlhttp.responseText);
-            console.log(data);
 
             // Set details
             document.querySelector("#content-title").innerHTML = data.title;
@@ -63,7 +61,6 @@ function handleDesktopClick() {
 
             // Decrement notification count if the card is unread
             if (Card.classList.contains("read") == false) {
-                console.log("decrement");
                 decrementUnreadNotification();
             }
 
@@ -73,7 +70,7 @@ function handleDesktopClick() {
             let contentContainer = document.querySelector("#notification-detail .content div");
 
             let url = window.location.href;
-            let root_url = url.split("/Notification")[0];
+            let root_url = window.location.origin;
             let preview_url = root_url + data.url;
 
             if (data.url) {
@@ -136,7 +133,7 @@ function setting_mobile() {
 function handleMobileClick() {
     let Card = this;
     let CardId = Card.getAttribute("data-id");
-    console.log(CardId);
+
 
     if(Card.getAttribute("name") == "clicked"){
         Card.nextElementSibling.classList.toggle("hidden");
@@ -151,12 +148,10 @@ function handleMobileClick() {
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             var data = JSON.parse(xmlhttp.responseText);
-            console.log(data);
 
             let url = window.location.href;
-            let root_url = url.split("/Notification")[0];
+            let root_url = window.location.origin;
             let preview_url = root_url + data.url;
-            console.log(preview_url);
             
             Card.setAttribute("name", "clicked");
             decrementUnreadNotification();

@@ -72,8 +72,7 @@ public class NotificationController : Controller
     {
         try
         {
-
-           int notificationsNumber = await _notificationService.GetUnreadNotificationsNumber();
+           var notificationsNumber = await _notificationService.GetUnreadNotificationsNumber();
 
             Console.WriteLine("Unread Notifications: " + notificationsNumber);
 
@@ -125,13 +124,15 @@ public class NotificationController : Controller
 
             if (await _notificationService.DeleteNotification(Guid.Parse(id))){
 
-                return Json(new { success = true });
+                return Json(new {
+                    success = true
+                });
 
             }
 
-            return Json(new { success = false });
-
-
+            return Json(new {
+                 success = false
+                });
         }
         catch (Exception ex)
         {
