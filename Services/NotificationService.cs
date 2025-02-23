@@ -28,27 +28,39 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         Guid userId = Guid.Parse(currentUser.Id ?? "");
 
-        var response = await _supabaseClient
+        var deleteTask = _supabaseClient
+            .From<Notification>()
+            .Filter("ToUserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
+            .Filter("Read", Supabase.Postgrest.Constants.Operator.Equals, "true")
+            .Filter("CreatedAt", Supabase.Postgrest.Constants.Operator.LessThan, DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-ddTHH:mm:ssZ"))
+            .Delete();
+
+        var notificationsTask = _supabaseClient
             .From<Notification>()
             .Select("NotificationId, FromUserId, ToUserId, Read, Title, CreatedAt")
             .Filter("ToUserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
             .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
             .Get();
 
+
+        await Task.WhenAll(deleteTask, notificationsTask);
+
+        var notificationsResponse = await notificationsTask;
+
         var notifications = new List<NotificationModel>();
 
 
-        if (response == null)
+        if (notificationsResponse == null)
         {
             throw new Exception("Failed to get notifications.");
         }
 
-        if (response.Models.Count != 0 && response.Models[0].ToUserId != userId)
+        if (notificationsResponse.Models.Count != 0 && notificationsResponse.Models[0].ToUserId != userId)
         {
             throw new Exception("User is not authorized to view notifications.");
         }
 
-        foreach (var notification in response.Models)
+        foreach (var notification in notificationsResponse.Models)
         {
 
             var FromUser = await _userService.GetUserByUserId(notification.FromUserId) ?? new User();
@@ -80,11 +92,12 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         Guid userId = Guid.Parse(currentUser.Id ?? "");
 
-        var notification = await _supabaseClient
+        var notification =  await _supabaseClient
             .From<Notification>()
             .Select("FromUserId, ToUserId, Title, Message, CreatedAt, Url")
             .Filter("NotificationId", Supabase.Postgrest.Constants.Operator.Equals, notificationId.ToString())
             .Single();
+        
 
         if (notification == null)
         {
@@ -96,12 +109,11 @@ public class NotificationService(Client supabaseClient, UserService userService)
             throw new Exception("User is not authorized to view notification details.");
         }
 
-        notification.Read = true;
         var modelUpdateTask = _supabaseClient
             .From<Notification>()
             .Select("FromUserId, ToUserId, Title, Message, CreatedAt, Url")
             .Filter("NotificationId", Supabase.Postgrest.Constants.Operator.Equals, notificationId.ToString())
-            .Set(x => x.Read, true)
+            .Set(row => row.Read, true)
             .Update();
         var fromUserTask = _userService.GetUserByUserId(notification.FromUserId);
 
