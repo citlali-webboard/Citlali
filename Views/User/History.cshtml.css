@@ -1,0 +1,307 @@
+.window {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.content {
+    margin-top: 4rem;
+    width: 90%;
+    max-width: 1200px;
+}
+
+.page-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.page-header h1 {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.page-header p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: #666;
+}
+
+.registration-history {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.history-card {
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    justify-content: space-between;
+}
+
+.history-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #f6f6f6;
+}
+
+.registration-detail {
+    flex: 1 1 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 2rem;
+    overflow: hidden;
+}
+
+.header-data {
+    height: fit-content;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+}
+
+.creator {
+    height: 100%;
+    max-height: 35px;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem; 
+    align-items: center;
+}
+
+#creator-display-name {
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.location {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    font-size: 0.8rem;
+    fill: #666 !important;
+}
+
+.creator img {
+    max-height: 35px;
+    height: 90%;
+    border-radius: 50%;
+    object-fit: cover;
+    aspect-ratio: 1/1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tag {
+    display: flex;
+    height: fit-content;
+    font-size: 0.8rem;
+    padding: 3px 6px;
+    border: 1px solid #666;
+    border-radius: 30px;
+    cursor: default;
+    width: fit-content;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.card-title {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+#event-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+}
+
+#event-title h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+
+    max-width: 100%;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#description {
+    margin-top: 0.5rem;
+    width: 70%;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#description p {
+    width: 100%;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.status {
+    flex: 1 1 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.status-symbol {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    height: 50%;
+    max-height: 100px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    margin-bottom: 0.5rem;
+}
+
+.status-symbol svg {
+    width: 50%;
+    height: 50%;
+}
+
+.status-symbol.pending {
+    background-color: #f0ad4e;
+}
+
+.status-symbol.awaiting-confirmation {
+    background-color: #5bc0de;
+}
+
+.status-symbol.confirmed {
+    background-color: #22bb33;
+}
+
+.status-symbol.rejected-invitation, 
+.status-symbol.rejected  {
+    background-color: #bb2124;
+}
+
+.status-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#status-text {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+#registration-time {
+    font-size: 0.7rem;
+    color: #666;
+}
+
+@media screen and (max-width: 768px) {
+    .page-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .page-header p {
+        font-size: 0.9rem;
+    }
+
+    .status {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .status-symbol {
+        max-height: 30px;
+        margin: 0;
+    }
+
+    .history-card {
+        flex-direction: column;
+    }
+
+    .status {
+        max-height: 50px;
+        flex-direction: row;
+        gap: 1rem;
+    }
+
+    .status-text {
+        flex-direction: row;
+        gap: 1rem;
+        font-size: 0.7rem;
+    }
+
+    #registration-time {
+        font-size: 0.6rem;
+        text-align: center;
+    }
+
+    .registration-detail {
+        padding-left: 0;
+    }
+
+    .header-data {
+        height: fit-content;
+        flex-wrap: wrap;
+    }
+
+    #event-title {
+        width: 100%;
+
+        text-wrap: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        align-items: flex-start;
+    }
+
+    #event-title h1 {
+        width: 100%;
+        font-size: 1rem;
+        text-wrap: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #description {
+        width: 100%;
+    }
+    #description p {
+        width: 100%;
+        font-size: 0.6rem;
+        text-wrap: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #creator-display-name {
+        font-size: 0.8rem;
+    }
+
+    .location {
+        font-size: 0.6rem;
+    }
+}

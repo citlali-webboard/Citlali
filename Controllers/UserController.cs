@@ -125,6 +125,27 @@ public class UserController : Controller
 
     }
 
+    [HttpGet("history")]
+    [Authorize]
+    public async Task<IActionResult> History()
+    {
+        try {
+            var historyList = await _eventService.GetHistory();
+            return View(historyList);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            TempData["Error"] = ex.Message;
+            return RedirectToAction("Index", "Event");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            TempData["Error"] = "Something went wrong. Please try again.";
+            return RedirectToAction("Index", "Event");
+        }
+    }
+
     [HttpGet("{username}")]
     public async Task<IActionResult> Profile(string username)
     {

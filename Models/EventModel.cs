@@ -276,3 +276,22 @@ public class EventStatusViewModel
     public DateTime RegistrationTime { get; set; } = new();
     public string Status { get; set; } = "";
 }
+
+public class RegistrationHistoryCardModel
+{
+    public Guid EventId { get; set; } = new();
+    public string EventTitle { get; set; } = "";
+    public string EventDescription { get; set; } = "";
+    public string CreatorUsername { get; set; } = "";
+    public string CreatorDisplayName { get; set; } = "";
+    public string CreatorProfileImageUrl { get; set; } = "";
+    public LocationTag LocationTag { get; set; } = new();
+    public EventCategoryTag EventCategoryTag { get; set; } = new();
+    public string Status { get; set; } = "";
+    public DateTime RegistrationTime { get; set; } = new();
+}
+
+public class RegistrationHistoryData
+{
+    public List<RegistrationHistoryCardModel> RegistrationHistoryCardModels { get; set; } = [];
+}
