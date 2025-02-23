@@ -137,6 +137,11 @@ function handleMobileClick() {
     let CardId = Card.getAttribute("data-id");
     console.log(CardId);
 
+    if(Card.getAttribute("name") == "clicked"){
+        Card.nextElementSibling.classList.toggle("hidden");
+        return;
+    }
+
     // Create new XMLHttpRequest object
     let xmlhttp = new XMLHttpRequest();
     let URL = window.location.href + "/detail/" + CardId;
@@ -152,48 +157,44 @@ function handleMobileClick() {
             let preview_url = root_url + data.url;
             console.log(preview_url);
 
-            if (Card.getAttribute("name") != "clicked") {
-                Card.setAttribute("name", "clicked");
-                decrementUnreadNotification();
+            
+            Card.setAttribute("name", "clicked");
+            decrementUnreadNotification();
 
-                let container_detail_mobile = document.createElement("div");
-                container_detail_mobile.classList.add("container-detail-mobile");
+            let container_detail_mobile = document.createElement("div");
+            container_detail_mobile.classList.add("container-detail-mobile");
 
-                if (data.url) {
-                    container_detail_mobile.innerHTML = `
-                        <p class="txt-over-card">${data.title}</p>
-                        <p class="txt-over-card">${data.message}</p>
-                        <a href="${preview_url}">
-                            <div class="preview-card-mobile">
-                                <p class="app-name">Citlali 🩷</p>
-                                <div class="preview-card-topic-mobile">
-                                    <h1>${data.urlTitle}</h1>
-                                    <p>${data.urlDescription}</p>
-                                </div>
-                                
-                                <a href="${preview_url}" target="">
-                                    <div style="border-radius: 8px; overflow: hidden; margin-top: 10px;">
-                                        <img src="${data.urlImage}" style="max-width: 100%; height: auto;">
-                                    </div>
-                                </a>
+            if (data.url) {
+                container_detail_mobile.innerHTML = `
+                    <p class="txt-over-card">${data.title}</p>
+                    <p class="txt-over-card">${data.message}</p>
+                    <a href="${preview_url}">
+                        <div class="preview-card-mobile">
+                            <p class="app-name">Citlali 🩷</p>
+                            <div class="preview-card-topic-mobile">
+                                <h1>${data.urlTitle}</h1>
+                                <p>${data.urlDescription}</p>
                             </div>
-                        </a>
-                    `;
-                } else {
-                    // ถ้าไม่มี URL แสดงเป็นข้อความปกติ
-                    container_detail_mobile.innerHTML = `
-                        <h2>${data.title}</h2>
-                        <p>${data.message}</p>
-                        ${data.imageUrl ? `<img src="${data.imageUrl}" width="100%" height="auto" />` : ""}
-                    `;
-                }
-
-                Card.after(container_detail_mobile);
+                            
+                            <a href="${preview_url}" target="">
+                                <div style="border-radius: 8px; overflow: hidden; margin-top: 10px;">
+                                    <img src="${data.urlImage}" style="max-width: 100%; height: auto;">
+                                </div>
+                            </a>
+                        </div>
+                    </a>
+                `;
             } else {
-                // ถ้าคลิกซ้ำให้ซ่อน
-                console.log("hidden");
-                Card.nextElementSibling.classList.toggle("hidden");
+                // ถ้าไม่มี URL แสดงเป็นข้อความปกติ
+                container_detail_mobile.innerHTML = `
+                    <h2>${data.title}</h2>
+                    <p>${data.message}</p>
+                    ${data.imageUrl ? `<img src="${data.imageUrl}" width="100%" height="auto" />` : ""}
+                `;
             }
+
+            Card.after(container_detail_mobile);
+            
         }
     };
     xmlhttp.send();
