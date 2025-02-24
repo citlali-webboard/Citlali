@@ -1,0 +1,380 @@
+.center-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin-top: 4rem;
+    align-items: center;
+    min-height: 100vh;
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.content {
+    width: 90%;
+    max-width: 1200px;
+}
+
+.control {
+    width: 100%;
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    /* justify-content: flex-end; */
+    gap: 1rem;
+}
+
+.action-button{
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem; 
+    
+    padding: 0.3rem 1rem; 
+
+    border: 1px solid #000;
+    border-radius: 20px;
+
+    font-size: 0.8rem;
+    text-decoration: none;
+    color: #000;
+    white-space: nowrap;
+}
+
+.action-button.danger {
+    color: #ff0000;
+    border-color: #ff0000;
+}
+
+.action-button.danger span {
+    fill: #ff0000 !important;
+}
+
+.action-button.danger:hover {
+    span {
+        fill: white !important;
+    }
+    
+    background-color: #ff0000;
+    color: white;
+}
+
+.action-button:hover{
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+.header {
+    width: 100%;
+    max-width: 768px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.questions {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.questions h3 {
+    margin: 0;
+    padding: 0;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.questions description {
+    margin: 0;
+    padding: 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+ul {
+    list-style-type: square;
+    padding-left: 1rem;
+}
+
+.question-container {
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.registrants-container {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.registrants {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+}
+
+.registrants * h3 {
+    margin: 0;
+    padding: 0;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.registrants * description {
+    margin: 0;
+    padding: 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.registrants {
+    display: flex;
+    flex-direction: row;
+    gap: 5%;
+}
+
+.registered-participants {
+    flex: 0 0 65%;
+    display: flex;
+    flex-direction: column;
+}
+
+.selected-participants {
+    flex: 0 0 30%;
+    display: flex;
+    flex-direction: column;
+}
+
+.selected-participants * h4 {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.selected-participants * hr {
+    margin: 0.5rem 0;
+    border: 0;
+    border-top: 1px solid #ccc;
+}
+
+.confirmed-participants,
+.await-confirmation,
+.rejected-invitation {
+    display: flex;
+    flex-direction: column;
+    margin-top: 2rem;
+}
+
+.registrant-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.registrant-header {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.registrant-header:hover {
+    background-color: #eee;
+}
+
+.profile-img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.registrant-name {
+    flex-grow: 1;
+    font-weight: bold;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+}
+
+.dropdown-icon {
+    font-size: 18px;
+    color: #555;
+}
+
+.registrant-details {
+    display: none;
+    padding: 10px;
+    background-color: white;
+}
+
+.answer-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    color: #555;
+}
+
+.form-group textarea {
+    field-sizing: content;
+    padding: 0.5rem;
+    border: 1px solid #000;
+    border-radius: 5px;
+
+    text-wrap: wrap;
+    resize: none;
+
+    font-size: 1rem;
+}
+
+.status-circle {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.status-circle.status-pending {
+    background-color: #666;
+}
+
+.status-circle.status-await-confirmation {
+    background-color: #ffcc00;
+}
+
+.status-circle.status-confirmed {
+    background-color: #00cc00;
+}
+
+.status-circle.status-rejected-invitation,
+.status-circle.status-rejected {
+    background-color: #ff0000;
+}
+
+.button-group {
+    width: 100%;
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    gap: 1rem;
+}
+
+.action-button.approve-btn {
+    span {
+        fill: #00cc00 !important;
+    }
+    border: 1px solid #00cc00;
+    color: #00cc00;
+}
+
+.action-button.approve-btn:hover {
+    span {
+        fill: white !important;
+    }
+    background-color: #00cc00;
+    color: white;
+}
+
+.action-button.reject-btn {
+    span {
+        fill: #ff0000 !important;
+    }
+    border: 1px solid #ff0000;
+    color: #ff0000;
+}
+
+.action-button.reject-btn:hover {
+    span {
+        fill: white !important;
+    }
+    background-color: #ff0000;
+    color: white;
+}
+
+.registrant-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.registrant-list .registrant-name {
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: normal;
+}
+
+.registrant {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.registrant img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.event-status {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+}
+
+.status-circle {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.status-circle.active {
+    background-color: #00cc00;
+}
+
+.status-circle.closed {
+    background-color: #333;
+}
+
+.visit-profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .registrants {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .registrants * h3 {
+        font-size: 1.1rem;
+    }
+
+    .registrants * description {
+        font-size: 0.8rem;
+    }
+}

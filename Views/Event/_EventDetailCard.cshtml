@@ -2,26 +2,52 @@
 
 <div class="event-detail detail-column">
     <div class="info-line">
-        <h1 class="title">@Model.EventTitle</h1>
+        <span class="creator">
+            <a href="/user/@Model.CreatorUsername">
+                <span>
+                    <img class="pfp" src=@Model.CreatorProfileImageUrl alt="Creator Profile Picture"/>
+                </span>
+            </a>
+            <a href="/user/@Model.CreatorUsername">
+                <span id="creator-name">@Model.CreatorDisplayName</span>
+            </a>
+            <span class="created-time">@Model.CreatedAt.ToString("t") • @Model.CreatedAt.ToString("d")</span>
+            <span class="location">
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Location>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                @Model.LocationTag.LocationTagName
+            </span>
+        </span>
         <span class="participants">
             <span>
-                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size32.PeopleTeam>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.PeopleTeam>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
             </span>
-            <span >@Model.CurrentParticipant/@Model.MaxParticipant</span>
+            <span>@Model.CurrentParticipant/@Model.MaxParticipant</span>
         </span>
     </div>
-    <div class="info-line">
-        <span class="creator">
-            <span>
-                <img class="pfp" src=@Model.CreatorProfileImageUrl alt="Creator Profile Picture"/>
-            </span>
-            <span>@Model.CreatorDisplayName</span>
-        </span>
-        <span class="text-align-right">@Model.CreatedAt.ToString("t") • @Model.CreatedAt.ToString("d")</span>
+
+    <div class="info-line" id="title-line">
+        <div class="title">
+            <h1 class="title-text">@Model.EventTitle</h1>
+            <div class="tag">
+                <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
+                <span>@Model.EventCategoryTag.EventCategoryTagName</span>
+            </div>
+        </div>
+        <div class="more-data">
+            <div class="datetime">
+                <span>
+                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Clock>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                </span>
+                <span>@Model.EventDate.ToString("t") @Model.EventDate.ToString("d")</span>
+            </div>
+            <div class="cost">
+                <span>
+                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Money>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                </span>
+                <span>@Model.Cost THB</span>
+            </div>
+        </div>
     </div>
-    <div class="tag">
-        <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
-        <span>@Model.EventCategoryTag.EventCategoryTagName</span>
-    </div>
+
     <p class="description">@Model.EventDescription</p>
 </div>

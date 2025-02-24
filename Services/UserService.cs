@@ -14,6 +14,7 @@ public class UserService
     private readonly Client _supabaseClient;
     private readonly Configuration _configuration;
     private readonly UtilitiesService _utilityService;
+    public Supabase.Gotrue.Session CurrentSession { get;set; } = new Supabase.Gotrue.Session();
 
     private readonly List<string> reservedUsernames = new List<string> {
         "admin",
@@ -22,6 +23,7 @@ public class UserService
         "superuser",
         "onboarding",
         "edit",
+        "history",
     };
     public UserService(Client supabaseClient, Configuration configuration, UtilitiesService utilityService)
     {
@@ -38,7 +40,7 @@ public class UserService
     /// </returns>
     /// </summary>
     public async Task<bool> RedirectToOnboarding() {
-        var id = _supabaseClient.Auth.CurrentUser?.Id;
+        var id = CurrentSession.User?.Id;
         if (string.IsNullOrEmpty(id)) {
             return false;
         }
@@ -113,7 +115,7 @@ public class UserService
 
     public async Task<User> EditUser(UserOnboardingDto userOnboardingDto)
     {
-        var supabaseUser = _supabaseClient.Auth.CurrentUser;
+        var supabaseUser = CurrentSession.User;
         string profileImageUrl = _configuration.User.DefaultProfileImage;
 
         if (supabaseUser?.Id == null || supabaseUser?.Email == null)
@@ -206,14 +208,16 @@ public class UserService
                 });
 
 
-            string publicUrl = _supabaseClient.Storage
+            string localUrl = _supabaseClient.Storage
                 .From(bucketName)
                 .GetPublicUrl(bucketFilePath);
 
             // generate a short id to prevent caching
             string imageId = Guid.NewGuid().ToString("N")[..8];
+
+            string publicUrl = $"{localUrl}?id={imageId}".Replace(_configuration.Supabase.LocalUrl, _configuration.Supabase.PublicUrl);
             
-            return $"{publicUrl}?id={imageId}";
+            return publicUrl;
         }
 
         catch (Exception ex)

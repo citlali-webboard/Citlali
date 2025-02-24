@@ -1,5 +1,4 @@
 using Supabase;
-
 using System.Text.Json;
 
 namespace Citlali.Services;

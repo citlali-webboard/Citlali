@@ -1,0 +1,257 @@
+@model Citlali.Models.EventManagementViewModel
+
+@{
+    ViewData["Title"] = Model.EventTitle;
+
+    var eventDetailCardData = new Citlali.Models.EventDetailCardData
+    {
+        EventTitle = Model.EventTitle,
+        CreatorDisplayName = Model.CreatorDisplayName,
+        CreatorUsername = Model.CreatorUsername,
+        CreatorProfileImageUrl = Model.CreatorProfileImageUrl,
+        EventDescription = Model.EventDescription,
+        LocationTag = Model.LocationTag,
+        EventCategoryTag = Model.EventCategoryTag,
+        EventDate = Model.EventDate,
+        MaxParticipant = Model.MaxParticipant,
+        CurrentParticipant = Model.CurrentParticipant,
+        Cost = Model.Cost,
+        CreatedAt = Model.CreatedAt
+    };
+
+    var totalRegisteredParticipant = Model.AnswerSet.Count;
+
+    var confirmedParticipantCount = Model.ConfirmedParticipant.Count;
+    var awaitingConfirmationParticipantCount = Model.AwaitingConfirmationParticipant.Count;
+    var rejectedConfirmationParticipantCount = Model.RejectedConfirmationParticipant.Count;
+    var totalInvitedParticipant = confirmedParticipantCount + awaitingConfirmationParticipantCount;
+}
+
+@section head {
+    <link rel="stylesheet" href="Manage.cshtml.css" asp-append-version="true" />
+    <script src="~/js/Event/Manage.js"></script>
+}
+
+<div class="center-wrapper">
+    <div class="content">
+        <div class="event-detail">
+            <partial name="_EventDetailCard" model=@eventDetailCardData />
+            <div class="control">
+                <div class="event-status">
+                    <span class="status-circle @Model.EventStatus"></span>
+                    <span class="status-text"><strong>Event status: </strong>@(Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(Model.EventStatus))</span>
+                </div>
+                @if (@Model.EventStatus == "active") {
+                    <form asp-action="CloseEvent" asp-route-eventId="@Model.EventId" method="post" onsubmit="return confirm('Are you sure you want to close this event? People will no longer be able to register for it.');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="action-button">
+                            <span>
+                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Pause>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                            </span>
+                            <span>
+                                Close event
+                            </span>
+                        </button>
+                    </form>
+                }
+                else if (@Model.EventStatus == "closed") {
+                    <form asp-action="OpenEvent" asp-route-eventId="@Model.EventId" method="post" onsubmit="return confirm('Are you sure you want to open this event? People will be able to register for it.');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="action-button">
+                            <span>
+                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Play>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                            </span>
+                            <span>
+                                Re-open event
+                            </span>
+                        </button>
+                    </form>
+                }
+                <button class="action-button" onclick="shareEvent('@Model.EventTitle', '@Model.EventId')">
+                    <span>
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Share>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+                    </span>
+                    <span id="share-btn-txt">
+                        Share
+                    </span>
+                </button>
+                <form asp-action="DeleteEvent" asp-route-eventId="@Model.EventId" method="post" onsubmit="return confirm('Are you sure you want to delete this event?');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="action-button danger">
+                        <span>
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                        </span>
+                        <span>
+                            Delete event
+                        </span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="questions">
+            <h3>📝 Questions for Participants</h3>
+            <description>These are the questions that participants will need to answer when they register for your event. you cannot add, edit or remove once the event is created.</description>
+            <div class="question-container">
+                <ul class="question">
+                    @foreach (var question in Model.Questions)
+                    {
+                        <li for="Email">@question.Question</li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="registrants">
+            <div class="registered-participants">
+                <h3>🛫 Registered Participants (@totalRegisteredParticipant) </h3>
+                <description>The following individuals have requested to participate in your event. Please take the time to review their responses to your questions.</description>
+                @if (Model.AnswerSet.Any())
+                {
+                    <div class="registrants-container">
+                        @foreach (var participant in Model.AnswerSet)
+                        {
+                            var collapseId = "collapse_" + participant.User.UserId; // Unique ID for each dropdown
+
+                            <div class="registrant-card">
+                                <div class="registrant-header" onclick="toggleDropdown('@collapseId')">
+                                    <img src="@participant.User.ProfileImageUrl" alt="Profile" class="profile-img">
+                                    <span class="registrant-name">
+                                        @participant.User.DisplayName (@participant.User.Username)
+                                        @{
+                                            var status = participant.Status switch
+                                            {
+                                                "pending" => "status-pending",
+                                                "awaiting-confirmation" => "status-await-confirmation",
+                                                "rejected" => "status-rejected",
+                                                "confirmed" => "status-confirmed",
+                                                "rejected-invitation" => "status-rejected-invitation",
+                                                _ => "status-pending"
+                                            };
+                                        }
+                                        <span class="status-circle @status"></span>
+                                    </span>
+
+                                    <span class="dropdown-icon">
+                                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.ChevronDown>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+                                    </span>
+                                </div>
+                                <div class="registrant-details" id="@collapseId">
+                                    <a href="/user/@participant.User.Username" class="action-button visit-profile-btn" target="_blank">
+                                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Open>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+                                        Visit Profile
+                                    </a>
+                                    <div class="answer-wrapper">
+                                        @foreach (var answer in participant.RegistrationAnswers)
+                                        {
+                                            <div class="form-group">
+                                                <label for="Question">@answer.Question</label>
+                                                <textarea class="form-control disabled-input" value="@answer.Answer" disabled>@answer.Answer</textarea>
+                                            </div>
+                                        }
+                                    </div>
+                                    @if (participant.Status == "pending") {
+                                        <div class="button-group">
+                                            <form asp-action="Invite" asp-controller="Event" asp-route-eventId="@Model.EventId" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="userId" value="@participant.User.UserId" />
+                                                <button class="action-button approve-btn" type="submit">
+                                                    <span>
+                                                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Add>>(RenderMode.ServerPrerendered, new { Color = Color.Success }))
+                                                    </span>
+                                                    <span>
+                                                        Invite
+                                                    </span>
+                                                </button>
+                                            </form>
+                                            <form asp-action="Reject" asp-controller="Event" asp-route-eventId="@Model.EventId" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="userId" value="@participant.User.UserId" />
+                                                <button type="submit" class="action-button reject-btn">
+                                                    <span>
+                                                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                                                    </span>
+                                                    <span>
+                                                        Reject
+                                                    </span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">No participants have registered yet.</p>
+                }
+            </div>
+
+            @* this is mockup for invited participants PLEASE FIX *@
+            <div class="selected-participants">
+                <h3>Invited participants (@totalInvitedParticipant/@Model.MaxParticipant) 💌</h3>
+                <description>These are people your have been selected and invited.</description>
+                <div class="confirmed-participants">
+                    <h4>✅ Confirmed (@confirmedParticipantCount)</h4>
+                    <hr>
+                    <div class="registrant-list">
+                        @foreach (var confirmedParticipant in Model.ConfirmedParticipant)
+                        {
+                            <a href="/user/@confirmedParticipant.Username" target="_blank">
+                                <div class="registrant">
+                                    <img src="@confirmedParticipant.ProfileImageUrl" alt="Profile" class="profile-img">
+                                    <span class="registrant-name">
+                                        <strong>@confirmedParticipant.DisplayName</strong> (@confirmedParticipant.Username)
+                                    </span>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </div>
+                <div class="await-confirmation">
+                    <h4>📨 Awaiting Confirmation (@awaitingConfirmationParticipantCount)</h4>
+                    <hr>
+                    <div class="registrant-list">
+                        @foreach (var awaitingParticipant in Model.AwaitingConfirmationParticipant)
+                        {
+                            <a href="/user/@awaitingParticipant.Username" target="_blank">
+                                <div class="registrant">
+                                    <img src="@awaitingParticipant.ProfileImageUrl" alt="Profile" class="profile-img">
+                                    <span class="registrant-name">
+                                        <strong>@awaitingParticipant.DisplayName</strong> (@awaitingParticipant.Username)
+                                    </span>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                <div>
+                <div class="rejected-invitation">
+                    <h4>❌ Rejected Invitaion (@rejectedConfirmationParticipantCount)</h4>
+                    <hr>
+                    <div class="registrant-list">
+                        @foreach (var rejectedParticipant in Model.RejectedConfirmationParticipant)
+                        {
+                            <a href="/user/@rejectedParticipant.Username" target="_blank">
+                                <div class="registrant">
+                                    <img src="@rejectedParticipant.ProfileImageUrl" alt="Profile" class="profile-img">
+                                    <span class="registrant-name">
+                                        <strong>@rejectedParticipant.DisplayName</strong> (@rejectedParticipant.Username)
+                                    </span>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                <div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleDropdown(id) {
+        var element = document.getElementById(id);
+        element.style.display = (element.style.display === "block") ? "none" : "block";
+    }
+</script>

@@ -5,46 +5,82 @@
   border-radius: 1rem;
 }
 
-.event-detail {
-  border: 2px solid var(--color-muted);
-  border-radius: 1rem;
-  padding: 1rem;
+.card:hover {
+  background-color: #f9f9f9;
 }
 
-.justify-between {
+.footer {
+  margin-top: 1rem;
   display: flex;
   justify-content: space-between;
-}
-
-.items-center {
-  display: flex;
   align-items: center;
 }
 
-.space-y-4 > * {
-  margin-bottom: 8px;
+.header-data {
+  height: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
 }
 
-.space-y-4 > *:last-child {
-  margin-bottom: 0;
+.creator {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 0.5rem;
 }
 
-.space-x-4 > * {
-  margin-right: 8px;
+.creator img {
+  height: 100%;
+  width: auto;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
 }
 
-.space-x-4 > *:last-child {
-  margin-right: 0;
+.creator span {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.created-time {
+  color: #666;
+  font-weight: 300;
+}
+
+.location {
+  display: flex;
+  color: #666;
+  font-weight: 300;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.participant {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 0.5rem;
+}
+
+.card-title {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .tag {
-  display: inline-block;
-  padding: 4px 8px 4px 8px;
-  background-color: var(--pink-color);
-  border: 2px solid var(--pink-color);
+  display: flex;
+  height: fit-content;
+  font-size: 0.8rem;
+  padding: 3px 6px;
+  border: 1px solid #666;
   border-radius: 30px;
   cursor: default;
   width: fit-content;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .event-title {
@@ -60,7 +96,79 @@
   color: var(--color-constructive);
 }
 
-.text-level-1 {
-  font-size: 1.5rem;
-  font-weight: bold;
+.description {
+  max-width: 50%;
+  text-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.7rem;
+  color: #666;
+}
+
+a {
+  display: block;
+}
+
+@media screen and (max-width: 768px) {
+  .card {
+    padding: 0.5rem;
+  }
+
+  .header-data {
+    margin-bottom: 0.5rem;
+  }
+
+  .creator img {
+    height: 1.5rem;
+  }
+
+  .creator span {
+    font-size: 0.7rem;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .created-time {
+    font-size: 0.6rem;
+  }
+
+  .location {
+    font-size: 0.6rem;
+  }
+
+  .participant img {
+    height: 1.5rem;
+  }
+
+  .participant span {
+    font-size: 0.7rem;
+  }
+
+  .card-title {
+    gap: 0.5rem;
+  }
+
+  .tag {
+    font-size: 0.6rem;
+    padding: 2px 4px;
+  }
+
+  .event-title {
+    font-size: 1.2rem;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .description {
+    max-width: 80%;
+    font-size: 0.6rem;
+  }
+  
 }

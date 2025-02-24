@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<Configuration>(builder.Configuration);
 var configuration = builder.Configuration.Get<Configuration>() ?? throw new Exception("Configuration must be set in the app's configuration.");
 
-var supabaseClient = new Client(configuration.Supabase.Url, configuration.Supabase.ServiceRoleKey);
+var supabaseClient = new Client(configuration.Supabase.LocalUrl, configuration.Supabase.ServiceRoleKey);
 await supabaseClient.InitializeAsync();
 
 var cultureInfo = new CultureInfo("en-US");
@@ -50,11 +50,14 @@ builder.Services.AddAuthentication()
                         {
                             var accessToken = context.Request.Cookies[configuration.Jwt.AccessCookie];
                             var refreshToken = context.Request.Cookies[configuration.Jwt.RefreshCookie];
+                            var userService = context.HttpContext.RequestServices.GetRequiredService<UserService>();
                             if (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken)) {
                                 context.Token = accessToken;
-                                await supabaseClient.Auth.SetSession(accessToken, refreshToken);
+                                userService.CurrentSession = await supabaseClient.Auth.SetSession(accessToken, refreshToken);
                                 // await supabaseClient.Auth.RefreshSession();
                                 // return Task.CompletedTask;
+                            } else {
+                                userService.CurrentSession.User = null;
                             }
                         },
                         OnAuthenticationFailed = context =>
@@ -84,7 +87,7 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/event/explore");
     app.UseHsts();
 }
 

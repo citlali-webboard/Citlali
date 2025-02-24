@@ -46,12 +46,12 @@ public class AuthController : Controller
 
     public IActionResult SignIn()
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser != null)
         {
             return RedirectToAction("Index", "User");
         }
-        return View();
+        return View(new AuthLoginDto());
     }
 
     [HttpPost]
@@ -67,8 +67,21 @@ public class AuthController : Controller
             var session = await _authService.SignIn(authLoginDto.Email, authLoginDto.Password);
             if (session != null && session.AccessToken != null && session.RefreshToken != null)
             {
+
                 Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
                 Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
+
+                var user = await _userService.GetUserByEmail(authLoginDto.Email);
+                string profileImageUrl = user?.ProfileImageUrl ?? _configuration.User.DefaultProfileImage; 
+
+                HttpContext.Response.Cookies.Append("ProfileImageUrl", profileImageUrl, new CookieOptions
+                {
+                    HttpOnly = false, 
+                    Secure = true, 
+                    SameSite = SameSiteMode.Strict, 
+                    Expires = DateTime.UtcNow.AddDays(30)
+                });
+
                 return RedirectToAction("Index", "User");
             }
             throw new Exception("Wrong credentials.");
@@ -77,7 +90,7 @@ public class AuthController : Controller
         {
             Console.WriteLine(ex.Message);
             TempData["Error"] = ex.Message;
-            return RedirectToAction("SignIn");
+            return View(authLoginDto);
         }
     }
 
@@ -86,6 +99,16 @@ public class AuthController : Controller
     {
         Response.Cookies.Delete(_configuration.Jwt.AccessCookie);
         Response.Cookies.Delete(_configuration.Jwt.RefreshCookie);
+        Response.Cookies.Delete("ProfileImageUrl");
+
+        HttpContext.Response.Cookies.Append("ProfileImageUrl", _configuration.User.DefaultProfileImage, new CookieOptions
+        {
+            HttpOnly = false, 
+            Secure = true, 
+            SameSite = SameSiteMode.Strict, 
+            Expires = DateTime.UtcNow.AddDays(30)
+        });
+        
         await _supabaseClient.Auth.SignOut();
         return RedirectToAction("SignIn");
     }

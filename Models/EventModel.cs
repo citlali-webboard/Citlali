@@ -15,10 +15,10 @@ public class Event : BaseModel
     public Guid CreatorUserId { get; set; } = new();
 
     [Column("EventTitle")]
-    public string EventTitle { get; set; } = "Sample title";
+    public string EventTitle { get; set; } = "";
 
     [Column("EventDescription")]
-    public string EventDescription { get; set; } = "Sample description";
+    public string EventDescription { get; set; } = "";
 
     [Column("EventCategoryTagId")]
     public Guid EventCategoryTagId { get; set; } = new();
@@ -44,7 +44,8 @@ public class Event : BaseModel
     [Column("Deleted")]
     public bool Deleted { get; set; } = false;
 
-
+    [Column("Status")]
+    public string Status { get; set; } = "active";
 }
 
 [Table("EVENT_QUESTION")]
@@ -58,7 +59,7 @@ public class EventQuestion : BaseModel
     public Guid EventId { get; set; } = new();
 
     [Column("Question")]
-    public string Question { get; set; } = "Question";
+    public string Question { get; set; } = "";
 
     [Column("CreatedAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -73,53 +74,75 @@ public class EventLocationTag
     public Guid EventLocationTagId {get ; set;} = new();
 
     [Column("LocationTagName")]
-    public string EventLocationTagName {get ; set;} = "Lat Krabang";
+    public string EventLocationTagName {get ; set;} = "";
 }
 
 public class EventBriefCardData
 {
     public Guid EventId {get ; set;} = new();
-    public string EventTitle {get ; set;} = "Basketball? Anyone?";
-    public string CreatorDisplayName {get ; set;} = "John Basketball";
+    public string EventTitle {get ; set;} = "";
+    public string EventDescription {get ; set;} = "";
+    public string CreatorUsername {get ; set; } = "";
+    public string CreatorDisplayName {get ; set;} = "";
     public string CreatorProfileImageUrl {get ; set;} = "";
     public LocationTag LocationTag {get ; set;} = new();
     public EventCategoryTag EventCategoryTag {get ; set;} = new();
     public int CurrentParticipant {get ; set;} = 0;
-    public int MaxParticipant {get ; set;} = 64;
-    public int Cost {get ; set;} = 64;
-    public DateTime EventDate {get ; set;} = new(2024, 12, 31);
-    public DateTime PostExpiryDate {get ; set;} = new(2024, 12, 30);
-    public DateTime CreatedAt {get ; set;} = new(2024, 12, 3);
+    public int MaxParticipant {get ; set;} = 0;
+    public int Cost {get ; set;} = 0;
+    public DateTime EventDate {get ; set;} = new();
+    public DateTime PostExpiryDate {get ; set;} = new();
+    public DateTime CreatedAt {get ; set;} = new();
 
 }
 
 public class EventDetailCardData : EventBriefCardData
 {
-    public string EventDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 }
 
 public class EventFormDto
 {
+    public Guid EventId { get; set; } = new();
+    public bool IsClosed { get; set; } = false;
     public List<QuestionViewModel> Questions { get; set; } = [];
 }
 
 public class EventDetailViewModel
 {
+    public bool IsUserRegistered { get; set; } = false;
+    public bool IsClosed { get; set; } = true;
     public EventDetailCardData EventDetailCardData { get; set; } = new();
+    public EventFormDto EventFormDto { get; set; } = new();
+}
+
+public class JoinEventModel
+{
+    public Guid EventId { get; set; } = new();
     public EventFormDto EventFormDto { get; set; } = new();
 }
 
 public class QuestionViewModel
 {
     public Guid EventQuestionId { get; set; }
-    public string Question { get; set; } = "Question Question";
-    [Required(ErrorMessage = "This field is required")]
-    public string Answer { get; set; } = "Answer Answer";
+    public string Question { get; set; } = "";
+    // [Required(ErrorMessage = "This field is required")]
+
+    public string Answer { get; set; } = "";
 }
 
 public class EventExploreViewModel
 {
     public EventBriefCardData[] EventBriefCardDatas = [new()];
+    public Tag[] Tags = [new()];
+    public int CurrentPage { get; set; } = 1;
+    public int TotalPage { get; set; }
+}
+
+public class TagEventExploreViewModel : EventExploreViewModel
+{
+    public Guid TagId { get; set; } = new();
+    public string TagName { get; set; } = "";
+    public string TagEmoji { get; set; } = "";
 }
 
 [Table("EVENT_CATEGORY_TAG")]
@@ -179,5 +202,96 @@ public class CreateEventViewModel
     public DateTime EventDate { get; set; } = new();
     public DateTime PostExpiryDate { get; set; } = new();
     public List<Tag> Tags { get; set; } = [];
-    public List<string> Questions { get; set; } = ["Why are you interested in this event?"];
+    public List<string> Questions { get; set; } = [];
+}
+
+[Table("REGISTRATION")]
+public class Registration : BaseModel
+{
+    [PrimaryKey]
+    [Column("RegistrationId")]
+    public Guid RegistrationId { get; set; } = new();
+
+    [Column("UserId")]
+    public Guid UserId { get; set; } = new();
+
+    [Column("EventId")]
+    public Guid EventId { get; set; } = new();
+
+    [Column("Status")]
+    public string Status { get; set; } = "pending";
+
+    [Column("CreatedAt")]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    
+}
+
+[Table("REGISTRATION_ANSWER")]
+public class RegistrationAnswer : BaseModel
+{
+    [PrimaryKey]
+    [Column("RegistrationAnswerId")]
+    public Guid RegistrationAnswerId { get; set; } = new();
+
+    [Column("RegistrationId")]
+    public Guid RegistrationId { get; set; } = new();
+
+    [Column("EventQuestionId")]
+    public Guid EventQuestionId { get; set; } = new();
+
+    [Column("Answer")]
+    public string Answer { get; set; } = "";
+
+    [Column("CreatedAt")]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}
+
+public class EventManagementViewModel : EventBriefCardData 
+{
+    public List<QuestionViewModel> Questions { get; set; } = [];
+    public List<EventManagementAnswerCollection> AnswerSet { get; set; } = [];
+    public List<BriefUser> ConfirmedParticipant { get; set; } = [];
+    public List<BriefUser> AwaitingConfirmationParticipant { get; set; } = [];
+    public List<BriefUser> RejectedConfirmationParticipant { get; set; } = [];
+    public string EventStatus { get; set; } = "";
+}
+
+public class RegistrationAnswerSimplify
+{
+    public Guid EventQuestionId { get; set; } = new();
+    public string Question { get; set; } = "";
+    public string Answer { get; set; } = "";
+}
+
+public class EventManagementAnswerCollection
+{
+    public User User { get; set; } = new();
+    public string Status { get; set; } = "pending";
+    public List<RegistrationAnswerSimplify> RegistrationAnswers { get; set; } = [];
+}
+
+public class EventStatusViewModel
+{
+    public EventDetailCardData EventDetailCardData { get; set; } = new();
+    public DateTime RegistrationTime { get; set; } = new();
+    public string Status { get; set; } = "";
+}
+
+public class RegistrationHistoryCardModel
+{
+    public Guid EventId { get; set; } = new();
+    public string EventTitle { get; set; } = "";
+    public string EventDescription { get; set; } = "";
+    public string CreatorUsername { get; set; } = "";
+    public string CreatorDisplayName { get; set; } = "";
+    public string CreatorProfileImageUrl { get; set; } = "";
+    public LocationTag LocationTag { get; set; } = new();
+    public EventCategoryTag EventCategoryTag { get; set; } = new();
+    public string Status { get; set; } = "";
+    public DateTime RegistrationTime { get; set; } = new();
+}
+
+public class RegistrationHistoryData
+{
+    public List<RegistrationHistoryCardModel> RegistrationHistoryCardModels { get; set; } = [];
 }

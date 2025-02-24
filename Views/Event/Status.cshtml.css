@@ -1,0 +1,182 @@
+.status-page {
+    width: 90%;
+    max-width: 1150px;
+    margin: 50px auto;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+}
+
+.status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.status-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.status-description {
+    font-size: 1rem;
+    text-align: center;
+    color: #666;
+
+    text-wrap: balance;
+}
+
+.status-symbol {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    width: 150px;
+    max-width: 80vh;
+    max-height: auto;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    margin-bottom: 2rem;
+}
+
+.status-symbol svg {
+    width: 50%;
+    height: 50%;
+}
+
+.status-symbol.pending {
+    background-color: #f0ad4e;
+}
+
+.status-symbol.awaiting-confirmation {
+    background-color: #5bc0de;
+}
+
+.status-symbol.confirmed {
+    background-color: #22bb33;
+}
+
+.status-symbol.rejected-invitation, 
+.status-symbol.rejected  {
+    background-color: #bb2124;
+}
+
+.action-button {
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem; 
+    
+    padding: 0.3rem 2rem; 
+    
+    border: 1px solid #000;
+    border-radius: 20px;
+    
+    font-size: 0.8rem;
+    text-decoration: none;
+    color: #000;
+    white-space: nowrap;
+    
+    margin-top: 1rem;
+}
+
+.action-button:hover {
+    cursor: pointer;
+}
+
+.action-button.confirm-button {
+    fill: #22bb33 !important;
+    color: #22bb33;
+    border-color: #22bb33;
+}
+
+.action-button.confirm-button:hover {
+    background-color: #22bb33;
+    color: white;
+    fill: white !important;
+}
+
+.action-button.cancel-button {
+    fill: #bb2124 !important;
+    color: #bb2124;
+    border-color: #bb2124;
+}
+
+.action-button.cancel-button:hover {
+    background-color: #bb2124;
+    color: white;
+    fill: white !important;
+}
+
+#back-button {
+    align-self: self-start;
+}
+
+.action-button.back-button {
+    margin: 0;
+    fill: #000 !important;
+    color: #000;
+    border-color: #000;
+}
+
+.action-button.back-button:hover {
+    background-color: #000;
+    color: white;
+    fill: white !important;
+}
+
+.event-wrapper {
+    width: 90%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.join-time {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+@media screen and (max-width: 768px) {
+    .status-page {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        width: 100%;
+        height: 100%;
+    }
+
+    .status-symbol {
+        width: 100px;
+    }
+
+    .status-title {
+        font-size: 1.2rem;
+    }
+
+    .status-description {
+        font-size: 0.8rem;
+    }
+
+    .action-button {
+        padding: 0.3rem 1rem;
+        font-size: 0.7rem;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+}

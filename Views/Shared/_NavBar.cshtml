@@ -1,16 +1,23 @@
-@* @model Citlali.Models.NavModel; *@
+
+@{
+    var accessToken = Context.Request.Cookies["accessToken"];
+    var refreshToken = Context.Request.Cookies["refreshToken"];
+    var profileImageUrl = Context.Request.Cookies["profileImageUrl"];
+
+    bool IsAuthenticated = !string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken);
+
+    if (string.IsNullOrEmpty(profileImageUrl))
+    {
+        profileImageUrl = ViewData["DefaultProfileImage"] as string;
+    }
+    var timestamp = DateTime.Now.Ticks;
+    profileImageUrl = $"{profileImageUrl}?v={timestamp}";
+}
 
 <nav>
   <ul>
     <div class="nav-group">
-      <a href="#">
-        <li>
-          @* Navigation Hamburger *@
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Navigation>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
-        </li>
-      </a>
-
-      <a href="#">
+      <a href="/Home/Index">
         <li class="logo">
           @* Logo *@
           <span>
@@ -22,36 +29,72 @@
     </div>
 
     <div class="nav-group">
-      <a href="#">
-        <li>
+      <a href="/Event/Create">
+        <li class="tooltip">
+          @* Create Event *@
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.AddCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          </span>
+          <span class="tooltip-text">Create Event</span>
+        </li>
+      </a>
+
+      <a href="/user/history">
+        <li class="tooltip">
           @* History *@
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.History>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.History>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          </span>
+          <p class="tooltip-text">History</p>
         </li>
       </a>
 
       <a href="#">
         @* Notification *@
-        <li>
-
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+        <li class="tooltip">
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          </span>
+          <p class="tooltip-text">Notification</p>
         </li>
       </a>
 
       <a href="#">
         @* Follow Heart *@
-        <li>
-          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Heart>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+        <li class="tooltip">
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Heart>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          </span>
+          <p class="tooltip-text">Followed</p>
         </li>
       </a>
 
-      <a href="#">
-        @* Profile *@
-        <li>
-          <div class="profile-placeholder">
-            @* <img src=@Model.profileImageUrl alt=""> *@
-          </div>
-        </li>
-      </a>
+      <div class="profile-container">
+        @if (IsAuthenticated)
+        {
+          @* Profile *@
+          <li>
+            <div class="profile-placeholder">
+              <img src=@profileImageUrl alt="">
+            </div>
+
+            @* Dropdown *@
+            <div class="profile-dropdown">
+              <a href="/user" class="dropdown-item">User Profile</a>
+              <form asp-controller="Auth" asp-action="SignOut" method="post">
+                <button type="submit" class="dropdown-item">Sign Out</button>
+              </form>
+            </div>
+          </li>
+        }
+        else
+        {
+          <li>
+            <a href="/Auth/SignIn" class="signin-btn">Sign In</a>
+          </li>
+        }
+      </div>
+
     </div>
   </ul>
 </nav>

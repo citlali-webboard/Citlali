@@ -15,19 +15,22 @@ public class UserController : Controller
     private readonly UserService _userService;
     private readonly EventService _eventService;
     private readonly Configuration _configuration;
+    private readonly EventService _eventService;
 
     public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService, EventService eventService, Configuration configuration)
+    public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService, Configuration configuration, EventService eventService)
     {
         _logger = logger;
         _supabaseClient = supabaseClient;
         _userService = userService;
         _eventService = eventService;
         _configuration = configuration;
+        _eventService = eventService;
     }
 
     public async Task<IActionResult> Index()
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null || currentUser.Id == null)
         {
             return RedirectToAction("explore", "event");
@@ -54,7 +57,7 @@ public class UserController : Controller
     [Authorize]
     public async Task<IActionResult> Onboarding()
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
         {
             return RedirectToAction("SignIn", "Auth");
@@ -107,6 +110,15 @@ public class UserController : Controller
                 TempData["Error"] = "Something went wrong. Please try again.";
                 return RedirectToAction("Onboarding");
             }
+            
+            HttpContext.Response.Cookies.Append("ProfileImageURL", userCreated.ProfileImageUrl, new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(30)
+            });
+
             return RedirectToAction("Index");
         }
         catch (InvalidUsernameException ex)
@@ -123,6 +135,27 @@ public class UserController : Controller
 
     }
 
+    [HttpGet("history")]
+    [Authorize]
+    public async Task<IActionResult> History()
+    {
+        try {
+            var historyList = await _eventService.GetHistory();
+            return View(historyList);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            TempData["Error"] = ex.Message;
+            return RedirectToAction("Index", "Event");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            TempData["Error"] = "Something went wrong. Please try again.";
+            return RedirectToAction("Index", "Event");
+        }
+    }
+
     [HttpGet("{username}")]
     public async Task<IActionResult> Profile(string username)
     {
@@ -132,11 +165,14 @@ public class UserController : Controller
             return Content("User not found.");
         }
 
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
         var followingCount = await _userService.GetFollowingCount(user.UserId);
         var followersCount = await _userService.GetFollowersCount(user.UserId);
         var isFollowing = currentUser != null && await _userService.IsFollowing(Guid.Parse(currentUser.Id ?? string.Empty), user.UserId);
+
+        var events = await _eventService.GetEventsByUserId(user.UserId);
+        var userEventBriefCards = (await _eventService.EventsToBriefCardArray(events)).ToList();
 
         var userViewModel = new UserViewModel
         {
@@ -149,7 +185,8 @@ public class UserController : Controller
             FollowingCount = followingCount,
             FollowersCount = followersCount,
             IsCurrentUser = isCurrentUser,
-            IsFollowing = isFollowing
+            IsFollowing = isFollowing,
+            UserEvents = userEventBriefCards
         };
 
         return View(userViewModel);
@@ -165,7 +202,15 @@ public class UserController : Controller
             return RedirectToAction("Index");
         }
             
-        await _userService.EditUser(userOnboardingDto);
+        var updatedUser = await _userService.EditUser(userOnboardingDto);
+
+        Response.Cookies.Append("ProfileImageUrl", updatedUser.ProfileImageUrl, new CookieOptions
+        {
+            HttpOnly = false,  
+            Secure = true, 
+            SameSite = SameSiteMode.Strict,  
+            Expires = DateTime.UtcNow.AddDays(30)
+        });
 
         return RedirectToAction("Index");
     }

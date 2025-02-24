@@ -1,12 +1,22 @@
 @model Citlali.Models.EventDetailViewModel;
 
+@{
+    ViewData["ogTitle"] = Model.EventDetailCardData.EventTitle + " • Citlali";
+    ViewData["ogDescription"] = Model.EventDetailCardData.EventDescription != null ? (Model.EventDetailCardData.EventDescription.Length > 100 ? Model.EventDetailCardData.EventDescription.Substring(0, 100) + "..." : Model.EventDetailCardData.EventDescription) : "";
+    Model.EventFormDto.IsClosed = Model.IsClosed;
+}
+
 @section head {
     <link rel="stylesheet" href="~/css/Form.css" asp-append-version="true" />
 }
 
 <div class="center-wrapper">
     <div class="detail-main-container">
-        <partial name="_EventDetailCard" model=@Model.EventDetailCardData />
-        <partial name="_EventJoinForm" model=@Model.EventFormDto />
+        <div class="detail">
+            <partial name="_EventDetailCard" model=@Model.EventDetailCardData />
+        </div>
+        <div class="request-form">
+            <partial name="_EventJoinForm" model=@Model.EventFormDto />
+        </div>
     </div>
 </div>
