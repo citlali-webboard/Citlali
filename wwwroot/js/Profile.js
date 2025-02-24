@@ -52,7 +52,7 @@ async function toggleFollow(username, follow) {
                     </svg>
                 </span>
                 <span>
-                    Following ✅
+                    Following
                 </span>
             `;
             followButton.setAttribute('onclick', `toggleFollow('${username}', false)`);
@@ -72,6 +72,8 @@ async function toggleFollow(username, follow) {
 
         followersCountElement.textContent = result.followersCount;
     } else {
+        const errorText = await response.text();
+        console.error('Error:', errorText);
         alert('An error occurred. Please try again.');
     }
 }

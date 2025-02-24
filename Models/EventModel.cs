@@ -143,6 +143,11 @@ public class TagEventExploreViewModel : EventExploreViewModel
     public Guid TagId { get; set; } = new();
     public string TagName { get; set; } = "";
     public string TagEmoji { get; set; } = "";
+    public bool IsFollowing { get; set; }
+    public new List<Tag> Tags { get; set; } = new List<Tag>();
+    public new EventBriefCardData[] EventBriefCardDatas { get; set; } = new EventBriefCardData[0];
+    public new int CurrentPage { get; set; }
+    public new int TotalPage { get; set; }
 }
 
 [Table("EVENT_CATEGORY_TAG")]

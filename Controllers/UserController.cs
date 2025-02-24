@@ -211,4 +211,88 @@ public class UserController : Controller
 
         return RedirectToAction("Index");
     }
+    
+    [HttpPost("follow/{username}")]
+    [Authorize]
+    public async Task<IActionResult> Follow(string username)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        var userToFollow = await _userService.GetUserByUsername(username);
+        if (userToFollow == null)
+        {
+            return NotFound();
+        }
+
+        var userId = currentUser.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        await _userService.FollowUser(Guid.Parse(userId), userToFollow.UserId);
+
+        var followersCount = await _userService.GetFollowersCount(userToFollow.UserId);
+        return Json(new { followersCount });
+    }
+
+    [HttpPost("unfollow/{username}")]
+    [Authorize]
+    public async Task<IActionResult> Unfollow(string username)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        var userToUnfollow = await _userService.GetUserByUsername(username);
+        if (userToUnfollow == null)
+        {
+            return NotFound();
+        }
+
+        var userId = currentUser.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        await _userService.UnfollowUser(Guid.Parse(userId), userToUnfollow.UserId);
+
+        var followersCount = await _userService.GetFollowersCount(userToUnfollow.UserId);
+        return Json(new { followersCount });
+    }
+
+    [HttpPost("followTag/{tagId}")]
+    [Authorize]
+    public async Task<IActionResult> FollowTag(Guid tagId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        await _userService.FollowTag(tagId);
+        return Ok();
+    }
+
+    [HttpPost("unfollowTag/{tagId}")]
+    [Authorize]
+    public async Task<IActionResult> UnfollowTag(Guid tagId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        await _userService.UnfollowTag(tagId);
+        return Ok();
+    }
 }
