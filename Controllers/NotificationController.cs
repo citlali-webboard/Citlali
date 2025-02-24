@@ -95,6 +95,7 @@ public class NotificationController : Controller
     {
         try
         {
+        
             await _notificationService.DeleteAllNotifications();
             return RedirectToAction("Index");
 

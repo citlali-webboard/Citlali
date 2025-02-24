@@ -34,6 +34,10 @@ function setting_desktop() {
     });
 }
 
+function handleDeleteClick() {
+    deleteNotification();
+}
+
 function handleDesktopClick() {
     let Card = this;
     let CardId = Card.getAttribute("data-id");
@@ -82,7 +86,6 @@ function handleDesktopClick() {
                     titleElement.textContent = escapeHTML(data.title);
 
                     let messageElement = document.createElement("p");
-                    messageElement.classList.add("txt-over-card")
                     messageElement.textContent = escapeHTML(data.message);
 
                     let linkElement = document.createElement("a");
@@ -134,6 +137,12 @@ function handleDesktopClick() {
                     contentContainer.appendChild(titleElement);
                     contentContainer.appendChild(messageElement);
                     contentContainer.appendChild(linkElement);
+
+                    var delete_btn = document.querySelector("#delete-btn");
+                    delete_btn.setAttribute("data-id", data.id);
+                
+                    delete_btn.removeEventListener("click", handleDeleteClick);
+                    delete_btn.addEventListener("click", handleDeleteClick);
                 }
 
                 createPreviewCard(data, preview_url);
@@ -163,6 +172,13 @@ function handleDesktopClick() {
                     if (imageElement) {
                         contentContainer.appendChild(imageElement);
                     }
+
+                    var delete_btn = document.querySelector("#delete-btn");
+                    delete_btn.setAttribute("data-id", data.id);
+                
+                    delete_btn.removeEventListener("click", handleDeleteClick);
+                    delete_btn.addEventListener("click", handleDeleteClick);
+
                 }
                 
                 createNoPreviewCard(data);
@@ -287,11 +303,24 @@ function handleMobileClick() {
             container_detail_mobile.appendChild(deleteButton);
             // Add the new content after the card
             Card.after(container_detail_mobile);
+
+            var delete_btn = document.querySelector("#delete-btn");
+            delete_btn.setAttribute("data-id", data.id);
+        
+            delete_btn.removeEventListener("click", handleDeleteClick);
+            delete_btn.addEventListener("click", handleDeleteClick);
         }
     };
 
     xmlhttp.send();
 }
+
+
+//set delete-all-btn when load page
+document.addEventListener("DOMContentLoaded", function () {
+    let deleteAllBtn = document.querySelector("#delete-all-btn");
+    deleteAllBtn.addEventListener("click", deleteAllNotification);
+});
 
 
 if (isMobile) {
@@ -324,4 +353,37 @@ function encodeURL(url) {
             "&": "%26"
         }[match];
     });
+}
+
+
+function deleteNotification(){
+    let id = document.querySelector("#delete-btn").getAttribute("data-id");
+    let URL = window.location.href + "/delete/" + id;
+    let xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("GET", URL, true);
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            //set card hidden select card from data-id 
+            let card = document.querySelector(`[data-id="${id}"]`);
+            card.classList.add("hidden");
+
+            //set to default notification
+            document.querySelector("#notification-detail").classList.add("hidden");
+            document.querySelector("#default-notification").classList.remove("hidden");
+        }
+    };
+    xmlhttp.send();
+}
+
+function deleteAllNotification(){
+    let URL = window.location.href + "/deleteAll";
+    let xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("POST", URL, true);
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            location.reload();
+        }
+    };
+    xmlhttp.send();
+    console.log("delete all");
 }
