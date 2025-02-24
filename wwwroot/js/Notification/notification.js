@@ -216,6 +216,8 @@ function handleMobileClick() {
         return;
     }
 
+    Card.classList.add("read");
+
     // Create new XMLHttpRequest object
     let xmlhttp = new XMLHttpRequest();
     let URL = window.location.href + "/detail/" + CardId;
@@ -234,6 +236,7 @@ function handleMobileClick() {
 
             let container_detail_mobile = document.createElement("div");
             container_detail_mobile.classList.add("container-detail-mobile");
+            container_detail_mobile.setAttribute("container-id", data.id);
 
             let boxtitleElement = document.createElement("div");
             boxtitleElement.classList.add("box-title-over-card");
@@ -289,6 +292,10 @@ function handleMobileClick() {
             let deleteButton = document.createElement("button");
             deleteButton.classList.add("delete-button-mobile");
             deleteButton.textContent = "Delete";
+            deleteButton.setAttribute("id", data.id);
+            deleteButton.addEventListener("click", function () {
+                deleteNotificationMobile(data.id);
+            });
 
             linkElement.appendChild(previewCardElement);
 
@@ -386,4 +393,23 @@ function deleteAllNotification(){
     };
     xmlhttp.send();
     console.log("delete all");
+}
+
+function deleteNotificationMobile(id){
+    let URL = window.location.href + "/delete/" + id;
+    let xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("GET", URL, true);
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            //set card hidden select card from data-id 
+            let card = document.querySelector(`[data-id="${id}"]`);
+            let containerDetail = document.querySelector(`[container-id="${id}"]`);
+            
+            card.classList.add("hidden");
+            containerDetail.classList.add("hidden");
+
+
+        }
+    };
+    xmlhttp.send();
 }
