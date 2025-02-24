@@ -218,6 +218,9 @@ function handleMobileClick() {
             let container_detail_mobile = document.createElement("div");
             container_detail_mobile.classList.add("container-detail-mobile");
 
+            let boxtitleElement = document.createElement("div");
+            boxtitleElement.classList.add("box-title-over-card");
+
             let titleElement = document.createElement("p");
             titleElement.classList.add("title-over-card");
             titleElement.textContent = escapeHTML(data.title);
@@ -268,8 +271,12 @@ function handleMobileClick() {
 
             linkElement.appendChild(previewCardElement);
 
-            container_detail_mobile.appendChild(titleElement);
-            container_detail_mobile.appendChild(messageElement);
+            boxtitleElement.appendChild(titleElement);
+            boxtitleElement.appendChild(messageElement);
+
+            container_detail_mobile.appendChild(boxtitleElement);
+            // container_detail_mobile.appendChild(titleElement);
+            // container_detail_mobile.appendChild(messageElement);
             container_detail_mobile.appendChild(linkElement);
 
             // Add the new content after the card

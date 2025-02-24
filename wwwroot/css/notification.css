@@ -4,7 +4,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 60vw;
+    width: 80vw;
     margin: 2% 0 2% 0;
 }
 
@@ -33,7 +33,7 @@ main {
 
 main .notification-container{
     width: 40%;
-    max-width: 300px;
+    /* max-width: 300px; */
     display: flex;
     flex-direction: column;
     row-gap: 0.55rem;
@@ -42,7 +42,8 @@ main .notification-container{
 
 .notification-card{
     width: 100%;
-    max-width: 600px;
+    /* max-width: 600px; */
+    height: auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -245,13 +246,13 @@ main .notification-container{
     overflow: hidden; 
 }
 /* ---------------------------- preview-card ------------------------ */
-@media screen and (min-width: 768px) {
+/* @media screen and (min-width: 768px) {
     .container {
         width: 80vw;
     }
 
     main .notification-container {
-        width: 80%;
+        width: 100%;
         gap: 0.3rem;
         max-width: 380px;
     }
@@ -260,7 +261,7 @@ main .notification-container{
     .notification-detail {
         width: 100%;
     }
-}
+} */
 
 
 @media screen and (max-width: 768px){
@@ -280,7 +281,7 @@ main .notification-container{
     main .notification-container {
         width: 100%;
         gap: 0.4rem;
-        max-width: 380px;
+        /* min-width: 380px; */
     }
 
     .default-notification,
@@ -298,12 +299,16 @@ main .notification-container{
         box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
     }
 
+    .box-title-over-card {
+        width: 80%;
+    }
+
     .container-detail-mobile .title-over-card {
         font-size: 1.3rem;
         font-weight: bold;
         margin-top: 0.5rem;
         align-self: flex-start;
-        margin-left: 2.5rem;
+        /* margin-left: 2.5rem; */
         
     }
 
@@ -312,7 +317,7 @@ main .notification-container{
         /* font-weight: bold; */
         margin-top: 0.3rem;
         align-self: flex-start;
-        margin-left: 2.5rem;
+        /* margin-left: 2.5rem; */
     }
 
     .link-over-card {
