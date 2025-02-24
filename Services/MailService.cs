@@ -92,7 +92,7 @@ public class MailService(
         MailAddress sendTo = new(recievingAddress);
         MailMessage mailMessage = new(_sendFrom, sendTo)
         {
-            Subject = $"{model.Action} {model.Title}",
+            Subject = $"{model.Title} • Citlali",
             BodyEncoding = System.Text.Encoding.UTF8,
             IsBodyHtml = true,
             Body = body
@@ -101,9 +101,9 @@ public class MailService(
         await _smtpClient.SendMailAsync(mailMessage);
     }
 
-    public async void SendSelected(MailSelectedViewModel model, string recievingAddress)
+    public async void SendNotificationEmail(MailNotificationViewModel model, string recievingAddress)
     {
-        var body = await RenderViewToStringAsync("~/Views/Mail/Selected.cshtml", model);
+        var body = await RenderViewToStringAsync("~/Views/Mail/Notification.cshtml", model);
         await Send(model, body, recievingAddress);
     }
 }

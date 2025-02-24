@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Citlali.Services;
 
-public class EventService(Client supabaseClient, UserService userService, NotificationService notificationService)
+public class EventService(Client supabaseClient, UserService userService, NotificationService notificationService, MailService mailService, Configuration configuration)
 {
     private readonly Client _supabaseClient = supabaseClient;
     private readonly UserService _userService = userService;
     private readonly NotificationService _notificationService = notificationService;
+    private readonly MailService _mailService = mailService;
+    private readonly Configuration _configuration = configuration;
     // CreateEvent
 
     public async Task<List<Tag>> GetTags()
@@ -113,7 +115,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Update();
 
         return true;
-        
+
     }
 
     public async Task<bool> DeleteEvent(Guid eventId)
@@ -202,27 +204,28 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var supabaseUser = _userService.CurrentSession.User
             ?? throw new UnauthorizedAccessException("User not authenticated");
 
-        var eventToInvite = await GetEventById(eventId)
-            ?? throw new KeyNotFoundException("Event not found");
-
-        if (eventToInvite.CreatorUserId.ToString() != supabaseUser.Id)
-        {
-            throw new UnauthorizedAccessException("User not authorized to invite to this event");
-        }
-
-        var invitedRegistrantCount = await _supabaseClient
+        var eventToInviteTask = GetEventById(eventId);
+        var registrationTask = GetRegistrationByEventIdAndUserId(eventId, userId);
+        var targetUserTask = _userService.GetUserByUserId(userId);
+        var invitedRegistrantCountTask = _supabaseClient
             .From<Registration>()
             .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
             .Filter("Status", Supabase.Postgrest.Constants.Operator.In, new[] { "awaiting-confirmation", "confirmed" })
             .Count(Supabase.Postgrest.Constants.CountType.Exact);
 
-        var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
-            ?? throw new KeyNotFoundException("Registration not found");
+        var eventToInvite = await eventToInviteTask ?? throw new KeyNotFoundException("Event not found");
+        if (eventToInvite.CreatorUserId.ToString() != supabaseUser.Id)
+        {
+            throw new UnauthorizedAccessException("User not authorized to invite to this event");
+        }
+        var invitedRegistrantCount = await invitedRegistrantCountTask;
 
         if (invitedRegistrantCount >= eventToInvite.MaxParticipant)
         {
             throw new MaximumInvitationExceedException();
         }
+
+        var registration = await registrationTask ?? throw new KeyNotFoundException("Registration not found");
 
         await _supabaseClient
             .From<Registration>()
@@ -232,8 +235,16 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         var notificationTitle = "You have been invited to an event! 🎉";
         var notificationBody = $"Congratulations! Your request to join the event {eventToInvite.EventTitle} has been reviewed and accepted! To confirm or reject the invitation, please visit the event page.";
+        var absoluteUrl = $"/event/detail/{eventId}";
+        var mailModel = new MailNotificationViewModel {
+            Title = notificationTitle,
+            Body = notificationBody,
+            Url = $"{_configuration.App.Url}{absoluteUrl}"
+        };
 
-        await _notificationService.CreateNotification(userId, notificationTitle, notificationBody, $"/event/detail/{eventId}");
+        var targetUser = await targetUserTask ?? throw new KeyNotFoundException("Can't query target user");
+        var notificaionTask = _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl);
+        _mailService.SendNotificationEmail(mailModel, targetUser.Email);
 
         return true;
     }
@@ -845,7 +856,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                         ?? throw new UnauthorizedAccessException("User not authenticated");
         if (supabaseUser == null)
             throw new UnauthorizedAccessException("User not authenticated");
-        
+
         var userId = Guid.Parse(supabaseUser.Id ?? throw new UnauthorizedAccessException("User ID not found"));
 
         var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
@@ -870,7 +881,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                         ?? throw new UnauthorizedAccessException("User not authenticated");
         if (supabaseUser == null)
             throw new UnauthorizedAccessException("User not authenticated");
-        
+
         var userId = Guid.Parse(supabaseUser.Id ?? throw new UnauthorizedAccessException("User ID not found"));
 
         var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
@@ -905,7 +916,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                         ?? throw new UnauthorizedAccessException("User not authenticated");
         if (supabaseUser == null)
             throw new UnauthorizedAccessException("User not authenticated");
-        
+
         var userId = Guid.Parse(supabaseUser.Id ?? throw new UnauthorizedAccessException("User ID not found"));
 
         var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
@@ -964,7 +975,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var registrants = await GetRegistrantsConfirmedByEventId(eventId);
 
         if (registrants != null && registrants.Count > 0) {
-            var notificationTasks = registrants.Select(registrant => 
+            var notificationTasks = registrants.Select(registrant =>
                 _notificationService.CreateNotification(registrant.UserId, title, message, $"/event/detail/{eventId}")
             );
 
@@ -995,7 +1006,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             var citlaliEvent = await GetEventById(registration.EventId);
             if (citlaliEvent == null)
                 continue;
-            
+
             var creatorTask = _userService.GetUserByUserId(citlaliEvent.CreatorUserId);
             var locationTagTask = GetLocationTagById(citlaliEvent.EventLocationTagId);
             var eventCategoryTagTask = GetTagById(citlaliEvent.EventCategoryTagId);
