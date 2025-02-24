@@ -52,7 +52,7 @@ function handleDesktopClick() {
             // Set details
             document.querySelector("#content-title").innerHTML = data.title;
             // document.querySelector("#content-body").innerHTML = data.message;
-            document.querySelector("#source-name").innerHTML = `${data.sourceDisplayName}(${data.sourceUsername})`;
+            document.querySelector("#source-name").innerHTML = `<span style="font-weight: bold;">${data.sourceDisplayName}</span> (${data.sourceUsername})`;
             document.querySelector("#create-at").href = data.createdAt;
 
             let source_img = document.querySelector("#source-img");
