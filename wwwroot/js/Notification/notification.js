@@ -311,6 +311,13 @@ function handleMobileClick() {
 }
 
 
+//set delete-all-btn when load page
+document.addEventListener("DOMContentLoaded", function () {
+    let deleteAllBtn = document.querySelector("#delete-all-btn");
+    deleteAllBtn.addEventListener("click", deleteAllNotification);
+});
+
+
 if (isMobile) {
     setting_mobile();
 } else {
@@ -361,4 +368,17 @@ function deleteNotification(){
         }
     };
     xmlhttp.send();
+}
+
+function deleteAllNotification(){
+    let URL = window.location.href + "/deleteAll";
+    let xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("POST", URL, true);
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            location.reload();
+        }
+    };
+    xmlhttp.send();
+    console.log("delete all");
 }
