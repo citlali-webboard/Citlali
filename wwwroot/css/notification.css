@@ -128,7 +128,7 @@ main .notification-container{
     display: flex;
     justify-content: flex-start;
     align-self: center;
-    margin: 0.5rem 0 0.5rem 2rem;
+    margin: 0.5rem 2rem 0.5rem 2rem;
     position: relative;
 }
 
@@ -168,26 +168,38 @@ main .notification-container{
     border: 2px solid red;
     color: red;
     border-radius: 8px;
-    padding: 0.4rem;
-    justify-self: flex-start;
+    padding: 0.3rem;
+    justify-self: center;
     align-self: flex-start;
     display: flex;
-    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+    font-weight: bold;
+}
 
+.delete-all-btn:hover {
+    background-color: #ff0000;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.5);
 }
 
 .notification-detail .header .delete-btn {
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 2px solid red;
     color: red;
-    border-radius: 8px;
     height: fit-content;
-    padding: 0.4rem;
+    align-self: center;
     position: absolute;
     right: 0;
-    gap: 0.25rem;
+    padding: 0.3rem;
+
+}
+
+.notification-detail .header .delete-btn:hover {
+    background-color: #f0f0f0;
+    padding: 0.3rem;
+    border-radius: 50%;
 }
 
 .notification-detail .content{
@@ -430,6 +442,17 @@ main .notification-container{
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden; 
+    }
+
+    .delete-button-mobile {
+        border: 2px solid red;
+        color: red;
+        border-radius: 8px;
+        padding: 0.2rem;
+        justify-self: flex-end;
+        align-self: flex-end;
+        margin-right: 10%;
+        margin-bottom: 2%;
     }
 
     .hidden {

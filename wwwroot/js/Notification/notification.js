@@ -270,6 +270,10 @@ function handleMobileClick() {
                 previewCardElement.appendChild(imageContainerElement);
             }
 
+            let deleteButton = document.createElement("button");
+            deleteButton.classList.add("delete-button-mobile");
+            deleteButton.textContent = "Delete";
+
             linkElement.appendChild(previewCardElement);
 
             boxtitleElement.appendChild(titleElement);
@@ -280,6 +284,7 @@ function handleMobileClick() {
             // container_detail_mobile.appendChild(messageElement);
             container_detail_mobile.appendChild(linkElement);
 
+            container_detail_mobile.appendChild(deleteButton);
             // Add the new content after the card
             Card.after(container_detail_mobile);
         }
