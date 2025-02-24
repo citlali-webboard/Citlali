@@ -963,9 +963,12 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         var registrants = await GetRegistrantsConfirmedByEventId(eventId);
 
-        foreach (var registrant in registrants)
-        {
-            await _notificationService.CreateNotification(registrant.UserId, title, message, $"/event/detail/{eventId}");
+        if (registrants != null && registrants.Count > 0) {
+            var notificationTasks = registrants.Select(registrant => 
+                _notificationService.CreateNotification(registrant.UserId, title, message, $"/event/detail/{eventId}")
+            );
+
+            await Task.WhenAll(notificationTasks);
         }
 
         return true;
