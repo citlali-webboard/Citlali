@@ -102,6 +102,20 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return modelEvent;
     }
 
+    public async Task<bool> CloseEventWhenMaxParticipant(Guid eventId)
+    {
+        var eventToClose = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
+
+        await _supabaseClient
+            .From<Event>()
+            .Where(row => row.EventId == eventId)
+            .Set(row => row.Status, "closed")
+            .Update();
+
+        return true;
+        
+    }
+
     public async Task<bool> DeleteEvent(Guid eventId)
     {
         var supabaseUser = _userService.CurrentSession.User;
@@ -664,6 +678,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                         ?? throw new UnauthorizedAccessException("User not authenticated");
 
         var user = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id ?? throw new UnauthorizedAccessException("User not found")));
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
 
         var ev = await GetEventById(eventId)
                 ?? throw new KeyNotFoundException("Event not found");
@@ -827,7 +843,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     {
         var supabaseUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
-        var userId = Guid.Parse(supabaseUser.Id);
+        if (supabaseUser == null)
+            throw new UnauthorizedAccessException("User not authenticated");
+        
+        var userId = Guid.Parse(supabaseUser.Id ?? throw new UnauthorizedAccessException("User ID not found"));
 
         var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
                 ?? throw new KeyNotFoundException("Registration not found");
@@ -849,7 +868,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     {
         var supabaseUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
-        var userId = Guid.Parse(supabaseUser.Id);
+        if (supabaseUser == null)
+            throw new UnauthorizedAccessException("User not authenticated");
+        
+        var userId = Guid.Parse(supabaseUser.Id ?? throw new UnauthorizedAccessException("User ID not found"));
 
         var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
                 ?? throw new KeyNotFoundException("Registration not found");
@@ -881,7 +903,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     {
         var supabaseUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
-        var userId = Guid.Parse(supabaseUser.Id);
+        if (supabaseUser == null)
+            throw new UnauthorizedAccessException("User not authenticated");
+        
+        var userId = Guid.Parse(supabaseUser.Id ?? throw new UnauthorizedAccessException("User ID not found"));
 
         var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
                 ?? throw new KeyNotFoundException("Registration not found");
@@ -947,6 +972,59 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
     }
 
+    public async Task<RegistrationHistoryData> GetHistory()
+    {
+        var currentUser = _userService.CurrentSession.User;
+        if (currentUser == null)
+            throw new UnauthorizedAccessException("User not authenticated.");
+        var userId = Guid.Parse(currentUser.Id ?? throw new UnauthorizedAccessException("User not authenticated."));
+
+        var registrationHistory = await _supabaseClient
+            .From<Registration>()
+            .Filter(row => row.UserId, Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
+            .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
+            .Get();
+
+        var historyList = new RegistrationHistoryData();
+
+        foreach (var registration in registrationHistory.Models)
+        {
+            var citlaliEvent = await GetEventById(registration.EventId);
+            if (citlaliEvent == null)
+                continue;
+            
+            var creatorTask = _userService.GetUserByUserId(citlaliEvent.CreatorUserId);
+            var locationTagTask = GetLocationTagById(citlaliEvent.EventLocationTagId);
+            var eventCategoryTagTask = GetTagById(citlaliEvent.EventCategoryTagId);
+
+            await Task.WhenAll(creatorTask, locationTagTask, eventCategoryTagTask);
+
+            var creator = await creatorTask;
+            var locationTag = await locationTagTask;
+            var eventCategoryTag = await eventCategoryTagTask;
+
+            if (creator == null || locationTag == null || eventCategoryTag == null)
+                continue;
+
+            var historyCard = new RegistrationHistoryCardModel
+            {
+                EventId = registration.EventId,
+                EventTitle = citlaliEvent.EventTitle,
+                EventDescription = citlaliEvent.EventDescription,
+                CreatorUsername = creator.Username,
+                CreatorDisplayName = creator.DisplayName,
+                CreatorProfileImageUrl = creator.ProfileImageUrl,
+                LocationTag = locationTag,
+                EventCategoryTag = eventCategoryTag,
+                Status = registration.Status,
+                RegistrationTime = registration.CreatedAt
+            };
+
+            historyList.RegistrationHistoryCardModels.Add(historyCard);
+        }
+
+        return historyList;
+    }
 }
 
 public class UserAlreadyRegisteredException : Exception

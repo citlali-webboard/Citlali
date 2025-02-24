@@ -20,6 +20,7 @@ public class UserService
         "superuser",
         "onboarding",
         "edit",
+        "history",
     };
     public UserService(Client supabaseClient, Configuration configuration, UtilitiesService utilityService)
     {

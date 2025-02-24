@@ -101,7 +101,7 @@
             <div class="control">
                 <div class="event-status">
                     <span class="status-circle @Model.EventStatus"></span>
-                    <span class="status-text"><strong>Event status: </strong>@Model.EventStatus</span>
+                    <span class="status-text"><strong>Event status: </strong>@(Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(Model.EventStatus))</span>
                 </div>
                 @if (@Model.EventStatus == "active") {
                     <form asp-action="CloseEvent" asp-route-eventId="@Model.EventId" method="post" onsubmit="return confirm('Are you sure you want to close this event? People will no longer be able to register for it.');">
@@ -174,7 +174,7 @@
                         @foreach (var participant in Model.AnswerSet)
                         {
                             var collapseId = "collapse_" + participant.User.UserId; // Unique ID for each dropdown
-                            
+
                             <div class="registrant-card">
                                 <div class="registrant-header" onclick="toggleDropdown('@collapseId')">
                                     <img src="@participant.User.ProfileImageUrl" alt="Profile" class="profile-img">
@@ -193,7 +193,7 @@
                                         }
                                         <span class="status-circle @status"></span>
                                     </span>
-                                    
+
                                     <span class="dropdown-icon">
                                         @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.ChevronDown>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
                                     </span>
