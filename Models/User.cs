@@ -49,7 +49,21 @@ public class UserFollowedCategory : BaseModel
 
         [Column("EventCategoryTagId")]
         public Guid EventCategoryTagId { get; set; }
-} 
+}
+
+[Table("USER_FOLLOWED")]
+public class UserFollowed : BaseModel
+{
+        [PrimaryKey]
+        [Column("FollowingId")]
+        public Guid UserFollowedId { get; set; } = Guid.NewGuid();
+
+        [Column("FollowerUserId")]
+        public Guid UserId { get; set; }
+
+        [Column("FollowedUserId")]
+        public Guid FollowedUserId { get; set; }
+}
 
 public class UserOnboardingDto : User
 {
@@ -59,6 +73,8 @@ public class UserOnboardingDto : User
 
 public class UserViewModel : User
 {
-        public int FollowedCount { get; set; } = 0;
+        public int FollowedCount { get; set; }
+        public int FollowersCount { get; set; }
         public bool IsCurrentUser { get; set; }
+        public bool IsFollowing { get; set; }
 }

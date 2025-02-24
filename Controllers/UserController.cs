@@ -33,7 +33,13 @@ public class UserController : Controller
             return RedirectToAction("explore", "event");
         }
 
-        var dbUser = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id));
+        var userId = currentUser.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return RedirectToAction("explore", "event");
+        }
+
+        var dbUser = await _userService.GetUserByUserId(Guid.Parse(userId));
         if (dbUser == null)
         {
             return RedirectToAction("Onboarding");
@@ -128,7 +134,9 @@ public class UserController : Controller
 
         var currentUser = _supabaseClient.Auth.CurrentUser;
         var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
-        var followedCount = await _userService.GetFollowedCount(user.UserId.ToString());
+        var followedCount = await _userService.GetFollowingCount(user.UserId);
+        var followersCount = await _userService.GetFollowersCount(user.UserId);
+        var isFollowing = currentUser != null && await _userService.IsFollowing(Guid.Parse(currentUser.Id ?? string.Empty), user.UserId);
 
         var userViewModel = new UserViewModel
         {
@@ -139,7 +147,9 @@ public class UserController : Controller
             DisplayName = user.DisplayName,
             UserBio = user.UserBio,
             FollowedCount = followedCount,
-            IsCurrentUser = isCurrentUser
+            FollowersCount = followersCount,
+            IsCurrentUser = isCurrentUser,
+            IsFollowing = isFollowing
         };
 
         return View(userViewModel);
@@ -149,15 +159,76 @@ public class UserController : Controller
     [Authorize]
     public async Task<IActionResult> ProfileEdit(UserOnboardingDto userOnboardingDto)
     {
-
         if (string.IsNullOrEmpty(userOnboardingDto.DisplayName))
-            {
-                TempData["Error"] = "Display name is required.";
-                return RedirectToAction("Index");
-            }
+        {
+            TempData["Error"] = "Display name is required.";
+            return RedirectToAction("Index");
+        }
             
         await _userService.EditUser(userOnboardingDto);
 
         return RedirectToAction("Index");
+    }
+
+    [HttpPost("follow/{username}")]
+    [Authorize]
+    public async Task<IActionResult> Follow(string username)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return RedirectToAction("SignIn", "Auth");
+        }
+
+        var userToFollow = await _userService.GetUserByUsername(username);
+        if (userToFollow == null)
+        {
+            return Content("User not found.");
+        }
+
+        var userId = currentUser.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return RedirectToAction("SignIn", "Auth");
+        }
+
+        await _userService.FollowUser(Guid.Parse(userId), userToFollow.UserId);
+
+        return RedirectToAction("Profile", new { username });
+    }
+
+    [HttpPost("unfollow/{username}")]
+    [Authorize]
+    public async Task<IActionResult> Unfollow(string username)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return RedirectToAction("SignIn", "Auth");
+        }
+
+        var userToUnfollow = await _userService.GetUserByUsername(username);
+        if (userToUnfollow == null)
+        {
+            return Content("User not found.");
+        }
+
+        var userId = currentUser.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return RedirectToAction("SignIn", "Auth");
+        }
+
+        try
+        {
+            await _userService.UnfollowUser(Guid.Parse(userId), userToUnfollow.UserId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error unfollowing user: {ex.Message}");
+            return Content("An error occurred while trying to unfollow the user.");
+        }
+
+        return RedirectToAction("Profile", new { username });
     }
 }

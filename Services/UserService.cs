@@ -1,8 +1,10 @@
 using Citlali.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Supabase;
+// using Supabase.Postgrest.Constants;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using static Supabase.Postgrest.Constants;
 
 namespace Citlali.Services;
 
@@ -304,12 +306,72 @@ public class UserService
         return 0;
     }
 
-    public async Task<int> GetFollowedCount(string userId) {
-        var followedTags = await GetFollowedTags(userId);
-        var followedTagCount = followedTags?.Count ?? 0;
+    public async Task<int> GetFollowingCount(Guid userId)
+    {
+        var followingCount = await _supabaseClient
+            .From<UserFollowed>()
+            .Where(f => f.UserId == userId)
+            .Count(CountType.Exact);
 
-        var followedUserCount = GetFollowedUser(userId);
-        return followedTagCount + followedUserCount;
+        return followingCount;
+    }
+
+    public async Task<int> GetFollowersCount(Guid userId)
+    {
+        var followersCount = await _supabaseClient
+            .From<UserFollowed>()
+            .Where(f => f.FollowedUserId == userId)
+            .Count(CountType.Exact);
+
+        return followersCount;
+    }
+
+    public async Task FollowUser(Guid followerUserId, Guid followedUserId)
+    {
+        var userFollowed = new UserFollowed
+        {
+            UserFollowedId = Guid.NewGuid(),
+            UserId = followerUserId,
+            FollowedUserId = followedUserId
+        };
+
+        await _supabaseClient
+            .From<UserFollowed>()
+            .Insert(userFollowed);
+    }
+
+    public async Task UnfollowUser(Guid followerUserId, Guid followedUserId)
+    {
+        try
+        {
+            var userFollowed = await _supabaseClient
+                .From<UserFollowed>()
+                .Where(f => f.UserId == followerUserId && f.FollowedUserId == followedUserId)
+                .Single();
+
+            if (userFollowed != null)
+            {
+                await _supabaseClient
+                    .From<UserFollowed>()
+                    .Where(f => f.UserId == followerUserId && f.FollowedUserId == followedUserId)
+                    .Delete();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error unfollowing user: {ex.Message}");
+            throw new Exception("An error occurred while trying to unfollow the user.");
+        }
+    }
+
+    public async Task<bool> IsFollowing(Guid followerUserId, Guid followedUserId)
+    {
+        var userFollowed = await _supabaseClient
+            .From<UserFollowed>()
+            .Where(f => f.UserId == followerUserId && f.FollowedUserId == followedUserId)
+            .Single();
+
+        return userFollowed != null;
     }
 
 }

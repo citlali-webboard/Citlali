@@ -29,3 +29,39 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+async function toggleFollow(username, follow) {
+    const url = follow ? `/user/follow/${username}` : `/user/unfollow/${username}`;
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+    });
+
+    if (response.ok) {
+        const followButton = document.getElementById('follow-button');
+        const followersCountElement = document.querySelector('.data h3.followers-count');
+        let followersCount = parseInt(followersCountElement.textContent);
+
+        if (follow) {
+            followButton.innerHTML = `
+                <span>
+                    Following ✅
+                </span>
+            `;
+            followButton.setAttribute('onclick', `toggleFollow('${username}', false)`);
+            followersCountElement.textContent = followersCount + 1;
+        } else {
+            followButton.innerHTML = `
+                <span>
+                    Follow
+                </span>
+            `;
+            followButton.setAttribute('onclick', `toggleFollow('${username}', true)`);
+            followersCountElement.textContent = followersCount - 1;
+        }
+    } else {
+        alert('An error occurred. Please try again.');
+    }
+}
