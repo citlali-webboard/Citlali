@@ -134,7 +134,7 @@ public class UserController : Controller
 
         var currentUser = _supabaseClient.Auth.CurrentUser;
         var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
-        var followedCount = await _userService.GetFollowingCount(user.UserId);
+        var followingCount = await _userService.GetFollowingCount(user.UserId);
         var followersCount = await _userService.GetFollowersCount(user.UserId);
         var isFollowing = currentUser != null && await _userService.IsFollowing(Guid.Parse(currentUser.Id ?? string.Empty), user.UserId);
 
@@ -146,7 +146,7 @@ public class UserController : Controller
             ProfileImageUrl = user.ProfileImageUrl,
             DisplayName = user.DisplayName,
             UserBio = user.UserBio,
-            FollowedCount = followedCount,
+            FollowingCount = followingCount,
             FollowersCount = followersCount,
             IsCurrentUser = isCurrentUser,
             IsFollowing = isFollowing
@@ -194,7 +194,8 @@ public class UserController : Controller
 
         await _userService.FollowUser(Guid.Parse(userId), userToFollow.UserId);
 
-        return RedirectToAction("Profile", new { username });
+        var followersCount = await _userService.GetFollowersCount(userToFollow.UserId);
+        return Json(new { followersCount });
     }
 
     [HttpPost("unfollow/{username}")]
@@ -219,16 +220,9 @@ public class UserController : Controller
             return RedirectToAction("SignIn", "Auth");
         }
 
-        try
-        {
-            await _userService.UnfollowUser(Guid.Parse(userId), userToUnfollow.UserId);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error unfollowing user: {ex.Message}");
-            return Content("An error occurred while trying to unfollow the user.");
-        }
+        await _userService.UnfollowUser(Guid.Parse(userId), userToUnfollow.UserId);
 
-        return RedirectToAction("Profile", new { username });
+        var followersCount = await _userService.GetFollowersCount(userToUnfollow.UserId);
+        return Json(new { followersCount });
     }
 }

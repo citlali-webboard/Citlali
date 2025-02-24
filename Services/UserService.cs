@@ -310,7 +310,7 @@ public class UserService
     {
         var followingCount = await _supabaseClient
             .From<UserFollowed>()
-            .Where(f => f.UserId == userId)
+            .Where(f => f.FollowerUserId == userId)
             .Count(CountType.Exact);
 
         return followingCount;
@@ -330,8 +330,8 @@ public class UserService
     {
         var userFollowed = new UserFollowed
         {
-            UserFollowedId = Guid.NewGuid(),
-            UserId = followerUserId,
+            FollowingId = Guid.NewGuid(),
+            FollowerUserId = followerUserId,
             FollowedUserId = followedUserId
         };
 
@@ -346,14 +346,14 @@ public class UserService
         {
             var userFollowed = await _supabaseClient
                 .From<UserFollowed>()
-                .Where(f => f.UserId == followerUserId && f.FollowedUserId == followedUserId)
+                .Where(f => f.FollowerUserId == followerUserId && f.FollowedUserId == followedUserId)
                 .Single();
 
             if (userFollowed != null)
             {
                 await _supabaseClient
                     .From<UserFollowed>()
-                    .Where(f => f.UserId == followerUserId && f.FollowedUserId == followedUserId)
+                    .Where(f => f.FollowerUserId == followerUserId && f.FollowedUserId == followedUserId)
                     .Delete();
             }
         }
@@ -368,7 +368,7 @@ public class UserService
     {
         var userFollowed = await _supabaseClient
             .From<UserFollowed>()
-            .Where(f => f.UserId == followerUserId && f.FollowedUserId == followedUserId)
+            .Where(f => f.FollowerUserId == followerUserId && f.FollowedUserId == followedUserId)
             .Single();
 
         return userFollowed != null;
