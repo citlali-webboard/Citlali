@@ -1,0 +1,30 @@
+@model MailSelectedViewModel;
+
+@{
+  Layout = "_LayoutMail";
+  ViewData["Action"] = Model.Action;
+  ViewData["Title"] = Model.Title;
+}
+
+<tr>
+  <td align="center" style="color: #555; font-size: 14px; line-height: 1.5;">
+    Congratulations!
+    <br>
+    You have been selected to participate in @Model.Title
+  </td>
+</tr>
+<tr>
+  <td align="center" style="font-size: 12px; color: #888; padding-top: 1rem;">
+    Follow the link below to accept or reject this invitation.
+  </td>
+</tr>
+<tr>
+  <td align="center" style="padding-top: 1.5rem;">
+    <a href=@Model.Url>
+      <div
+        style="font-size: 1rem; font-weight: 700; color: white; background-color: black; padding: 1rem; border-radius: 1rem; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: inline-block;">
+        View Invitation
+      </div>
+    </a>
+  </td>
+</tr>
