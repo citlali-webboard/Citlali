@@ -580,7 +580,8 @@ public class EventController : Controller
 
         }catch(Exception e){
             TempData["Error"] = e.Message;
-            return RedirectToAction("explore");
+            
+            return RedirectToAction("manage", new { eventId = eventId });
         }
     }
 
