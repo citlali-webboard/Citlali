@@ -76,6 +76,7 @@ public class UserViewModel : User
         public int FollowingCount { get; set; }
         public int FollowersCount { get; set; }
         public bool IsCurrentUser { get; set; }
+        public bool IsFollowing { get; set; }
         public List<EventBriefCardData> UserEvents { get; set; } = new List<EventBriefCardData>();
 }
 

@@ -15,17 +15,14 @@ public class UserController : Controller
     private readonly UserService _userService;
     private readonly EventService _eventService;
     private readonly Configuration _configuration;
-    private readonly EventService _eventService;
 
     public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService, EventService eventService, Configuration configuration)
-    public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService, Configuration configuration, EventService eventService)
     {
         _logger = logger;
         _supabaseClient = supabaseClient;
         _userService = userService;
         _eventService = eventService;
         _configuration = configuration;
-        _eventService = eventService;
     }
 
     public async Task<IActionResult> Index()
@@ -213,61 +210,5 @@ public class UserController : Controller
         });
 
         return RedirectToAction("Index");
-    }
-
-    [HttpPost("follow/{username}")]
-    [Authorize]
-    public async Task<IActionResult> Follow(string username)
-    {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
-        if (currentUser == null)
-        {
-            return RedirectToAction("SignIn", "Auth");
-        }
-
-        var userToFollow = await _userService.GetUserByUsername(username);
-        if (userToFollow == null)
-        {
-            return Content("User not found.");
-        }
-
-        var userId = currentUser.Id;
-        if (string.IsNullOrEmpty(userId))
-        {
-            return RedirectToAction("SignIn", "Auth");
-        }
-
-        await _userService.FollowUser(Guid.Parse(userId), userToFollow.UserId);
-
-        var followersCount = await _userService.GetFollowersCount(userToFollow.UserId);
-        return Json(new { followersCount });
-    }
-
-    [HttpPost("unfollow/{username}")]
-    [Authorize]
-    public async Task<IActionResult> Unfollow(string username)
-    {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
-        if (currentUser == null)
-        {
-            return RedirectToAction("SignIn", "Auth");
-        }
-
-        var userToUnfollow = await _userService.GetUserByUsername(username);
-        if (userToUnfollow == null)
-        {
-            return Content("User not found.");
-        }
-
-        var userId = currentUser.Id;
-        if (string.IsNullOrEmpty(userId))
-        {
-            return RedirectToAction("SignIn", "Auth");
-        }
-
-        await _userService.UnfollowUser(Guid.Parse(userId), userToUnfollow.UserId);
-
-        var followersCount = await _userService.GetFollowersCount(userToUnfollow.UserId);
-        return Json(new { followersCount });
     }
 }
