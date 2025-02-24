@@ -185,10 +185,14 @@ main .notification-container{
 }
 
 .read{
-    background-color: #d4e5f0;
+    background-color: #f0f0f0;
     font-size: 0.8rem;
     opacity: 0.6;
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+}
+
+.read #title {
+    font-weight: normal;
 }
 
 .read:hover{
@@ -203,10 +207,10 @@ main .notification-container{
 .title-over-card {
     font-size: 1.5rem;
     font-weight: bold;
-    display: -webkit-box;
+    /* display: -webkit-box;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
-    overflow: hidden; 
+    overflow: hidden;  */
 }
 
 .txt-over-card {
