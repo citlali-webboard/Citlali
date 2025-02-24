@@ -82,6 +82,7 @@ function handleDesktopClick() {
                     titleElement.textContent = escapeHTML(data.title);
 
                     let messageElement = document.createElement("p");
+                    messageElement.classList.add("txt-over-card")
                     messageElement.textContent = escapeHTML(data.message);
 
                     let linkElement = document.createElement("a");

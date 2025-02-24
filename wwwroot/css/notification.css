@@ -42,7 +42,7 @@ main .notification-container{
 
 .notification-card{
     width: 100%;
-    /* max-width: 600px; */
+    min-width: 250px;
     height: auto;
     display: flex;
     justify-content: space-between;
@@ -57,12 +57,18 @@ main .notification-container{
     font-size: 1rem;
     font-weight: bold;
     opacity: 1;
+    justify-self: flex-start;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden; 
 }
 
 .notification-time {
     position: absolute;
     bottom: 10%;
     right: 3%;
+    text-overflow: ellipsis;
 }
 
 .notification-card:hover{
@@ -82,11 +88,11 @@ main .notification-container{
     border-radius: 50%;
 }
 
-#title{
+/* #title{
     justify-self: flex-start;
     font-weight: bold;
     opacity: 0.8;
-}
+} */
 
 #display-name{
     opacity: 0.5;
@@ -197,6 +203,22 @@ main .notification-container{
 .title-over-card {
     font-size: 1.5rem;
     font-weight: bold;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden; 
+}
+
+.txt-over-card {
+    /* display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;  */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    line-height: 1.5em;
+    max-height: 4.3em;
 }
 
 /* ---------------------------- preview-card ------------------------ */
@@ -218,21 +240,27 @@ main .notification-container{
     font-size: 1.5rem; 
     font-weight: bold; 
     margin: 0.5rem 0;
-}
-
-.preview-card-topic p {
-    font-size: 1rem; 
-    /* white-space: nowrap;  */
-    width: 100%; 
-    height: auto;
-    /* max-width: 400px;  */
-    margin-bottom: 1rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden; 
-    /* text-overflow: ellipsis;  */
-    
+}
+
+.preview-card-topic p {
+    font-size: 1rem; 
+    width: 100%; 
+    height: auto;
+    margin-bottom: 1rem;
+    /* max-width: 400px;  */
+    /* display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;  */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    line-height: 1.5em;
+    max-height: 4.4em;
 }
 
 .preview-link {
@@ -309,6 +337,10 @@ main .notification-container{
         margin-top: 0.5rem;
         align-self: flex-start;
         /* margin-left: 2.5rem; */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden; 
         
     }
 
@@ -318,6 +350,15 @@ main .notification-container{
         margin-top: 0.3rem;
         align-self: flex-start;
         /* margin-left: 2.5rem; */
+        /* display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;  */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        line-height: 1.5em;
+        max-height: 2.9em;
     }
 
     .link-over-card {
@@ -341,6 +382,10 @@ main .notification-container{
         font-size: 1.5rem; 
         font-weight: bold; 
         margin: 0.5rem 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden; 
     }
 
     .preview-card-topic-mobile p {
