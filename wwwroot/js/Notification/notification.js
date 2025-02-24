@@ -227,6 +227,7 @@ function handleMobileClick() {
             messageElement.textContent = escapeHTML(data.message);
 
             let linkElement = document.createElement("a");
+            linkElement.classList.add("link-over-card");
             linkElement.href = escapeHTML(preview_url);
 
             let previewCardElement = document.createElement("div");
