@@ -60,3 +60,10 @@ form p {
   font-size: 1rem;
   margin-bottom: 1.5rem;
 }
+
+input:disabled {
+  cursor: not-allowed;
+  background-color: #e0e0e0 !important;
+  color: #666 !important;
+  opacity: 0.7;
+}

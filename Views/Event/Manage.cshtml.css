@@ -160,7 +160,8 @@ ul {
 }
 
 .confirmed-participants,
-.await-confirmation {
+.await-confirmation,
+.rejected-invitation {
     display: flex;
     flex-direction: column;
     margin-top: 2rem;
@@ -262,6 +263,7 @@ ul {
     background-color: #00cc00;
 }
 
+.status-circle.status-rejected-invitation,
 .status-circle.status-rejected {
     background-color: #ff0000;
 }
@@ -329,6 +331,36 @@ ul {
     width: 30px;
     height: 30px;
     border-radius: 50%;
+}
+
+.event-status {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+}
+
+.status-circle {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.status-circle.active {
+    background-color: #00cc00;
+}
+
+.status-circle.closed {
+    background-color: #333;
+}
+
+.visit-profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+    margin-bottom: 1rem;
 }
 
 @media (max-width: 768px) {

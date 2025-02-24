@@ -51,7 +51,7 @@ public class AuthController : Controller
         {
             return RedirectToAction("Index", "User");
         }
-        return View();
+        return View(new AuthLoginDto());
     }
 
     [HttpPost]
@@ -90,7 +90,7 @@ public class AuthController : Controller
         {
             Console.WriteLine(ex.Message);
             TempData["Error"] = ex.Message;
-            return RedirectToAction("SignIn");
+            return View(authLoginDto);
         }
     }
 
