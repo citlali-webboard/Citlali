@@ -188,7 +188,23 @@ public class AuthController : Controller
             {
                 return View(authConfirmDto);
             }
-            var session = await _authService.VerifyEmailOtp(authConfirmDto.Email, authConfirmDto.Otp, authConfirmDto.Type);
+            var userTask = _userService.GetUserByEmail(authConfirmDto.Email);
+            var sessionTask = _authService.VerifyEmailOtp(authConfirmDto.Email, authConfirmDto.Otp, authConfirmDto.Type);
+            await Task.WhenAll(userTask, sessionTask);
+            var user = await userTask;
+            var session = await sessionTask;
+
+            if (user != null) {
+                string profileImageUrl = user.ProfileImageUrl ?? _configuration.User.DefaultProfileImage;
+                HttpContext.Response.Cookies.Append("ProfileImageUrl", profileImageUrl, new CookieOptions
+                {
+                    HttpOnly = false,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddDays(30)
+                });
+            }
+
             if (session != null && session.AccessToken != null && session.RefreshToken != null)
             {
                 await _supabaseClient.Auth.SetSession(session.AccessToken, session.RefreshToken);
