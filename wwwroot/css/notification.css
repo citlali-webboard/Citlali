@@ -129,6 +129,7 @@ main .notification-container{
     justify-content: flex-start;
     align-self: center;
     margin: 0.5rem 0 0.5rem 2rem;
+    position: relative;
 }
 
 .notification-detail .header .source-img{
@@ -161,6 +162,32 @@ main .notification-container{
     margin-left: 1rem;
     align-self: center;
     opacity: 0.6;
+}
+
+.delete-all-btn {
+    border: 2px solid red;
+    color: red;
+    border-radius: 8px;
+    padding: 0.4rem;
+    justify-self: flex-start;
+    align-self: flex-start;
+    display: flex;
+    gap: 0.25rem;
+
+}
+
+.notification-detail .header .delete-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid red;
+    color: red;
+    border-radius: 8px;
+    height: fit-content;
+    padding: 0.4rem;
+    position: absolute;
+    right: 0;
+    gap: 0.25rem;
 }
 
 .notification-detail .content{

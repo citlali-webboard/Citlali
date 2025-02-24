@@ -60,6 +60,10 @@
             <h1>Notification 🔔</h1>
             <p>Stay updated with important news and alerts. Don't miss out on the latest updates! 📢</p>
         </header>
+        <button class="delete-all-btn" id="delete-all-btn">
+            Delete All
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Error }))
+        </button>
         <main>
             <div class="notification-container">
                 @for (var i = 0; i < Model.Notifications.Count; i++)
@@ -105,7 +109,10 @@
                         <div id="source-name" class="source-name"></div>
                         <div id="create-at" class="create-at"></div>
                     </div>
-                        
+                    <button class="delete-btn" id="delete-btn">
+                        Delete
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Error }))
+                    </button>    
                 </div>
                 <hr>
                 <div class="content">
