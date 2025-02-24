@@ -18,12 +18,11 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
     public string EscapeInput(string input)
     {
-        if (string.IsNullOrEmpty(input))
-        {
-            return input;
-        }
-
-        return System.Net.WebUtility.HtmlEncode(input);
+        return input.Replace("&", "&amp;")
+            .Replace("<", "&lt;")
+            .Replace(">", "&gt;")
+            .Replace("\"", "&quot;")
+            .Replace("'", "&#039;");
     }
 
     //GetNotifications
