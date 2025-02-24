@@ -16,6 +16,15 @@ public class NotificationService(Client supabaseClient, UserService userService)
     private readonly Client _supabaseClient = supabaseClient;
     private readonly UserService _userService = userService;
 
+    public string EscapeInput(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return input;
+        }
+
+        return System.Net.WebUtility.HtmlEncode(input);
+    }
 
     //GetNotifications
     public async Task<List<NotificationModel>> GetNotifications()
@@ -23,7 +32,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
         var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
         {
-            throw new Exception("User is not authenticated.");
+            throw new UnauthorizedAccessException("User not authenticated");
         }
 
         Guid userId = Guid.Parse(currentUser.Id ?? "");
@@ -52,12 +61,12 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         if (notificationsResponse == null)
         {
-            throw new Exception("Failed to get notifications.");
+            throw new GetNotificationException("Failed to get notifications.");
         }
 
         if (notificationsResponse.Models.Count != 0 && notificationsResponse.Models[0].ToUserId != userId)
         {
-            throw new Exception("User is not authorized to view notifications.");
+            throw new UnauthorizedAccessException("User is not authorized to view notifications.");
         }
 
         foreach (var notification in notificationsResponse.Models)
@@ -87,7 +96,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
         var currentUser = _supabaseClient.Auth.CurrentUser;
         if (currentUser == null)
         {
-            throw new Exception("User is not authenticated.");
+            throw new UnauthorizedAccessException("User is not authenticated.");
         }
 
         Guid userId = Guid.Parse(currentUser.Id ?? "");
@@ -101,12 +110,12 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         if (notification == null)
         {
-            throw new Exception("Failed to get notification details.");
+            throw new GetNotificationException("Failed to get notification details.");
         }
 
         if (userId != notification.ToUserId)
         {
-            throw new Exception("User is not authorized to view notification details.");
+            throw new UnauthorizedAccessException("User is not authorized to view notification details.");
         }
 
         var modelUpdateTask = _supabaseClient
@@ -119,7 +128,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         await Task.WhenAll(modelUpdateTask, fromUserTask);
 
-        var fromUser = await fromUserTask ?? new User();
+        var fromUser = await fromUserTask ?? throw new GetUserException("Failed to get source user details.");
 
         var notificationDetails = new NotificationDetailModel
         {
@@ -148,12 +157,12 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         if (fromUserId == Guid.Empty || toUserId == Guid.Empty)
         {
-            throw new Exception("Invalid user id.");
+            throw new SameSourceAndDestinationException("Source and destination are the same.");
         }
 
         if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(message))
         {
-            throw new Exception("Title and message are required.");
+            throw new EmptyInputException("Title and message are required.");
         }
 
         var notification = new Notification
@@ -161,9 +170,9 @@ public class NotificationService(Client supabaseClient, UserService userService)
             NotificationId = Guid.NewGuid(),
             FromUserId = fromUserId,
             ToUserId = toUserId,
-            Title = title,
-            Message = message,
-            Url = url,
+            Title = EscapeInput(title),
+            Message = EscapeInput(message),
+            Url = EscapeInput(url),
             CreatedAt = DateTime.UtcNow,
             Read = false
         };
@@ -171,7 +180,6 @@ public class NotificationService(Client supabaseClient, UserService userService)
         await _supabaseClient
             .From<Notification>()
             .Insert(notification);
-
 
         return true;
     }
@@ -183,7 +191,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
         var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
         {
-            throw new Exception("User is not authenticated.");
+            throw new UnauthorizedAccessException("User is not authenticated.");
         }
 
         Guid userId = Guid.Parse(currentUser.Id ?? "");
@@ -197,13 +205,13 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         if (response == null)
         {
-            throw new Exception("Failed to get notifications.");
+            throw new GetNotificationException("Failed to get notifications.");
         }
 
         return response.Models.Count;
     }
 
-    //get notificaion by id
+    //get notification by id
     public async Task<Notification> GetNotificationById(Guid notificationId)
     {
         var notification = await _supabaseClient
@@ -211,7 +219,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
             .Filter("NotificationId", Supabase.Postgrest.Constants.Operator.Equals, notificationId.ToString())
             .Single();
 
-        return notification ?? throw new Exception("Notification not found");
+        return notification ?? throw new GetNotificationException("Notification not found");
     }
 
     //DeleteNotification
@@ -220,7 +228,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
         var currentUser = _supabaseClient.Auth.CurrentUser;
         if (currentUser == null)
         {
-            throw new Exception("User is not authenticated.");
+            throw new UnauthorizedAccessException("User is not authenticated.");
         }
 
         Guid userId = Guid.Parse(currentUser.Id ?? "");
@@ -229,7 +237,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         if (userId != notification.ToUserId)
         {
-            throw new Exception("User is not authorized to delete notification.");
+            throw new UnauthorizedAccessException("User is not authorized to delete notification.");
         }
 
         await _supabaseClient
@@ -247,7 +255,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
         var currentUser = _supabaseClient.Auth.CurrentUser;
         if (currentUser == null)
         {
-            throw new Exception("User is not authenticated.");
+            throw new UnauthorizedAccessException("User is not authenticated.");
         }
 
         Guid userId = Guid.Parse(currentUser.Id ?? "");
@@ -260,7 +268,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
     }
 
     public async Task<NotificationModel> NotificationRowToModel (Notification notificationRow) {
-        var sourceUser = await _userService.GetUserByUserId(notificationRow.FromUserId) ?? throw new Exception("Source user not found");
+        var sourceUser = await _userService.GetUserByUserId(notificationRow.FromUserId) ?? throw new GetUserException("Source user not found");
 
         return new NotificationModel
         {
@@ -323,4 +331,45 @@ public class NotificationService(Client supabaseClient, UserService userService)
             Console.WriteLine($"Exception: {ex.Message}");
         }
     }
+}
+
+public class GetNotificationException : Exception
+{
+    public GetNotificationException() : base("Failed to get notification details.") { }
+
+    public GetNotificationException(string message) : base(message) { }
+
+    public GetNotificationException(string message, Exception innerException)
+        : base(message, innerException) { }
+}
+
+
+public class GetUserException : Exception
+{
+    public GetUserException() : base("Failed to get source user details.") { }
+
+    public GetUserException(string message) : base(message) { }
+
+    public GetUserException(string message, Exception innerException)
+        : base(message, innerException) { }
+}
+
+public class SameSourceAndDestinationException : Exception
+{
+    public SameSourceAndDestinationException() : base("Source and destination are the same.") { }
+
+    public SameSourceAndDestinationException(string message) : base(message) { }
+
+    public SameSourceAndDestinationException(string message, Exception innerException)
+        : base(message, innerException) { }
+}
+
+public class EmptyInputException : Exception
+{
+    public EmptyInputException() : base("Title and message are required.") { }
+
+    public EmptyInputException(string message) : base(message) { }
+
+    public EmptyInputException(string message, Exception innerException)
+        : base(message, innerException) { }
 }
