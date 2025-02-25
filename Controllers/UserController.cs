@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Citlali.Models;
 using Citlali.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Routing;
 
 namespace Citlali.Controllers;
 
@@ -100,7 +101,7 @@ public class UserController : Controller
                 TempData["Error"] = "Something went wrong. Please try again.";
                 return RedirectToAction("Onboarding");
             }
-            
+
             HttpContext.Response.Cookies.Append("ProfileImageURL", userCreated.ProfileImageUrl, new CookieOptions
             {
                 HttpOnly = false,
@@ -157,6 +158,15 @@ public class UserController : Controller
 
         var currentUser = _userService.CurrentSession.User;
         var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
+        if (isCurrentUser) {
+            HttpContext.Response.Cookies.Append("ProfileImageUrl", user.ProfileImageUrl, new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(30)
+            });
+        }
 
         var events = await _eventService.GetEventsByUserId(user.UserId);
         var userEventBriefCards = (await _eventService.EventsToBriefCardArray(events)).ToList();
@@ -186,14 +196,14 @@ public class UserController : Controller
                 TempData["Error"] = "Display name is required.";
                 return RedirectToAction("Index");
             }
-            
+
         var updatedUser = await _userService.EditUser(userOnboardingDto);
 
         Response.Cookies.Append("ProfileImageUrl", updatedUser.ProfileImageUrl, new CookieOptions
         {
-            HttpOnly = false,  
-            Secure = true, 
-            SameSite = SameSiteMode.Strict,  
+            HttpOnly = false,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
             Expires = DateTime.UtcNow.AddDays(30)
         });
 
