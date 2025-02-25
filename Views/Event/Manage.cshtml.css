@@ -19,6 +19,7 @@
     margin-top: 1rem;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     /* justify-content: flex-end; */
     gap: 1rem;
 }
@@ -627,5 +628,9 @@ ul {
     .popup-info {
         width: 90% !important;
         align-self: center;
+    }
+
+    .event-status {
+        width: 100%;
     }
 }
