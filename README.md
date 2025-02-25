@@ -28,18 +28,34 @@ cd Citlali
 dotnet restore
 ```
 
-### 3️⃣ Use dotnet user-secrets to add secrets
+### 3️⃣ Edit appsettings.json
+you should read all of them and change according to your environment, but you definitely should change
+- App
+  - Url: base url/FQDN on your environment
+- Supabase
+  - LocalUrl : url for this backend connection to supabase, can be the same as PublicUrl but ideally should be a private IP
+  - PublicUrl : url for user connection to supabase
+- Mail
+  - SendAddress : email address for sending transactional notification email
+  - SmtpServer : smtp server for transactional notification email
+  - SmtpPort : port for above smtp server mentioned
+
+### 4️⃣ Use dotnet user-secrets to add secrets
 you need to set
-- `Supabase:ServiceRoleKey` : a service role key to access supabase
 - `Jwt:Secret` : your jwt signing key, should be the same on supabase
-by running
+- `Supabase:ServiceRoleKey` : a service role key to access supabase
+- `Supabase:AnonKey` : an anon key to access supabase
+- `Mail:SmtpUsername` : Username for logging in to SmtpServer in appsettings
+- `Mail:SmtpPassword` : Password for logging in to SmtpServer in appsettings
+
+by running something like
+
 ```bash
 dotnet user-secrets set "Supabase:ServiceRoleKey" "replace_with_your_own_secret"
 
 ```
 
-
-### 4️⃣ Run in Watch Mode
+### 5️⃣ Run in Watch Mode
 Running in watch mode will automatically recompile the source code when it is modified.
 This will start the application and automatically open it in your browser.
 ```bash

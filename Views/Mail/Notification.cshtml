@@ -1,0 +1,26 @@
+@model MailNotificationViewModel;
+
+@{
+  Layout = "_LayoutMail";
+  ViewData["Title"] = Model.Title;
+}
+
+<tr>
+  <td align="center" style="color: #555; font-size: 14px; line-height: 1.5; white-space: pre-wrap;">
+    @Model.Body
+  </td>
+</tr>
+@{
+  if(Model.Url != null) {
+    <tr>
+      <td align="center" style="padding-top: 1.5rem;">
+        <a href="@Model.Url">
+          <div
+            style="font-size: 1rem; font-weight: 700; color: white; background-color: black; padding: 1rem; border-radius: 1rem; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: inline-block;">
+            View Event
+          </div>
+        </a>
+      </td>
+    </tr>
+  }
+}
