@@ -1,51 +1,138 @@
 using Supabase;
+using Supabase.Gotrue;
 using System.Text.Json;
 
 namespace Citlali.Services;
 
-public class AuthService(Client supabaseClient, IConfiguration configuration)
+public class AuthService(Supabase.Client supabaseClient, IConfiguration configuration)
 {
-    private readonly Client _supabaseClient = supabaseClient;
+    private readonly Supabase.Client _supabaseClient = supabaseClient;
     private readonly IConfiguration _configuration = configuration;
 
-    public async Task<Supabase.Gotrue.Session?> SignIn(string email, string password){
-        try{
+    public async Task<Session?> SignIn(string email, string password)
+    {
+        try
+        {
             var response = await _supabaseClient.Auth.SignIn(email, password);
             return response;
 
-        }catch(Exception e){
+        }
+        catch (Exception e)
+        {
+            try
+            {
+                var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
+                string msgError = errorJson.GetProperty("msg").GetString() ?? "";
+                Console.WriteLine(msgError);
 
-            var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
-            string msgError = errorJson.GetProperty("msg").GetString()??"";
-            Console.WriteLine(msgError);
-
-            throw new Exception(msgError);
+                throw new Exception(msgError);
+            }
+            catch
+            {
+                throw new Exception(e.Message);
+            }
         }
     }
 
-    public async Task<Supabase.Gotrue.Session?> SignUp(string email, string password){
-        try{
+    public async Task<Session?> SignUp(string email, string password)
+    {
+        try
+        {
             var response = await _supabaseClient.Auth.SignUp(email, password);
             return response;
-        }catch(Exception e){
-            var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
-            string msgError = errorJson.GetProperty("msg").GetString()??"";
-            Console.WriteLine(msgError);
+        }
+        catch (Exception e)
+        {
+            try
+            {
+                var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
+                string msgError = errorJson.GetProperty("msg").GetString() ?? "";
+                Console.WriteLine(msgError);
 
-            throw new Exception(msgError);
+                throw new Exception(msgError);
+            }
+            catch
+            {
+                throw new Exception(e.Message);
+            }
         }
     }
 
-    public async Task<Supabase.Gotrue.Session?> VerifyEmailOtp(string email, string token, Supabase.Gotrue.Constants.EmailOtpType type) {
-        try{
+    public async Task<ResetPasswordForEmailState> ForgotPassword(string email)
+    {
+        try
+        {
+            var response = await _supabaseClient.Auth.ResetPasswordForEmail(new ResetPasswordForEmailOptions(email)
+            {
+                RedirectTo = "/auth/reset-password"
+            });
+            return response;
+        }
+        catch (Exception e)
+        {
+            try
+            {
+                var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
+                string msgError = errorJson.GetProperty("msg").GetString() ?? "";
+                Console.WriteLine(msgError);
+
+                throw new Exception(msgError);
+            }
+            catch
+            {
+                throw new Exception(e.Message);
+            }
+        }
+    }
+
+    public async Task<User?> ResetPassword(string password)
+    {
+        try
+        {
+            var response = await _supabaseClient.Auth.Update(new UserAttributes
+            {
+                Password = password
+            });
+            return response;
+        }
+        catch (Exception e)
+        {
+            try
+            {
+                var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
+                string msgError = errorJson.GetProperty("msg").GetString() ?? "";
+                Console.WriteLine(msgError);
+
+                throw new Exception(msgError);
+            }
+            catch
+            {
+                throw new Exception(e.Message);
+            }
+        }
+    }
+
+    public async Task<Session?> VerifyEmailOtp(string email, string token, Constants.EmailOtpType type)
+    {
+        try
+        {
             var response = await _supabaseClient.Auth.VerifyOTP(email, token, type);
             return response;
-        }catch(Exception e){
-            var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
-            string msgError = errorJson.GetProperty("msg").GetString()??"";
-            Console.WriteLine(msgError);
+        }
+        catch (Exception e)
+        {
+            try
+            {
+                var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
+                string msgError = errorJson.GetProperty("msg").GetString() ?? "";
+                Console.WriteLine(msgError);
 
-            throw new Exception(msgError);
+                throw new Exception(msgError);
+            }
+            catch
+            {
+                throw new Exception(e.Message);
+            }
         }
     }
 }

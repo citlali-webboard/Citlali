@@ -17,7 +17,8 @@ public class AuthController : Controller
         ("Auth", "SignIn"),
         ("Auth", "SignUp"),
         ("Auth", "Confirm"),
-        ("Auth", "AuthCodeError")
+        ("Auth", "AuthCodeError"),
+        ("Auth", "ResetPassword"),
     };
 
     private bool IsValidRedirect(string controller, string action)
@@ -67,18 +68,17 @@ public class AuthController : Controller
             var session = await _authService.SignIn(authLoginDto.Email, authLoginDto.Password);
             if (session != null && session.AccessToken != null && session.RefreshToken != null)
             {
-
                 Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
                 Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
 
                 var user = await _userService.GetUserByEmail(authLoginDto.Email);
-                string profileImageUrl = user?.ProfileImageUrl ?? _configuration.User.DefaultProfileImage; 
+                string profileImageUrl = user?.ProfileImageUrl ?? _configuration.User.DefaultProfileImage;
 
                 HttpContext.Response.Cookies.Append("ProfileImageUrl", profileImageUrl, new CookieOptions
                 {
-                    HttpOnly = false, 
-                    Secure = true, 
-                    SameSite = SameSiteMode.Strict, 
+                    HttpOnly = false,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
                     Expires = DateTime.UtcNow.AddDays(30)
                 });
 
@@ -103,12 +103,12 @@ public class AuthController : Controller
 
         HttpContext.Response.Cookies.Append("ProfileImageUrl", _configuration.User.DefaultProfileImage, new CookieOptions
         {
-            HttpOnly = false, 
-            Secure = true, 
-            SameSite = SameSiteMode.Strict, 
+            HttpOnly = false,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
             Expires = DateTime.UtcNow.AddDays(30)
         });
-        
+
         await _supabaseClient.Auth.SignOut();
         return RedirectToAction("SignIn");
     }
@@ -180,7 +180,7 @@ public class AuthController : Controller
     }
 
     [HttpPost("auth/confirm")]
-    public async Task<IActionResult> ConfirmPost(AuthConfirmDto authConfirmDto, string? Next)
+    public async Task<IActionResult> ConfirmPost(AuthConfirmDto authConfirmDto)
     {
         try
         {
@@ -188,16 +188,32 @@ public class AuthController : Controller
             {
                 return View(authConfirmDto);
             }
-            var session = await _authService.VerifyEmailOtp(authConfirmDto.Email, authConfirmDto.Otp, authConfirmDto.Type);
+            var userTask = _userService.GetUserByEmail(authConfirmDto.Email);
+            var sessionTask = _authService.VerifyEmailOtp(authConfirmDto.Email, authConfirmDto.Otp, authConfirmDto.Type);
+            await Task.WhenAll(userTask, sessionTask);
+            var user = await userTask;
+            var session = await sessionTask;
+
+            if (user != null) {
+                string profileImageUrl = user.ProfileImageUrl ?? _configuration.User.DefaultProfileImage;
+                HttpContext.Response.Cookies.Append("ProfileImageUrl", profileImageUrl, new CookieOptions
+                {
+                    HttpOnly = false,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddDays(30)
+                });
+            }
+
             if (session != null && session.AccessToken != null && session.RefreshToken != null)
             {
                 await _supabaseClient.Auth.SetSession(session.AccessToken, session.RefreshToken);
                 Response.Cookies.Append(_configuration.Jwt.AccessCookie, session.AccessToken);
                 Response.Cookies.Append(_configuration.Jwt.RefreshCookie, session.RefreshToken);
-                var authorizedRedirects = new List<string> { "User/Index", "User/Onboarding" };
-                if (!string.IsNullOrEmpty(Next) && authorizedRedirects.Contains(Next))
+                var authorizedRedirects = new List<string> { "User/Index", "User/Onboarding", "Auth/ResetPassword" };
+                if (!string.IsNullOrEmpty(authConfirmDto.Next) && authorizedRedirects.Contains(authConfirmDto.Next))
                 {
-                    var parts = Next.Split('/');
+                    var parts = authConfirmDto.Next.Split('/');
                     if (parts.Length == 2 && IsValidRedirect(parts[0], parts[1]))
                     {
                         return RedirectToAction(parts[1], parts[0]);
@@ -217,6 +233,69 @@ public class AuthController : Controller
             return RedirectToAction("Confirm", authConfirmDto);
 
         }
+    }
 
+    [HttpGet("auth/forgotpassword")]
+    public IActionResult ForgotPassword()
+    {
+        var currentUser = _userService.CurrentSession.User;
+        if (currentUser != null)
+        {
+            return RedirectToAction("Index", "User");
+        }
+        return View();
+    }
+
+    [HttpPost("auth/forgotpassword")]
+    public async Task<IActionResult> ForgotPassword(AuthForgotPasswordDto authForgotPasswordDto)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new Exception("All fields are required.");
+            }
+            var state = await _authService.ForgotPassword(authForgotPasswordDto.Email);
+            var authConfirmDto = new AuthConfirmDto
+            {
+                Email = authForgotPasswordDto.Email,
+                Next = "Auth/ResetPassword",
+                Type = Supabase.Gotrue.Constants.EmailOtpType.Recovery
+            };
+            return RedirectToAction("Confirm", authConfirmDto);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            TempData["Error"] = ex.Message;
+            return RedirectToAction("ForgotPassword");
+        }
+    }
+
+    [HttpGet("auth/resetpassword")]
+    public IActionResult ResetPassword()
+    {
+        return View();
+    }
+
+    [HttpPost("auth/resetpassword")]
+    public async Task<IActionResult> ResetPassword(AuthResetPasswordDto authResetPasswordDto)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new Exception("All fields are required.");
+            }
+            var state = await _authService.ResetPassword(authResetPasswordDto.Password);
+
+            return RedirectToAction("Index", "User");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            TempData["Error"] = ex.Message;
+            return RedirectToAction("ResetPassword");
+        }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Citlali.Models;
 using Citlali.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Routing;
 
 namespace Citlali.Controllers;
 
@@ -107,7 +108,7 @@ public class UserController : Controller
                 TempData["Error"] = "Something went wrong. Please try again.";
                 return RedirectToAction("Onboarding");
             }
-            
+
             HttpContext.Response.Cookies.Append("ProfileImageURL", userCreated.ProfileImageUrl, new CookieOptions
             {
                 HttpOnly = false,
@@ -167,6 +168,15 @@ public class UserController : Controller
         var followingCount = await _userService.GetFollowingCount(user.UserId);
         var followersCount = await _userService.GetFollowersCount(user.UserId);
         var isFollowing = currentUser != null && await _userService.IsFollowing(Guid.Parse(currentUser.Id ?? string.Empty), user.UserId);
+        if (isCurrentUser) {
+            HttpContext.Response.Cookies.Append("ProfileImageUrl", user.ProfileImageUrl, new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(30)
+            });
+        }
 
         var events = await _eventService.GetEventsByUserId(user.UserId);
         var userEventBriefCards = (await _eventService.EventsToBriefCardArray(events)).ToList();
@@ -203,9 +213,9 @@ public class UserController : Controller
 
         Response.Cookies.Append("ProfileImageUrl", updatedUser.ProfileImageUrl, new CookieOptions
         {
-            HttpOnly = false,  
-            Secure = true, 
-            SameSite = SameSiteMode.Strict,  
+            HttpOnly = false,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
             Expires = DateTime.UtcNow.AddDays(30)
         });
 
