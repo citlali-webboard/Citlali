@@ -274,6 +274,23 @@ public class UserService
         return true;
     }
 
+    public async Task<bool> IsFollowingTag(Guid tagId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null || currentUser.Id == null)
+        {
+            throw new UnauthorizedAccessException("User is not authenticated.");
+        }
+
+        var response = await _supabaseClient
+            .From<UserFollowedCategory>()
+            .Filter(row => row.UserId, Supabase.Postgrest.Constants.Operator.Equals, Guid.Parse(currentUser.Id))
+            .Filter(row => row.EventCategoryTagId, Supabase.Postgrest.Constants.Operator.Equals, tagId)
+            .Single();
+
+        return response != null;
+    }
+
     public async Task<List<Tag>?> GetFollowedTags(string userId)
     {
         var response = await _supabaseClient

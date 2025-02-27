@@ -10,7 +10,6 @@
 @{
     string ExploreTagName = Model.TagName;
     string ExploreTagEmoji = Model.TagEmoji;
-    bool isFollowing = Model.IsFollowing;
 
     ViewData["Title"] = "Explore " + ExploreTagName;
 }
@@ -21,10 +20,10 @@
             <div class="title">
                 <h1>Explore @ExploreTagName @ExploreTagEmoji
                     <button id="followButton" class="action-button" data-tag-id="@Model.TagId">
-                        @(isFollowing ? "Unfollow" : "Follow")
+                        @(Model.IsFollowing ? "Unfollow" : "Follow")
                     </button>
                 </h1>
-                <p>Cute webboard which brings people together~ Let's explore events and find what suits you the best !</p>
+                <p>Cute webboard which brings people together~ Let's explore events and find what suits you the best!</p>
             </div>
             <div class="tags">
                 @foreach (var tag in Model.Tags)
@@ -86,4 +85,4 @@
 </div>
 
 <!-- Include CSRF token -->
-<input type="hidden" id="csrfToken" name="__RequestVerificationToken" value="@Antiforgery.GetAndStoreTokens(Context).RequestToken" />
+<input type="hidden" name="__RequestVerificationToken" value="@Antiforgery.GetAndStoreTokens(Context).RequestToken" />

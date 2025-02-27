@@ -288,8 +288,16 @@ public class UserController : Controller
             return Unauthorized();
         }
 
-        await _userService.FollowTag(tagId);
-        return Ok();
+        try
+        {
+            var success = await _userService.FollowTag(tagId);
+            return Json(new { success });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error following tag");
+            return StatusCode(500, "Internal server error");
+        }
     }
 
     [HttpPost("unfollowTag/{tagId}")]
@@ -302,7 +310,43 @@ public class UserController : Controller
             return Unauthorized();
         }
 
-        await _userService.UnfollowTag(tagId);
-        return Ok();
+        try
+        {
+            var success = await _userService.UnfollowTag(tagId);
+            return Json(new { success });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error unfollowing tag");
+            return StatusCode(500, "Internal server error");
+        }
+    }
+
+    [HttpGet("followedTags")]
+    [Authorize]
+    public async Task<IActionResult> GetFollowedTags()
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        var followedTags = await _userService.GetFollowedTags(currentUser.Id ?? string.Empty);
+        return Json(followedTags);
+    }
+
+    [HttpGet("isFollowingTag/{tagId}")]
+    [Authorize]
+    public async Task<IActionResult> IsFollowingTag(Guid tagId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        var isFollowing = await _userService.IsFollowingTag(tagId);
+        return Json(new { isFollowing });
     }
 }
