@@ -86,6 +86,67 @@ public class EventController : Controller
         }
     }
 
+    [HttpPost("editEvent/{eventId}")]
+    [Authorize]
+    public async Task<IActionResult> EditEvent(string eventId, CreateEventViewModel createEventViewModel)
+    {
+        try
+        {
+            if (!Guid.TryParse(eventId, out _))
+            {
+                throw new Exception("Invalid Event id");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                throw new Exception("All fields are required");
+            }
+            if (createEventViewModel.PostExpiryDate < DateTime.UtcNow || createEventViewModel.EventDate < DateTime.UtcNow)
+            {
+                throw new Exception("Post expiry date and event date must be in the future");
+            }
+            if (createEventViewModel.EventDate <= createEventViewModel.PostExpiryDate)
+            {
+                throw new Exception("Event date must be after post expiry date");
+            }
+            if (createEventViewModel.Cost < 0)
+            {
+                throw new Exception("Cost must be a positive number");
+            }
+            if (createEventViewModel.MaxParticipant < 0)
+            {
+                throw new Exception("Max participants must be a positive number");
+            }
+            if (createEventViewModel.EventLocationTagId == Guid.Empty || createEventViewModel.EventCategoryTagId == Guid.Empty)
+            {
+                throw new Exception("Location and Category tags are required");
+            }
+
+            await _eventService.EditEvent(Guid.Parse(eventId), createEventViewModel);
+            return RedirectToAction("detail", new { id = eventId });
+        }
+        catch (UnauthorizedAccessException) 
+        {
+            TempData["Error"] = "You are not authorized to edit this event";
+            return RedirectToAction("explore");
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["Error"] = "Event not found";
+            return RedirectToAction("explore");
+        }
+        catch (MaximumParticipantExceedException)
+        {
+            TempData["Error"] = "Maximum participants exceed";
+            return RedirectToAction("edit", new { eventId = eventId });
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("edit", new { eventId = eventId });
+        }
+    }
+
     [HttpPost("delete/{eventId}")]
     [Authorize]
     public async Task<IActionResult> DeleteEvent(string eventId)

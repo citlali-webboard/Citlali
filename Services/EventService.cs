@@ -101,6 +101,36 @@ public class EventService(Client supabaseClient, UserService userService)
         return modelEvent;
     }
 
+    public async Task<bool> EditEvent(Guid eventId, CreateEventViewModel createEventViewModel)
+    {
+        var supabaseUser = _userService.CurrentSession.User ?? throw new UnauthorizedAccessException("User not authenticated");
+        Guid userId = Guid.Parse(supabaseUser.Id ?? throw new UnauthorizedAccessException("User ID not found"));
+
+        var eventToEdit = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
+
+        if (eventToEdit.CreatorUserId != userId)
+            throw new UnauthorizedAccessException("User not authorized to edit this event");
+
+        var currentParticipant = await GetRegistrationCountByEventId(eventId);
+        if (createEventViewModel.MaxParticipant < currentParticipant)
+            throw new MaximumParticipantExceedException();
+
+        await _supabaseClient
+            .From<Event>()
+            .Where(row => row.EventId == eventId)
+            .Set(row => row.EventTitle, createEventViewModel.EventTitle)
+            .Set(row => row.EventDescription, createEventViewModel.EventDescription)
+            .Set(row => row.EventCategoryTagId, createEventViewModel.EventCategoryTagId)
+            .Set(row => row.EventLocationTagId, createEventViewModel.EventLocationTagId)
+            .Set(row => row.MaxParticipant, createEventViewModel.MaxParticipant)
+            .Set(row => row.Cost, createEventViewModel.Cost)
+            .Set(row => row.EventDate, createEventViewModel.EventDate)
+            .Set(row => row.PostExpiryDate, createEventViewModel.PostExpiryDate)
+            .Update();
+
+        return true;
+    }
+
     public async Task<bool> CloseEventWhenMaxParticipant(Guid eventId)
     {
         var eventToClose = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
@@ -1049,5 +1079,15 @@ public class EventClosedException : Exception
     public EventClosedException(string message) : base(message) { }
 
     public EventClosedException(string message, Exception innerException)
+        : base(message, innerException) { }
+}
+
+public class MaximumParticipantExceedException : Exception
+{
+    public MaximumParticipantExceedException() : base("Maximum participant has been exceeded.") { }
+
+    public MaximumParticipantExceedException(string message) : base(message) { }
+
+    public MaximumParticipantExceedException(string message, Exception innerException)
         : base(message, innerException) { }
 }
