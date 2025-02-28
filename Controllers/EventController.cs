@@ -16,14 +16,17 @@ public class EventController : Controller
     private readonly ILogger<EventController> _logger;
     private readonly EventService _eventService;
     private readonly UserService _userService;
+    private readonly NotificationService _notificationService;
     private readonly Supabase.Client _supabaseClient;
 
-    public EventController(ILogger<EventController> logger, EventService eventService, UserService userService, Supabase.Client supabaseClient)
+
+    public EventController(ILogger<EventController> logger, EventService eventService, UserService userService, Supabase.Client supabaseClient, NotificationService notificationService)
     {
         _logger = logger;
         _eventService = eventService;
         _userService = userService;
         _supabaseClient = supabaseClient;
+        _notificationService = notificationService;
     }
 
     [HttpGet("")]
@@ -517,6 +520,7 @@ public class EventController : Controller
     {
         try {
             await _eventService.InviteUser(Guid.Parse(eventId), Guid.Parse(userId));
+            
             return RedirectToAction("manage", new { eventId = eventId });
         }
         catch (UnauthorizedAccessException)
@@ -648,6 +652,28 @@ public class EventController : Controller
         {
             TempData["Error"] = e.Message;
             return RedirectToAction("explore");
+        }
+    }
+
+
+    [HttpPost("Broadcast")]
+    [Authorize]
+    public async Task<IActionResult> Broadcast(string eventId, string title, string message)
+    {
+        try{
+            if (!Guid.TryParse(eventId, out _))
+            {
+                throw new Exception("Invalid Event id");
+            }
+
+            await _eventService.Broadcast(Guid.Parse(eventId), title, message);
+            
+            return RedirectToAction("manage", new { eventId = eventId });
+
+        }catch(Exception e){
+            TempData["Error"] = e.Message;
+            
+            return RedirectToAction("manage", new { eventId = eventId });
         }
     }
 
