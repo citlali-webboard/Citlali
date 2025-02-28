@@ -55,7 +55,6 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         var notificationsResponse = await notificationsTask;
 
-        var notifications = new List<NotificationModel>();
 
 
         if (notificationsResponse == null)
@@ -68,18 +67,34 @@ public class NotificationService(Client supabaseClient, UserService userService)
             throw new UnauthorizedAccessException("User is not authorized to view notifications.");
         }
 
+        var uniqueUserIds = notificationsResponse.Models
+            .Select(n => n.FromUserId)
+            .Distinct()
+            .ToList();
+
+        var usersDictionary = new Dictionary<Guid, User>();
+
+        var userTasks = uniqueUserIds.Select(uid => _userService.GetUserByUserId(uid));
+        var users = await Task.WhenAll(userTasks);
+
+        foreach (var user in users.Where(u => u != null))
+        {
+            usersDictionary[user.UserId] = user;
+        }
+
+        var notifications = new List<NotificationModel>();
         foreach (var notification in notificationsResponse.Models)
         {
+            usersDictionary.TryGetValue(notification.FromUserId, out var fromUser);
+            var user = fromUser ?? new User();
 
-            var FromUser = await _userService.GetUserByUserId(notification.FromUserId) ?? new User();
-
-            notifications.Add(new NotificationModel // return a list of notifications with only the necessary fields
+            notifications.Add(new NotificationModel
             {
                 NotificationId = notification.NotificationId,
                 SourceUserId = notification.FromUserId,
-                SourceUsername = FromUser.Username,
-                SourceDisplayName = FromUser.DisplayName,
-                SourceProfileImageUrl = FromUser.ProfileImageUrl,
+                SourceUsername = user.Username,
+                SourceDisplayName = user.DisplayName,
+                SourceProfileImageUrl = user.ProfileImageUrl,
                 Read = notification.Read,
                 Title = notification.Title,
                 CreatedAt = notification.CreatedAt
