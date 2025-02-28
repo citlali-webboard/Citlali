@@ -19,7 +19,7 @@
         <header>
             <div class="title">
                 <h1>Explore @ExploreTagName @ExploreTagEmoji
-                    <button id="followButton" class="action-button" data-tag-id="@Model.TagId">
+                    <button id="followButton" class="action-button" data-tag-id="@Model.TagId" onclick="toggleFollowTag('@Model.TagId', @(Model.IsFollowing ? "false" : "true"))">
                         @(Model.IsFollowing ? "Unfollow" : "Follow")
                     </button>
                 </h1>

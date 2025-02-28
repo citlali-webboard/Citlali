@@ -5,6 +5,7 @@ using Supabase;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using static Supabase.Postgrest.Constants;
+using System.Reflection;
 
 namespace Citlali.Services;
 
@@ -238,23 +239,31 @@ public class UserService
 
     public async Task<bool> FollowTag(Guid tagId)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = CurrentSession.User;
         if (currentUser == null || currentUser.Id == null)
         {
             throw new UnauthorizedAccessException("User is not authenticated.");
         }
 
-        var model = new UserFollowedCategory
+        try
         {
-            UserId = Guid.Parse(currentUser.Id),
-            EventCategoryTagId = tagId
-        };
+            var userFollowedCategory = new UserFollowedCategory
+            {
+                UserId = Guid.Parse(currentUser.Id),
+                EventCategoryTagId = tagId
+            };
 
-        await _supabaseClient
-            .From<UserFollowedCategory>()
-            .Insert(model);
-
-        return true;
+            await _supabaseClient
+                .From<UserFollowedCategory>()
+                .Insert(userFollowedCategory);
+                        
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error following tag: {ex.Message}");
+            throw new Exception("An error occurred while trying to follow the tag.");
+        }
     }
 
     public async Task<bool> UnfollowTag(Guid tagId)
@@ -265,13 +274,24 @@ public class UserService
             throw new UnauthorizedAccessException("User is not authenticated.");
         }
 
-        await _supabaseClient
-            .From<UserFollowedCategory>()
-            .Filter(row => row.UserId, Supabase.Postgrest.Constants.Operator.Equals, currentUser.Id)
-            .Filter(row => row.EventCategoryTagId, Supabase.Postgrest.Constants.Operator.Equals, tagId)
-            .Delete();
-
-        return true;
+        try
+        {
+            var userId = Guid.Parse(currentUser.Id);
+            
+            // Use the exact column names from the model class
+            await _supabaseClient
+                .From<UserFollowedCategory>()
+                .Filter("UserId", Operator.Equals, userId.ToString())
+                .Filter("EventCategoryTagId", Operator.Equals, tagId.ToString())
+                .Delete();
+            
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error unfollowing tag: {ex.Message}");
+            throw new Exception("An error occurred while trying to unfollow the tag.");
+        }
     }
 
     public async Task<bool> IsFollowingTag(Guid tagId)
@@ -279,23 +299,34 @@ public class UserService
         var currentUser = _supabaseClient.Auth.CurrentUser;
         if (currentUser == null || currentUser.Id == null)
         {
-            throw new UnauthorizedAccessException("User is not authenticated.");
+            return false; // User not authenticated, can't be following
         }
 
-        var response = await _supabaseClient
-            .From<UserFollowedCategory>()
-            .Filter(row => row.UserId, Supabase.Postgrest.Constants.Operator.Equals, Guid.Parse(currentUser.Id))
-            .Filter(row => row.EventCategoryTagId, Supabase.Postgrest.Constants.Operator.Equals, tagId)
-            .Single();
-
-        return response != null;
+        try
+        {
+            var userId = Guid.Parse(currentUser.Id);
+            
+            // Use the exact column names from the model class
+            var response = await _supabaseClient
+                .From<UserFollowedCategory>()
+                .Filter("UserId", Operator.Equals, userId.ToString())
+                .Filter("EventCategoryTagId", Operator.Equals, tagId.ToString())
+                .Get();
+            
+            return response != null && response.Models.Count > 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error checking if following tag: {ex.Message}");
+            return false; // Default to not following in case of error
+        }
     }
 
     public async Task<List<Tag>?> GetFollowedTags(string userId)
     {
         var response = await _supabaseClient
             .From<UserFollowedCategory>()
-            .Filter(row => row.UserId, Supabase.Postgrest.Constants.Operator.Equals, userId)
+            .Filter("USER_ID", Operator.Equals, userId)
             .Select("*")
             .Get();
 

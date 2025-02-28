@@ -338,16 +338,23 @@ public class EventController : Controller
 
             var exploreTag = await _eventService.GetTagById(tagId) ?? new EventCategoryTag();
 
+            bool isFollowing = false;
+            var currentUser = _userService.CurrentSession.User;
+            if (currentUser != null && currentUser.Id != null)
+            {
+                isFollowing = await _userService.IsFollowingTag(tagId);
+            }
+
             var model = new TagEventExploreViewModel
             {
                 TagId = exploreTag.EventCategoryTagId,
                 TagName = exploreTag.EventCategoryTagName,
                 TagEmoji = exploreTag.EventCategoryTagEmoji,
-                IsFollowing = false, // Set this based on your logic
+                IsFollowing = isFollowing, // Use the variable, not hardcoded false
                 Tags = tags.ToList(),
                 EventBriefCardDatas = paginatedEventsCardData,
                 CurrentPage = page,
-                TotalPage = (int)Math.Ceiling(events.Count / (double)pageSize) // Use Count instead of Length
+                TotalPage = (int)Math.Ceiling(events.Count / (double)pageSize)
             };
 
             return View(model);
