@@ -92,7 +92,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
     //GetNotificationDetails
     public async Task<NotificationDetailModel> GetNotificationDetails(Guid notificationId)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;;
         if (currentUser == null)
         {
             throw new UnauthorizedAccessException("User is not authenticated.");
@@ -224,7 +224,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
     //DeleteNotification
     public async Task<bool> DeleteNotification(Guid notificationId)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
         {
             throw new UnauthorizedAccessException("User is not authenticated.");
@@ -251,7 +251,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
     public async Task DeleteAllNotifications()
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
         {
             throw new UnauthorizedAccessException("User is not authenticated.");
