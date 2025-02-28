@@ -1,0 +1,309 @@
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: #fefefe;
+}
+
+ul {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fefefe;
+    height: var(--navbar-size);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    padding: 0 3rem;
+    margin: 0;
+}
+
+li>svg {
+    fill: black !important;
+}
+
+.nav-group {
+    display: flex;
+    gap: 1rem;
+    height: 100%;
+    align-items: center;
+}
+
+.nav-group a:not(.nav-item):not(.signin-btn) {
+    height: 100%;
+}
+
+.website-logo {
+    height: 60%;
+}
+
+.logo {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+body nav ul .nav-group .logo p {
+    font-size: 1.25rem;
+    font-weight: bold !important;
+}
+
+.nav-group#navigation-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    text-decoration: none;
+    color: #333;
+}
+
+.nav-item:hover {
+    border-bottom: 1px solid black;
+    transition: border-bottom 0.3s ease-in-out;
+}
+
+/* Profile styles */
+.profile-placeholder {
+    height: 40px;
+    width: 40px;
+    background-color: black;
+    border-radius: 100%;
+    transition: transform 0.2s ease;
+    overflow: hidden;
+}
+
+.profile-placeholder:hover {
+    transform: scale(1.05);
+}
+
+.profile-placeholder img {
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-container li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 100%;
+}
+
+.signin-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    background-color: transparent;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.signin-btn:hover {
+    background-color: #f2f2f2;
+}
+
+/* Profile dropdown styling with animations */
+.profile-dropdown-container {
+    position: relative;
+    cursor: pointer;
+}
+
+.profile-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 5px);
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    z-index: 1000;
+    overflow: hidden;
+
+    /* Animation properties */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease,
+        visibility 0.2s ease,
+        transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.profile-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: black;
+
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: background-color 0.2s ease,
+        transform 0.3s ease,
+        opacity 0.2s ease;
+}
+
+.profile-dropdown.show .dropdown-item {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Staggered animation for items */
+.profile-dropdown.show .dropdown-item:nth-child(1) {
+    transition-delay: 0.05s;
+}
+
+.profile-dropdown.show .dropdown-item:nth-child(2) {
+    transition-delay: 0.1s;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+    border-bottom: none;
+    transform: translateX(5px);
+}
+
+/* Mobile Nav Toggle (Hamburger) */
+.mobile-nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    cursor: pointer;
+    z-index: 1010;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.mobile-nav-toggle .bar {
+    height: 3px;
+    width: 100%;
+    background-color: #333;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.mobile-nav-toggle.active .bar:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+
+.mobile-nav-toggle.active .bar:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-nav-toggle.active .bar:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    nav ul {
+        padding: 0 1rem;
+        height: var(--navbar-size);
+    }
+
+    .mobile-nav-toggle {
+        display: flex;
+    }
+
+    .nav-group#navigation-links {
+        position: fixed;
+        top: var(--navbar-size);
+        left: 0;
+        flex-direction: column;
+        width: 100%;
+        background-color: #fefefe;
+        align-items: center;
+        padding: 1rem 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        /* Hide by default */
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        height: auto;
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+    .nav-group#auth-section {
+        position: fixed;
+        top: calc(var(--navbar-size) + 200px);
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        background-color: #fefefe;
+        padding: 1rem 0;
+
+        /* Hide by default */
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s ease;
+        z-index: 999;
+    }
+
+    .nav-group#navigation-links.show-mobile,
+    .nav-group#auth-section.show-mobile {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .nav-item {
+        width: 100%;
+        justify-content: center;
+        padding: 1rem 0;
+    }
+
+    .nav-item:hover {
+        border-bottom: none;
+        background-color: #f5f5f5;
+    }
+
+    .profile-dropdown {
+        position: fixed;
+        top: calc(var(--navbar-size) + 230px);
+        left: 50%;
+        transform: translateX(-50%) translateY(-10px);
+        width: 90%;
+        max-width: 300px;
+    }
+
+    .profile-dropdown.show {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    body.menu-open {
+        overflow: hidden;
+        /* Prevent scrolling when menu is open */
+    }
+}

@@ -20,7 +20,7 @@
   --max-text-width: 65ch;
   /* --max-screen-width: 786px; */
   --max-screen-width: 1024px;
-  --navbar-size: 3rem;
+  --navbar-size: 5rem;
 }
 
 .error-popup {
