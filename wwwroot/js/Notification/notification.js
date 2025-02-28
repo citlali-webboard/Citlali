@@ -269,7 +269,7 @@ function handleMobileClick() {
             deleteButton.innerHTML = `
                 <svg width="20px" height="20px" viewBox="0 0 24.00 24.00" version="1.1" 
                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-                    fill="#ff0000" transform="rotate(0)matrix(1, 0, 0, 1, 0, 0)" stroke="#ff0000">
+                    fill="#666" transform="rotate(0)matrix(1, 0, 0, 1, 0, 0)" stroke="#666">
                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.72"></g>
                     <g id="SVGRepo_iconCarrier">
@@ -291,7 +291,7 @@ function handleMobileClick() {
                                         C10.51285,10 10.9355092,10.386027 10.9932725,10.8833761 L11,11 L11,16 C11,16.5523 10.5523,17 10,17 C9.48715929,17 9.06449214,16.613973 
                                         9.00672766,16.1166239 L9,16 L9,11 C9,10.4477 9.44771,10 10,10 Z M14,10 C14.5523,10 15,10.4477 15,11 L15,16 C15,16.5523 14.5523,17 
                                         14,17 C13.4477,17 13,16.5523 13,16 L13,11 C13,10.4477 13.4477,10 14,10 Z M14.2792,4 L9.72076,4 L9.38743,5 L14.6126,5 L14.2792,4 Z" 
-                                        fill="#ff0000"></path>
+                                        fill="#666"></path>
                                 </g>
                             </g>
                         </g>
