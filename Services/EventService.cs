@@ -757,6 +757,58 @@ public class EventService(Client supabaseClient, UserService userService)
         };
     }
 
+    public async Task<EditEventViewModel> GetEventEditPage(Guid eventId)
+    {
+        var currentUser = _userService.CurrentSession.User 
+                        ?? throw new UnauthorizedAccessException("User not authenticated");
+        var userId = Guid.Parse(currentUser.Id 
+                        ?? throw new UnauthorizedAccessException("User ID not found"));
+        
+        var eventTask = GetEventById(eventId);
+        var ev = await eventTask ?? throw new KeyNotFoundException("Event not found");
+        
+        if (ev.CreatorUserId != userId)
+            throw new UnauthorizedAccessException("User not authorized to edit this event");
+        
+        var tasks = new Task[]
+        {
+            Task.CompletedTask,
+            GetLocationTagById(ev.EventLocationTagId),
+            GetTagById(ev.EventCategoryTagId),
+            GetLocationTags(),
+            GetTags(),
+            GetQuestionsByEventId(eventId),
+            GetRegistrationCountByEventId(eventId)
+        
+        };
+        
+        await Task.WhenAll(tasks);
+        
+        var locationTag = await (Task<LocationTag?>)tasks[1] ?? new LocationTag();
+        var categoryTag = await (Task<EventCategoryTag?>)tasks[2] ?? new EventCategoryTag();
+        var locationTags = await (Task<List<Location>>)tasks[3];
+        var categoryTags = await (Task<List<Tag>>)tasks[4];
+        var questions = await (Task<List<QuestionViewModel>>)tasks[5];
+        var currentParticipant = await (Task<int>)tasks[6];
+        
+        return new EditEventViewModel
+        {
+            EventId = ev.EventId,
+            EventTitle = ev.EventTitle,
+            EventDescription = ev.EventDescription,
+            EventCategoryTag = categoryTag,
+            EventLocationTag = locationTag,
+            MaxParticipant = ev.MaxParticipant,
+            CurrentParticipant = currentParticipant,
+            Cost = ev.Cost,
+            EventDate = ev.EventDate,
+            PostExpiryDate = ev.PostExpiryDate,
+            LocationTagsList = locationTags,
+            EventCategoryTagsList = categoryTags,
+            Questions = questions
+        };
+    }
+
     public async Task<Registration?> GetRegistrationByEventIdAndUserId(Guid eventId, Guid userId)
     {
         var response = await _supabaseClient

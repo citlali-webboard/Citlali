@@ -385,6 +385,37 @@ public class EventController : Controller
         }
     }
 
+    [HttpGet("edit/{eventId}")]
+    [Authorize]
+    public async Task<IActionResult> Edit(string eventId)
+    {
+        try
+        {
+            if (!Guid.TryParse(eventId, out _))
+            {
+                throw new Exception("Invalid Event id");
+            }
+
+            var eventEditViewModel = await _eventService.GetEventEditPage(Guid.Parse(eventId));
+            return View(eventEditViewModel);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "You are not authorized to edit this event";
+            return RedirectToAction("explore");
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["Error"] = "Event not found";
+            return RedirectToAction("explore");
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
+    }
+
     [HttpGet("status/{eventId}")]
     [Authorize]
     public async Task<IActionResult> Status(string eventId)
