@@ -14,6 +14,7 @@
     profileImageUrl = $"{profileImageUrl}?v={timestamp}";
 }
 
+
 <nav>
   <ul>
     <div class="nav-group">
@@ -49,10 +50,10 @@
         </li>
       </a>
 
-      <a href="#">
+      <a href="/Notification">
         @* Notification *@
         <li class="tooltip">
-          <span>
+          <span id="notification-icon">
             @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
           </span>
           <p class="tooltip-text">Notification</p>
@@ -98,3 +99,4 @@
     </div>
   </ul>
 </nav>
+

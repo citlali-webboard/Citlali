@@ -1,0 +1,133 @@
+@model Citlali.Models.NotificationViewModel;
+
+@{
+    ViewData["Title"] = "Notification";
+}
+
+@functions{
+    public string GetPastRelativeTime(DateTime date){
+        const int SECOND = 1;
+        const int MINUTE = 60 * SECOND;
+        const int HOUR = 60 * MINUTE;
+        const int DAY = 24 * HOUR;
+        const int MONTH = 30 * DAY;
+
+        var diff = DateTime.Now - date;
+        var timeSpan = Math.Floor(diff.TotalSeconds);
+
+        if(timeSpan <= 0){
+            throw new InvalidDataException();
+        }
+
+        if (timeSpan < 1 * MINUTE)
+            return "a few seconds ago";
+        if (timeSpan < 2 * MINUTE)
+            return "a minute ago";
+        if (timeSpan < 1 * HOUR)
+            return $"{Math.Floor(timeSpan / MINUTE)} minutes ago";
+        if (timeSpan < 2 * HOUR)
+            return "an hour ago";
+        if (timeSpan < 1 * DAY)
+            return $"{Math.Floor(timeSpan / HOUR)} hours ago";
+        if (timeSpan < 2 * DAY)
+            return "yesterday";
+        if (timeSpan < 1 * MONTH)
+            return $"{Math.Floor(timeSpan / DAY)} days ago";
+
+
+        return date.ToString("MMM dd, yyyy");
+    }
+}
+
+@section head {
+    <link rel="stylesheet" href="~/css/notification.css" asp-append-version="true" />
+}
+@if(Model.Notifications.Count == 0 ){
+    <div class="no-noti-container">
+        <div class="no-noti-icon">
+            @* @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size28.AlertOff>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral })) *@
+            <svg viewBox="0 0 24.00 24.00" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.288"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M9.44303 19.1694C9.90172 18.8618 10.5229 18.9843 10.8305 19.443C10.9299 19.5912 11.0843 19.731 11.2919 19.8345C11.4998 19.938 11.7444 19.9964 12 19.9964C12.2556 19.9964 12.5002 19.938 12.7081 19.8345C12.9157 19.731 13.0701 19.5912 13.1695 19.443C13.4771 18.9843 14.0983 18.8618 14.557 19.1694C15.0157 19.4771 15.1381 20.0983 14.8305 20.557C14.5234 21.0149 14.0944 21.3783 13.6 21.6246C13.1058 21.8708 12.5546 21.9964 12 21.9964C11.4454 21.9964 10.8942 21.8708 10.4 21.6246C9.90564 21.3783 9.47658 21.0149 9.16946 20.557C8.86186 20.0983 8.98434 19.4771 9.44303 19.1694Z" fill="#ffffff"></path> <path fill-rule="evenodd" clip-rule="evenodd" d="M2.29289 2.29289C2.68342 1.90237 3.31658 1.90237 3.70711 2.29289L21.7071 20.2929C22.0976 20.6834 22.0976 21.3166 21.7071 21.7071C21.3166 22.0976 20.6834 22.0976 20.2929 21.7071L2.29289 3.70711C1.90237 3.31658 1.90237 2.68342 2.29289 2.29289Z" fill="#ffffff"></path> <path fill-rule="evenodd" clip-rule="evenodd" d="M6.22469 5.6389C5.84619 6.54916 5.66667 7.5609 5.66667 8.6V10.3333C5.66667 10.5774 5.55716 10.8709 5.27166 11.2498C4.99798 11.6129 4.6427 11.9534 4.25022 12.3296L4.18372 12.3934C3.49997 13.0494 3 13.9996 3 15.1333C3 16.67 4.19824 18 5.77778 18H18.2222C18.3385 18 18.4528 17.9928 18.5646 17.9788L6.22469 5.6389ZM19.9711 16.5569C20.1824 16.7682 20.5344 16.7486 20.6718 16.4832C20.8822 16.0767 21 15.6152 21 15.1333C21 13.9996 20.5 13.0494 19.8163 12.3934L19.7498 12.3296C19.3573 11.9534 19.002 11.6129 18.7283 11.2498C18.4428 10.8709 18.3333 10.5774 18.3333 10.3333V8.6C18.3333 6.87057 17.836 5.21692 16.7518 3.98079C15.651 2.72578 14.0305 2 12 2C10.2057 2 8.73159 2.56674 7.65331 3.5646C7.45733 3.74597 7.46601 4.0518 7.65483 4.24061L19.9711 16.5569Z" fill="#ffffff"></path> </g></svg>
+        </div>
+        <div class="no-noti-text">
+            <h1>Notification 🔕</h1>
+            <p>No new notifications at the moment. Check back later! 😊</p>
+        </div>
+    </div>
+
+}else{
+    <div class="container">
+        <header>
+            <h1>Notification 🔔</h1>
+            <p>Stay updated with important news and alerts. Don't miss out on the latest updates! 📢</p>
+        </header>
+        <button class="delete-all-btn" id="delete-all-btn">
+            <span>
+                 @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+            </span>
+            <span>
+                Delete event
+            </span>
+        </button>
+        <main>
+            <div class="notification-container">
+                @for (var i = 0; i < Model.Notifications.Count; i++)
+                {
+                    @if(Model.Notifications[i].Read){
+                        <div class="notification-card read" data-id="@Model.Notifications[i].NotificationId">
+                            <div class="notification-card-source-user">
+                                <img src="@Model.Notifications[i].SourceProfileImageUrl" alt="">
+                                <div>
+                                    <div id="title">@Model.Notifications[i].Title</div>
+                                    <div id="display-name">@Model.Notifications[i].SourceDisplayName</div> 
+                                </div>
+                            </div>
+                            <div class="notification-time"> @GetPastRelativeTime(Model.Notifications[i].CreatedAt)</div>
+                        </div>
+                    }
+                    else{
+                        <div class="notification-card" data-id="@Model.Notifications[i].NotificationId">
+                            <div class="notification-card-source-user">
+                                <img src="@Model.Notifications[i].SourceProfileImageUrl" alt="">
+                                <div>
+                                    <div id="title">@Model.Notifications[i].Title</div>
+                                    <div id="display-name">@Model.Notifications[i].SourceDisplayName</div> 
+                                </div>
+                            </div>
+                            <div class="notification-time"> @GetPastRelativeTime(Model.Notifications[i].CreatedAt)</div>
+                        </div>
+                    }
+                }
+            </div>
+
+            <div id="default-notification" class="default-notification">
+                <svg width="147px" height="147px" viewBox="-2.4 -2.4 28.80 28.80" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00024000000000000003" transform="matrix(1, 0, 0, 1, 0, 0)rotate(0)"><g id="SVGRepo_bgCarrier" stroke-width="0" transform="translate(0,0), scale(1)"><rect x="-2.4" y="-2.4" width="28.80" height="28.80" rx="14.4" fill="#d6d6d6" strokewidth="0"></rect></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.43200000000000005"></g><g id="SVGRepo_iconCarrier"> <path d="M8.35179 20.2418C9.19288 21.311 10.5142 22 12 22C13.4858 22 14.8071 21.311 15.6482 20.2418C13.2264 20.57 10.7736 20.57 8.35179 20.2418Z" fill="#ffffff"></path> <path d="M18.7491 9V9.7041C18.7491 10.5491 18.9903 11.3752 19.4422 12.0782L20.5496 13.8012C21.5612 15.3749 20.789 17.5139 19.0296 18.0116C14.4273 19.3134 9.57274 19.3134 4.97036 18.0116C3.21105 17.5139 2.43882 15.3749 3.45036 13.8012L4.5578 12.0782C5.00972 11.3752 5.25087 10.5491 5.25087 9.7041V9C5.25087 5.13401 8.27256 2 12 2C15.7274 2 18.7491 5.13401 18.7491 9Z" fill="#ffffff"></path> </g></svg>
+                <div class="default-notification-text">Click on notification to check messages !</div>
+            </div>
+
+            <div id="notification-detail" class="notification-detail hidden">
+                <div class="header">
+                    <div class="source-img"> 
+                        <img  id="source-img" src="" alt="SourceProfileImage">
+                    </div>
+                    <div class="source-info">
+                        <div id="source-name" class="source-name"></div>
+                        <div id="create-at" class="create-at"></div>
+                    </div>
+                    <button class="delete-btn" id="delete-btn">
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Info }))   
+                    </button>    
+                </div>
+                <hr>
+                <div class="content">
+                    <div id="content-title" class="content-title"></div>
+                    <div id="content-body" class="content-body"></div>
+                </div>
+            </div>
+        </main>
+
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/Notification/notification.js"></script>
+}

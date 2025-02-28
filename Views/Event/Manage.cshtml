@@ -34,6 +34,68 @@
 
 <div class="center-wrapper">
     <div class="content">
+
+        <div class="broadcast-popup">
+            <div class="popup-content">
+                <form class="popup-form" asp-controller="Event" asp-action="Broadcast" method="post" enctype="multipart/form-data">
+                <div class="popup-navigation">
+                    <a class="popup-action-button" onclick="closeDialog()">
+                    <span>
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.DismissCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                    </span>
+                    </a>
+                    <div class="popup-title">
+                        <h1>Broadcast</h1>
+                        <description>Broadcast a message to all confirmed participants.</description>
+                    </div>
+                    <button type="submit" class="popup-action-button">
+                    <span>
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Send>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                    </span>
+                    </button>
+                </div>
+
+                <div class="popup-body">
+                    <div class="popup-confirmed-participants">
+                        <h3>✅ Confirmed Participants (@confirmedParticipantCount)</h3>
+                        <description>These are the people who have confirmed their participation. Your broadcast will be sent to these people.</description>
+                        <div class="popup-confirmed-participants-list">
+                            @foreach (var confirmedParticipant in Model.ConfirmedParticipant)
+                            {
+                                <div class="popup-each-confirmed-participant">
+                                    <img src="@confirmedParticipant.ProfileImageUrl" alt="Profile" class="profile-img">
+                                    <span>
+                                        @confirmedParticipant.DisplayName
+                                    </span>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                    <div class="popup-info">
+                        <div class="form-group">
+                            <input type="hidden" name="eventId" value="@Model.EventId" />
+                        </div>
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" class="form-control" name="title" id="title" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea class="form-control" name="message" id="message" rows="5" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="broadcast-button">Broadcast</button>
+                        </div>
+                            
+                        
+                    </div>
+                </div>
+                </form>
+            </div>
+        </div>
+
+
         <div class="event-detail">
             <partial name="_EventDetailCard" model=@eventDetailCardData />
             <div class="control">
@@ -106,7 +168,7 @@
             <div class="registered-participants">
                 <h3>🛫 Registered Participants (@totalRegisteredParticipant) </h3>
                 <description>The following individuals have requested to participate in your event. Please take the time to review their responses to your questions.</description>
-                @if (Model.AnswerSet.Any())
+                @if (Model.AnswerSet.Count > 0)
                 {
                     <div class="registrants-container">
                         @foreach (var participant in Model.AnswerSet)
@@ -194,7 +256,17 @@
                 <h3>Invited participants (@totalInvitedParticipant/@Model.MaxParticipant) 💌</h3>
                 <description>These are people your have been selected and invited.</description>
                 <div class="confirmed-participants">
-                    <h4>✅ Confirmed (@confirmedParticipantCount)</h4>
+                    <div class="confirm-text-header">
+                        <h4>✅ Confirmed (@confirmedParticipantCount)</h4>
+                        <button onclick="openBroadcastPopup()" class="action-button">
+                            <span>
+                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                            </span> 
+                            <span>
+                                Broadcast
+                            </span>
+                        </button>
+                    </div>
                     <hr>
                     <div class="registrant-list">
                         @foreach (var confirmedParticipant in Model.ConfirmedParticipant)
@@ -248,10 +320,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    function toggleDropdown(id) {
-        var element = document.getElementById(id);
-        element.style.display = (element.style.display === "block") ? "none" : "block";
-    }
-</script>
