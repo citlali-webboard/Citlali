@@ -154,9 +154,7 @@ public class NotificationController : Controller
 
             NotificationDetailModel notificationDetail = await _notificationService.GetNotificationDetails(Guid.Parse(id));
 
-            Console.WriteLine(notificationDetail.Url);
             var EventId = Guid.Parse(notificationDetail.Url.Split("/").Last());
-            Console.WriteLine(EventId);
 
             var Event = await _eventService.GetEventById(EventId) ?? new Event();
 
@@ -176,12 +174,9 @@ public class NotificationController : Controller
                 { "urlImage", notificationDetail.UrlImage }
             };
 
-            Console.WriteLine(Json(dtoNotificationDetails));
-
             return Json(dtoNotificationDetails);
 
         }catch(Exception ex){
-            Console.WriteLine(ex.Message);
             TempData["error"] = ex.Message;
             return RedirectToAction("Index");
         }
