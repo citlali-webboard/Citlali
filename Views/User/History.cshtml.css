@@ -7,7 +7,7 @@
     min-height: calc(100vh - var(--navbar-size));
     margin-top: var(--navbar-size);
 
-    background-color: #f0f0f0;
+    /* background-color: #f0f0f0; */
     width: 100%;
 }
 
