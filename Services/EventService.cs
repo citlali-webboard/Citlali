@@ -236,7 +236,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var notificationTitle = "You have been invited to an event! 🎉";
         var notificationBody = $"Congratulations! Your request to join the event {eventToInvite.EventTitle} has been reviewed and accepted! To confirm or reject the invitation, please visit the event page.";
         var absoluteUrl = $"/event/detail/{eventId}";
-        var mailModel = new MailNotificationViewModel {
+        var mailModel = new MailNotificationViewModel
+        {
             Title = notificationTitle,
             Body = notificationBody,
             Url = $"{_configuration.App.Url}{absoluteUrl}"
@@ -523,27 +524,27 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             case "date":
                 query = query.Order("EventDate", Supabase.Postgrest.Constants.Ordering.Ascending);
                 break;
-                
+
             case "popularity":
                 // Get all events with their IDs to sort by popularity
                 var allActiveEvents = await _supabaseClient
                     .From<Event>()
-                    .Select("*") 
+                    .Select("*")
                     .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
                     .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
                     .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
                     .Get();
-                
+
                 // Create a dictionary to store events with their participant counts
                 var eventWithCounts = new List<(Event Event, int Count)>();
-                
+
                 // Get participant count for each event
                 foreach (var e in allActiveEvents.Models)
                 {
                     var count = await GetRegistrationCountByEventId(e.EventId);
                     eventWithCounts.Add((e, count));
                 }
-                
+
                 // Sort events by participant count and take the requested range
                 var sortedEvents = eventWithCounts
                     .OrderByDescending(x => x.Count)
@@ -551,7 +552,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                     .Skip(start)
                     .Take(end - start + 1)
                     .ToList();
-                
+
                 return sortedEvents.Select(e => new Event
                 {
                     EventId = e.EventId,
@@ -567,7 +568,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                     CreatedAt = e.CreatedAt,
                     Deleted = e.Deleted
                 }).ToList();
-                
+
             case "newest":
             default:
                 query = query.Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending);
@@ -575,7 +576,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         }
 
         var response = await query.Get();
-        
+
         var events = new List<Event>();
         if (response != null)
         {
@@ -647,22 +648,22 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var currentParticipant = await GetRegistrationCountByEventId(citlaliEvent.EventId);
 
         return new EventDetailCardData
-            {
-                EventId = citlaliEvent.EventId,
-                EventTitle = citlaliEvent.EventTitle,
-                EventDescription = citlaliEvent.EventDescription,
-                CreatorUsername = creator.Username,
-                CreatorDisplayName = creator.DisplayName,
-                CreatorProfileImageUrl = creator.ProfileImageUrl,
-                LocationTag = locationTag,
-                EventCategoryTag = categoryTag,
-                CurrentParticipant = currentParticipant,
-                MaxParticipant = citlaliEvent.MaxParticipant,
-                Cost = citlaliEvent.Cost,
-                EventDate = citlaliEvent.EventDate,
-                PostExpiryDate = citlaliEvent.PostExpiryDate,
-                CreatedAt = citlaliEvent.CreatedAt,
-            };
+        {
+            EventId = citlaliEvent.EventId,
+            EventTitle = citlaliEvent.EventTitle,
+            EventDescription = citlaliEvent.EventDescription,
+            CreatorUsername = creator.Username,
+            CreatorDisplayName = creator.DisplayName,
+            CreatorProfileImageUrl = creator.ProfileImageUrl,
+            LocationTag = locationTag,
+            EventCategoryTag = categoryTag,
+            CurrentParticipant = currentParticipant,
+            MaxParticipant = citlaliEvent.MaxParticipant,
+            Cost = citlaliEvent.Cost,
+            EventDate = citlaliEvent.EventDate,
+            PostExpiryDate = citlaliEvent.PostExpiryDate,
+            CreatedAt = citlaliEvent.CreatedAt,
+        };
     }
 
     public async Task<EventBriefCardData[]> EventsToBriefCardArray(List<Event> citlaliEvents)
@@ -709,11 +710,11 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
     public async Task<bool> UpdateEventStatus(Guid eventId)
     {
-       var response = await _supabaseClient
-            .Rpc("update_event_status", new Dictionary<string, object>
-            {
+        var response = await _supabaseClient
+             .Rpc("update_event_status", new Dictionary<string, object>
+             {
                 { "event_uuid", eventId }
-            });
+             });
 
         return true;
     }
@@ -1044,7 +1045,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Filter("Status", Supabase.Postgrest.Constants.Operator.Equals, "confirmed")
             .Get();
 
-        return response.Models ;
+        return response.Models;
     }
 
 
@@ -1062,7 +1063,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         var registrants = await GetRegistrantsConfirmedByEventId(eventId);
 
-        if (registrants != null && registrants.Count > 0) {
+        if (registrants != null && registrants.Count > 0)
+        {
             var notificationTasks = registrants.Select(registrant =>
                 _notificationService.CreateNotification(registrant.UserId, title, message, $"/event/detail/{eventId}")
             );
@@ -1127,6 +1129,65 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         return historyList;
     }
+
+    public async Task<List<Event>> GetTrendingEvents()
+    {
+        var allActiveEvents = await _supabaseClient
+                    .From<Event>()
+                    .Select("*")
+                    .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
+                    .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+                    .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
+                    .Range(0, 5)
+                    .Get();
+
+        return allActiveEvents.Models;
+    }
+
+    public async Task<List<EventCategoryTag>> GetPopularTags()
+    {
+        // Get all active events
+        var allActiveEvents = await _supabaseClient
+                    .From<Event>()
+                    .Select("*")
+                    .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
+                    .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+                    .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
+                    .Get();
+
+        // Count occurrences of each category tag
+        var tagCounts = new Dictionary<Guid, int>();
+        foreach (var e in allActiveEvents.Models)
+        {
+            if (tagCounts.TryGetValue(e.EventCategoryTagId, out var count))
+            {
+                tagCounts[e.EventCategoryTagId] = count + 1;
+            }
+            else
+            {
+                tagCounts[e.EventCategoryTagId] = 1;
+            }
+        }
+
+        // Get the top 5 most popular tag IDs
+        var popularTagsId = tagCounts.OrderByDescending(tc => tc.Value)
+                                    .Take(5)
+                                    .Select(tc => tc.Key)
+                                    .ToList();
+
+        // Fetch all popular tags in a single query
+        if (popularTagsId.Count == 0)
+            return null;
+
+        var tagResponse = await _supabaseClient
+            .From<EventCategoryTag>()
+            .Filter(tag => tag.EventCategoryTagId, Supabase.Postgrest.Constants.Operator.In, string.Join(",", popularTagsId))
+            .Get();
+
+        return tagResponse.Models;
+    }
+    
+
 }
 
 public class UserAlreadyRegisteredException : Exception
