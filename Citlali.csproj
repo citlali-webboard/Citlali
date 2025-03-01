@@ -4,7 +4,10 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>44d3bd42-37a1-4795-b8bf-831fb3b93a30</UserSecretsId>
+    <!-- Production secrets -->
+    <!-- <UserSecretsId>44d3bd42-37a1-4795-b8bf-831fb3b93a30</UserSecretsId> -->
+    <!-- Localhost secrets -->
+    <UserSecretsId>614c9690-4e83-406c-80fc-f2863453341e</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
