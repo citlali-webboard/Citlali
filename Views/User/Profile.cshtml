@@ -14,14 +14,11 @@
   ViewBag.profileImageUrl = Model.ProfileImageUrl ?? "";
 
   ViewData["ogTitle"] = Model.DisplayName + " • Citlali";
-
-
   ViewData["ogDescription"] = Model.UserBio != null ? (Model.UserBio.Length > 100 ? Model.UserBio.Substring(0, 100) + "..." : Model.UserBio) : "";
   ViewData["ogImage"] = Model.ProfileImageUrl;
 }
 
 <div class="window">
-
   @if (Model.IsCurrentUser) {
     <div class="edit-popup" id="edit-popup">
       <div class="popup-content">
@@ -114,14 +111,28 @@
               </a>
             }
             else {
-              <a class="action-button">
-                <span>
-                  @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.AddCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
-                </span>
-                <span>
-                  Follow
-                </span>
-              </a>
+              @if (Model.IsFollowing)
+              {
+                <button type="button" class="action-button" id="follow-button" onclick="toggleFollow('@Model.Username', false)">
+                  @* <span>
+                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                  </span> *@
+                  <span>
+                    Following
+                  </span>
+                </button>
+              }
+              else
+              {
+                <button type="button" class="action-button" id="follow-button" onclick="toggleFollow('@Model.Username', true)">
+                  @* <span>
+                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Add>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                  </span> *@
+                  <span>
+                    Follow
+                  </span>
+                </button>
+              }
             }
           </div>
         </div>
@@ -131,11 +142,11 @@
             <p>Events</p>
           </div>
           <div class="data">
-            <h3>1332</h3>
+            <h3 class="followers-count">@Model.FollowersCount</h3>
             <p>Followers</p>
           </div>
           <div class="data">
-            <h3>6969</h3>
+            <h3>@Model.FollowingCount</h3>
             <p>Followings</p>
           </div>
         </div>
