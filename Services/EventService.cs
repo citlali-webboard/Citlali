@@ -563,7 +563,14 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         }
 
         var response = await query.Get();
-        return response.Models;
+
+        int count = response.Models.Count;
+        int actualEnd = Math.Min(end, count - 1);
+
+        if (start >= count || start > actualEnd)
+            return [];
+
+        return [.. response.Models.Skip(start).Take(actualEnd - start + 1)];
     }
 
     // public async Task<List<Event>> GetPaginatedEventsDumb(int from, int to, string sortBy)
