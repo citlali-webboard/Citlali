@@ -69,6 +69,10 @@ body nav ul .nav-group .logo p {
     transition: border-bottom 0.3s ease-in-out;
 }
 
+#notification-icon {
+    position: relative;
+}
+
 /* Profile styles */
 .profile-placeholder {
     height: 40px;
@@ -127,7 +131,6 @@ body nav ul .nav-group .logo p {
     background-color: #f2f2f2;
 }
 
-/* Profile dropdown styling with animations */
 .profile-dropdown-container {
     position: relative;
     cursor: pointer;
@@ -179,7 +182,6 @@ body nav ul .nav-group .logo p {
     transform: translateX(0);
 }
 
-/* Staggered animation for items */
 .profile-dropdown.show .dropdown-item:nth-child(1) {
     transition-delay: 0.05s;
 }
@@ -194,7 +196,6 @@ body nav ul .nav-group .logo p {
     transform: translateX(5px);
 }
 
-/* Mobile Nav Toggle (Hamburger) */
 .mobile-nav-toggle {
     display: none;
     flex-direction: column;
@@ -228,7 +229,35 @@ body nav ul .nav-group .logo p {
     transform: translateY(-9px) rotate(-45deg);
 }
 
-/* Media Queries */
+.count-notifications {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ff0000;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    min-width: 15px;
+    height: 15px;
+    padding: 2px;
+    top: 0;
+    right: -8px;
+    font-weight: bold;
+}
+
+#notification-icon .count-notifications {
+    top: -8px;
+    right: -12px;
+}
+
+.mobile-nav-toggle .count-notifications.mobile-badge {
+    display: none;
+    top: -5px;
+    right: -5px;
+    z-index: 1020;
+}
+
 @media (max-width: 768px) {
     nav ul {
         padding: 0 1rem;
@@ -310,6 +339,13 @@ body nav ul .nav-group .logo p {
 
     body.menu-open {
         overflow: hidden;
-        /* Prevent scrolling when menu is open */
+    }
+
+    .mobile-nav-toggle .count-notifications.mobile-badge {
+        display: flex;
+    }
+    
+    body.menu-open #notification-icon .count-notifications {
+        display: flex;
     }
 }
