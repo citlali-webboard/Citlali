@@ -63,10 +63,12 @@
               @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Person>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
               <span>Profile</span>
             </a>
-            <a href="/auth/signout" class="dropdown-item">
-              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.SignOut>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
-              <span>Sign out</span>
-            </a>
+            <form class="dropdown-item" asp-action="signout" asp-controller="auth" method="post">
+              <button type="submit" class="signout-btn">
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.SignOut>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+                Sign out
+              </button>
+            </form>
           </div>
         </div>
       }

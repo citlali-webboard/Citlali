@@ -117,6 +117,12 @@ body nav ul .nav-group .logo p {
     transition: background-color 0.3s ease;
 }
 
+.signout-btn {
+    width: 100%;
+    display: inline-flex;
+    gap: 0.5rem;
+}
+
 .signin-btn:hover {
     background-color: #f2f2f2;
 }
