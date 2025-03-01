@@ -148,8 +148,10 @@ public class UserController : Controller
     }
 
     [HttpGet("{username}")]
-    public async Task<IActionResult> Profile(string username)
+    public async Task<IActionResult> Profile(string username, int page = 1, string filter = null, string sort = "newest")
     {
+        const int pageSize = 10;
+        
         var user = await _userService.GetUserByUsername(username);
         if (user == null)
         {
@@ -169,6 +171,47 @@ public class UserController : Controller
         }
 
         var events = await _eventService.GetEventsByUserId(user.UserId);
+        if (!string.IsNullOrEmpty(filter))
+        {
+            if (filter == "active")
+            {
+                events = events.Where(e => e.Status == "active" && e.PostExpiryDate > DateTime.Now).ToList();
+            }
+            else if (filter == "closed")
+            {
+                events = events.Where(e => e.Status == "closed" || e.PostExpiryDate <= DateTime.Now).ToList();
+            }
+        }
+        
+        switch (sort)
+        {
+            case "oldest":
+                events = events.OrderBy(e => e.CreatedAt).ToList();
+                break;
+            case "popular":
+                var eventsWithCounts = new List<(Event Event, int Count)>();
+                foreach (var e in events)
+                {
+                    var count = await _eventService.GetRegistrationCountByEventId(e.EventId);
+                    eventsWithCounts.Add((e, count));
+                }
+                events = eventsWithCounts.OrderByDescending(x => x.Count).Select(x => x.Event).ToList();
+                break;
+            case "newest":
+            default:
+                events = events.OrderByDescending(e => e.CreatedAt).ToList();
+                break;
+        }
+        
+        // Calculate total pages
+        int totalEvents = events.Count;
+        int totalPages = (int)Math.Ceiling(totalEvents / (double)pageSize);
+        
+        // Ensure page is within valid range
+        page = Math.Max(1, Math.Min(page, totalPages == 0 ? 1 : totalPages));
+        
+        // Apply pagination
+        events = events.Skip((page - 1) * pageSize).Take(pageSize).ToList();
         var userEventBriefCards = (await _eventService.EventsToBriefCardArray(events)).ToList();
 
         var userViewModel = new UserViewModel
@@ -182,6 +225,11 @@ public class UserController : Controller
             IsCurrentUser = isCurrentUser,
             UserEvents = userEventBriefCards
         };
+
+        ViewBag.CurrentPage = page;
+        ViewBag.TotalPages = totalPages;
+        ViewBag.Filter = filter;
+        ViewBag.Sort = sort;
 
         return View(userViewModel);
     }
