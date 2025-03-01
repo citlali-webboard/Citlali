@@ -342,6 +342,7 @@ public class EventController : Controller
             }
 
             var tags = (await _eventService.GetTags()).ToArray();
+            var locations = (await _eventService.GetLocationTags());
 
             var exploreTag = await _eventService.GetTagById(tagId) ?? new EventCategoryTag();
 
@@ -359,6 +360,7 @@ public class EventController : Controller
                 TagEmoji = exploreTag.EventCategoryTagEmoji,
                 IsFollowing = isFollowing, // Use the variable, not hardcoded false
                 Tags = tags.ToList(),
+                Locations = locations,
                 EventBriefCardDatas = paginatedEventsCardData,
                 CurrentPage = page,
                 TotalPage = (int)Math.Ceiling(events.Count / (double)pageSize)

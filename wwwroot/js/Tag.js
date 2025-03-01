@@ -1,78 +1,97 @@
-async function toggleFollowTag(tagId, follow) {
-    const url = follow ? `/user/followTag/${tagId}` : `/user/unfollowTag/${tagId}`;
-    const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
-
-    console.log(`Sending request to ${url} with follow=${follow}`);
-
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': csrfToken
+document.addEventListener('DOMContentLoaded', function() {
+    // Tags container toggle functionality
+    const tagsContainer = document.getElementById('tags-container');
+    const toggleBtn = document.getElementById('tags-toggle-btn');
+    
+    if (toggleBtn && tagsContainer) {
+        toggleBtn.addEventListener('click', function() {
+            tagsContainer.classList.toggle('expanded');
+            toggleBtn.classList.toggle('expanded');
+            
+            if (tagsContainer.classList.contains('expanded')) {
+                toggleBtn.querySelector('.tags-toggle-text').textContent = 'See less';
+            } else {
+                toggleBtn.querySelector('.tags-toggle-text').textContent = 'See more';
             }
         });
-
-        console.log(`Response status: ${response.status}`);
-
-        if (response.ok) {
-            const result = await response.json();
-            const followButton = document.getElementById('followButton');
-
-            console.log(`Result: ${JSON.stringify(result)}`);
-
-            if (result.success) {
-                if (follow) {
-                    followButton.innerHTML = `
-                        <span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
-                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.97 11.03a.75.75 0 0 0 1.08 0l3.992-3.992a.75.75 0 1 0-1.08-1.08L7.5 9.439 5.53 7.47a.75.75 0 1 0-1.08 1.08l2.52 2.52z"/>
-                            </svg>
-                        </span>
-                        <span>
-                            Unfollow
-                        </span>
-                    `;
-                    followButton.setAttribute('onclick', `toggleFollowTag('${tagId}', false)`);
-                } else {
-                    followButton.innerHTML = `
-                        <span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
-                                <path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1zm0 1a6 6 0 1 0 0 12A6 6 0 0 0 8 2zm3 5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H9v2.5a.5.5 0 0 1-1 0V9H5.5a.5.5 0 0 1 0-1H8V5.5a.5.5 0 0 1 1 0V8h2.5z"/>
-                            </svg>
-                        </span>
-                        <span>
-                            Follow
-                        </span>
-                    `;
-                    followButton.setAttribute('onclick', `toggleFollowTag('${tagId}', true)`);
-                }
-            } else {
-                console.error("Failed to follow/unfollow tag");
-                alert("Failed to follow/unfollow tag. Please try again.");
-            }
-        } else {
-            let errorText = "An error occurred";
-            try {
-                errorText = await response.text();
-            } catch (e) {
-                console.error("Could not parse error text", e);
-            }
-            console.error('Error:', errorText);
-            alert('An error occurred. Please try again.');
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        alert(`An unexpected error occurred: ${error.message}`);
     }
+
+    // Locations container toggle functionality
+    const locationContainer = document.getElementById('location-container');
+    const locationToggleBtn = document.getElementById('location-toggle-btn');
+    
+    if (locationToggleBtn && locationContainer) {
+        locationToggleBtn.addEventListener('click', function() {
+            locationContainer.classList.toggle('expanded');
+            locationToggleBtn.classList.toggle('expanded');
+            
+            if (locationContainer.classList.contains('expanded')) {
+                locationToggleBtn.querySelector('.location-toggle-text').textContent = 'See less';
+            } else {
+                locationToggleBtn.querySelector('.location-toggle-text').textContent = 'See more';
+            }
+        });
+    }
+
+    // Sort buttons functionality
+    const sortButtons = document.querySelectorAll('.sort-btn');
+    
+    sortButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const sortBy = this.getAttribute('data-sort');
+            window.location.href = updateUrlParameter(window.location.href, 'sortBy', sortBy);
+        });
+    });
+});
+
+// Helper function to toggle tag following
+function toggleFollowTag(tagId, shouldFollow) {
+    const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+    const followButton = document.getElementById('followButton');
+
+    shouldFollow = shouldFollow === 'true' || shouldFollow === true;
+    const url = shouldFollow ? `/user/followTag/${tagId}` : `/user/unfollowTag/${tagId}`;
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': csrfToken
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        if (data.success) {
+            // Update UI
+            if (shouldFollow) {
+                followButton.innerHTML = `<span class="icon-container"><svg style="width: 16px; fill: var(--neutral-foreground-rest);" focusable="false" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8a6 6 0 1 1 12 0A6 6 0 0 1 2 8Zm6-7a7 7 0 1 0 0 14A7 7 0 0 0 8 1Zm2.85 5.85a.5.5 0 0 0-.7-.7l-2.9 2.9-1.4-1.4a.5.5 0 1 0-.7.7L6.9 10.1c.2.2.5.2.7 0l3.25-3.25Z"></path></svg></span><span>Following</span>`;
+                followButton.classList.add('following');
+            } else {
+                followButton.innerHTML = `<span class="icon-container"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></span><span>Follow</span>`;
+                followButton.classList.remove('following');
+                console.log('Unfollowed');
+            }
+            
+            // Update follower count
+            const followerCountElem = document.querySelector('.follower-count');
+            if (followerCountElem) {
+                const count = parseInt(followerCountElem.textContent);
+                followerCountElem.textContent = `${shouldFollow ? count + 1 : count - 1} followers`;
+            }
+            
+            // Update button onclick attribute
+            followButton.setAttribute('onclick', `toggleFollowTag('${tagId}', '${!shouldFollow}')`);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 }
 
-// Set follow button event listener when the page loads
-document.addEventListener("DOMContentLoaded", function() {
-    const followButton = document.getElementById('followButton');
-    if (followButton) {
-        const tagId = followButton.getAttribute('data-tag-id');
-        const isFollowing = followButton.textContent.trim() === "Unfollow";
-        followButton.setAttribute('onclick', `toggleFollowTag('${tagId}', ${!isFollowing})`);
-    }
-});
+// Helper function to update URL parameters
+function updateUrlParameter(url, param, value) {
+    const urlObj = new URL(url);
+    urlObj.searchParams.set(param, value);
+    return urlObj.toString();
+}

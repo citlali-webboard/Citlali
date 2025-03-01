@@ -146,6 +146,7 @@ public class TagEventExploreViewModel : EventExploreViewModel
     public string TagEmoji { get; set; } = "";
     public bool IsFollowing { get; set; }
     public new List<Tag> Tags { get; set; } = new List<Tag>();
+    public new List<Location> Locations { get; set; } = new List<Location>();
     public new EventBriefCardData[] EventBriefCardDatas { get; set; } = new EventBriefCardData[0];
     public new int CurrentPage { get; set; }
     public new int TotalPage { get; set; }
