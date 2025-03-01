@@ -505,18 +505,99 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return count;
     }
 
-    public async Task<List<Event>> GetPaginatedEvents(int from, int to)
+    public async Task<List<Event>> GetPaginatedEvents(int start, int end, string sortBy = "newest")
     {
-        var response = await _supabaseClient
+        var query = _supabaseClient
             .From<Event>()
-            .Filter(row => row.Deleted, Supabase.Postgrest.Constants.Operator.Equals, "false")
+            .Select("*")
+            .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
             .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
             .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
-            .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
-            .Range(from, to)
-            .Get();
+            .Range(start, end);
 
-        return response.Models;
+        // Apply different sorting based on the sortBy parameter
+        switch (sortBy)
+        {
+            case "date":
+                query = query.Order("EventDate", Supabase.Postgrest.Constants.Ordering.Ascending);
+                break;
+                
+            case "popularity":
+                // Get all events with their IDs to sort by popularity
+                var allActiveEvents = await _supabaseClient
+                    .From<Event>()
+                    .Select("*") 
+                    .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
+                    .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+                    .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
+                    .Get();
+                
+                // Create a dictionary to store events with their participant counts
+                var eventWithCounts = new List<(Event Event, int Count)>();
+                
+                // Get participant count for each event
+                foreach (var e in allActiveEvents.Models)
+                {
+                    var count = await GetRegistrationCountByEventId(e.EventId);
+                    eventWithCounts.Add((e, count));
+                }
+                
+                // Sort events by participant count and take the requested range
+                var sortedEvents = eventWithCounts
+                    .OrderByDescending(x => x.Count)
+                    .Select(x => x.Event)
+                    .Skip(start)
+                    .Take(end - start + 1)
+                    .ToList();
+                
+                return sortedEvents.Select(e => new Event
+                {
+                    EventId = e.EventId,
+                    CreatorUserId = e.CreatorUserId,
+                    EventTitle = e.EventTitle,
+                    EventDescription = e.EventDescription,
+                    EventCategoryTagId = e.EventCategoryTagId,
+                    EventLocationTagId = e.EventLocationTagId,
+                    MaxParticipant = e.MaxParticipant,
+                    Cost = e.Cost,
+                    EventDate = e.EventDate,
+                    PostExpiryDate = e.PostExpiryDate,
+                    CreatedAt = e.CreatedAt,
+                    Deleted = e.Deleted
+                }).ToList();
+                
+            case "newest":
+            default:
+                query = query.Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending);
+                break;
+        }
+
+        var response = await query.Get();
+        
+        var events = new List<Event>();
+        if (response != null)
+        {
+            foreach (var e in response.Models)
+            {
+                events.Add(new Event
+                {
+                    EventId = e.EventId,
+                    CreatorUserId = e.CreatorUserId,
+                    EventTitle = e.EventTitle,
+                    EventDescription = e.EventDescription,
+                    EventCategoryTagId = e.EventCategoryTagId,
+                    EventLocationTagId = e.EventLocationTagId,
+                    MaxParticipant = e.MaxParticipant,
+                    Cost = e.Cost,
+                    EventDate = e.EventDate,
+                    PostExpiryDate = e.PostExpiryDate,
+                    CreatedAt = e.CreatedAt,
+                    Deleted = e.Deleted
+                });
+            }
+        }
+
+        return events;
     }
 
     public async Task<EventBriefCardData> EventToBriefCard(Event citlaliEvent)

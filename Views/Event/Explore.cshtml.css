@@ -1,6 +1,325 @@
 .center-wrapper {
   width: 100%;
   height: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--navbar-size));
+  margin-top: var(--navbar-size);
   background-color: #f0f0f0;
+  
+  /* Add display: flex to enable flexbox layout */
+  display: flex;
+  flex-direction: row;
+
+  padding: 0 2rem;
+}
+
+.sidebar-left,
+.sidebar-right {
+  flex: 0 0 20%;
+  padding: 1rem 0.5rem;
+  padding-top: 3rem;
+  /* border: 1px solid #000; */
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.main-content {
+  flex: 0 0 60%;
+  overflow: hidden;
+  padding: 1rem 2rem;
+  padding-top: 3rem;
+  /* border: 1px solid #000; */
+}
+
+.main-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+}
+
+.main-header h1 {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.main-header p {
+  font-size: 1rem;
+  color: #666;
+}
+
+.event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sidebar-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 8px;
+}
+
+.sidebar-card h2 {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.sidebar-card h2::after {
+  content: '';
+  margin-top: 0.5rem;
+  display: block;
+  width: 100%;
+  height: 1px;
+  background-color: #ccc;
+}
+
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 6px;
+  border: 1px solid #666;
+  border-radius: 30px;
+  font-size: 0.8rem;
+
+  margin-bottom: 0.5rem;
+}
+
+.tag-hidden {
+  display: none;
+}
+
+.tags-container.expanded .tag-hidden {
+  display: inline-flex;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tags-toggle {
+  text-align: center;
+}
+
+.toggle-icon {
+  transition: transform 0.3s ease;
+}
+
+.tags-toggle-btn.expanded .toggle-icon {
+  transform: rotate(180deg);
+}
+
+.tags-toggle-btn {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 0.9rem;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0 auto;
+  transition: all 0.2s ease;
+}
+
+.tags-toggle-btn:hover {
+  color: #aaa;
+}
+
+.tag:hover {
+  cursor: pointer;
+  background-color: #f0f0f0;
+}
+
+/* Pagination styling */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+  gap: 0.5rem;
+}
+
+.pagination-link, 
+.pagination-current-page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  color: #555;
+  font-weight: 500;
+}
+
+/* Regular page links */
+.pagination-link {
+  background-color: #f0f0f0;
+  border: 1px solid transparent;
+}
+
+.pagination-link:hover {
+  background-color: #e0e0e0;
+  transform: translateY(-2px);
+  color: #333;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Current page styling */
+.pagination-current-page {
+  background-color: var(--pink-saturated);
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 3px 8px rgba(253, 0, 227, 0.3);
+  cursor: default;
+  animation: pulse 2s infinite;
+}
+
+/* Special styling for Previous/Next buttons */
+.pagination-link:first-child,
+.pagination-link:last-child {
+  padding: 0 1rem;
+  position: relative;
+  font-weight: 600;
+}
+
+/* Add arrows to Previous/Next */
+.pagination-link:first-child::before {
+  content: "«";
+  margin-right: 0.3rem;
+}
+
+.pagination-link:last-child::after {
+  content: "»";
+  margin-left: 0.3rem;
+}
+
+
+.credit {
+  color: #666;
+}
+
+.credit h3 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.credit p {
+  font-size: 0.7rem;
+}
+
+/* Controls row */
+.controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Button group for sorting */
+.button-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.create-btn,
+.sort-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.create-btn {
+  border: 1px solid #666;
+}
+
+.sort-btn:hover, .create-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.sort-btn.active {
+  background-color: #333;
+  color: white;
+  svg {
+    fill: white !important;
+  }
+}
+
+/* Responsive layout for mobile devices */
+@media (max-width: 768px) {
+  .center-wrapper {
+    flex-direction: column;
+    padding: 0 0.5rem;
+  }
+  
+  .sidebar-left, .main-content, .sidebar-right {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+  
+  .sidebar-left {
+    order: 1;
+  }
+  
+  .main-content {
+    order: 0;
+    padding: 1rem 0.5rem;
+  }
+  
+  .sidebar-right {
+    order: 2;
+  }
+
+  .controls-row {
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .button-group {
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .sort-btn {
+    white-space: nowrap;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+  }
+  
+  .pagination-link:not(:first-child):not(:last-child) {
+    display: none;
+  }
+  
+  .pagination-current-page {
+    display: inline-flex;
+  }
 }

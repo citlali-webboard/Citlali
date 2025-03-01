@@ -262,14 +262,19 @@ public class EventController : Controller
 
 
     [HttpGet("explore")]
-    public async Task<IActionResult> Explore(int page = 1, int pageSize = 10)
+    public async Task<IActionResult> Explore(int page = 1, int pageSize = 10, string sortBy = "newest")
     {
         try
         {
-            var eventsTask = _eventService.GetPaginatedEvents((page - 1) * pageSize, (page * pageSize) - 1);
+            // Store sortBy in ViewBag for active button highlighting
+            ViewBag.SortBy = sortBy;
+
+            var eventsTask = _eventService.GetPaginatedEvents((page - 1) * pageSize, (page * pageSize) - 1, sortBy);
             var eventsCountTask = _eventService.GetEventsExactCount();
             var tagsTask = _eventService.GetTags();
+            
             await Task.WhenAll(eventsTask, eventsCountTask, tagsTask);
+            
             var events = await eventsTask;
             var eventsCount = await eventsCountTask;
             var tags = (await tagsTask).ToArray();
@@ -283,6 +288,7 @@ public class EventController : Controller
                 CurrentPage = page,
                 TotalPage = (int)Math.Ceiling(eventsCount / (double)pageSize)
             };
+            
             return View(model);
         }
         catch (Exception e)
