@@ -1,11 +1,13 @@
 .window {
     width: 100dvw;
     min-height: calc(100dvh - var(--navbar-size));
+    margin-top: var(--navbar-size);
 
     display: flex;
     flex-direction: column;
 
-    margin-bottom: 2rem;
+    background-color: #f0f0f0;
+    padding-bottom: 2rem;
 }
 
 h1 {
@@ -41,7 +43,7 @@ h3 {
 
 .profile-header {
     width: 100%;
-    /* margin: 2.5% 5% 2.5% 5%; */
+    margin-top: 2rem;
     display: flex;
     /* height: 70%; */
     height: fit-content;
@@ -138,6 +140,7 @@ h3, p {
 }
 
 .action-button{
+    background-color: #fefefe;
     width: fit-content;
     height: fit-content;
     display: flex;
@@ -157,7 +160,7 @@ h3, p {
 }
 
 .action-button:hover{
-    background-color: #f0f0f0;
+    background-color: #fbfbfb;
     cursor: pointer;
 }
 
