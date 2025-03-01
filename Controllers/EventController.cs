@@ -305,12 +305,12 @@ public class EventController : Controller
     {
         try
         {
-            if (!Guid.TryParse(id, out _))
+            if (!Guid.TryParse(id, out var tagId))
             {
                 throw new Exception("Invalid Tag id");
             }
 
-            var events = await _eventService.GetEventsByTagId(Guid.Parse(id));
+            var events = await _eventService.GetEventsByTagId(tagId);
             var paginatedEvents = events.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
 
             var paginatedEventsCardData = new EventBriefCardData[paginatedEvents.Length];
@@ -344,19 +344,26 @@ public class EventController : Controller
 
             var tags = (await _eventService.GetTags()).ToArray();
 
+            var exploreTag = await _eventService.GetTagById(tagId) ?? new EventCategoryTag();
+
+            bool isFollowing = false;
+            var currentUser = _userService.CurrentSession.User;
+            if (currentUser != null && currentUser.Id != null)
+            {
+                isFollowing = await _userService.IsFollowingTag(tagId);
+            }
+
             var model = new TagEventExploreViewModel
             {
+                TagId = exploreTag.EventCategoryTagId,
+                TagName = exploreTag.EventCategoryTagName,
+                TagEmoji = exploreTag.EventCategoryTagEmoji,
+                IsFollowing = isFollowing, // Use the variable, not hardcoded false
+                Tags = tags.ToList(),
                 EventBriefCardDatas = paginatedEventsCardData,
-                Tags = tags,
                 CurrentPage = page,
-                TotalPage = (int)Math.Ceiling(events.Count() / (double)pageSize)
+                TotalPage = (int)Math.Ceiling(events.Count / (double)pageSize)
             };
-            
-            var exploreTag = await _eventService.GetTagById(Guid.Parse(id))?? new EventCategoryTag();
-
-            model.TagId = exploreTag.EventCategoryTagId;
-            model.TagName = exploreTag.EventCategoryTagName;
-            model.TagEmoji = exploreTag.EventCategoryTagEmoji;
 
             return View(model);
         }

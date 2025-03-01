@@ -37,14 +37,46 @@ public class User : BaseModel
 
 }
 
+[Table("USER_FOLLOWED_CATEGORY")]
+public class UserFollowedCategory : BaseModel
+{
+        [PrimaryKey]
+        [Column("UserFollowedTagId")]
+        public Guid UserFollowedTagId { get; set; } = Guid.NewGuid();
+
+        [Column("UserId")]
+        public Guid UserId { get; set; }
+
+        [Column("EventCategoryTagId")]
+        public Guid EventCategoryTagId { get; set; }
+}
+
+[Table("USER_FOLLOWED")]
+public class UserFollowed : BaseModel
+{
+    [PrimaryKey]
+    [Column("FollowingId")]
+    public Guid FollowingId { get; set; } = Guid.NewGuid();
+
+    [Column("FollowerUserId")]
+    public Guid FollowerUserId { get; set; }
+
+    [Column("FollowedUserId")]
+    public Guid FollowedUserId { get; set; }
+}
+
 public class UserOnboardingDto : User
 {
         public IFormFile? ProfileImage { get; set; }
+        public List<Guid> SelectedTags { get; set; } = new List<Guid>();
 }
 
 public class UserViewModel : User
 {
+        public int FollowingCount { get; set; }
+        public int FollowersCount { get; set; }
         public bool IsCurrentUser { get; set; }
+        public bool IsFollowing { get; set; }
         public List<EventBriefCardData> UserEvents { get; set; } = new List<EventBriefCardData>();
 }
 

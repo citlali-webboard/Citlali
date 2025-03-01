@@ -14,16 +14,16 @@ public class UserController : Controller
     private readonly ILogger<UserController> _logger;
     private readonly Supabase.Client _supabaseClient;
     private readonly UserService _userService;
-    private readonly Configuration _configuration;
     private readonly EventService _eventService;
+    private readonly Configuration _configuration;
 
-    public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService, Configuration configuration, EventService eventService)
+    public UserController(ILogger<UserController> logger, Supabase.Client supabaseClient, UserService userService, EventService eventService, Configuration configuration)
     {
         _logger = logger;
         _supabaseClient = supabaseClient;
         _userService = userService;
-        _configuration = configuration;
         _eventService = eventService;
+        _configuration = configuration;
     }
 
     public async Task<IActionResult> Index()
@@ -34,7 +34,13 @@ public class UserController : Controller
             return RedirectToAction("explore", "event");
         }
 
-        var dbUser = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id));
+        var userId = currentUser.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return RedirectToAction("explore", "event");
+        }
+
+        var dbUser = await _userService.GetUserByUserId(Guid.Parse(userId));
         if (dbUser == null)
         {
             return RedirectToAction("Onboarding");
@@ -62,6 +68,7 @@ public class UserController : Controller
 
         ViewBag.Email = currentUser.Email;
         ViewBag.ProfileImageUrl = _configuration.User.DefaultProfileImage;
+        ViewBag.Tags = await _eventService.GetTags();
 
         return View();
     }
@@ -160,6 +167,9 @@ public class UserController : Controller
 
         var currentUser = _userService.CurrentSession.User;
         var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
+        var followingCount = await _userService.GetFollowingCount(user.UserId);
+        var followersCount = await _userService.GetFollowersCount(user.UserId);
+        var isFollowing = currentUser != null && await _userService.IsFollowing(Guid.Parse(currentUser.Id ?? string.Empty), user.UserId);
         if (isCurrentUser) {
             HttpContext.Response.Cookies.Append("ProfileImageUrl", user.ProfileImageUrl, new CookieOptions
             {
@@ -222,7 +232,10 @@ public class UserController : Controller
             ProfileImageUrl = user.ProfileImageUrl,
             DisplayName = user.DisplayName,
             UserBio = user.UserBio,
+            FollowingCount = followingCount,
+            FollowersCount = followersCount,
             IsCurrentUser = isCurrentUser,
+            IsFollowing = isFollowing,
             UserEvents = userEventBriefCards
         };
 
@@ -238,13 +251,12 @@ public class UserController : Controller
     [Authorize]
     public async Task<IActionResult> ProfileEdit(UserOnboardingDto userOnboardingDto)
     {
-
         if (string.IsNullOrEmpty(userOnboardingDto.DisplayName))
-            {
-                TempData["Error"] = "Display name is required.";
-                return RedirectToAction("Index");
-            }
-
+        {
+            TempData["Error"] = "Display name is required.";
+            return RedirectToAction("Index");
+        }
+            
         var updatedUser = await _userService.EditUser(userOnboardingDto);
 
         Response.Cookies.Append("ProfileImageUrl", updatedUser.ProfileImageUrl, new CookieOptions
@@ -256,5 +268,133 @@ public class UserController : Controller
         });
 
         return RedirectToAction("Index");
+    }
+    
+    [HttpPost("follow/{username}")]
+    [Authorize]
+    public async Task<IActionResult> Follow(string username)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        var userToFollow = await _userService.GetUserByUsername(username);
+        if (userToFollow == null)
+        {
+            return NotFound();
+        }
+
+        var userId = currentUser.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        await _userService.FollowUser(Guid.Parse(userId), userToFollow.UserId);
+
+        var followersCount = await _userService.GetFollowersCount(userToFollow.UserId);
+        return Json(new { followersCount });
+    }
+
+    [HttpPost("unfollow/{username}")]
+    [Authorize]
+    public async Task<IActionResult> Unfollow(string username)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        var userToUnfollow = await _userService.GetUserByUsername(username);
+        if (userToUnfollow == null)
+        {
+            return NotFound();
+        }
+
+        var userId = currentUser.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        await _userService.UnfollowUser(Guid.Parse(userId), userToUnfollow.UserId);
+
+        var followersCount = await _userService.GetFollowersCount(userToUnfollow.UserId);
+        return Json(new { followersCount });
+    }
+
+    [HttpPost("followTag/{tagId}")]
+    [Authorize]
+    public async Task<IActionResult> FollowTag(Guid tagId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var success = await _userService.FollowTag(tagId);
+            return Json(new { success });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error following tag");
+            return StatusCode(500, "Internal server error");
+        }
+    }
+
+    [HttpPost("unfollowTag/{tagId}")]
+    [Authorize]
+    public async Task<IActionResult> UnfollowTag(Guid tagId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var success = await _userService.UnfollowTag(tagId);
+            return Json(new { success });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error unfollowing tag");
+            return StatusCode(500, "Internal server error");
+        }
+    }
+
+    [HttpGet("followedTags")]
+    [Authorize]
+    public async Task<IActionResult> GetFollowedTags()
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        var followedTags = await _userService.GetFollowedTags(currentUser.Id ?? string.Empty);
+        return Json(followedTags);
+    }
+
+    [HttpGet("isFollowingTag/{tagId}")]
+    [Authorize]
+    public async Task<IActionResult> IsFollowingTag(Guid tagId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        var isFollowing = await _userService.IsFollowingTag(tagId);
+        return Json(new { isFollowing });
     }
 }
