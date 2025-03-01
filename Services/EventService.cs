@@ -499,7 +499,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     {
         var count = await _supabaseClient
             .From<Event>()
-            .Filter(row => row.Deleted, Supabase.Postgrest.Constants.Operator.Equals, "false")
+            .Where(row => row.Deleted == false)
+            .Where(row => row.PostExpiryDate > DateTime.Now)
+            .Where(row => row.Status == "active")
+            .Order(row => row.CreatedAt, Supabase.Postgrest.Constants.Ordering.Descending)
             .Count(Supabase.Postgrest.Constants.CountType.Exact);
 
         return count;
@@ -507,16 +510,56 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
     public async Task<List<Event>> GetPaginatedEvents(int from, int to)
     {
+        return await GetPaginatedEventsDumb(from, to);
+        // return await GetPaginatedEventsSlow(from, to);
+    }
+
+    public async Task<List<Event>> GetPaginatedEventsDumb(int from, int to)
+    {
         var response = await _supabaseClient
             .From<Event>()
-            .Filter(row => row.Deleted, Supabase.Postgrest.Constants.Operator.Equals, "false")
-            .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
-            .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
-            .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
-            .Range(from, to)
+            .Select("*")
+            .Where(row => row.Deleted == false)
+            .Where(row => row.PostExpiryDate > DateTime.Now)
+            .Where(row => row.Status == "active")
+            .Order(row => row.CreatedAt, Supabase.Postgrest.Constants.Ordering.Descending)
             .Get();
 
-        return response.Models;
+        int count = response.Models.Count;
+        int actualTo = Math.Min(to, count - 1);
+
+        if (from >= count || from > actualTo)
+            return [];
+
+        return [.. response.Models.Skip(from).Take(actualTo - from + 1)];
+    }
+
+    public async Task<List<Event>> GetPaginatedEventsSlow(int from, int to)
+    {
+        var models = await _supabaseClient
+            .From<Event>()
+            .Select(row => new object[] { row.EventId })
+            .Where(row => row.Deleted == false)
+            .Where(row => row.PostExpiryDate > DateTime.Now)
+            .Where(row => row.Status == "active")
+            .Order(row => row.CreatedAt, Supabase.Postgrest.Constants.Ordering.Descending)
+            .Get();
+
+        int count = models.Models.Count;
+        int actualTo = Math.Min(to, count - 1);
+
+        if (from >= count || from > actualTo)
+            return [];
+
+        var idModelsToFetch = models.Models.Skip(from).Take(actualTo - from + 1);
+        var idsToFetch = models.Models.ConvertAll(x => x.EventId.ToString());
+
+        var events = await _supabaseClient
+            .From<Event>()
+            .Select("*")
+            .Filter(x => x.EventId, Supabase.Postgrest.Constants.Operator.In, idsToFetch)
+            .Get();
+        return events.Models;
     }
 
     public async Task<EventBriefCardData> EventToBriefCard(Event citlaliEvent)

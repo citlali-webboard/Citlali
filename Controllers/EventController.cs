@@ -256,7 +256,6 @@ public class EventController : Controller
         }
         catch (EventClosedException) {
             return RedirectToAction("detail", new { eventId = joinEventModel.EventId });
-
         }
     }
 
@@ -343,7 +342,7 @@ public class EventController : Controller
                 CurrentPage = page,
                 TotalPage = (int)Math.Ceiling(events.Count() / (double)pageSize)
             };
-            
+
             var exploreTag = await _eventService.GetTagById(Guid.Parse(id))?? new EventCategoryTag();
 
             model.TagId = exploreTag.EventCategoryTagId;
@@ -411,7 +410,7 @@ public class EventController : Controller
         {
             return RedirectToAction("detail", new { id = eventId });
         }
-        catch (JoinOwnerException) 
+        catch (JoinOwnerException)
         {
             return RedirectToAction("detail", new { id = eventId });
         }
@@ -428,7 +427,7 @@ public class EventController : Controller
     {
         try {
             await _eventService.InviteUser(Guid.Parse(eventId), Guid.Parse(userId));
-            
+
             return RedirectToAction("manage", new { eventId = eventId });
         }
         catch (UnauthorizedAccessException)
@@ -462,7 +461,7 @@ public class EventController : Controller
         }
         catch (UnauthorizedAccessException)
         {
-            TempData["Error"] = "You are not authorized to rejects users to this event"; 
+            TempData["Error"] = "You are not authorized to rejects users to this event";
             return RedirectToAction("explore");
         }
     }
@@ -575,12 +574,12 @@ public class EventController : Controller
             }
 
             await _eventService.Broadcast(Guid.Parse(eventId), title, message);
-            
+
             return RedirectToAction("manage", new { eventId = eventId });
 
         }catch(Exception e){
             TempData["Error"] = e.Message;
-            
+
             return RedirectToAction("manage", new { eventId = eventId });
         }
     }
@@ -594,5 +593,5 @@ public class EventController : Controller
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 
-    
+
 }
