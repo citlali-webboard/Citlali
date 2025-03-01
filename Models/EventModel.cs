@@ -134,6 +134,7 @@ public class EventExploreViewModel
 {
     public EventBriefCardData[] EventBriefCardDatas = [new()];
     public Tag[] Tags = [new()];
+    public Location[] Locations = [new()];
     public int CurrentPage { get; set; } = 1;
     public int TotalPage { get; set; }
 }

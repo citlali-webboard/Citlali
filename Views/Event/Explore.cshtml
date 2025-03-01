@@ -12,7 +12,7 @@
 <div class="center-wrapper">
     <div class="sidebar-left">
         <div class="sidebar-card">
-            <h2>Filter by tags 🏷️</h2>
+            <h2>Explore by tags 🏷️</h2>
             <div class="tags-container" id="tags-container">
                 @{
                     int initialTagsToShow = 10;
@@ -34,7 +34,7 @@
             {
                 <div class="tags-toggle">
                     <button id="tags-toggle-btn" class="tags-toggle-btn">
-                        <span class="toggle-text">See more</span>
+                        <span class="tags-toggle-text">See more</span>
                         <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
@@ -43,9 +43,37 @@
             }
         </div>
         <div class="sidebar-card">
-            <h2>Filter by locations 📍</h2>
+            <h2>Explore by locations 📍</h2>
+            <div class="tags-container" id="location-container">
+                @{
+                    bool hasMoreLocations = Model.Locations.Count() > initialTagsToShow;
+                }
+                
+                @for (int i = 0; i < Model.Locations.Count(); i++)
+                {
+                    var location = Model.Locations.ElementAt(i);
+                    var isHidden = i >= initialTagsToShow;
+                    
+                    <div class="tag @(isHidden ? "tag-hidden" : "")" data-index="@i">
+                        <a href="/event/location/@location.EventLocationTagId">@location.EventLocationTagName</a>
+                    </div>
+                }
+
+                @if (hasMoreLocations)
+                {
+                    <div class="location-toggle">
+                        <button id="location-toggle-btn" class="tags-toggle-btn">
+                            <span class="location-toggle-text">See more</span>
+                            <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                }
+            </div>
         </div>
     </div>
+
     <div class="main-content">
         <div class="main-header">
         <div class="controls-row">

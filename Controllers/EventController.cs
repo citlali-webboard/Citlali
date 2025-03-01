@@ -280,11 +280,13 @@ public class EventController : Controller
             var tags = (await tagsTask).ToArray();
 
             var briefCardDatas = await _eventService.EventsToBriefCardArray(events);
+            var locations = (await _eventService.GetLocationTags()).ToArray();
 
             var model = new EventExploreViewModel
             {
                 EventBriefCardDatas = briefCardDatas,
                 Tags = tags,
+                Locations = locations,
                 CurrentPage = page,
                 TotalPage = (int)Math.Ceiling(eventsCount / (double)pageSize)
             };
