@@ -15,7 +15,7 @@ public class UserService
     private readonly Client _supabaseClient;
     private readonly Configuration _configuration;
     private readonly UtilitiesService _utilityService;
-    public Supabase.Gotrue.Session CurrentSession { get;set; } = new Supabase.Gotrue.Session();
+    public Supabase.Gotrue.Session CurrentSession { get; set; } = new Supabase.Gotrue.Session();
 
     private readonly List<string> reservedUsernames = new List<string> {
         "admin",
@@ -40,12 +40,15 @@ public class UserService
     /// Return <c>true</c> if the user is not onboarded, <c>false</c> otherwise
     /// </returns>
     /// </summary>
-    public async Task<bool> RedirectToOnboarding() {
+    public async Task<bool> RedirectToOnboarding()
+    {
         var id = CurrentSession.User?.Id;
-        if (string.IsNullOrEmpty(id)) {
+        if (string.IsNullOrEmpty(id))
+        {
             return false;
         }
-        if (await GetUserByUserId(Guid.Parse(id)) is null) {
+        if (await GetUserByUserId(Guid.Parse(id)) is null)
+        {
             return true;
         }
         return false;
@@ -53,7 +56,8 @@ public class UserService
 
     public async Task<User> CreateUser(UserOnboardingDto userOnboardingDto)
     {
-        try {
+        try
+        {
             var supabaseUser = _supabaseClient.Auth.CurrentUser;
             string profileImageUrl = _configuration.User.DefaultProfileImage;
 
@@ -103,10 +107,12 @@ public class UserService
 
             return dbUser;
         }
-        catch (InvalidUsernameException) {
+        catch (InvalidUsernameException)
+        {
             throw new InvalidUsernameException();
         }
-         catch(Exception e) {
+        catch (Exception e)
+        {
             var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
             string msgError = errorJson.GetProperty("msg").GetString() ?? "";
             Console.WriteLine(msgError);
@@ -132,7 +138,7 @@ public class UserService
 
         if (userOnboardingDto.DisplayName == null || userOnboardingDto.DisplayName == "")
         {
-           throw new Exception("Display name is required.");
+            throw new Exception("Display name is required.");
         }
 
         if (userOnboardingDto.ProfileImage != null)
@@ -192,11 +198,14 @@ public class UserService
             var fileName = $"{_configuration.User.ProfileImageName}.{_configuration.User.ProfileImageFormat}";
             var bucketFilePath = $"{userId}/{fileName}";
 
-            try {
+            try
+            {
                 _ = await _supabaseClient.Storage
                     .From(bucketName)
                     .Remove(bucketFilePath);
-            } catch { 
+            }
+            catch
+            {
             }
 
             var imageBytes = _utilityService.ProcessProfileImage(image);
@@ -217,7 +226,7 @@ public class UserService
             string imageId = Guid.NewGuid().ToString("N")[..8];
 
             string publicUrl = $"{localUrl}?id={imageId}".Replace(_configuration.Supabase.LocalUrl, _configuration.Supabase.PublicUrl);
-            
+
             return publicUrl;
         }
 
@@ -256,7 +265,7 @@ public class UserService
             await _supabaseClient
                 .From<UserFollowedCategory>()
                 .Insert(userFollowedCategory);
-                        
+
             return true;
         }
         catch (Exception ex)
@@ -277,14 +286,14 @@ public class UserService
         try
         {
             var userId = Guid.Parse(currentUser.Id);
-            
+
             // Use the exact column names from the model class
             await _supabaseClient
                 .From<UserFollowedCategory>()
                 .Filter("UserId", Operator.Equals, userId.ToString())
                 .Filter("EventCategoryTagId", Operator.Equals, tagId.ToString())
                 .Delete();
-            
+
             return true;
         }
         catch (Exception ex)
@@ -305,14 +314,14 @@ public class UserService
         try
         {
             var userId = Guid.Parse(currentUser.Id);
-            
+
             // Use the exact column names from the model class
             var response = await _supabaseClient
                 .From<UserFollowedCategory>()
                 .Filter("UserId", Operator.Equals, userId.ToString())
                 .Filter("EventCategoryTagId", Operator.Equals, tagId.ToString())
                 .Get();
-            
+
             return response != null && response.Models.Count > 0;
         }
         catch (Exception ex)
@@ -354,7 +363,8 @@ public class UserService
         return tags;
     }
 
-    public int GetFollowedUser(string userId) {
+    public int GetFollowedUser(string userId)
+    {
         return 0;
     }
 
@@ -426,6 +436,68 @@ public class UserService
         return userFollowed != null;
     }
 
+    public async Task<List<User>> GetSuperstars()
+    {
+        // Get all user follows
+        var followedResponse = await _supabaseClient
+            .From<UserFollowed>()
+            .Select("FollowedUserId")
+            .Get();
+
+        if (followedResponse == null || followedResponse.Models.Count == 0)
+        {
+            return new List<User>();
+        }
+
+        // Count occurrences of each FollowedUserId
+        Dictionary<Guid, int> followCounts = new Dictionary<Guid, int>();
+
+        foreach (var followed in followedResponse.Models)
+        {
+            if (followCounts.ContainsKey(followed.FollowedUserId))
+            {
+                followCounts[followed.FollowedUserId]++;
+            }
+            else
+            {
+                followCounts[followed.FollowedUserId] = 1;
+            }
+        }
+
+        // Get top 5 most followed user IDs
+        var topUserIds = followCounts
+            .OrderByDescending(pair => pair.Value)
+            .Take(5)
+            .Select(pair => pair.Key)
+            .ToList();
+
+        if (topUserIds.Count == 0)
+        {
+            return new List<User>();
+        }
+
+        // Get user details for these IDs
+        var users = new List<User>();
+
+        // Use IN operator to fetch all users in one query
+        var userIdsString = string.Join(",", topUserIds.Select(id => $"'{id}'"));
+
+        var usersResponse = await _supabaseClient
+            .From<User>()
+            .Filter("UserId", Operator.In, userIdsString)
+            .Get();
+
+        if (usersResponse != null && usersResponse.Models.Count > 0)
+        {
+            // Sort users according to follow count order
+            return usersResponse.Models
+                .OrderBy(user => topUserIds.IndexOf(user.UserId))
+                .ToList();
+        }
+
+        return new List<User>();
+    }
+
 }
 
 public class InvalidUsernameException : Exception
@@ -434,6 +506,6 @@ public class InvalidUsernameException : Exception
 
     public InvalidUsernameException(string message) : base(message) { }
 
-    public InvalidUsernameException(string message, Exception innerException) 
+    public InvalidUsernameException(string message, Exception innerException)
         : base(message, innerException) { }
 }
