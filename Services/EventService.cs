@@ -499,7 +499,9 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     {
         var count = await _supabaseClient
             .From<Event>()
-            .Filter(row => row.Deleted, Supabase.Postgrest.Constants.Operator.Equals, "false")
+            .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
+            .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+            .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
             .Count(Supabase.Postgrest.Constants.CountType.Exact);
 
         return count;
