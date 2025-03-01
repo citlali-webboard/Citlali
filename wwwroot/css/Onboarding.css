@@ -1,11 +1,13 @@
 .window {
     width: 100vw;
-    min-height: 100vh;
+    min-height: calc(100vh - var(--navbar-size));
+    margin-top: var(--navbar-size);
 
     display: flex;
     justify-content: center;
     align-items: center;
 
+    background-color: #f0f0f0;
 }
 
 .content {
@@ -220,6 +222,7 @@ input[type="file"] {
 .continue-button svg {
     margin-left: 0.5rem;
     align-self: center;
+    fill: #fff !important;
 }
 
 @media screen and (max-width: 1150px) {
