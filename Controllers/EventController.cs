@@ -18,15 +18,17 @@ public class EventController : Controller
     private readonly UserService _userService;
     private readonly NotificationService _notificationService;
     private readonly Supabase.Client _supabaseClient;
+    private readonly Configuration _configuration;
 
 
-    public EventController(ILogger<EventController> logger, EventService eventService, UserService userService, Supabase.Client supabaseClient, NotificationService notificationService)
+    public EventController(ILogger<EventController> logger, EventService eventService, UserService userService, Supabase.Client supabaseClient, NotificationService notificationService, Configuration configuration)
     {
         _logger = logger;
         _eventService = eventService;
         _userService = userService;
         _supabaseClient = supabaseClient;
         _notificationService = notificationService;
+        _configuration = configuration;
     }
 
     [HttpGet("")]
@@ -673,5 +675,119 @@ public class EventController : Controller
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 
+<<<<<<< Updated upstream
 
+=======
+    [HttpGet("followed")]
+    public async Task<IActionResult> Followed(int page = 1, int pageSize = 10)
+    {
+        try
+        {
+            if (_userService.CurrentSession.User == null || string.IsNullOrEmpty(_userService.CurrentSession.User.Id))
+            {
+                return RedirectToAction("SignIn", "Auth");
+            }
+            
+            var userId = Guid.Parse(_userService.CurrentSession.User.Id);
+            
+            // Start tasks in parallel - using GetFollowedTags instead of HasFollowedTags
+            var followedTagsTask = _userService.GetFollowedTags(userId.ToString());
+            var tagsTask = _eventService.GetTags();
+            var eventsTask = _eventService.GetEventsFromFollowed(userId);
+            
+            // Wait for all initial tasks to complete
+            await Task.WhenAll(followedTagsTask, tagsTask, eventsTask);
+            
+            var followedTags = await followedTagsTask;
+            var tags = (await tagsTask).ToArray();
+            var events = await eventsTask;
+            
+            // Check if user has followed tags/users
+            bool hasFollowedTags = followedTags != null && followedTags.Count > 0;
+            bool hasFollowedUsers = await _userService.GetFollowingCount(userId) > 0;
+            
+            // If no events found, return early with empty arrays
+            if (events.Count == 0)
+            {
+                var emptyModel = new FollowedExploreViewModel
+                {
+                    EventBriefCardDatas = Array.Empty<EventBriefCardData>(),
+                    Tags = tags,
+                    CurrentPage = 1,
+                    TotalPage = 0,
+                    HasFollowedTags = hasFollowedTags,
+                    HasFollowedUsers = hasFollowedUsers
+                };
+                return View(emptyModel);
+            }
+            
+            var paginatedEvents = events.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
+            
+            // Create tasks for all creators, location tags, and event tags at once
+            var cardTasks = new List<Task>();
+            var paginatedEventsCardData = new EventBriefCardData[paginatedEvents.Length];
+            
+            for (int i = 0; i < paginatedEvents.Length; i++)
+            {
+                var ev = paginatedEvents[i];
+                var index = i; // Capture the current index for the closure
+                
+                var creatorTask = _userService.GetUserByUserId(ev.CreatorUserId);
+                var locationTagTask = _eventService.GetLocationTagById(ev.EventLocationTagId);
+                var categoryTagTask = _eventService.GetTagById(ev.EventCategoryTagId);
+                var participantCountTask = _eventService.GetRegistrationCountByEventId(ev.EventId);
+                
+                // Create a composite task that processes all needed data for this card
+                var cardTask = Task.WhenAll(creatorTask, locationTagTask, categoryTagTask, participantCountTask)
+                    .ContinueWith(t => {
+                        var creator = creatorTask.Result ?? new User
+                        {
+                            DisplayName = "Unknown User",
+                            ProfileImageUrl = "/images/default-profile.png",
+                        };
+                        
+                        paginatedEventsCardData[index] = new EventBriefCardData
+                        {
+                            EventId = ev.EventId,
+                            EventTitle = ev.EventTitle,
+                            EventDescription = ev.EventDescription,
+                            CreatorDisplayName = creator.DisplayName,
+                            CreatorProfileImageUrl = creator.ProfileImageUrl,
+                            LocationTag = locationTagTask.Result ?? new LocationTag(),
+                            EventCategoryTag = categoryTagTask.Result ?? new EventCategoryTag(),
+                            CurrentParticipant = participantCountTask.Result,
+                            MaxParticipant = ev.MaxParticipant,
+                            Cost = ev.Cost,
+                            EventDate = ev.EventDate,
+                            PostExpiryDate = ev.PostExpiryDate,
+                            CreatedAt = ev.CreatedAt,
+                        };
+                    });
+                    
+                cardTasks.Add(cardTask);
+            }
+            
+            await Task.WhenAll(cardTasks);
+
+            var model = new FollowedExploreViewModel
+            {
+                Tags = tags,
+                EventBriefCardDatas = paginatedEventsCardData,
+                CurrentPage = page,
+                TotalPage = (int)Math.Ceiling(events.Count / (double)pageSize),
+                HasFollowedTags = hasFollowedTags,
+                HasFollowedUsers = hasFollowedUsers
+            };
+
+            return View(model);
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("Explore");
+        }
+    }
+
+    
+>>>>>>> Stashed changes
 }

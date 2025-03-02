@@ -1,0 +1,89 @@
+@model Citlali.Models.FollowedExploreViewModel;
+
+@section head {
+    <link rel="stylesheet" href="~/css/Form.css" asp-append-version="true" />
+}
+
+@{
+    ViewData["Title"] = "Followed Content";
+}
+
+<div class="center-wrapper">
+    <div class="container">
+        <header>
+            <div class="title">
+                <h1>Your Followed Content ❤️</h1>
+                <p>See events from creators and topics you follow!</p>
+            </div>
+            <div class="tags">
+                @foreach (var tag in Model.Tags)
+                {
+                    <a href="/event/tag/@tag.TagId">
+                        <span class="tag">
+                            <span>@tag.TagEmoji</span>
+                            <span>@tag.TagName</span>
+                        </span>
+                    </a>
+                }
+            </div>
+        </header>
+        
+        @if (Model.EventBriefCardDatas.Length == 0 || (Model.EventBriefCardDatas.Length == 1 && Model.EventBriefCardDatas[0].EventId == Guid.Empty))
+        {
+            <div class="empty-state">
+                @if (!Model.HasFollowedTags && !Model.HasFollowedUsers)
+                {
+                    <h2>No followed content yet</h2>
+                    <p>Follow users and topics to see their events here!</p>
+                }
+                else if (Model.HasFollowedTags && !Model.HasFollowedUsers)
+                {
+                    <h2>No events from followed tags</h2>
+                    <p>The tags you follow don't have any events yet. Try following some users as well!</p>
+                }
+                else if (!Model.HasFollowedTags && Model.HasFollowedUsers)
+                {
+                    <h2>No events from followed users</h2>
+                    <p>The users you follow haven't created any events yet. Try following some tags as well!</p>
+                }
+                else
+                {
+                    <h2>No events found</h2>
+                    <p>The users and tags you follow don't have any events yet. Check back later!</p>
+                }
+                <a href="/event/explore" class="action-button">Explore Events</a>
+            </div>
+        }
+        else
+        {
+            <div class="event-list">
+                @for (var i = 0; i < Model.EventBriefCardDatas.Length; i++)
+                {
+                    <div>
+                        <partial name="_EventBriefCard" model=@Model.EventBriefCardDatas[i] />
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    
+    @if (Model.TotalPage > 1)
+    {
+        <div class="pagination">
+            @if (Model.CurrentPage > 1)
+            {
+                <a href="@Url.Action("Followed", new { page = Model.CurrentPage - 1 })">Previous</a>
+            }
+
+            @for (var i = 1; i <= Model.TotalPage; i++)
+            {
+                <a href="@Url.Action("Followed", new { page = i })" class="@(i == Model.CurrentPage ? "active" : "")">@i</a>
+            }
+
+            @if (Model.CurrentPage < Model.TotalPage)
+            {
+                <a href="@Url.Action("Followed", new { page = Model.CurrentPage + 1 })">Next</a>
+            }
+        </div>
+    }
+</div>

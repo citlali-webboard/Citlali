@@ -1171,6 +1171,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return historyList;
     }
 
+<<<<<<< Updated upstream
     public async Task<List<Event>> GetTrendingEvents()
     {
         var allActiveEvents = await _supabaseClient
@@ -1229,6 +1230,98 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     }
 
 
+=======
+    public async Task<List<Event>> GetEventsFromFollowed(Guid userId)
+    {
+        try {
+            var followedTagsTask = _supabaseClient
+                .From<UserFollowedCategory>()
+                .Where(f => f.UserId == userId)
+                .Get();
+            
+            var followedUsersTask = _supabaseClient
+                .From<UserFollowed>()
+                .Where(f => f.FollowerUserId == userId)
+                .Get();
+            
+            await Task.WhenAll(followedTagsTask, followedUsersTask);
+            
+            var followedTagIds = followedTagsTask.Result.Models
+                .Select(x => x.EventCategoryTagId)
+                .ToList();
+            
+            var followedUserIds = followedUsersTask.Result.Models
+                .Select(x => x.FollowedUserId)
+                .ToList();
+            
+            var eventTasks = new List<Task<List<Event>>>();
+            
+            if (followedTagIds.Any())
+            {
+                var tagEventTasks = followedTagIds.Select(tagId => GetEventsByTagId(tagId)).ToList();
+                eventTasks.AddRange(tagEventTasks);
+            }
+            
+            // Get events from followed users (in parallel with tag queries)
+            if (followedUserIds.Any())
+            {
+                var userEventTasks = new List<Task<Supabase.Postgrest.Responses.ModeledResponse<Event>>>();
+                
+                foreach (var followedUserId in followedUserIds)
+                {
+                    // Start each query but don't await it yet - store the task
+                    var userEventsTask = _supabaseClient
+                        .From<Event>()
+                        .Where(e => e.CreatorUserId == followedUserId 
+                                && !e.Deleted 
+                                && e.PostExpiryDate > DateTime.Now
+                                && e.Status == "active")
+                        .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
+                        .Get();
+                        
+                    userEventTasks.Add(userEventsTask);
+                }
+                
+                // Wait for all user event tasks to complete
+                await Task.WhenAll(userEventTasks);
+                
+                // Process results
+                foreach (var task in userEventTasks)
+                {
+                    if (task.Result.Models.Count > 0)
+                    {
+                        eventTasks.Add(Task.FromResult(task.Result.Models));
+                    }
+                }
+            }
+            
+            // Wait for all event tasks to complete
+            await Task.WhenAll(eventTasks);
+            
+            // Combine all events
+            var allEvents = new List<Event>();
+            foreach (var task in eventTasks)
+            {
+                allEvents.AddRange(task.Result);
+            }
+            
+            // Remove duplicates
+            var uniqueEvents = allEvents
+                .GroupBy(e => e.EventId)
+                .Select(g => g.First())
+                .ToList();
+            
+            return uniqueEvents
+                .OrderByDescending(e => e.CreatedAt)
+                .ToList();
+        }
+        catch (Exception ex) {
+            Console.Error.WriteLine($"Error in GetEventsFromFollowed: {ex.Message}");
+            Console.Error.WriteLine(ex.StackTrace);
+            throw;
+        }
+    }
+>>>>>>> Stashed changes
 }
 
 public class UserAlreadyRegisteredException : Exception
