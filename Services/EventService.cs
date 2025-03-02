@@ -1171,18 +1171,45 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return historyList;
     }
 
-    public async Task<List<Event>> GetTrendingEvents()
+    public async Task<List<EventBriefCardData>> GetTrendingEvents()
     {
+        // GEt event most participant 5 events and create at in 1 week ago
         var allActiveEvents = await _supabaseClient
                     .From<Event>()
                     .Select("*")
                     .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
+                    .Filter("CreatedAt", Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.AddDays(-7).ToString("yyyy-MM-ddTHH:mm:ssZ"))
                     .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
                     .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
-                    .Range(0, 5)
                     .Get();
+            
+        // Count participant of each event 
+        var eventCounts = new Dictionary<Guid, int>();
+        foreach (var e in allActiveEvents.Models)
+        {
+            var count = await GetRegistrationCountByEventId(e.EventId);
+            eventCounts[e.EventId] = count;
+        }
 
-        return allActiveEvents.Models;
+        // Get the top 5 most popular event IDs
+        var popularEventsId = eventCounts.OrderByDescending(tc => tc.Value)
+                                    .Take(5)
+                                    .Select(tc => tc.Key)
+                                    .ToList();
+
+        // Fetch all popular events in a single query
+        if (popularEventsId.Count == 0)
+            return new List<EventBriefCardData>();
+
+        var eventResponse = await _supabaseClient
+            .From<Event>()
+            .Filter(tag => tag.EventId, Supabase.Postgrest.Constants.Operator.In, string.Join(",", popularEventsId))
+            .Get();
+
+        var eventBriefCardDataTasks = eventResponse.Models.Select(EventToBriefCard);
+        var eventBriefCardData = await Task.WhenAll(eventBriefCardDataTasks);
+
+        return eventBriefCardData.ToList();
     }
 
     public async Task<List<EventCategoryTag>> GetPopularTags()
