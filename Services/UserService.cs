@@ -399,6 +399,10 @@ public class UserService
 
     public async Task FollowUser(Guid followerUserId, Guid followedUserId)
     {
+
+        if (await IsFollowing(followerUserId, followedUserId))
+            return;
+
         var userFollowed = new UserFollowed
         {
             FollowingId = Guid.NewGuid(),
@@ -440,9 +444,9 @@ public class UserService
         var userFollowed = await _supabaseClient
             .From<UserFollowed>()
             .Where(f => f.FollowerUserId == followerUserId && f.FollowedUserId == followedUserId)
-            .Single();
+            .Get();
 
-        return userFollowed != null;
+        return userFollowed != null && userFollowed.Models.Count > 0;
     }
 
     public async Task<List<User>> GetSuperstars()

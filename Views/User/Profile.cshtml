@@ -122,7 +122,7 @@
             <p>Events</p>
           </div>
           <div class="data">
-            <h3>@FormatNumber(Model.FollowersCount)</h3>
+            <h3 class="followers-count">@FormatNumber(Model.FollowersCount)</h3>
             <p>Followers</p>
           </div>
           <div class="data">
@@ -145,12 +145,19 @@
             </a>
           }
           else {
-            <a class="action-button">
+            <button class="action-button follow-btn @(Model.IsFollowing ? "following" : "")" onclick="toggleFollow('@Model.Username', @(Model.IsFollowing ? "false" : "true"))" id="follow-button">
               <span>
-                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.AddCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                @if (Model.IsFollowing)
+                {
+                  @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.CheckmarkCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                }
+                else
+                {
+                  @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.AddCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                }
               </span>
-              <span>Follow</span>
-            </a>
+              <span>@(Model.IsFollowing ? "Following" : "Follow")</span>
+            </button>
           }
         </div>
       </div>
