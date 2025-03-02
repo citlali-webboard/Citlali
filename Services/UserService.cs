@@ -370,12 +370,21 @@ public class UserService
 
     public async Task<int> GetFollowingCount(Guid userId)
     {
-        var followingCount = await _supabaseClient
+        var userFollowingCountTask = _supabaseClient
             .From<UserFollowed>()
             .Where(f => f.FollowerUserId == userId)
             .Count(CountType.Exact);
 
-        return followingCount;
+        var tagFollowingCountTask = _supabaseClient
+            .From<UserFollowedCategory>()
+            .Where(f => f.UserId == userId)
+            .Count(CountType.Exact);
+
+        await Task.WhenAll(userFollowingCountTask, tagFollowingCountTask);
+        var userFollowingCount = await userFollowingCountTask;
+        var tagFollowingCount = await tagFollowingCountTask;
+
+        return userFollowingCount + tagFollowingCount;
     }
 
     public async Task<int> GetFollowersCount(Guid userId)
