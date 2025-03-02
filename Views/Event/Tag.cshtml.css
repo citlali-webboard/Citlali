@@ -215,9 +215,12 @@
 }
 
 .sort-btn.active {
-  background-color: var(--color-primary-light);
-  color: var(--color-primary);
+  background-color: #444;
+  color: #fefefe;
   font-weight: 500;
+  svg {
+    fill: #fefefe !important;
+  }
 }
 
 .action-button {

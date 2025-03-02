@@ -300,7 +300,7 @@ public class EventController : Controller
     }
 
     [HttpGet("tag/{id}")]
-    public async Task<IActionResult> Tag(string id, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> Tag(string id, int page = 1, int pageSize = 10, string sortBy = "newest")
     {
         try
         {
@@ -309,43 +309,68 @@ public class EventController : Controller
                 throw new Exception("Invalid Tag id");
             }
 
-            var events = await _eventService.GetEventsByTagId(tagId);
+            ViewBag.SortBy = sortBy;
+
+            var eventsTask = _eventService.GetEventsByTagId(tagId);
+            var tagsTask = _eventService.GetTags();
+            var locationsTask = _eventService.GetLocationTags();
+            var exploreTagTask = _eventService.GetTagById(tagId);
+            var eventCountTask = _eventService.GetEventCountByTagId(tagId);
+            var tagFollowersTask = _eventService.GetTagFollowersCountByTagId(tagId);
+
+            await Task.WhenAll(eventsTask, tagsTask, locationsTask, exploreTagTask, eventCountTask, tagFollowersTask);
+
+            var events = await eventsTask;
+            var tags = (await tagsTask).ToList();
+            var locations = await locationsTask;
+            var exploreTag = await exploreTagTask ?? new EventCategoryTag();
+            var eventCount = await eventCountTask;
+            var tagFollowers = await tagFollowersTask;
+
+            // Apply sorting before pagination
+            switch (sortBy)
+            {
+                case "oldest":
+                    events = events.OrderBy(e => e.CreatedAt).ToList();
+                    break;
+                case "date":
+                    events = events.OrderBy(e => e.EventDate).ToList();
+                    break;
+                case "popularity":
+                    var eventCountPairs = new List<(Event Event, int Count)>();
+                    var registrationCountTasks = events.Select(ev => 
+                        Task.Run(async () => {
+                            var count = await _eventService.GetRegistrationCountByEventId(ev.EventId);
+                            return (ev, count);
+                        })).ToArray();
+                    
+                    var eventWithCounts = await Task.WhenAll(registrationCountTasks);
+                    
+                    events = eventWithCounts
+                        .OrderByDescending(p => p.count)
+                        .Select(p => p.ev)
+                        .ToList();
+                    break;
+                case "newest":
+                default:
+                    events = events.OrderByDescending(e => e.CreatedAt).ToList();
+                    break;
+            }
+
             var paginatedEvents = events.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
 
-            var paginatedEventsCardData = new EventBriefCardData[paginatedEvents.Length];
-
+            var eventDataTasks = new Task<EventBriefCardData>[paginatedEvents.Length];
+            
             for (int i = 0; i < paginatedEvents.Length; i++)
             {
                 var ev = paginatedEvents[i];
-                var creator = await _userService.GetUserByUserId(ev.CreatorUserId);
-                if (creator == null)
-                {
-                    continue;
-                }
-
-                paginatedEventsCardData[i] = new EventBriefCardData
-                {
-                    EventId = ev.EventId,
-                    EventTitle = ev.EventTitle,
-                    EventDescription = ev.EventDescription,
-                    CreatorDisplayName = creator.DisplayName,
-                    CreatorProfileImageUrl = creator.ProfileImageUrl,
-                    LocationTag = await _eventService.GetLocationTagById(ev.EventLocationTagId) ?? new LocationTag(),
-                    EventCategoryTag = await _eventService.GetTagById(ev.EventCategoryTagId) ?? new EventCategoryTag(),
-                    CurrentParticipant = await _eventService.GetRegistrationCountByEventId(ev.EventId),
-                    MaxParticipant = ev.MaxParticipant,
-                    Cost = ev.Cost,
-                    EventDate = ev.EventDate,
-                    PostExpiryDate = ev.PostExpiryDate,
-                    CreatedAt = ev.CreatedAt,
-                };
+                eventDataTasks[i] = ProcessEventDataAsync(ev);
             }
 
-            var tags = (await _eventService.GetTags()).ToArray();
-            var locations = (await _eventService.GetLocationTags());
+            // Wait for all event processing to complete
+            var paginatedEventsCardData = await Task.WhenAll(eventDataTasks);
 
-            var exploreTag = await _eventService.GetTagById(tagId) ?? new EventCategoryTag();
-
+            // Check if current user is following the tag
             bool isFollowing = false;
             var currentUser = _userService.CurrentSession.User;
             if (currentUser != null && currentUser.Id != null)
@@ -353,13 +378,16 @@ public class EventController : Controller
                 isFollowing = await _userService.IsFollowingTag(tagId);
             }
 
+            // Create and return the view model
             var model = new TagEventExploreViewModel
             {
                 TagId = exploreTag.EventCategoryTagId,
                 TagName = exploreTag.EventCategoryTagName,
                 TagEmoji = exploreTag.EventCategoryTagEmoji,
-                IsFollowing = isFollowing, // Use the variable, not hardcoded false
-                Tags = tags.ToList(),
+                EventCount = eventCount,
+                TagFollowers = tagFollowers,
+                IsFollowing = isFollowing,
+                Tags = tags,
                 Locations = locations,
                 EventBriefCardDatas = paginatedEventsCardData,
                 CurrentPage = page,
@@ -373,6 +401,41 @@ public class EventController : Controller
             TempData["Error"] = e.Message;
             return RedirectToAction("explore");
         }
+    }
+
+    private async Task<EventBriefCardData?> ProcessEventDataAsync(Event ev)
+    {
+        var creatorTask = _userService.GetUserByUserId(ev.CreatorUserId);
+        var locationTagTask = _eventService.GetLocationTagById(ev.EventLocationTagId);
+        var categoryTagTask = _eventService.GetTagById(ev.EventCategoryTagId);
+        var registrationCountTask = _eventService.GetRegistrationCountByEventId(ev.EventId);
+
+        await Task.WhenAll(creatorTask, locationTagTask, categoryTagTask, registrationCountTask);
+
+        var creator = await creatorTask;
+        if (creator == null)
+            return null;
+
+        var locationTag = await locationTagTask ?? new LocationTag();
+        var categoryTag = await categoryTagTask ?? new EventCategoryTag();
+        var registrationCount = await registrationCountTask;
+
+        return new EventBriefCardData
+        {
+            EventId = ev.EventId,
+            EventTitle = ev.EventTitle,
+            EventDescription = ev.EventDescription,
+            CreatorDisplayName = creator.DisplayName,
+            CreatorProfileImageUrl = creator.ProfileImageUrl,
+            LocationTag = locationTag,
+            EventCategoryTag = categoryTag,
+            CurrentParticipant = registrationCount,
+            MaxParticipant = ev.MaxParticipant,
+            Cost = ev.Cost,
+            EventDate = ev.EventDate,
+            PostExpiryDate = ev.PostExpiryDate,
+            CreatedAt = ev.CreatedAt,
+        };
     }
 
     [HttpGet("manage/{eventId}")]

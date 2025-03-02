@@ -143,6 +143,8 @@ public class TagEventExploreViewModel : EventExploreViewModel
 {
     public Guid TagId { get; set; } = new();
     public string TagName { get; set; } = "";
+    public int EventCount { get; set; } = 0;
+    public int TagFollowers { get; set; } = 0;
     public string TagEmoji { get; set; } = "";
     public bool IsFollowing { get; set; }
     public new List<Tag> Tags { get; set; } = new List<Tag>();

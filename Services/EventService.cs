@@ -726,6 +726,29 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return response.Content != null ? int.Parse(response.Content) : 0;
     }
 
+    public async Task<int> GetEventCountByTagId(Guid tagId)
+    {
+        var response = await _supabaseClient
+            .From<Event>()
+            .Filter("EventCategoryTagId", Supabase.Postgrest.Constants.Operator.Equals, tagId.ToString())
+            .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
+            .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+            .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
+            .Count(Supabase.Postgrest.Constants.CountType.Exact);
+    
+        return response;
+    }
+
+    public async Task<int> GetTagFollowersCountByTagId(Guid tagId)
+    {
+        var response = await _supabaseClient
+            .From<UserFollowedCategory>()
+            .Filter("EventCategoryTagId", Supabase.Postgrest.Constants.Operator.Equals, tagId.ToString())
+            .Count(Supabase.Postgrest.Constants.CountType.Exact);
+
+        return response;
+    }
+
     public async Task<bool> UpdateEventStatus(Guid eventId)
     {
         var response = await _supabaseClient
