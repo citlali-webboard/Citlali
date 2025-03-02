@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Attributes;
+using Citlali.Models;
 
 namespace Citlali.Models;
 
@@ -303,4 +304,10 @@ public class RegistrationHistoryCardModel
 public class RegistrationHistoryData
 {
     public List<RegistrationHistoryCardModel> RegistrationHistoryCardModels { get; set; } = [];
+}
+
+
+public class PopularTag : EventCategoryTag
+{
+    public int EventCount { get; set; } = 0;
 }

@@ -1212,7 +1212,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return eventBriefCardData.ToList();
     }
 
-    public async Task<List<EventCategoryTag>> GetPopularTags()
+    public async Task<List<PopularTag>> GetPopularTags()
     {
         // Get all active events
         var allActiveEvents = await _supabaseClient
@@ -1245,14 +1245,22 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         // Fetch all popular tags in a single query
         if (popularTagsId.Count == 0)
-            return null;
+            return new List<PopularTag>();
 
         var tagResponse = await _supabaseClient
             .From<EventCategoryTag>()
             .Filter(tag => tag.EventCategoryTagId, Supabase.Postgrest.Constants.Operator.In, string.Join(",", popularTagsId))
             .Get();
 
-        return tagResponse.Models;
+        var popularTags = tagResponse.Models.Select(tag => new PopularTag
+        {
+            EventCategoryTagId = tag.EventCategoryTagId,
+            EventCategoryTagName = tag.EventCategoryTagName,
+            EventCategoryTagEmoji = tag.EventCategoryTagEmoji,
+            EventCount = tagCounts[tag.EventCategoryTagId]
+        }).ToList();
+
+        return popularTags;
     }
 
 
