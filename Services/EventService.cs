@@ -1229,6 +1229,39 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     }
 
 
+    public async Task<List<Event>> GetEventsByLocationId(Guid locationId)
+    {
+        try
+        {
+            var response = await _supabaseClient
+                .From<Event>()
+                .Where(e => e.EventLocationTagId == locationId)
+                .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
+                .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+                .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
+                .Get();
+
+            return response.Models;
+        }
+        catch (Exception)
+        {
+            return new List<Event>();
+        }
+    }
+
+    public async Task<int> GetEventCountByLocationId(Guid locationId)
+    {
+        var response = await _supabaseClient
+            .From<Event>()
+            .Filter("EventLocationTagId", Supabase.Postgrest.Constants.Operator.Equals, locationId.ToString())
+            .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
+            .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+            .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
+            .Count(Supabase.Postgrest.Constants.CountType.Exact);
+
+        return response;
+    }
+
 }
 
 public class UserAlreadyRegisteredException : Exception
