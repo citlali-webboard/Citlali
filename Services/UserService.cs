@@ -445,7 +445,7 @@ public class UserService
         return userFollowed != null;
     }
 
-    public async Task<List<User>> GetSuperstars()
+    public async Task<List<PopularUser>> GetSuperstars()
     {
         // Get all user follows
         var followedResponse = await _supabaseClient
@@ -455,17 +455,17 @@ public class UserService
 
         if (followedResponse == null || followedResponse.Models.Count == 0)
         {
-            return new List<User>();
+            return new List<PopularUser>();
         }
 
         // Count occurrences of each FollowedUserId
-        Dictionary<Guid, int> followCounts = new Dictionary<Guid, int>();
+        var followCounts = new Dictionary<Guid, int>();
 
         foreach (var followed in followedResponse.Models)
         {
-            if (followCounts.ContainsKey(followed.FollowedUserId))
+            if (followCounts.TryGetValue(followed.FollowedUserId, out var count))
             {
-                followCounts[followed.FollowedUserId]++;
+                followCounts[followed.FollowedUserId] = count + 1;
             }
             else
             {
@@ -482,11 +482,11 @@ public class UserService
 
         if (topUserIds.Count == 0)
         {
-            return new List<User>();
+            return new List<PopularUser>();
         }
 
         // Get user details for these IDs
-        var users = new List<User>();
+        var users = new List<PopularUser>();
 
         // Use IN operator to fetch all users in one query
         var userIdsString = string.Join(",", topUserIds.Select(id => $"'{id}'"));
@@ -501,10 +501,18 @@ public class UserService
             // Sort users according to follow count order
             return usersResponse.Models
                 .OrderBy(user => topUserIds.IndexOf(user.UserId))
+                .Select(user => new PopularUser
+                {
+                    UserId = user.UserId,
+                    Username = user.Username,
+                    DisplayName = user.DisplayName,
+                    ProfileImageUrl = user.ProfileImageUrl,
+                    FollowersCount = followCounts[user.UserId]
+                })
                 .ToList();
         }
 
-        return new List<User>();
+        return new List<PopularUser>();
     }
 
 }

@@ -87,3 +87,8 @@ public class BriefUser
         public string ProfileImageUrl { get; set; } = "";
         public string DisplayName { get; set; } = "";
 }
+
+public class PopularUser : BriefUser
+{
+        public int FollowersCount { get; set; } = 0;
+}
