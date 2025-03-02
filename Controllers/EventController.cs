@@ -675,9 +675,7 @@ public class EventController : Controller
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 
-<<<<<<< Updated upstream
 
-=======
     [HttpGet("followed")]
     public async Task<IActionResult> Followed(int page = 1, int pageSize = 10)
     {
@@ -789,5 +787,4 @@ public class EventController : Controller
     }
 
     
->>>>>>> Stashed changes
 }
