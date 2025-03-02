@@ -138,6 +138,9 @@ public class EventExploreViewModel
     public Location[] Locations = [new()];
     public int CurrentPage { get; set; } = 1;
     public int TotalPage { get; set; }
+    public EventBriefCardData[] TrendingEvents = [new()];
+    public PopularTag[] PopularTags = [new()];
+    public PopularUser[] PopularUsers = [new()];
 }
 
 public class TagEventExploreViewModel : EventExploreViewModel
