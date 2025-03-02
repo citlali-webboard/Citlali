@@ -1203,7 +1203,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         var eventResponse = await _supabaseClient
             .From<Event>()
-            .Filter(tag => tag.EventId, Supabase.Postgrest.Constants.Operator.In, string.Join(",", popularEventsId))
+            .Filter("EventId", Supabase.Postgrest.Constants.Operator.In, popularEventsId.Select(id => id.ToString()).ToArray())
             .Get();
 
         var eventBriefCardDataTasks = eventResponse.Models.Select(EventToBriefCard);
@@ -1243,22 +1243,27 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                                     .Select(tc => tc.Key)
                                     .ToList();
 
-        // Fetch all popular tags in a single query
-        if (popularTagsId.Count == 0)
-            return new List<PopularTag>();
-
-        var tagResponse = await _supabaseClient
-            .From<EventCategoryTag>()
-            .Filter(tag => tag.EventCategoryTagId, Supabase.Postgrest.Constants.Operator.In, string.Join(",", popularTagsId))
-            .Get();
-
-        var popularTags = tagResponse.Models.Select(tag => new PopularTag
+        // Fetch all popular tags individually
+        var popularTags = new List<PopularTag>();
+        foreach (var tagId in popularTagsId)
         {
-            EventCategoryTagId = tag.EventCategoryTagId,
-            EventCategoryTagName = tag.EventCategoryTagName,
-            EventCategoryTagEmoji = tag.EventCategoryTagEmoji,
-            EventCount = tagCounts[tag.EventCategoryTagId]
-        }).ToList();
+            var tagResponse = await _supabaseClient
+                .From<EventCategoryTag>()
+                .Select("*")
+                .Filter(tag => tag.EventCategoryTagId, Supabase.Postgrest.Constants.Operator.Equals, tagId.ToString())
+                .Single();
+
+            if (tagResponse != null)
+            {
+                popularTags.Add(new PopularTag
+                {
+                    EventCategoryTagId = tagResponse.EventCategoryTagId,
+                    EventCategoryTagName = tagResponse.EventCategoryTagName,
+                    EventCategoryTagEmoji = tagResponse.EventCategoryTagEmoji,
+                    EventCount = tagCounts[tagResponse.EventCategoryTagId]
+                });
+            }
+        }
 
         return popularTags;
     }

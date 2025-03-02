@@ -140,7 +140,7 @@ public class EventExploreViewModel
     public int TotalPage { get; set; }
     public EventBriefCardData[] TrendingEvents = [new()];
     public PopularTag[] PopularTags = [new()];
-    public PopularUser[] PopularUsers = [new()];
+    public PopularUser[] Superstars = [new()];
 }
 
 public class TagEventExploreViewModel : EventExploreViewModel
