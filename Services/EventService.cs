@@ -1171,7 +1171,6 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return historyList;
     }
 
-<<<<<<< Updated upstream
     public async Task<List<Event>> GetTrendingEvents()
     {
         var allActiveEvents = await _supabaseClient
@@ -1230,7 +1229,6 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     }
 
 
-=======
     public async Task<List<Event>> GetEventsFromFollowed(Guid userId)
     {
         try {
@@ -1321,7 +1319,6 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             throw;
         }
     }
->>>>>>> Stashed changes
 }
 
 public class UserAlreadyRegisteredException : Exception
