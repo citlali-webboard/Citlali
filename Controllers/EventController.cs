@@ -271,12 +271,18 @@ public class EventController : Controller
             var eventsTask = _eventService.GetPaginatedEvents((page - 1) * pageSize, (page * pageSize) - 1, sortBy);
             var eventsCountTask = _eventService.GetEventsExactCount();
             var tagsTask = _eventService.GetTags();
+            var eventsTrendingTask = _eventService.GetTrendingEvents();
+            var popularTagsTask = _eventService.GetPopularTags();
+            var superstarsTask = _userService.GetSuperstars();
 
-            await Task.WhenAll(eventsTask, eventsCountTask, tagsTask);
+            await Task.WhenAll(eventsTask, eventsCountTask, tagsTask, eventsTrendingTask,  popularTagsTask, superstarsTask);
 
             var events = await eventsTask;
             var eventsCount = await eventsCountTask;
             var tags = (await tagsTask).ToArray();
+            var eventsTrending = (await eventsTrendingTask).ToArray();
+            var popularTags = (await popularTagsTask).ToArray();
+            var superstars = (await superstarsTask).ToArray();
 
             var briefCardDatas = await _eventService.EventsToBriefCardArray(events);
             var locations = (await _eventService.GetLocationTags()).ToArray();
@@ -287,7 +293,10 @@ public class EventController : Controller
                 Tags = tags,
                 Locations = locations,
                 CurrentPage = page,
-                TotalPage = (int)Math.Ceiling(eventsCount / (double)pageSize)
+                TotalPage = (int)Math.Ceiling(eventsCount / (double)pageSize),
+                TrendingEvents = eventsTrending,
+                PopularTags = popularTags,
+                Superstars = superstars
             };
 
             return View(model);
@@ -295,6 +304,7 @@ public class EventController : Controller
         catch (Exception e)
         {
             TempData["Error"] = e.Message;
+            Console.WriteLine(e);
             return RedirectToAction("explore");
         }
     }

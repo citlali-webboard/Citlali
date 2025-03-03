@@ -449,66 +449,80 @@ public class UserService
         return userFollowed != null && userFollowed.Models.Count > 0;
     }
 
-    public async Task<List<User>> GetSuperstars()
+    public async Task<List<PopularUser>> GetSuperstars()
     {
-        // Get all user follows
-        var followedResponse = await _supabaseClient
-            .From<UserFollowed>()
-            .Select("FollowedUserId")
-            .Get();
-
-        if (followedResponse == null || followedResponse.Models.Count == 0)
+        try
         {
-            return new List<User>();
-        }
+            // Get all user follows
+            var followedResponse = await _supabaseClient
+                .From<UserFollowed>()
+                .Select("FollowedUserId")
+                .Get();
 
-        // Count occurrences of each FollowedUserId
-        Dictionary<Guid, int> followCounts = new Dictionary<Guid, int>();
-
-        foreach (var followed in followedResponse.Models)
-        {
-            if (followCounts.ContainsKey(followed.FollowedUserId))
+            if (followedResponse == null || followedResponse.Models.Count == 0)
             {
-                followCounts[followed.FollowedUserId]++;
+                return new List<PopularUser>();
             }
-            else
+
+            // Count occurrences of each FollowedUserId
+            var followCounts = new Dictionary<Guid, int>();
+
+            foreach (var followed in followedResponse.Models)
             {
-                followCounts[followed.FollowedUserId] = 1;
+                if (followCounts.TryGetValue(followed.FollowedUserId, out var count))
+                {
+                    followCounts[followed.FollowedUserId] = count + 1;
+                }
+                else
+                {
+                    followCounts[followed.FollowedUserId] = 1;
+                }
             }
-        }
 
-        // Get top 5 most followed user IDs
-        var topUserIds = followCounts
-            .OrderByDescending(pair => pair.Value)
-            .Take(5)
-            .Select(pair => pair.Key)
-            .ToList();
-
-        if (topUserIds.Count == 0)
-        {
-            return new List<User>();
-        }
-
-        // Get user details for these IDs
-        var users = new List<User>();
-
-        // Use IN operator to fetch all users in one query
-        var userIdsString = string.Join(",", topUserIds.Select(id => $"'{id}'"));
-
-        var usersResponse = await _supabaseClient
-            .From<User>()
-            .Filter("UserId", Operator.In, userIdsString)
-            .Get();
-
-        if (usersResponse != null && usersResponse.Models.Count > 0)
-        {
-            // Sort users according to follow count order
-            return usersResponse.Models
-                .OrderBy(user => topUserIds.IndexOf(user.UserId))
+            // Get top 5 most followed user IDs
+            var topUserIds = followCounts
+                .OrderByDescending(pair => pair.Value)
+                .Take(5)
+                .Select(pair => pair.Key)
                 .ToList();
-        }
 
-        return new List<User>();
+            if (topUserIds.Count == 0)
+            {
+                return new List<PopularUser>();
+            }
+
+            // Get user details for these IDs
+            var users = new List<PopularUser>();
+
+            // CHANGE: Pass the IDs directly instead of as a comma-separated string
+            var usersResponse = await _supabaseClient
+                .From<User>()
+                .Filter("UserId", Operator.In, topUserIds)
+                .Get();
+
+            if (usersResponse != null && usersResponse.Models.Count > 0)
+            {
+                // Sort users according to follow count order
+                return usersResponse.Models
+                    .OrderBy(user => topUserIds.IndexOf(user.UserId))
+                    .Select(user => new PopularUser
+                    {
+                        UserId = user.UserId,
+                        Username = user.Username,
+                        DisplayName = user.DisplayName,
+                        ProfileImageUrl = user.ProfileImageUrl,
+                        FollowersCount = followCounts[user.UserId]
+                    })
+                    .ToList();
+            }
+
+            return new List<PopularUser>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting superstars: {ex.Message}");
+            return new List<PopularUser>();
+        }
     }
 
 }
