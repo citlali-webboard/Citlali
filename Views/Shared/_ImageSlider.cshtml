@@ -1,0 +1,39 @@
+@model Citlali.Models.ImageSliderModel
+
+<div class="image-slider-container">
+    <div class="slider-wrapper">
+        @for (var i = 0; i < Model.Images.Count(); i++)
+        {
+            var image = Model.Images[i];
+            <div class="slide @(i == 0 ? "active" : "")">
+                <img src="@image.imageUrl" alt="@image.caption" />
+                @if (!string.IsNullOrEmpty(image.caption))
+                {
+                    <div class="caption">@image.caption</div>
+                }
+            </div>
+        }
+    </div>
+    
+    @if (Model.Images.Count() > 1)
+    {
+        <div class="slider-controls">
+            <button class="prev-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"></path>
+                </svg>
+            </button>
+            <div class="slider-dots">
+                @for (var i = 0; i < Model.Images.Count(); i++)
+                {
+                    <span class="dot @(i == 0 ? "active" : "")" data-index="@i"></span>
+                }
+            </div>
+            <button class="next-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"></path>
+                </svg>
+            </button>
+        </div>
+    }
+</div>
