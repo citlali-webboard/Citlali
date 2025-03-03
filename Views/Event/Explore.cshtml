@@ -132,7 +132,7 @@
                     <a href="@herfPath">
                         <div class="card-popular">
                             <div class="trending-events-card-left">
-                                <img class="img-popular" src="https://sw6.elbenwald.de/media/7a/13/a9/1724453189/E1084640_1.jpg" alt="Profile Creator">
+                                <img class="img-popular" src="@eventItem.CreatorProfileImageUrl" alt="Profile Creator">
                                 <h3>@eventItem.EventTitle</h3>
                             </div>
                             <div class="trending-events-card-right">
@@ -182,9 +182,11 @@
                     <a href="@path">
                         <div class="card-popular"> 
                             <div class="superstars-card-left " data-rank="@rank"> 
-                                <img class="img-popular" src="https://sw6.elbenwald.de/media/7a/13/a9/1724453189/E1084640_1.jpg" alt="Profile Creator">
-                                <span> @user.DisplayName</span>
-                                <span>(@user.Username) </span>
+                                <img class="img-popular" src="@user.ProfileImageUrl" alt="Profile Creator">
+                                <div class="name-popular-user">
+                                    <span> @user.DisplayName</span>
+                                    <span>(@user.Username) </span>
+                                </div>
                             </div>
                             <div class="superstars-card-right"> 
                                 <span> @user.FollowersCount </span>

@@ -1180,7 +1180,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                 .From<Event>()
                 .Select("*")
                 .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
-                // .Filter("CreatedAt", Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.AddDays(-7).ToString("yyyy-MM-ddTHH:mm:ssZ"))
+                .Filter("CreatedAt", Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.AddDays(-7).ToString("yyyy-MM-ddTHH:mm:ssZ"))
                 .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
                 .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
                 .Get();

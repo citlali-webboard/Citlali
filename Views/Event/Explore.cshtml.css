@@ -321,6 +321,7 @@
   width: 25%;
   justify-content: flex-start;
   gap: 0.5rem;
+  font-size: 0.9rem;
 }
 
 .card-popular .trending-events-card-right span{
@@ -331,6 +332,8 @@
   height: 20px !important;
   width: 20px !important;
   aspect-ratio: 1/1 !important;
+  position: relative;
+  
 }
 
 .count-participant{
@@ -359,6 +362,15 @@
   padding: 3px 6px;
 }
 
+
+.tags-popular:nth-child(1){
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+  font-size: 0.8rem;
+}
+
 .tags-popular:hover {
   cursor: pointer;
   background-color: #f0f0f0;
@@ -370,6 +382,7 @@
   align-items: center;
   gap: 0.5rem;
   opacity: 0.5;
+  font-size: 0.8rem;
 }
 
 
@@ -411,22 +424,36 @@
 }
 
 
-.superstars-card-left span:nth-child(3){
+.name-popular-user{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 100%;
+
+}
+
+.name-popular-user span:nth-child(1){
+  text-wrap: nowrap;
+}
+
+.name-popular-user span:nth-child(2){
   opacity: 0.5;
-  max-width: 70%;
+  font-size: 0.9rem;
+  max-width: 100%;
+  text-wrap: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-wrap: nowrap;
 }
 
 .superstars-card-right{
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.2rem;
   opacity: 0.5;
+  font-size: 0.8rem;
 }
-
 
 
 /* Responsive layout for mobile devices */
@@ -480,4 +507,17 @@
   .pagination-current-page {
     display: inline-flex;
   }
+
+  .card-popular .trending-events-card-right{
+    width: 60%;
+  }
+
+  .card-popular .trending-events-card-right {
+    width: 20%;
+  }
+
+
+
+
+
 }
