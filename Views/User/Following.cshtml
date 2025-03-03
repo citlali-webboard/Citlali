@@ -8,11 +8,11 @@
 <div class="follow-page">
     <div class="follow-header">
         <h1>Following</h1>
-        <button class="close-btn" onclick="closeFollowPopup()">&times;</button>
+        <button class="close-btn" onclick="closeFollowPopup('@(Model.User?.Username ?? "unknown")')">&times;</button>
     </div>
     
     <div class="search-box">
-        <input type="text" placeholder="Search" id="searchInput" onkeyup="filterUsers()" />
+        <input type="text" placeholder="Search" id="searchInput" onkeyup="filterUsersandTags()" />
     </div>
 
     <div class="follow-list" id="followList">
@@ -25,7 +25,7 @@
                     <h2>@user.DisplayName</h2>
                     <p>@user.Username</p>
                 </div>
-                <button class="follow-btn" onclick="toggleFollow('@user.Username', false)">Remove</button>
+                <button class="follow-btn" onclick="toggleFollow('@user.Username', false)">Unfollow</button>
             </div>
         }
         <h2>Tags</h2>
@@ -35,7 +35,7 @@
                 <div class="follow-info">
                     <h2>@tag.TagEmoji @tag.TagName</h2>
                 </div>
-                <button class="follow-btn" onclick="toggleFollowTag('@tag.TagId', false)">Remove</button>
+                <button class="follow-btn" onclick="toggleFollowTag('@tag.TagId', false)">Unfollow</button>
             </div>
         }
     </div>

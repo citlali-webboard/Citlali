@@ -592,6 +592,18 @@ public class UserService
         return tags;
     }
 
+    public async Task RemoveFollower(Guid followerId, Guid userId)
+    {
+        var followings = await _supabaseClient.From<UserFollowed>()
+            .Where(f => f.FollowerUserId == followerId && f.FollowedUserId == userId)
+            .Get();
+        
+        if (followings.Models.Any())
+        {
+            await _supabaseClient.From<UserFollowed>().Delete(followings.Models.First());
+        }
+    }
+
 }
 
 public class InvalidUsernameException : Exception

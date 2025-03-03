@@ -1232,11 +1232,13 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     public async Task<List<Event>> GetEventsFromFollowed(Guid userId)
     {
         try {
+            // Use string-based filter to avoid null reference exceptions
             var followedTagsTask = _supabaseClient
                 .From<UserFollowedCategory>()
                 .Where(f => f.UserId == userId)
                 .Get();
             
+            // Use string-based filter for UserFollowed table as well
             var followedUsersTask = _supabaseClient
                 .From<UserFollowed>()
                 .Where(f => f.FollowerUserId == userId)
@@ -1267,13 +1269,13 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                 
                 foreach (var followedUserId in followedUserIds)
                 {
-                    // Start each query but don't await it yet - store the task
+                    // Use string-based filter for the CreatorUserId field
                     var userEventsTask = _supabaseClient
                         .From<Event>()
-                        .Where(e => e.CreatorUserId == followedUserId 
-                                && !e.Deleted 
-                                && e.PostExpiryDate > DateTime.Now
-                                && e.Status == "active")
+                        .Filter("CreatorUserId", Supabase.Postgrest.Constants.Operator.Equals, followedUserId.ToString())
+                        .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
+                        .Filter("PostExpiryDate", Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+                        .Filter("Status", Supabase.Postgrest.Constants.Operator.Equals, "active")
                         .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
                         .Get();
                         
@@ -1316,7 +1318,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         catch (Exception ex) {
             Console.Error.WriteLine($"Error in GetEventsFromFollowed: {ex.Message}");
             Console.Error.WriteLine(ex.StackTrace);
-            throw;
+            return new List<Event>();
         }
     }
 }

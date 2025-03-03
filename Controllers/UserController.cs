@@ -410,6 +410,7 @@ public class UserController : Controller
         var followers = await _userService.GetFollowers(user.UserId);
         var model = new FollowViewModel
         {
+            User = user,  // Add this line
             Users = followers
         };
 
@@ -429,11 +430,40 @@ public class UserController : Controller
         var followingTags = await _userService.GetFollowingTags(user.UserId);
         var model = new FollowViewModel
         {
+            User = user,  // Add this line
             Users = followingUsers,
             Tags = followingTags
         };
 
         return View(model);
+    }
+
+    [HttpPost("removeFollower/{username}")]
+    [Authorize]
+    public async Task<IActionResult> RemoveFollower(string username)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        var followerToRemove = await _userService.GetUserByUsername(username);
+        if (followerToRemove == null)
+        {
+            return NotFound();
+        }
+
+        var userId = currentUser.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        // This removes the follower (they will no longer follow the current user)
+        await _userService.UnfollowUser(followerToRemove.UserId, Guid.Parse(userId));
+
+        return Ok();
     }
 
 }
