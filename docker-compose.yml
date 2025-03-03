@@ -1,6 +1,6 @@
 services:
   app:
-    image: ${DOCKER_IMAGE}
+    image: ghcr.io/citlali-webboard/citlali:main
     build:
       context: .
       dockerfile: Dockerfile
