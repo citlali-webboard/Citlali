@@ -275,7 +275,7 @@ public class EventController : Controller
             var popularTagsTask = _eventService.GetPopularTags();
             var superstarsTask = _userService.GetSuperstars();
 
-            await Task.WhenAll(eventsTask, eventsCountTask, tagsTask, eventsTrendingTask, popularTagsTask, superstarsTask);
+            await Task.WhenAll(eventsTask, eventsCountTask, tagsTask, eventsTrendingTask,  popularTagsTask, superstarsTask);
 
             var events = await eventsTask;
             var eventsCount = await eventsCountTask;
@@ -304,6 +304,7 @@ public class EventController : Controller
         catch (Exception e)
         {
             TempData["Error"] = e.Message;
+            Console.WriteLine(e);
             return RedirectToAction("explore");
         }
     }

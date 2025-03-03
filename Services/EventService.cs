@@ -511,7 +511,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
     public async Task<List<Event>> GetPaginatedEvents(int start, int end, string sortBy = "newest")
     {
-        var query =_supabaseClient
+        var query = _supabaseClient
             .From<Event>()
             .Select("*")
             .Where(row => row.Deleted == false)
@@ -735,7 +735,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
             .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
             .Count(Supabase.Postgrest.Constants.CountType.Exact);
-    
+
         return response;
     }
 
@@ -1173,43 +1173,52 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
     public async Task<List<EventBriefCardData>> GetTrendingEvents()
     {
-        // GEt event most participant 5 events and create at in 1 week ago
-        var allActiveEvents = await _supabaseClient
-                    .From<Event>()
-                    .Select("*")
-                    .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
-                    .Filter("CreatedAt", Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.AddDays(-7).ToString("yyyy-MM-ddTHH:mm:ssZ"))
-                    .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
-                    .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
-                    .Get();
-            
-        // Count participant of each event 
-        var eventCounts = new Dictionary<Guid, int>();
-        foreach (var e in allActiveEvents.Models)
+        try
         {
-            var count = await GetRegistrationCountByEventId(e.EventId);
-            eventCounts[e.EventId] = count;
+            // Get events created in the last week that are active
+            var allActiveEvents = await _supabaseClient
+                .From<Event>()
+                .Select("*")
+                .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
+                // .Filter("CreatedAt", Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.AddDays(-7).ToString("yyyy-MM-ddTHH:mm:ssZ"))
+                .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+                .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
+                .Get();
+
+            if (allActiveEvents?.Models == null || allActiveEvents.Models.Count == 0)
+                return new List<EventBriefCardData>();
+
+            // Get participant count for each event concurrently
+            var eventWithParticipants = new List<(Event Event, int Count)>();
+            var tasks = allActiveEvents.Models.Select(async e =>
+            {
+                var count = await GetRegistrationCountByEventId(e.EventId);
+                return (e, count);
+            });
+
+            eventWithParticipants = (await Task.WhenAll(tasks)).ToList();
+
+            // Sort events by participant count and take top 5
+            var sortedEvents = eventWithParticipants
+                .OrderByDescending(x => x.Count)
+                .Take(5)
+                .Select(x => x.Event)
+                .ToList();
+
+            if (sortedEvents.Count == 0)
+                return new List<EventBriefCardData>();
+
+            // Convert to brief card data
+            var eventBriefCardDataTasks = sortedEvents.Select(EventToBriefCard);
+            var eventBriefCardData = await Task.WhenAll(eventBriefCardDataTasks);
+
+            return eventBriefCardData.ToList();
         }
-
-        // Get the top 5 most popular event IDs
-        var popularEventsId = eventCounts.OrderByDescending(tc => tc.Value)
-                                    .Take(5)
-                                    .Select(tc => tc.Key)
-                                    .ToList();
-
-        // Fetch all popular events in a single query
-        if (popularEventsId.Count == 0)
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting trending events: {ex.Message}");
             return new List<EventBriefCardData>();
-
-        var eventResponse = await _supabaseClient
-            .From<Event>()
-            .Filter("EventId", Supabase.Postgrest.Constants.Operator.In, popularEventsId.Select(id => id.ToString()).ToArray())
-            .Get();
-
-        var eventBriefCardDataTasks = eventResponse.Models.Select(EventToBriefCard);
-        var eventBriefCardData = await Task.WhenAll(eventBriefCardDataTasks);
-
-        return eventBriefCardData.ToList();
+        }
     }
 
     public async Task<List<PopularTag>> GetPopularTags()
