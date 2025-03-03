@@ -153,6 +153,12 @@
     background-color: #e0e0e0;
 }
 
+.action-button.follow-btn.following {
+    background-color: #fefefe;
+    border: 1px solid #ccc;
+    color: var(--text-primary);
+}
+
 /*----------------------------------------------
   4. Events Section 
 ----------------------------------------------*/

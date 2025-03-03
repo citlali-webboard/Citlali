@@ -401,7 +401,96 @@ public class EventController : Controller
                 Locations = locations,
                 EventBriefCardDatas = paginatedEventsCardData,
                 CurrentPage = page,
-                TotalPage = (int)Math.Ceiling(events.Count / (double)pageSize)
+                TotalPage = (int)Math.Ceiling(events.Count() / (double)pageSize)
+            };
+
+            return View(model);
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            return RedirectToAction("explore");
+        }
+    }
+
+    [HttpGet("location/{id}")]
+    public async Task<IActionResult> Location(string id, int page = 1, int pageSize = 10, string sortBy = "newest")
+    {
+        try
+        {
+            if (!Guid.TryParse(id, out var locationId))
+            {
+                throw new Exception("Invalid Location id");
+            }
+
+            ViewBag.SortBy = sortBy;
+
+            // Create tasks for parallel execution of independent queries
+            var eventsTask = _eventService.GetEventsByLocationId(locationId);
+            var tagsTask = _eventService.GetTags();
+            var locationsTask = _eventService.GetLocationTags();
+            var exploreLocationTask = _eventService.GetLocationTagById(locationId);
+            var eventCountTask = _eventService.GetEventCountByLocationId(locationId);
+            await Task.WhenAll(eventsTask, tagsTask, locationsTask, exploreLocationTask, eventCountTask);
+
+            var events = await eventsTask;
+            var tags = (await tagsTask).ToList();
+            var locations = await locationsTask;
+            var exploreLocation = await exploreLocationTask ?? new LocationTag(); // Changed to LocationTag
+            var eventCount = await eventCountTask;
+
+            switch (sortBy)
+            {
+                case "oldest":
+                    events = events.OrderBy(e => e.CreatedAt).ToList();
+                    break;
+                case "date":
+                    events = events.OrderBy(e => e.EventDate).ToList();
+                    break;
+                case "popularity":
+                    var registrationCountTasks = events.Select(ev => 
+                        Task.Run(async () => {
+                            var count = await _eventService.GetRegistrationCountByEventId(ev.EventId);
+                            return (ev, count);
+                        })).ToArray();
+                    
+                    var eventWithCounts = await Task.WhenAll(registrationCountTasks);
+                    
+                    events = eventWithCounts
+                        .OrderByDescending(p => p.count)
+                        .Select(p => p.ev)
+                        .ToList();
+                    break;
+                case "newest":
+                default:
+                    events = events.OrderByDescending(e => e.CreatedAt).ToList();
+                    break;
+            }
+
+            var paginatedEvents = events.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
+
+            var eventDataTasks = new Task<EventBriefCardData>[paginatedEvents.Length];
+            
+            for (int i = 0; i < paginatedEvents.Length; i++)
+            {
+                var ev = paginatedEvents[i];
+                eventDataTasks[i] = ProcessEventDataAsync(ev);
+            }
+
+            // Wait for all event processing to complete
+            var paginatedEventsCardData = await Task.WhenAll(eventDataTasks);
+
+            // Create and return the view model using LocationEventExploreViewModel
+            var model = new LocationEventExploreViewModel
+            {
+                LocationId = exploreLocation.LocationTagId, // Updated property names
+                LocationName = exploreLocation.LocationTagName,
+                EventCount = eventCount,
+                Tags = tags,
+                Locations = locations.ToList(),
+                EventBriefCardDatas = paginatedEventsCardData,
+                CurrentPage = page,
+                TotalPage = (int)Math.Ceiling(events.Count() / (double)pageSize)
             };
 
             return View(model);

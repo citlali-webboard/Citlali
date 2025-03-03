@@ -314,3 +314,15 @@ public class PopularTag : EventCategoryTag
 {
     public int EventCount { get; set; } = 0;
 }
+
+public class LocationEventExploreViewModel
+{
+    public Guid LocationId { get; set; }
+    public string LocationName { get; set; }
+    public int EventCount { get; set; }
+    public List<Tag> Tags { get; set; } = new();
+    public List<Location> Locations { get; set; } = new();
+    public EventBriefCardData[] EventBriefCardDatas { get; set; } = [];
+    public int CurrentPage { get; set; }
+    public int TotalPage { get; set; }
+}
