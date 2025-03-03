@@ -110,7 +110,7 @@ public class AuthController : Controller
         });
 
         await _supabaseClient.Auth.SignOut();
-        return RedirectToAction("SignIn");
+        return RedirectToAction("explore", "event");
     }
 
     public IActionResult SignUp()
