@@ -2,12 +2,14 @@ using Citlali.Models;
 using Supabase;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Citlali.Services;
 
 
-public class AdminService(Client supabaseClient, Configuration configuration, EventService eventService)
+public class AdminService(ILogger<AdminService> logger,Client supabaseClient, Configuration configuration, EventService eventService)
 {
+    private readonly ILogger<AdminService> _logger = logger;
     private readonly Client _supabaseClient = supabaseClient;
     private readonly Configuration _configuration = configuration;
     private readonly EventService _eventService = eventService;
@@ -22,5 +24,19 @@ public class AdminService(Client supabaseClient, Configuration configuration, Ev
         viewModel.Tags = tags;
 
         return viewModel;
+    }
+
+    public async Task CategoryCreate(EventCategoryTag eventCategoryTag) {
+        await _supabaseClient
+            .From<EventCategoryTag>()
+            .Insert(eventCategoryTag);
+    }
+
+    public async Task CategorySoftDelete(Guid eventCategoryTagId) {
+        await _supabaseClient
+            .From<EventCategoryTag>()
+            .Where(x => x.EventCategoryTagId == eventCategoryTagId)
+            .Set(x => x.Deleted, true)
+            .Update();
     }
 }

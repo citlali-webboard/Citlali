@@ -1,17 +1,12 @@
 namespace Citlali.Models
 {
-    public class AdminCategoryCreateDto
-    {
-        public Tag Tag = new();
-    }
-    public class AdminCategoryDeleteDto
-    {
-        public Tag Tag = new();
-    }
     public class AdminCategoriesViewModel
     {
-        public List<Tag> Tags = [];
-        public AdminCategoryCreateDto CreateDto = new();
-        public AdminCategoryDeleteDto DeleteDto = new();
+        public List<Tag> Tags { get; set; } = [];
+        public Tag CreateDto { get; set; } = new();
+        public Tag DeleteDto { get; set; } = new();
+    }
+    public class CategoryCreateDto {
+        public Tag CreateDto { get; set; } = new();
     }
 }

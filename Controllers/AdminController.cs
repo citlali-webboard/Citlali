@@ -39,8 +39,8 @@ public class AdminController(ILogger<AdminController> logger, UserService userSe
         return View(categoriesViewModel);
     }
 
-    [HttpPost("category/create")]
-    public async Task<IActionResult> CategoryCreate()
+    [HttpPost("CategoryCreate")]
+    public async Task<IActionResult> CategoryCreate(string tagName, string tagEmoji)
     {
         if (_userService.IsUserAdmin() == false)
         {
@@ -48,8 +48,52 @@ public class AdminController(ILogger<AdminController> logger, UserService userSe
             return RedirectToAction("Index", "Home");
         }
 
-        var categoriesViewModel = await _adminService.GetCategoryListViewModel();
+        if (string.IsNullOrEmpty(tagName) || string.IsNullOrEmpty(tagEmoji)) {
+            TempData["Error"] = $"Unable to create category: Incomplete data";
+            return RedirectToAction("CategoryList");
+        }
 
-        return View(categoriesViewModel);
+        try
+        {
+            var eventCategoryTag = new EventCategoryTag() {
+                EventCategoryTagId = Guid.NewGuid(),
+                EventCategoryTagName = tagName,
+                EventCategoryTagEmoji = tagEmoji,
+            };
+            await _adminService.CategoryCreate(eventCategoryTag);
+        }
+        catch (Exception exception)
+        {
+            TempData["Error"] = $"Unable to create category: {exception.Message}";
+        }
+
+        return RedirectToAction("CategoryList");
+    }
+
+    [HttpPost("CategoryDelete")]
+    public async Task<IActionResult> CategoryDelete(string tagId)
+    {
+        if (_userService.IsUserAdmin() == false)
+        {
+            TempData["Error"] = "Unauthorized";
+            return RedirectToAction("Index", "Home");
+        }
+
+        if (string.IsNullOrEmpty(tagId)) {
+            TempData["Error"] = $"Unable to delete category: ID not specified";
+            return RedirectToAction("CategoryList");
+        }
+
+        try
+        {
+            var guid = Guid.Parse(tagId);
+            await _adminService.CategorySoftDelete(guid);
+        }
+        catch (Exception exception)
+        {
+            TempData["Error"] = $"Unable to create Category : {exception.Message}";
+        }
+
+        return RedirectToAction("CategoryList");
     }
 }

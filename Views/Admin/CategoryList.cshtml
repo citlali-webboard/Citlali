@@ -7,24 +7,26 @@
       <span>
         @tag.TagEmoji @tag.TagName
       </span>
-      <form asp-action="CategoryDelete" method="post" enctype="multipart/form-data">
-        <input asp-for="DeleteDto.Tag.TagId" id="DeleteDto.Tag.TagId" type="text" hidden value=@tag.TagId />
-        <span asp-validation-for="DeleteDto.Tag.TagId"></span>
+      <form asp-action="CategoryDelete" method="post">
+        <input asp-for="DeleteDto.TagId" name="tagId" type="text" value=@tag.TagId hidden />
+        <span asp-validation-for="DeleteDto.TagId"></span>
         <button type="submit">Delete</button>
       </form>
     </li>
   }
 </ul>
 
-<form asp-action="CategoryCreate" method="post" enctype="multipart/form-data">
+<form asp-action="CategoryCreate" method="post">
   <fieldset>
-    <input asp-for="CreateDto.Tag.TagName" id="CreateDto.Tag.TagName" type="text" value=@Model.CreateDto.Tag.TagName />
-    <span asp-validation-for="CreateDto.Tag.TagName"></span>
+    <label asp-for="CreateDto.TagName">Tag Name</label>
+    <input asp-for="CreateDto.TagName" class="form-control" name="tagName"/>
+    <span asp-validation-for="CreateDto.TagName" class="text-danger"></span>
   </fieldset>
 
   <fieldset>
-    <input asp-for="CreateDto.Tag.TagEmoji" id="CreateDto.Tag.TagEmoji" type="text" value=@Model.CreateDto.Tag.TagEmoji />
-    <span asp-validation-for="CreateDto.Tag.TagEmoji"></span>
+    <label asp-for="CreateDto.TagEmoji">Tag Emoji</label>
+    <input asp-for="CreateDto.TagEmoji" class="form-control" name="tagEmoji" />
+    <span asp-validation-for="CreateDto.TagEmoji" class="text-danger"></span>
   </fieldset>
 
   <button type="submit">Create</button>
