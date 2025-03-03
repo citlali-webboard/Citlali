@@ -397,4 +397,43 @@ public class UserController : Controller
         var isFollowing = await _userService.IsFollowingTag(tagId);
         return Json(new { isFollowing });
     }
+
+    [HttpGet("followers/{username}")]
+    public async Task<IActionResult> Followers(string username)
+    {
+        var user = await _userService.GetUserByUsername(username);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        var followers = await _userService.GetFollowers(user.UserId);
+        var model = new FollowViewModel
+        {
+            Users = followers
+        };
+
+        return View(model);
+    }
+
+    [HttpGet("following/{username}")]
+    public async Task<IActionResult> Following(string username)
+    {
+        var user = await _userService.GetUserByUsername(username);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        var followingUsers = await _userService.GetFollowingUsers(user.UserId);
+        var followingTags = await _userService.GetFollowingTags(user.UserId);
+        var model = new FollowViewModel
+        {
+            Users = followingUsers,
+            Tags = followingTags
+        };
+
+        return View(model);
+    }
+
 }

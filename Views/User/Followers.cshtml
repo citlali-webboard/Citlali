@@ -1,0 +1,31 @@
+@model Citlali.Models.FollowViewModel
+
+<head>
+    <link rel="stylesheet" href="~/css/Follow.css" />
+    <script src="~/js/Follow.js"></script>
+</head>
+
+<div class="follow-page">
+    <div class="follow-header">
+        <h1>Followers</h1>
+        <button class="close-btn" onclick="closeFollowPopup()">&times;</button>
+    </div>
+    
+    <div class="search-box">
+        <input type="text" placeholder="Search" id="searchInput" onkeyup="filterUsers()" />
+    </div>
+
+    <div class="follow-list" id="followList">
+        @foreach (var user in Model.Users)
+        {
+            <div class="follow-item">
+                <img src="@user.ProfileImageUrl" alt="@user.DisplayName" />
+                <div class="follow-info">
+                    <h2>@user.DisplayName</h2>
+                    <p>@user.Username</p>
+                </div>
+                <button class="follow-btn" onclick="toggleFollow('@user.Username', false)">Remove</button>
+            </div>
+        }
+    </div>
+</div>
