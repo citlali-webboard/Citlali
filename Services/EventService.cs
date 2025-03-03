@@ -20,6 +20,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var response = await _supabaseClient
             .From<EventCategoryTag>()
             .Select("*")
+            .Where(x => x.Deleted == false)
             .Get();
 
         var tags = new List<Tag>();
@@ -45,6 +46,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var response = await _supabaseClient
             .From<LocationTag>()
             .Select("*")
+            .Where(x => x.Deleted == false)
             .Get();
 
         var locations = new List<Location>();
