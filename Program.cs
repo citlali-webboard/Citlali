@@ -63,19 +63,34 @@ builder.Services.AddAuthentication()
                     {
                         OnMessageReceived = async context =>
                         {
-                            var accessToken = context.Request.Cookies[configuration.Jwt.AccessCookie];
-                            var refreshToken = context.Request.Cookies[configuration.Jwt.RefreshCookie];
-                            var userService = context.HttpContext.RequestServices.GetRequiredService<UserService>();
-                            if (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken))
+                            try
                             {
-                                context.Token = accessToken;
-                                userService.CurrentSession = await supabaseClient.Auth.SetSession(accessToken, refreshToken);
-                                // await supabaseClient.Auth.RefreshSession();
-                                // return Task.CompletedTask;
+                                var accessToken = context.Request.Cookies[configuration.Jwt.AccessCookie];
+                                var refreshToken = context.Request.Cookies[configuration.Jwt.RefreshCookie];
+                                var userService = context.HttpContext.RequestServices.GetRequiredService<UserService>();
+                                if (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken))
+                                {
+                                    context.Token = accessToken;
+                                    userService.CurrentSession = await supabaseClient.Auth.SetSession(accessToken, refreshToken);
+                                    // await supabaseClient.Auth.RefreshSession();
+                                    // return Task.CompletedTask;
+                                }
+                                else
+                                {
+                                    userService.CurrentSession.User = null;
+                                }
                             }
-                            else
+                            catch (Exception exception)
                             {
-                                userService.CurrentSession.User = null;
+                                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                                logger.LogError("Authentication failed: {ExceptionMessage}", exception.Message);
+
+                                // Clear cookies to prevent infinite loops due to expired/invalid tokens
+                                context.Response.Cookies.Delete(configuration.Jwt.AccessCookie);
+                                context.Response.Cookies.Delete(configuration.Jwt.RefreshCookie);
+
+                                // Redirect to signin page
+                                context.Response.Redirect("/auth/signin");
                             }
                         },
                         OnAuthenticationFailed = context =>
