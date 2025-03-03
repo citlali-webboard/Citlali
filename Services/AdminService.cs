@@ -39,4 +39,28 @@ public class AdminService(ILogger<AdminService> logger,Client supabaseClient, Co
             .Set(x => x.Deleted, true)
             .Update();
     }
+
+    public async Task<AdminLocationsViewModel> GetLocationListViewModel()
+    {
+        var viewModel = new AdminLocationsViewModel();
+
+        var locations = await _eventService.GetLocationTags();
+        viewModel.Locations = locations;
+
+        return viewModel;
+    }
+
+    public async Task LocationCreate(LocationTag locationTag) {
+        await _supabaseClient
+            .From<LocationTag>()
+            .Insert(locationTag);
+    }
+
+    public async Task LocationSoftDelete(Guid locationTagId) {
+        await _supabaseClient
+            .From<LocationTag>()
+            .Where(x => x.LocationTagId == locationTagId)
+            .Set(x => x.Deleted, true)
+            .Update();
+    }
 }

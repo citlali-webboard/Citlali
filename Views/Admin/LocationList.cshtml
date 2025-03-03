@@ -1,0 +1,27 @@
+@model Citlali.Models.AdminLocationsViewModel;
+
+<ul>
+  @foreach (var tag in Model.Locations)
+  {
+    <li value="@tag.EventLocationTagId">
+      <span>
+        @tag.EventLocationTagName
+      </span>
+      <form asp-action="LocationDelete" method="post">
+        <input asp-for="DeleteDto.EventLocationTagId" name="tagId" type="text" value=@tag.EventLocationTagId hidden />
+        <span asp-validation-for="DeleteDto.EventLocationTagId"></span>
+        <button type="submit">Delete</button>
+      </form>
+    </li>
+  }
+</ul>
+
+<form asp-action="LocationCreate" method="post">
+  <fieldset>
+    <label asp-for="CreateDto.EventLocationTagName">Tag Name</label>
+    <input asp-for="CreateDto.EventLocationTagName" class="form-control" name="tagName"/>
+    <span asp-validation-for="CreateDto.EventLocationTagName" class="text-danger"></span>
+  </fieldset>
+
+  <button type="submit">Create</button>
+</form>

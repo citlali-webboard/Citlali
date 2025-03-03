@@ -6,7 +6,11 @@ namespace Citlali.Models
         public Tag CreateDto { get; set; } = new();
         public Tag DeleteDto { get; set; } = new();
     }
-    public class CategoryCreateDto {
-        public Tag CreateDto { get; set; } = new();
+
+    public class AdminLocationsViewModel
+    {
+        public List<Location> Locations { get; set; } = [];
+        public Location CreateDto { get; set; } = new();
+        public Location DeleteDto { get; set; } = new();
     }
 }

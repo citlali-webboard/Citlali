@@ -91,9 +91,80 @@ public class AdminController(ILogger<AdminController> logger, UserService userSe
         }
         catch (Exception exception)
         {
-            TempData["Error"] = $"Unable to create Category : {exception.Message}";
+            TempData["Error"] = $"Unable to create category: {exception.Message}";
         }
 
         return RedirectToAction("CategoryList");
+    }
+
+    [HttpGet("locations")]
+    public async Task<IActionResult> LocationList()
+    {
+        if (_userService.IsUserAdmin() == false)
+        {
+            TempData["Error"] = "Unauthorized";
+            return RedirectToAction("Index", "Home");
+        }
+
+        var locationsViewModel = await _adminService.GetLocationListViewModel();
+
+        return View(locationsViewModel);
+    }
+
+    [HttpPost("LocationCreate")]
+    public async Task<IActionResult> LocationCreate(string tagName)
+    {
+        if (_userService.IsUserAdmin() == false)
+        {
+            TempData["Error"] = "Unauthorized";
+            return RedirectToAction("Index", "Home");
+        }
+
+        if (string.IsNullOrEmpty(tagName)) {
+            TempData["Error"] = $"Unable to create location: Incomplete data";
+            return RedirectToAction("LocationList");
+        }
+
+        try
+        {
+            var locationTag = new LocationTag() {
+                LocationTagId = Guid.NewGuid(),
+                LocationTagName = tagName,
+            };
+            await _adminService.LocationCreate(locationTag);
+        }
+        catch (Exception exception)
+        {
+            TempData["Error"] = $"Unable to create location: {exception.Message}";
+        }
+
+        return RedirectToAction("LocationList");
+    }
+
+    [HttpPost("LocationDelete")]
+    public async Task<IActionResult> LocationDelete(string tagId)
+    {
+        if (_userService.IsUserAdmin() == false)
+        {
+            TempData["Error"] = "Unauthorized";
+            return RedirectToAction("Index", "Home");
+        }
+
+        if (string.IsNullOrEmpty(tagId)) {
+            TempData["Error"] = $"Unable to delete location: ID not specified";
+            return RedirectToAction("LocationList");
+        }
+
+        try
+        {
+            var guid = Guid.Parse(tagId);
+            await _adminService.LocationSoftDelete(guid);
+        }
+        catch (Exception exception)
+        {
+            TempData["Error"] = $"Unable to create location: {exception.Message}";
+        }
+
+        return RedirectToAction("LocationList");
     }
 }
