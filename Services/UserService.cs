@@ -182,7 +182,7 @@ public class UserService
                 _ = await _supabaseClient.Storage
                     .From(bucketName)
                     .Remove(bucketFilePath);
-            } catch { 
+            } catch {
             }
 
             var imageBytes = _utilityService.ProcessProfileImage(image);
@@ -203,7 +203,7 @@ public class UserService
             string imageId = Guid.NewGuid().ToString("N")[..8];
 
             string publicUrl = $"{localUrl}?id={imageId}".Replace(_configuration.Supabase.LocalUrl, _configuration.Supabase.PublicUrl);
-            
+
             return publicUrl;
         }
 
@@ -222,6 +222,18 @@ public class UserService
         }
         return Regex.IsMatch(username, @"^[A-Za-z][A-Za-z0-9_]{3,29}$");
     }
+
+    public bool IsUserAdmin() {
+        try {
+            var role = CurrentSession.User?.AppMetadata["app_role"].ToString();
+            if (role == "admin") {
+                return true;
+            }
+            return false;
+        } catch {
+            return false;
+        }
+    }
 }
 
 public class InvalidUsernameException : Exception
@@ -230,6 +242,6 @@ public class InvalidUsernameException : Exception
 
     public InvalidUsernameException(string message) : base(message) { }
 
-    public InvalidUsernameException(string message, Exception innerException) 
+    public InvalidUsernameException(string message, Exception innerException)
         : base(message, innerException) { }
 }

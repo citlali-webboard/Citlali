@@ -4,8 +4,8 @@ using Citlali.Services;
 
 namespace Citlali.Controllers;
 
-[Route("user")]
-public class AdminController(ILogger<AdminController> logger, Supabase.Client supabaseClient, UserService userService, Configuration configuration, EventService eventService) : Controller
+[Route("admin")]
+public class AdminController(ILogger<AdminController> logger, UserService userService, Configuration configuration, EventService eventService) : Controller
 {
     private readonly ILogger<AdminController> _logger = logger;
     private readonly UserService _userService = userService;
@@ -14,6 +14,14 @@ public class AdminController(ILogger<AdminController> logger, Supabase.Client su
 
     public IActionResult Index()
     {
-        return View();
+        if (_userService.IsUserAdmin())
+        {
+            return View();
+        }
+        else
+        {
+            TempData["Error"] = "Unauthorized";
+            return RedirectToAction("Index", "Home");
+        }
     }
 }
