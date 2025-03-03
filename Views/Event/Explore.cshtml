@@ -79,15 +79,15 @@
         <div class="controls-row">
                 <div class="button-group">
                     <button class="sort-btn @(ViewBag.SortBy == "newest" ? "active" : "")" data-sort="newest">
-                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Clock>>(RenderMode.ServerPrerendered, new { Color = Color.Custom }))
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Clock>>(RenderMode.ServerPrerendered, new { Color = Color.Custom, Style = "fill: currentColor;" }))
                         Newest
                     </button>
                     <button class="sort-btn @(ViewBag.SortBy == "date" ? "active" : "")" data-sort="date">
-                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Calendar>>(RenderMode.ServerPrerendered, new { Color = Color.Custom }))
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Calendar>>(RenderMode.ServerPrerendered, new { Color = Color.Custom, Style = "fill: currentColor;" }))
                         Event Date
                     </button>
                     <button class="sort-btn @(ViewBag.SortBy == "popularity" ? "active" : "")" data-sort="popularity">
-                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Star>>(RenderMode.ServerPrerendered, new { Color = Color.Custom }))
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Star>>(RenderMode.ServerPrerendered, new { Color = Color.Custom, Style = "fill: currentColor;" }))
                         Popularity
                     </button>
                 </div>
@@ -136,7 +136,7 @@
                                 <h3>@eventItem.EventTitle</h3>
                             </div>
                             <div class="trending-events-card-right">
-                                <svg viewBox="0 0 24 24" id="magicoon-Filled" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <defs> <style>.cls-1{fill:#666666;}</style> </defs> <title>users-three</title> <g id="users-three-Filled"> <path id="users-three-Filled-2" data-name="users-three-Filled" class="cls-1" d="M20.35,6.71a3.694,3.694,0,0,1-2.61,3.53A5.91,5.91,0,0,0,18,8.5a5.99,5.99,0,0,0-2.93-5.15A3.769,3.769,0,0,1,16.65,3,3.707,3.707,0,0,1,20.35,6.71ZM19.6,11.3a1.646,1.646,0,0,0-1.25.15,3.33,3.33,0,0,1-1.39.41,5.1,5.1,0,0,1-.7.85A5.425,5.425,0,0,1,19.92,17h.69a1.228,1.228,0,0,0,1.09-.63,2.551,2.551,0,0,0,.3-1.21v-.71A3.241,3.241,0,0,0,19.6,11.3ZM8.93,3.35A3.769,3.769,0,0,0,7.35,3a3.7,3.7,0,0,0-1.09,7.24A5.91,5.91,0,0,1,6,8.5,5.99,5.99,0,0,1,8.93,3.35ZM7.74,12.71a5.1,5.1,0,0,1-.7-.85,3.33,3.33,0,0,1-1.39-.41A1.646,1.646,0,0,0,4.4,11.3,3.241,3.241,0,0,0,2,14.45v.71a2.551,2.551,0,0,0,.3,1.21A1.224,1.224,0,0,0,3.38,17h.7A5.425,5.425,0,0,1,7.74,12.71Zm7.84,1.36a2.333,2.333,0,0,0-.53-.07,2.033,2.033,0,0,0-.99.26,4.268,4.268,0,0,1-4.12,0A2.033,2.033,0,0,0,8.95,14a2.333,2.333,0,0,0-.53.07A3.955,3.955,0,0,0,5.5,17.9v.87a3.073,3.073,0,0,0,.37,1.46A1.455,1.455,0,0,0,7.18,21h9.64a1.455,1.455,0,0,0,1.31-.77,3.073,3.073,0,0,0,.37-1.46V17.9A3.955,3.955,0,0,0,15.58,14.07ZM16.5,8.5A4.5,4.5,0,1,0,12,13,4.5,4.5,0,0,0,16.5,8.5Z"></path> </g> </g></svg>
+                                @* <svg viewBox="0 0 24 24" id="magicoon-Filled" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <defs> <style>.cls-1{fill:#666666;}</style> </defs> <title>users-three</title> <g id="users-three-Filled"> <path id="users-three-Filled-2" data-name="users-three-Filled" class="cls-1" d="M20.35,6.71a3.694,3.694,0,0,1-2.61,3.53A5.91,5.91,0,0,0,18,8.5a5.99,5.99,0,0,0-2.93-5.15A3.769,3.769,0,0,1,16.65,3,3.707,3.707,0,0,1,20.35,6.71ZM19.6,11.3a1.646,1.646,0,0,0-1.25.15,3.33,3.33,0,0,1-1.39.41,5.1,5.1,0,0,1-.7.85A5.425,5.425,0,0,1,19.92,17h.69a1.228,1.228,0,0,0,1.09-.63,2.551,2.551,0,0,0,.3-1.21v-.71A3.241,3.241,0,0,0,19.6,11.3ZM8.93,3.35A3.769,3.769,0,0,0,7.35,3a3.7,3.7,0,0,0-1.09,7.24A5.91,5.91,0,0,1,6,8.5,5.99,5.99,0,0,1,8.93,3.35ZM7.74,12.71a5.1,5.1,0,0,1-.7-.85,3.33,3.33,0,0,1-1.39-.41A1.646,1.646,0,0,0,4.4,11.3,3.241,3.241,0,0,0,2,14.45v.71a2.551,2.551,0,0,0,.3,1.21A1.224,1.224,0,0,0,3.38,17h.7A5.425,5.425,0,0,1,7.74,12.71Zm7.84,1.36a2.333,2.333,0,0,0-.53-.07,2.033,2.033,0,0,0-.99.26,4.268,4.268,0,0,1-4.12,0A2.033,2.033,0,0,0,8.95,14a2.333,2.333,0,0,0-.53.07A3.955,3.955,0,0,0,5.5,17.9v.87a3.073,3.073,0,0,0,.37,1.46A1.455,1.455,0,0,0,7.18,21h9.64a1.455,1.455,0,0,0,1.31-.77,3.073,3.073,0,0,0,.37-1.46V17.9A3.955,3.955,0,0,0,15.58,14.07ZM16.5,8.5A4.5,4.5,0,1,0,12,13,4.5,4.5,0,0,0,16.5,8.5Z"></path> </g> </g></svg> *@
                                 <div class="count-participant">
                                     <span id="current-participant"> @eventItem.CurrentParticipant</span>
                                     <span>/</span>
