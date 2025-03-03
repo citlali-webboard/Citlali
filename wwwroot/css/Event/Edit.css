@@ -1,9 +1,12 @@
 .window {
     width: 100vw;
     min-height: calc(100vh - var(--navbar-size));
+    margin-top: var(--navbar-size);
     display: flex;
     justify-content: center;
     align-items: center;
+
+    background-color: #f0f0f0;
 }
 
 .content {
@@ -13,7 +16,7 @@
     padding: 2rem;
     margin: 2rem;
     border-radius: 10px;
-    background-color: var(--bg-color);
+    background-color: #fefefe;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -172,6 +175,8 @@
 }
 
 .added-question ul {
+    display: inline-block !important;
+    height: fit-content !important;
     list-style-type: square !important; 
     padding-left: 1.5rem;
 }
