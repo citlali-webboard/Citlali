@@ -3,8 +3,11 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    min-height: 100vh;
-    margin-bottom: 2rem;
+
+    min-height: calc(100vh - var(--navbar-size));
+    margin-top: var(--navbar-size);
+
+    /* background-color: #f0f0f0; */
     width: 100%;
 }
 
@@ -49,6 +52,7 @@
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     justify-content: space-between;
+    background-color: #fefefe;
 }
 
 .history-card:hover {

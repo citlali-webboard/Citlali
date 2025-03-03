@@ -1,7 +1,11 @@
 using Citlali.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Supabase;
+// using Supabase.Postgrest.Constants;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using static Supabase.Postgrest.Constants;
+using System.Reflection;
 
 namespace Citlali.Services;
 
@@ -11,7 +15,7 @@ public class UserService
     private readonly Client _supabaseClient;
     private readonly Configuration _configuration;
     private readonly UtilitiesService _utilityService;
-    public Supabase.Gotrue.Session CurrentSession { get;set; } = new Supabase.Gotrue.Session();
+    public Supabase.Gotrue.Session CurrentSession { get; set; } = new Supabase.Gotrue.Session();
 
     private readonly List<string> reservedUsernames = new List<string> {
         "admin",
@@ -36,12 +40,15 @@ public class UserService
     /// Return <c>true</c> if the user is not onboarded, <c>false</c> otherwise
     /// </returns>
     /// </summary>
-    public async Task<bool> RedirectToOnboarding() {
+    public async Task<bool> RedirectToOnboarding()
+    {
         var id = CurrentSession.User?.Id;
-        if (string.IsNullOrEmpty(id)) {
+        if (string.IsNullOrEmpty(id))
+        {
             return false;
         }
-        if (await GetUserByUserId(Guid.Parse(id)) is null) {
+        if (await GetUserByUserId(Guid.Parse(id)) is null)
+        {
             return true;
         }
         return false;
@@ -49,7 +56,8 @@ public class UserService
 
     public async Task<User> CreateUser(UserOnboardingDto userOnboardingDto)
     {
-        try {
+        try
+        {
             var supabaseUser = _supabaseClient.Auth.CurrentUser;
             string profileImageUrl = _configuration.User.DefaultProfileImage;
 
@@ -87,12 +95,24 @@ public class UserService
                 .From<User>()
                 .Insert(dbUser);
 
+            // I know this is not the best way to do this, but I'm too lazy to improve this - OkuSan
+            var SelectedTags = userOnboardingDto.SelectedTags;
+            if (SelectedTags != null && SelectedTags.Count > 0)
+            {
+                for (int i = 0; i < SelectedTags.Count; i++)
+                {
+                    await FollowTag(SelectedTags[i]);
+                }
+            }
+
             return dbUser;
         }
-        catch (InvalidUsernameException) {
+        catch (InvalidUsernameException)
+        {
             throw new InvalidUsernameException();
         }
-         catch(Exception e) {
+        catch (Exception e)
+        {
             var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
             string msgError = errorJson.GetProperty("msg").GetString() ?? "";
             Console.WriteLine(msgError);
@@ -118,7 +138,7 @@ public class UserService
 
         if (userOnboardingDto.DisplayName == null || userOnboardingDto.DisplayName == "")
         {
-           throw new Exception("Display name is required.");
+            throw new Exception("Display name is required.");
         }
 
         if (userOnboardingDto.ProfileImage != null)
@@ -178,11 +198,14 @@ public class UserService
             var fileName = $"{_configuration.User.ProfileImageName}.{_configuration.User.ProfileImageFormat}";
             var bucketFilePath = $"{userId}/{fileName}";
 
-            try {
+            try
+            {
                 _ = await _supabaseClient.Storage
                     .From(bucketName)
                     .Remove(bucketFilePath);
-            } catch {
+            }
+            catch
+            {
             }
 
             var imageBytes = _utilityService.ProcessProfileImage(image);
@@ -234,6 +257,285 @@ public class UserService
             return false;
         }
     }
+    public async Task<bool> FollowTag(Guid tagId)
+    {
+        var currentUser = CurrentSession.User;
+        if (currentUser == null || currentUser.Id == null)
+        {
+            throw new UnauthorizedAccessException("User is not authenticated.");
+        }
+
+        try
+        {
+            var userFollowedCategory = new UserFollowedCategory
+            {
+                UserId = Guid.Parse(currentUser.Id),
+                EventCategoryTagId = tagId
+            };
+
+            await _supabaseClient
+                .From<UserFollowedCategory>()
+                .Insert(userFollowedCategory);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error following tag: {ex.Message}");
+            throw new Exception("An error occurred while trying to follow the tag.");
+        }
+    }
+
+    public async Task<bool> UnfollowTag(Guid tagId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null || currentUser.Id == null)
+        {
+            throw new UnauthorizedAccessException("User is not authenticated.");
+        }
+
+        try
+        {
+            var userId = Guid.Parse(currentUser.Id);
+
+            // Use the exact column names from the model class
+            await _supabaseClient
+                .From<UserFollowedCategory>()
+                .Filter("UserId", Operator.Equals, userId.ToString())
+                .Filter("EventCategoryTagId", Operator.Equals, tagId.ToString())
+                .Delete();
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error unfollowing tag: {ex.Message}");
+            throw new Exception("An error occurred while trying to unfollow the tag.");
+        }
+    }
+
+    public async Task<bool> IsFollowingTag(Guid tagId)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null || currentUser.Id == null)
+        {
+            return false; // User not authenticated, can't be following
+        }
+
+        try
+        {
+            var userId = Guid.Parse(currentUser.Id);
+
+            // Use the exact column names from the model class
+            var response = await _supabaseClient
+                .From<UserFollowedCategory>()
+                .Filter("UserId", Operator.Equals, userId.ToString())
+                .Filter("EventCategoryTagId", Operator.Equals, tagId.ToString())
+                .Get();
+
+            return response != null && response.Models.Count > 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error checking if following tag: {ex.Message}");
+            return false; // Default to not following in case of error
+        }
+    }
+
+    public async Task<List<Tag>?> GetFollowedTags(string userId)
+    {
+        var response = await _supabaseClient
+            .From<UserFollowedCategory>()
+            .Filter("USER_ID", Operator.Equals, userId)
+            .Select("*")
+            .Get();
+
+        var allTags = await _supabaseClient
+            .From<EventCategoryTag>()
+            .Select("*")
+            .Get();
+
+        var tags = new List<Tag>();
+        foreach (var tag in response.Models)
+        {
+            var eventTagId = tag.EventCategoryTagId;
+            var tagResponse = allTags.Models.FirstOrDefault(x => x.EventCategoryTagId == eventTagId);
+            if (tagResponse != null)
+            {
+                tags.Add(new Tag
+                {
+                    TagId = tagResponse.EventCategoryTagId,
+                    TagEmoji = tagResponse.EventCategoryTagEmoji,
+                    TagName = tagResponse.EventCategoryTagName
+                });
+            }
+        }
+
+        return tags;
+    }
+
+    public int GetFollowedUser(string userId)
+    {
+        return 0;
+    }
+
+    public async Task<int> GetFollowingCount(Guid userId)
+    {
+        var userFollowingCountTask = _supabaseClient
+            .From<UserFollowed>()
+            .Where(f => f.FollowerUserId == userId)
+            .Count(CountType.Exact);
+
+        var tagFollowingCountTask = _supabaseClient
+            .From<UserFollowedCategory>()
+            .Where(f => f.UserId == userId)
+            .Count(CountType.Exact);
+
+        await Task.WhenAll(userFollowingCountTask, tagFollowingCountTask);
+        var userFollowingCount = await userFollowingCountTask;
+        var tagFollowingCount = await tagFollowingCountTask;
+
+        return userFollowingCount + tagFollowingCount;
+    }
+
+    public async Task<int> GetFollowersCount(Guid userId)
+    {
+        var followersCount = await _supabaseClient
+            .From<UserFollowed>()
+            .Where(f => f.FollowedUserId == userId)
+            .Count(CountType.Exact);
+
+        return followersCount;
+    }
+
+    public async Task FollowUser(Guid followerUserId, Guid followedUserId)
+    {
+
+        if (await IsFollowing(followerUserId, followedUserId))
+            return;
+
+        var userFollowed = new UserFollowed
+        {
+            FollowingId = Guid.NewGuid(),
+            FollowerUserId = followerUserId,
+            FollowedUserId = followedUserId
+        };
+
+        await _supabaseClient
+            .From<UserFollowed>()
+            .Insert(userFollowed);
+    }
+
+    public async Task UnfollowUser(Guid followerUserId, Guid followedUserId)
+    {
+        try
+        {
+            var userFollowed = await _supabaseClient
+                .From<UserFollowed>()
+                .Where(f => f.FollowerUserId == followerUserId && f.FollowedUserId == followedUserId)
+                .Single();
+
+            if (userFollowed != null)
+            {
+                await _supabaseClient
+                    .From<UserFollowed>()
+                    .Where(f => f.FollowerUserId == followerUserId && f.FollowedUserId == followedUserId)
+                    .Delete();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error unfollowing user: {ex.Message}");
+            throw new Exception("An error occurred while trying to unfollow the user.");
+        }
+    }
+
+    public async Task<bool> IsFollowing(Guid followerUserId, Guid followedUserId)
+    {
+        var userFollowed = await _supabaseClient
+            .From<UserFollowed>()
+            .Where(f => f.FollowerUserId == followerUserId && f.FollowedUserId == followedUserId)
+            .Get();
+
+        return userFollowed != null && userFollowed.Models.Count > 0;
+    }
+
+    public async Task<List<PopularUser>> GetSuperstars()
+    {
+        try
+        {
+            // Get all user follows
+            var followedResponse = await _supabaseClient
+                .From<UserFollowed>()
+                .Select("FollowedUserId")
+                .Get();
+
+            if (followedResponse == null || followedResponse.Models.Count == 0)
+            {
+                return new List<PopularUser>();
+            }
+
+            // Count occurrences of each FollowedUserId
+            var followCounts = new Dictionary<Guid, int>();
+
+            foreach (var followed in followedResponse.Models)
+            {
+                if (followCounts.TryGetValue(followed.FollowedUserId, out var count))
+                {
+                    followCounts[followed.FollowedUserId] = count + 1;
+                }
+                else
+                {
+                    followCounts[followed.FollowedUserId] = 1;
+                }
+            }
+
+            // Get top 5 most followed user IDs
+            var topUserIds = followCounts
+                .OrderByDescending(pair => pair.Value)
+                .Take(5)
+                .Select(pair => pair.Key)
+                .ToList();
+
+            if (topUserIds.Count == 0)
+            {
+                return new List<PopularUser>();
+            }
+
+            // Get user details for these IDs
+            var users = new List<PopularUser>();
+
+            // CHANGE: Pass the IDs directly instead of as a comma-separated string
+            var usersResponse = await _supabaseClient
+                .From<User>()
+                .Filter("UserId", Operator.In, topUserIds)
+                .Get();
+
+            if (usersResponse != null && usersResponse.Models.Count > 0)
+            {
+                // Sort users according to follow count order
+                return usersResponse.Models
+                    .OrderBy(user => topUserIds.IndexOf(user.UserId))
+                    .Select(user => new PopularUser
+                    {
+                        UserId = user.UserId,
+                        Username = user.Username,
+                        DisplayName = user.DisplayName,
+                        ProfileImageUrl = user.ProfileImageUrl,
+                        FollowersCount = followCounts[user.UserId]
+                    })
+                    .ToList();
+            }
+
+            return new List<PopularUser>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting superstars: {ex.Message}");
+            return new List<PopularUser>();
+        }
+    }
+
 }
 
 public class InvalidUsernameException : Exception

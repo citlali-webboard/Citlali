@@ -13,6 +13,7 @@
 }
 
 .event-detail {
+  background-color: #fefefe;
   border: 2px solid var(--color-muted);
   border-radius: 1rem;
   padding: 1rem;
