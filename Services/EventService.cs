@@ -453,8 +453,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var supabaseUser = _userService.CurrentSession.User ?? throw new Exception("User not authenticated");
         Guid userId = Guid.Parse(supabaseUser.Id ?? throw new Exception("User ID not found"));
         Guid EventId = joinEventModel.EventId;
-        var citlaliEvent = await GetEventById(EventId);
-
+        var citlaliEvent = await GetEventById(EventId) ?? throw new EventNotFoundException();
         if (citlaliEvent.Status == "closed")
             throw new EventClosedException();
 
@@ -776,7 +775,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         await Task.WhenAll(usersTask, answersTask);
 
-        var allUsers = usersTask.Result.Where(u => u != null).ToDictionary(u => u.UserId);
+        var allUsers = usersTask.Result.Where(u => u != null).ToDictionary(u => u?.UserId ?? Guid.Empty);
         var allAnswers = answersTask.Result.Models;
         var answersByRegistration = allAnswers
             .GroupBy(a => a.RegistrationId)
@@ -794,7 +793,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
             var briefUser = new BriefUser
             {
-                UserId = registrant.UserId,
+                UserId = registrant?.UserId ?? throw new GetUserException(),
                 Username = registrant.Username,
                 ProfileImageUrl = registrant.ProfileImageUrl,
                 DisplayName = registrant.DisplayName
@@ -1050,7 +1049,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
 
     //GetRegistrantsConfirmedByEventId
-    public async Task<List<Registration?>> GetRegistrantsConfirmedByEventId(Guid eventId)
+    public async Task<List<Registration>> GetRegistrantsConfirmedByEventId(Guid eventId)
     {
         var response = await _supabaseClient
             .From<Registration>()
@@ -1059,7 +1058,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Filter("Status", Supabase.Postgrest.Constants.Operator.Equals, "confirmed")
             .Get();
 
-        return response.Models ;
+        return response.Models;
     }
 
 
@@ -1068,7 +1067,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     {
         var supabaseUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
-        var userId = Guid.Parse(supabaseUser.Id);
+        var userId = Guid.Parse(supabaseUser.Id ?? throw new GetUserException());
 
         var Event = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
 
@@ -1201,5 +1200,15 @@ public class MaximumParticipantExceedException : Exception
     public MaximumParticipantExceedException(string message) : base(message) { }
 
     public MaximumParticipantExceedException(string message, Exception innerException)
+        : base(message, innerException) { }
+}
+
+public class EventNotFoundException : Exception
+{
+    public EventNotFoundException() : base("Event not found!") { }
+
+    public EventNotFoundException(string message) : base(message) { }
+
+    public EventNotFoundException(string message, Exception innerException)
         : base(message, innerException) { }
 }
