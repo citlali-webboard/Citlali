@@ -218,6 +218,23 @@ public class CreateEventViewModel
     public List<string> Questions { get; set; } = [];
 }
 
+public class EditEventViewModel
+{
+    public Guid EventId { get; set; } = new();
+    public string EventTitle { get; set; } = "";
+    public string EventDescription { get; set; } = "";
+    public EventCategoryTag EventCategoryTag { get; set; } = new();
+    public List<Location> LocationTagsList { get; set; } = [];
+    public LocationTag EventLocationTag { get; set; } = new();
+    public int MaxParticipant { get; set; } = 0;
+    public int CurrentParticipant { get; set; } = 0;
+    public int Cost { get; set; } = 0;
+    public DateTime EventDate { get; set; } = new();
+    public DateTime PostExpiryDate { get; set; } = new();
+    public List<Tag> EventCategoryTagsList { get; set; } = [];
+    public List<QuestionViewModel> Questions { get; set; } = [];
+}
+
 [Table("REGISTRATION")]
 public class Registration : BaseModel
 {
