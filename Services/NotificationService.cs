@@ -79,6 +79,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         foreach (var user in users.Where(u => u != null))
         {
+            if (user == null) throw new GetUserException();
             usersDictionary[user.UserId] = user;
         }
 
