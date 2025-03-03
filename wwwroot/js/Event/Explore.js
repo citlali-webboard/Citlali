@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initImageSlider() {
+    const INTERVAL = 3500;  // ms
     const sliderContainer = document.querySelector('.image-slider-container');
     if (!sliderContainer) return;
     
@@ -73,14 +74,12 @@ function initImageSlider() {
     const totalSlides = slides.length;
     
     // Set up auto rotation
-    let slideInterval = setInterval(nextSlide, 5000);
+    let slideInterval = setInterval(nextSlide, INTERVAL);
     
     function showSlide(index) {
-        // Remove active class from all slides and dots
         slides.forEach(slide => slide.classList.remove('active'));
         dots.forEach(dot => dot.classList.remove('active'));
         
-        // Add active class to current slide and dot
         slides[index].classList.add('active');
         dots[index].classList.add('active');
     }
@@ -95,38 +94,56 @@ function initImageSlider() {
         showSlide(currentIndex);
     }
     
-    // Add event listeners
     if (prevBtn) {
         prevBtn.addEventListener('click', function() {
-            clearInterval(slideInterval);
             prevSlide();
-            slideInterval = setInterval(nextSlide, 5000);
+            clearInterval(slideInterval);
         });
     }
     
     if (nextBtn) {
         nextBtn.addEventListener('click', function() {
-            clearInterval(slideInterval);
             nextSlide();
-            slideInterval = setInterval(nextSlide, 5000);
+            clearInterval(slideInterval);
         });
     }
     
     dots.forEach((dot, index) => {
         dot.addEventListener('click', function() {
-            clearInterval(slideInterval);
             currentIndex = index;
             showSlide(currentIndex);
-            slideInterval = setInterval(nextSlide, 5000);
+            clearInterval(slideInterval);
         });
     });
     
-    // Pause rotation when hovering over slider
     sliderContainer.addEventListener('mouseenter', function() {
         clearInterval(slideInterval);
     });
     
     sliderContainer.addEventListener('mouseleave', function() {
-        slideInterval = setInterval(nextSlide, 5000);
+        slideInterval = setInterval(nextSlide, INTERVAL);
     });
+    
+    let touchStartX = 0;
+    
+    sliderContainer.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+        clearInterval(slideInterval);
+    }, {passive: true});
+    
+    sliderContainer.addEventListener('touchend', function(e) {
+        const touchEndX = e.changedTouches[0].screenX;
+        const diff = touchEndX - touchStartX;
+        
+        if (diff > 50) {
+            // Swipe right - show previous slide
+            prevSlide();
+        } else if (diff < -50) {
+            // Swipe left - show next slide
+            nextSlide();
+        }
+        
+        // Restart the timer
+        slideInterval = setInterval(nextSlide, INTERVAL);
+    }, {passive: true});
 }

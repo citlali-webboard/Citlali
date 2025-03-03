@@ -8,20 +8,22 @@
 @{
     ViewData["Title"] = "Explore";
 
-    var image1 = new Citlali.Models.ImageSliderItem
+    var imageUrls = new List<string>
     {
-        imageUrl = "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2024/12/genshin-30.jpg",
-        caption = "Citlali"
-    };
-    var image2 = new Citlali.Models.ImageSliderItem
-    {
-        imageUrl = "https://img.4gamers.com.tw/ckfinder-th/image2/auto/2025-01/Citlali_Introduction_Banner-250102-181140.png?versionId=r4yCiZ0mpYQb4la101fQUFNeaAW0mcgl",
-        caption = "Citlali"
+        "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2024/12/genshin-30.jpg",
+        "https://img.4gamers.com.tw/ckfinder-th/image2/auto/2025-01/Citlali_Introduction_Banner-250102-181140.png?versionId=r4yCiZ0mpYQb4la101fQUFNeaAW0mcgl",
+        "https://static1.thegamerimages.com/wordpress/wp-content/uploads/wm/2025/01/citlali-is-in-her-burst-animation-in-genshin-impact.jpg",
+        "https://shop.ldrescdn.com/rms/ld-space/process/img/2299c5454c564d8f941a68de6ccbad7c1735637742.png?1735637751071",
+        "https://staticg.sportskeeda.com/editor/2024/11/c89e4-17318266801921-1920.jpg?w=640",
+        
     };
 
     var imageSlider = new Citlali.Models.ImageSliderModel
     {
-        Images = [image1, image2]
+        Images = imageUrls.Select(url => new Citlali.Models.ImageSliderItem
+        {
+            imageUrl = url,
+        }).ToArray()
     };
 }
 
