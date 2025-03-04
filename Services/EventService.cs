@@ -951,6 +951,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             answerSet.Add(new EventManagementAnswerCollection
             {
                 User = registrant,
+                RegistrationTime = registration.CreatedAt,
                 Status = registration.Status,
                 RegistrationAnswers = registrationAnswers
             });
