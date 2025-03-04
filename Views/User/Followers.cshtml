@@ -25,7 +25,7 @@
     </div>
     
     <div class="search-box">
-        <input type="text" placeholder="Search" id="searchInput" onkeyup="filterUsersandTags()" />
+        <input type="text" placeholder="Search" id="searchInput" onkeyup="filterUsers()" />
     </div>
 
     <div class="follow-list" id="followList">
@@ -34,9 +34,12 @@
             <div class="follow-item">
                 <div class="follow-info">
                     <img src="@user.ProfileImageUrl" alt="@user.DisplayName" />
-                    <h2>@user.DisplayName</h2>
-                    <p>@user.Username</p>
+                    <div>
+                        <h2>@user.Username</h2>
+                        <p>@user.DisplayName </p>
+                    </div>
                 </div>
+                
                 @if (isCurrentUserProfile)
                 {
                     <button class="follow-btn" onclick="toggleUnFollow('@user.Username')">Remove</button>

@@ -93,15 +93,21 @@ body {
     margin-right: 16px;
 }
 
+.follow-info{
+    display: flex;
+    justify-content: center;
+}
+
 .follow-info h2 {
     margin: 0;
     font-size: 14px;
-    color: #262626;
+    color: #999;
+    text-align: left;
 }
 
 .follow-info p {
     font-size: 12px;
-    color: #999;
+    color: #262626;
 }
 
 .follow-btn {

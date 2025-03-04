@@ -128,22 +128,27 @@ function filterUsersandTags() {
     const usersHeader = sectionHeaders[0];
     const tagsHeader = sectionHeaders[1];
     
+    // First identify all user and tag elements and check visibility
     followItems.forEach(item => {
-        const isUserItem = item.previousElementSibling === usersHeader || 
-                          (item.previousElementSibling && 
-                           item.previousElementSibling.previousElementSibling === usersHeader);
+        // Better method to determine if item is a user or tag
+        // Check if the item is before tagsHeader in the DOM tree
+        const itemIndex = Array.from(item.parentNode.children).indexOf(item);
+        const tagsHeaderIndex = Array.from(item.parentNode.children).indexOf(tagsHeader);
+        const isUserItem = itemIndex < tagsHeaderIndex;
         
         let shouldShow = false;
         
         if (isUserItem) {
-            const displayName = item.querySelector('.follow-info h2').textContent.toLowerCase();
-            const username = item.querySelector('.follow-info p').textContent.toLowerCase();
+            // For user items
+            const displayName = item.querySelector('.follow-info h2')?.textContent.toLowerCase() || '';
+            const username = item.querySelector('.follow-info p')?.textContent.toLowerCase() || '';
             shouldShow = displayName.includes(searchInput) || username.includes(searchInput);
             
             if (shouldShow) visibleUsers++;
         } 
         else {
-            const tagName = item.querySelector('.follow-info h2').textContent.toLowerCase();
+            // For tag items
+            const tagName = item.querySelector('div h2')?.textContent.toLowerCase() || '';
             shouldShow = tagName.includes(searchInput);
             
             if (shouldShow) visibleTags++;
@@ -152,20 +157,64 @@ function filterUsersandTags() {
         item.style.display = shouldShow ? 'flex' : 'none';
     });
     
-    usersHeader.style.display = visibleUsers > 0 ? 'block' : 'none';
-    tagsHeader.style.display = visibleTags > 0 ? 'block' : 'none';
+    // Handle section visibility
+    // If searching for something, show relevant sections
+    if (searchInput) {
+        // Show/hide based on results
+        usersHeader.style.display = visibleUsers > 0 ? 'block' : 'none';
+        tagsHeader.style.display = visibleTags > 0 ? 'block' : 'none';
+    } else {
+        // If not searching, show all sections
+        usersHeader.style.display = 'block';
+        tagsHeader.style.display = 'block';
+    }
     
     const followList = document.getElementById('followList');
     
+    // Remove existing "no results" message if any
     const existingNoResults = followList.querySelector('.no-results-message');
     if (existingNoResults) {
         followList.removeChild(existingNoResults);
     }
     
+    // Show "no results" message if needed
     if (searchInput && visibleUsers === 0 && visibleTags === 0) {
         const noResultsMessage = document.createElement('div');
         noResultsMessage.className = 'no-results-message';
         noResultsMessage.textContent = 'No users or tags found matching your search.';
+        followList.appendChild(noResultsMessage);
+    }
+}
+
+// Add the filterUsers function that was missing
+function filterUsers() {
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    const followItems = document.querySelectorAll('.follow-item');
+    
+    let visibleCount = 0;
+    
+    followItems.forEach(item => {
+        const displayName = item.querySelector('.follow-info h2').textContent.toLowerCase();
+        const username = item.querySelector('.follow-info p').textContent.toLowerCase();
+        const shouldShow = displayName.includes(searchInput) || username.includes(searchInput);
+        
+        item.style.display = shouldShow ? 'flex' : 'none';
+        if (shouldShow) visibleCount++;
+    });
+    
+    const followList = document.getElementById('followList');
+    
+    // Remove existing no results message if any
+    const existingNoResults = followList.querySelector('.no-results-message');
+    if (existingNoResults) {
+        followList.removeChild(existingNoResults);
+    }
+    
+    // Add no results message if needed
+    if (searchInput && visibleCount === 0) {
+        const noResultsMessage = document.createElement('div');
+        noResultsMessage.className = 'no-results-message';
+        noResultsMessage.textContent = 'No users found matching your search.';
         followList.appendChild(noResultsMessage);
     }
 }
