@@ -145,18 +145,16 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     {
         var Event = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
 
-        if(Event.FirstComeFirstServed == false)
-            return true ;
+        if (!Event.FirstComeFirstServed)
+            return true;
 
         var currentParticipant = await _supabaseClient
             .From<Registration>()
             .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
-            .Filter("Status", Supabase.Postgrest.Constants.Operator.In, new[] { "awaiting-confirmation", "confirmed" })
+            .Filter("Status", Supabase.Postgrest.Constants.Operator.In, new[] {"awaiting-confirmation", "confirmed"})
             .Count(Supabase.Postgrest.Constants.CountType.Exact);
 
         int countUserToInvite = Event.MaxParticipant - currentParticipant;
-
-        Console.WriteLine($"Current participant: {currentParticipant}");
 
         if (countUserToInvite <= 0)
             return true;
@@ -173,19 +171,27 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         // Take only the number of registrations we can invite
         var registrationsToUpdate = pendingRegistrations.Models
             .Take(countUserToInvite)
-            .Select(r => r.RegistrationId)
             .ToList();
 
         if (registrationsToUpdate.Count == 0)
             return true; // No registrations to update
 
-        // Update status for selected registrations
+        // Batch update all registrations at once
+        var registrationIds = registrationsToUpdate.Select(r => r.RegistrationId).ToList();
         await _supabaseClient
             .From<Registration>()
-            .Filter("RegistrationId", Supabase.Postgrest.Constants.Operator.In, registrationsToUpdate)
+            .Filter("RegistrationId", Supabase.Postgrest.Constants.Operator.In, registrationIds)
             .Set(row => row.Status, "awaiting-confirmation")
             .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
+
+        // Now send notifications to each user (this still needs to be per-user)
+        var batchNotificationTasks = new List<Task>();
+        foreach (var registration in registrationsToUpdate)
+        {
+            batchNotificationTasks.Add(InviteUser(Event.EventId, registration.UserId));
+        }
+        await Task.WhenAll(batchNotificationTasks);
 
         return true;
     }
@@ -542,11 +548,11 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             UserId = userId,
         };
 
-        await UpdateInviteRegistration(EventId);
-
         await _supabaseClient
             .From<Registration>()
             .Insert(newRegistration);
+
+        await UpdateInviteRegistration(EventId);
 
         var eventQuestions = await eventQuestionsTask;
         if (eventQuestions.Models.Count > 0)
@@ -1188,7 +1194,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Update();
 
 
-        await UpdateInviteRegistration(eventId); 
+        await UpdateInviteRegistration(eventId);
 
         var CreatorUserId = await GetCreatorEventIdByEventId(eventId);
 
