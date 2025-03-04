@@ -1408,6 +1408,23 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return response;
     }
 
+    // bypass confirmation 
+    public async Task<bool> BypassConfirmation(Guid eventId, Guid userId)
+    {
+        var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
+                ?? throw new KeyNotFoundException("Registration not found");
+
+        await _supabaseClient
+            .From<Registration>()
+            .Where(row => row.RegistrationId == registration.RegistrationId)
+            .Set(row => row.Status, "confirmed")
+            .Update();
+
+        await UpdateEventStatus(eventId);
+
+        return true;
+    }
+
 }
 
 public class UserAlreadyRegisteredException : Exception
