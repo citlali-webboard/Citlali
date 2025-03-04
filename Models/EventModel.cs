@@ -219,6 +219,7 @@ public class CreateEventViewModel
     public DateTime PostExpiryDate { get; set; } = new();
     public List<Tag> Tags { get; set; } = [];
     public List<string> Questions { get; set; } = [];
+    public bool FirstComeFirstServed { get; set; } = false;
 }
 
 public class EditEventViewModel

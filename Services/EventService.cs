@@ -82,6 +82,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             Cost = createEventViewModel.Cost,
             EventDate = createEventViewModel.EventDate,
             PostExpiryDate = createEventViewModel.PostExpiryDate,
+            FirstComeFirstServed = createEventViewModel.FirstComeFirstServed,
         };
         await _supabaseClient
             .From<Event>()
