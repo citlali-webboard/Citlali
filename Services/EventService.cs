@@ -148,9 +148,15 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         if(Event.FirstComeFirstServed == false)
             return true ;
 
-        var currentParticipant = await GetRegistrationCountByEventId(eventId);
+        var currentParticipant = await _supabaseClient
+            .From<Registration>()
+            .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
+            .Filter("Status", Supabase.Postgrest.Constants.Operator.In, new[] { "awaiting-confirmation", "confirmed" })
+            .Count(Supabase.Postgrest.Constants.CountType.Exact);
 
         int countUserToInvite = Event.MaxParticipant - currentParticipant;
+
+        Console.WriteLine($"Current participant: {currentParticipant}");
 
         if (countUserToInvite <= 0)
             return true;
