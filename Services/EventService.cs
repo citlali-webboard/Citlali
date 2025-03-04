@@ -135,15 +135,22 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         if (createEventViewModel.FirstComeFirstServed)
         {
-            await UpdateInviteRegistration(eventId, currentParticipant, createEventViewModel.MaxParticipant);
+            await UpdateInviteRegistration(eventId);
         }
 
         return true;
     }
 
-    public async Task<bool> UpdateInviteRegistration(Guid eventId, int currentParticipant, int maxParticipant)
+    public async Task<bool> UpdateInviteRegistration(Guid eventId)
     {
-        int countUserToInvite = maxParticipant - currentParticipant;
+        var Event = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
+
+        if(Event.FirstComeFirstServed == false)
+            return true ;
+
+        var currentParticipant = await GetRegistrationCountByEventId(eventId);
+
+        int countUserToInvite = Event.MaxParticipant - currentParticipant;
 
         if (countUserToInvite <= 0)
             return true;
@@ -1172,6 +1179,9 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.Status, "rejected-invitation")
             .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
+
+
+        await UpdateInviteRegistration(eventId); 
 
         var CreatorUserId = await GetCreatorEventIdByEventId(eventId);
 
