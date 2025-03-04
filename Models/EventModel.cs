@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Attributes;
+using Citlali.Models;
 
 namespace Citlali.Models;
 
@@ -137,6 +138,9 @@ public class EventExploreViewModel
     public Location[] Locations = [new()];
     public int CurrentPage { get; set; } = 1;
     public int TotalPage { get; set; }
+    public EventBriefCardData[] TrendingEvents = [new()];
+    public PopularTag[] PopularTags = [new()];
+    public PopularUser[] Superstars = [new()];
 }
 
 public class TagEventExploreViewModel : EventExploreViewModel
@@ -222,6 +226,23 @@ public class CreateEventViewModel
     public DateTime PostExpiryDate { get; set; } = new();
     public List<Tag> Tags { get; set; } = [];
     public List<string> Questions { get; set; } = [];
+}
+
+public class EditEventViewModel
+{
+    public Guid EventId { get; set; } = new();
+    public string EventTitle { get; set; } = "";
+    public string EventDescription { get; set; } = "";
+    public EventCategoryTag EventCategoryTag { get; set; } = new();
+    public List<Location> LocationTagsList { get; set; } = [];
+    public LocationTag EventLocationTag { get; set; } = new();
+    public int MaxParticipant { get; set; } = 0;
+    public int CurrentParticipant { get; set; } = 0;
+    public int Cost { get; set; } = 0;
+    public DateTime EventDate { get; set; } = new();
+    public DateTime PostExpiryDate { get; set; } = new();
+    public List<Tag> EventCategoryTagsList { get; set; } = [];
+    public List<QuestionViewModel> Questions { get; set; } = [];
 }
 
 [Table("REGISTRATION")]
@@ -313,4 +334,22 @@ public class RegistrationHistoryCardModel
 public class RegistrationHistoryData
 {
     public List<RegistrationHistoryCardModel> RegistrationHistoryCardModels { get; set; } = [];
+}
+
+
+public class PopularTag : EventCategoryTag
+{
+    public int EventCount { get; set; } = 0;
+}
+
+public class LocationEventExploreViewModel
+{
+    public Guid LocationId { get; set; }
+    public string LocationName { get; set; }
+    public int EventCount { get; set; }
+    public List<Tag> Tags { get; set; } = new();
+    public List<Location> Locations { get; set; } = new();
+    public EventBriefCardData[] EventBriefCardDatas { get; set; } = [];
+    public int CurrentPage { get; set; }
+    public int TotalPage { get; set; }
 }

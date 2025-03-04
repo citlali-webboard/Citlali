@@ -1,0 +1,111 @@
+@model Citlali.Models.EditEventViewModel
+
+@section head {
+    <link rel="stylesheet" href="~/css/Event/Edit.css" asp-append-version="true" />
+}
+
+@{
+    ViewData["Title"] = "Edit Event";
+}
+
+<div class="window">
+    <div class="content">
+        <a href="/event/manage/@Model.EventId" class="action-button" onclick="return confirm('Are you sure you want to go back? Unsaved changes will be lost.');">
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.ArrowLeft>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+            Back to manage
+        </a>
+        <h2>Edit your event ✏️</h2>
+        <p>Update your event details below to ensure everything is accurate and up-to-date.</p>
+        <form asp-action="EditEvent" asp-route-eventId="@Model.EventId" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="EventId" />
+            <div class="header">
+                <div class="form-group" id="eventTitle">
+                    <label for="EventTitle">Event Title</label>
+                    <input asp-for="EventTitle" class="form-control" />
+                    <span asp-validation-for="EventTitle" class="text-danger"></span>
+                </div>
+                <div class="form-group" id="eventTag">
+                    <label for="EventCategoryTagId">Event Tag</label>
+                    <select name="EventCategoryTagId" id="EventCategoryTagId" class="form-control">
+                        <option value="" disabled>🎯 Select event category tag</option>
+                        @foreach (var tag in Model.EventCategoryTagsList)
+                        {
+                            <option value="@tag.TagId" selected="@(tag.TagId == Model.EventCategoryTag?.EventCategoryTagId)">
+                                @tag.TagEmoji @tag.TagName
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group" id="eventLocation">
+                    <label for="EventLocationTagId">Location</label>
+                    <select name="EventLocationTagId" id="EventLocationTagId" class="form-control">
+                        <option value="" disabled>📍 Select event location</option>
+                        @foreach (var location in Model.LocationTagsList)
+                        {
+                            <option value="@location.EventLocationTagId" selected="@(location.EventLocationTagId == Model.EventLocationTag?.LocationTagId)">
+                                @location.EventLocationTagName
+                            </option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="detail">
+                <div class="description">
+                    <div class="form-group" id="eventDescription">
+                        <label for="EventDescription">Description</label>
+                        <textarea asp-for="EventDescription" class="form-control"></textarea>
+                        <span asp-validation-for="EventDescription" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="meta-data">
+                    <div class="form-group" id="eventDate">
+                        <label for="EventDate">Event Date</label>
+                        <input asp-for="EventDate" class="form-control" id="EventDate" type="datetime-local" value="@Model.EventDate.ToString("yyyy-MM-ddTHH:mm")" />
+                        <span asp-validation-for="EventDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group" id="postExpiryDate">
+                        <label for="PostExpiryDate">Post Expiry Date</label>
+                        <input asp-for="PostExpiryDate" class="form-control" id="PostExpiryDate" type="datetime-local" value="@Model.PostExpiryDate.ToString("yyyy-MM-ddTHH:mm")" />
+                        <span asp-validation-for="PostExpiryDate" class="text-danger"></span>
+                    </div>
+                    <div class="participate-detail">
+                        <div class="form-group">
+                            <label for="Cost">Participation Cost (THB) / Person </label>
+                            <input asp-for="Cost" class="form-control" />
+                            <span asp-validation-for="Cost" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="MaxParticipant">Max Participant (Current: @Model.CurrentParticipant)</label>
+                            <input asp-for="MaxParticipant" class="form-control" />
+                            <span asp-validation-for="MaxParticipant" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="question">
+                <div class="question-list" id="question-list">
+                    <div class="form-group">
+                        <div class="added-question">
+                            <h5>Current questions</h5>
+                            <p>These questions cannot be modified once the event is created.</p>
+                            <ul>
+                                @for (int i = 0; i < Model.Questions.Count; i++)
+                                {   
+                                    <li class="question-item">
+                                        @Model.Questions[i].Question
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="submit">
+                <button type="submit" class="submit-button">
+                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.SaveEdit>>(RenderMode.ServerPrerendered, new { Color = Color.Lightweight}))
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

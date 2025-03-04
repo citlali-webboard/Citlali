@@ -1,59 +1,60 @@
+/* ---------------------------------------------
+   1. LAYOUT & STRUCTURE
+---------------------------------------------- */
 .center-wrapper {
   width: 100%;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0 2rem;
   min-height: calc(100vh - var(--navbar-size));
   margin-top: var(--navbar-size);
   background-color: #f0f0f0;
-  
-  /* Add display: flex to enable flexbox layout */
-  display: flex;
-  flex-direction: row;
-
-  padding: 0 2rem;
 }
 
+.content {
+  padding: 0 2rem;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.slider {
+  margin: 0 auto;
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 1rem;
+}
+
+/* Sidebar columns */
 .sidebar-left,
 .sidebar-right {
   flex: 0 0 20%;
   padding: 1rem 0.5rem;
   padding-top: 3rem;
-  /* border: 1px solid #000; */
-
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  width: 100%;
+  overflow: hidden;
 }
 
+/* Main content column */
 .main-content {
   flex: 0 0 60%;
   overflow: hidden;
   padding: 1rem 2rem;
   padding-top: 3rem;
-  /* border: 1px solid #000; */
 }
 
-.main-header {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 2rem;
-}
-
-.main-header h1 {
-  font-size: 2rem;
-  font-weight: bold;
-}
-
-.main-header p {
-  font-size: 1rem;
-  color: #666;
-}
-
-.event-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
+/* ---------------------------------------------
+   2. SIDEBAR CARDS
+---------------------------------------------- */
 .sidebar-card {
   display: flex;
   flex-direction: column;
@@ -77,7 +78,10 @@
   background-color: #ccc;
 }
 
-.tag-container {
+/* ---------------------------------------------
+   3. TAGS COMPONENTS
+---------------------------------------------- */
+.tags-container {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -90,8 +94,7 @@
   border: 1px solid #666;
   border-radius: 30px;
   font-size: 0.8rem;
-
-  margin-bottom: 0.5rem;
+  /* margin-bottom: 0.5rem; */
 }
 
 .tag-hidden {
@@ -108,16 +111,19 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.tags-toggle {
+.tag:hover {
+  cursor: pointer;
+  background-color: #f0f0f0;
+}
+
+/* Toggle buttons for "See more" */
+.tags-toggle, 
+.location-toggle {
   text-align: center;
 }
 
 .toggle-icon {
   transition: transform 0.3s ease;
-}
-
-.tags-toggle-btn.expanded .toggle-icon {
-  transform: rotate(180deg);
 }
 
 .tags-toggle-btn {
@@ -138,12 +144,91 @@
   color: #aaa;
 }
 
-.tag:hover {
-  cursor: pointer;
-  background-color: #f0f0f0;
+.tags-toggle-btn.expanded .toggle-icon {
+  transform: rotate(180deg);
 }
 
-/* Pagination styling */
+/* ---------------------------------------------
+   4. MAIN CONTENT HEADER
+---------------------------------------------- */
+.main-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+}
+
+.main-header h1 {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.main-header p {
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Controls row with buttons */
+.controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 1rem;
+}
+
+/* Button group for sorting */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 1rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.create-btn,
+.sort-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.create-btn {
+  border: 1px solid #666;
+}
+
+.sort-btn:hover, 
+.create-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.sort-btn.active {
+  background-color: #333;
+  color: white;
+}
+
+.sort-btn.active svg {
+  fill: white !important;
+}
+
+/* ---------------------------------------------
+   5. EVENT LIST
+---------------------------------------------- */
+.event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ---------------------------------------------
+   6. PAGINATION
+---------------------------------------------- */
 .pagination {
   display: flex;
   justify-content: center;
@@ -188,10 +273,9 @@
   font-weight: bold;
   box-shadow: 0 3px 8px rgba(253, 0, 227, 0.3);
   cursor: default;
-  animation: pulse 2s infinite;
 }
 
-/* Special styling for Previous/Next buttons */
+/* Previous/Next buttons */
 .pagination-link:first-child,
 .pagination-link:last-child {
   padding: 0 1rem;
@@ -199,7 +283,6 @@
   font-weight: 600;
 }
 
-/* Add arrows to Previous/Next */
 .pagination-link:first-child::before {
   content: "«";
   margin-right: 0.3rem;
@@ -210,7 +293,186 @@
   margin-left: 0.3rem;
 }
 
+/* ---------------------------------------------
+   7. POPULAR CARDS (Trending, Tags, Users)
+---------------------------------------------- */
+.container-popular {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
+.card-popular {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* Image styling for profile pictures */
+.img-popular {
+  height: 32px;
+  width: 32px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 1px 1px 4px 1px rgba(102, 102, 102, 0.3);
+}
+
+/* Trending events card styling */
+.card-popular .trending-events-card-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  width: 75%;
+  position: relative;
+}
+
+.card-popular .trending-events-card-left h3 {
+  max-width: 70%;
+  text-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.9rem;
+} 
+
+.card-popular .trending-events-card-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 25%;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.card-popular .trending-events-card-right span {
+  opacity: 0.7;
+}
+
+/* Participants count */
+.count-participant {
+  display: flex;
+  flex-direction: row;
+  text-wrap: nowrap;
+  gap: 1px;
+  color: #666;
+}
+
+#current-participant {
+  font-weight: 700;
+  color: #666;
+}
+
+/* Popular tags styling */
+.tags-popular-card-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tags-popular-card-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.5;
+  font-size: 0.8rem;
+}
+
+.tags-popular {
+  border: 1px solid #666;
+  border-radius: 20px;
+  padding: 3px 6px;
+}
+
+.tags-popular:nth-child(1) {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+  font-size: 0.8rem;
+}
+
+.tags-popular:hover {
+  cursor: pointer;
+  background-color: #f0f0f0;
+}
+
+/* Superstar users styling */
+.superstars-card-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 60%;
+  position: relative;
+}
+
+.name-popular-user {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 100%;
+}
+
+.name-popular-user span:nth-child(1) {
+  text-wrap: nowrap;
+}
+
+.name-popular-user span:nth-child(2) {
+  opacity: 0.5;
+  font-size: 0.9rem;
+  max-width: 100%;
+  text-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.superstars-card-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.2rem;
+  opacity: 0.5;
+  font-size: 0.8rem;
+}
+
+/* Rank badges for superstars */
+.superstars-card-left[data-rank]::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: -14px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transform: rotate(20deg);
+}
+
+/* Different colors for different ranks */
+.superstars-card-left[data-rank="1"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Cpath d='M19.6872 14.0931L19.8706 12.3884C19.9684 11.4789 20.033 10.8783 19.9823 10.4999L20 10.5C20.8284 10.5 21.5 9.82843 21.5 9C21.5 8.17157 20.8284 7.5 20 7.5C19.1716 7.5 18.5 8.17157 18.5 9C18.5 9.37466 18.6374 9.71724 18.8645 9.98013C18.5384 10.1814 18.1122 10.606 17.4705 11.2451L17.4705 11.2451C16.9762 11.7375 16.729 11.9837 16.4533 12.0219C16.3005 12.043 16.1449 12.0213 16.0038 11.9592C15.7492 11.847 15.5794 11.5427 15.2399 10.934L13.4505 7.7254C13.241 7.34987 13.0657 7.03557 12.9077 6.78265C13.556 6.45187 14 5.77778 14 5C14 3.89543 13.1046 3 12 3C10.8954 3 10 3.89543 10 5C10 5.77778 10.444 6.45187 11.0923 6.78265C10.9343 7.03559 10.759 7.34984 10.5495 7.7254L8.76006 10.934C8.42056 11.5427 8.25081 11.847 7.99621 11.9592C7.85514 12.0213 7.69947 12.043 7.5467 12.0219C7.27097 11.9837 7.02381 11.7375 6.5295 11.2451C5.88787 10.606 5.46156 10.1814 5.13553 9.98012C5.36264 9.71724 5.5 9.37466 5.5 9C5.5 8.17157 4.82843 7.5 4 7.5C3.17157 7.5 2.5 8.17157 2.5 9C2.5 9.82843 3.17157 10.5 4 10.5L4.01771 10.4999C3.96702 10.8783 4.03162 11.4789 4.12945 12.3884L4.3128 14.0931C4.41458 15.0393 4.49921 15.9396 4.60287 16.75H19.3971C19.5008 15.9396 19.5854 15.0393 19.6872 14.0931Z' fill='%23F29D38'%3E%3C/path%3E%3Cpath d='M10.9121 21H13.0879C15.9239 21 17.3418 21 18.2879 20.1532C18.7009 19.7835 18.9623 19.1172 19.151 18.25H4.84896C5.03765 19.1172 5.29913 19.7835 5.71208 20.1532C6.65817 21 8.07613 21 10.9121 21Z' fill='%23F29D38'%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+}
+
+.superstars-card-left[data-rank="2"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Cpath d='M19.6872 14.0931L19.8706 12.3884C19.9684 11.4789 20.033 10.8783 19.9823 10.4999L20 10.5C20.8284 10.5 21.5 9.82843 21.5 9C21.5 8.17157 20.8284 7.5 20 7.5C19.1716 7.5 18.5 8.17157 18.5 9C18.5 9.37466 18.6374 9.71724 18.8645 9.98013C18.5384 10.1814 18.1122 10.606 17.4705 11.2451L17.4705 11.2451C16.9762 11.7375 16.729 11.9837 16.4533 12.0219C16.3005 12.043 16.1449 12.0213 16.0038 11.9592C15.7492 11.847 15.5794 11.5427 15.2399 10.934L13.4505 7.7254C13.241 7.34987 13.0657 7.03557 12.9077 6.78265C13.556 6.45187 14 5.77778 14 5C14 3.89543 13.1046 3 12 3C10.8954 3 10 3.89543 10 5C10 5.77778 10.444 6.45187 11.0923 6.78265C10.9343 7.03559 10.759 7.34984 10.5495 7.7254L8.76006 10.934C8.42056 11.5427 8.25081 11.847 7.99621 11.9592C7.85514 12.0213 7.69947 12.043 7.5467 12.0219C7.27097 11.9837 7.02381 11.7375 6.5295 11.2451C5.88787 10.606 5.46156 10.1814 5.13553 9.98012C5.36264 9.71724 5.5 9.37466 5.5 9C5.5 8.17157 4.82843 7.5 4 7.5C3.17157 7.5 2.5 8.17157 2.5 9C2.5 9.82843 3.17157 10.5 4 10.5L4.01771 10.4999C3.96702 10.8783 4.03162 11.4789 4.12945 12.3884L4.3128 14.0931C4.41458 15.0393 4.49921 15.9396 4.60287 16.75H19.3971C19.5008 15.9396 19.5854 15.0393 19.6872 14.0931Z' fill='%23666666'%3E%3C/path%3E%3Cpath d='M10.9121 21H13.0879C15.9239 21 17.3418 21 18.2879 20.1532C18.7009 19.7835 18.9623 19.1172 19.151 18.25H4.84896C5.03765 19.1172 5.29913 19.7835 5.71208 20.1532C6.65817 21 8.07613 21 10.9121 21Z' fill='%23666666'%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+}
+
+.superstars-card-left[data-rank="3"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Cpath d='M19.6872 14.0931L19.8706 12.3884C19.9684 11.4789 20.033 10.8783 19.9823 10.4999L20 10.5C20.8284 10.5 21.5 9.82843 21.5 9C21.5 8.17157 20.8284 7.5 20 7.5C19.1716 7.5 18.5 8.17157 18.5 9C18.5 9.37466 18.6374 9.71724 18.8645 9.98013C18.5384 10.1814 18.1122 10.606 17.4705 11.2451L17.4705 11.2451C16.9762 11.7375 16.729 11.9837 16.4533 12.0219C16.3005 12.043 16.1449 12.0213 16.0038 11.9592C15.7492 11.847 15.5794 11.5427 15.2399 10.934L13.4505 7.7254C13.241 7.34987 13.0657 7.03557 12.9077 6.78265C13.556 6.45187 14 5.77778 14 5C14 3.89543 13.1046 3 12 3C10.8954 3 10 3.89543 10 5C10 5.77778 10.444 6.45187 11.0923 6.78265C10.9343 7.03559 10.759 7.34984 10.5495 7.7254L8.76006 10.934C8.42056 11.5427 8.25081 11.847 7.99621 11.9592C7.85514 12.0213 7.69947 12.043 7.5467 12.0219C7.27097 11.9837 7.02381 11.7375 6.5295 11.2451C5.88787 10.606 5.46156 10.1814 5.13553 9.98012C5.36264 9.71724 5.5 9.37466 5.5 9C5.5 8.17157 4.82843 7.5 4 7.5C3.17157 7.5 2.5 8.17157 2.5 9C2.5 9.82843 3.17157 10.5 4 10.5L4.01771 10.4999C3.96702 10.8783 4.03162 11.4789 4.12945 12.3884L4.3128 14.0931C4.41458 15.0393 4.49921 15.9396 4.60287 16.75H19.3971C19.5008 15.9396 19.5854 15.0393 19.6872 14.0931Z' fill='%23704116'%3E%3C/path%3E%3Cpath d='M10.9121 21H13.0879C15.9239 21 17.3418 21 18.2879 20.1532C18.7009 19.7835 18.9623 19.1172 19.151 18.25H4.84896C5.03765 19.1172 5.29913 19.7835 5.71208 20.1532C6.65817 21 8.07613 21 10.9121 21Z' fill='%23704116'%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------------------------------------------
+   8. CREDITS
+---------------------------------------------- */
 .credit {
   color: #666;
 }
@@ -227,67 +489,41 @@
   font-size: 0.7rem;
 }
 
-/* Controls row */
-.controls-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+/* ---------------------------------------------
+   9. RESPONSIVE LAYOUTS
+---------------------------------------------- */
 
-/* Button group for sorting */
-.button-group {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.create-btn,
-.sort-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1rem;
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.create-btn {
-  border: 1px solid #666;
-}
-
-.sort-btn:hover, .create-btn:hover {
-  background-color: #e0e0e0;
-}
-
-.sort-btn.active {
-  background-color: #333;
-  color: white;
-  svg {
-    fill: white !important;
-  }
-}
-
-/* Responsive layout for mobile devices */
+/* Mobile layout - Stack everything */
 @media (max-width: 768px) {
   .center-wrapper {
-    flex-direction: column;
     padding: 0 0.5rem;
   }
+
+  .content {
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 0;
+  }
   
-  .sidebar-left, .main-content, .sidebar-right {
-    flex: 0 0 100%;
+  .sidebar-left, 
+  .main-content, 
+  .sidebar-right {
+    flex: 0 1 auto;
+    margin-top: 0;
     width: 100%;
   }
   
   .sidebar-left {
     order: 1;
   }
+
+  .slider {
+    margin: 1rem auto;
+    padding: 0 0.5rem;
+  }
   
   .main-content {
+    flex: 0 1 auto;
     order: 0;
     padding: 1rem 0.5rem;
   }
@@ -321,5 +557,73 @@
   
   .pagination-current-page {
     display: inline-flex;
+  }
+}
+
+/* Tablet layout - Right sidebar moves below left sidebar */
+@media (min-width: 769px) and (max-width: 1250px) {
+  .center-wrapper {
+    padding: 1.5rem;
+  }
+  
+  .content {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    grid-template-areas: 
+      "left-sidebar main-content"
+      "right-sidebar main-content";
+    gap: 0.5rem;
+  }
+  
+  .slider {
+    width: 100%;
+    grid-column: 1 / -1;
+    margin-bottom: 1.5rem;
+  }
+  
+  .sidebar-left {
+    grid-area: left-sidebar;
+    flex: none;
+    width: 100%;
+    padding-top: 1rem;
+  }
+  
+  .main-content {
+    grid-area: main-content;
+    flex: none;
+    padding: 1rem;
+  }
+  
+  .sidebar-right {
+    grid-area: right-sidebar;
+    flex: none;
+    width: 100%;
+    padding-top: 0;
+  }
+  
+  .card-popular .trending-events-card-left {
+    width: 65%;
+  }
+  
+  .card-popular .trending-events-card-right {
+    width: 35%;
+  }
+  
+  .card-popular .trending-events-card-left h3 {
+    max-width: 60%;
+  }
+  
+  .event-list {
+    width: 100%;
+  }
+  
+  .name-popular-user {
+    max-width: 130px;
+  }
+  
+  .controls-row {
+    margin-bottom: 1rem;
   }
 }

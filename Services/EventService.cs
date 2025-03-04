@@ -104,6 +104,36 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return modelEvent;
     }
 
+    public async Task<bool> EditEvent(Guid eventId, CreateEventViewModel createEventViewModel)
+    {
+        var supabaseUser = _userService.CurrentSession.User ?? throw new UnauthorizedAccessException("User not authenticated");
+        Guid userId = Guid.Parse(supabaseUser.Id ?? throw new UnauthorizedAccessException("User ID not found"));
+
+        var eventToEdit = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
+
+        if (eventToEdit.CreatorUserId != userId)
+            throw new UnauthorizedAccessException("User not authorized to edit this event");
+
+        var currentParticipant = await GetRegistrationCountByEventId(eventId);
+        if (createEventViewModel.MaxParticipant < currentParticipant)
+            throw new MaximumParticipantExceedException();
+
+        await _supabaseClient
+            .From<Event>()
+            .Where(row => row.EventId == eventId)
+            .Set(row => row.EventTitle, createEventViewModel.EventTitle)
+            .Set(row => row.EventDescription, createEventViewModel.EventDescription)
+            .Set(row => row.EventCategoryTagId, createEventViewModel.EventCategoryTagId)
+            .Set(row => row.EventLocationTagId, createEventViewModel.EventLocationTagId)
+            .Set(row => row.MaxParticipant, createEventViewModel.MaxParticipant)
+            .Set(row => row.Cost, createEventViewModel.Cost)
+            .Set(row => row.EventDate, createEventViewModel.EventDate)
+            .Set(row => row.PostExpiryDate, createEventViewModel.PostExpiryDate)
+            .Update();
+
+        return true;
+    }
+
     public async Task<bool> CloseEventWhenMaxParticipant(Guid eventId)
     {
         var eventToClose = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
@@ -424,8 +454,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var supabaseUser = _userService.CurrentSession.User ?? throw new Exception("User not authenticated");
         Guid userId = Guid.Parse(supabaseUser.Id ?? throw new Exception("User ID not found"));
         Guid EventId = joinEventModel.EventId;
-        var citlaliEvent = await GetEventById(EventId);
-
+        var citlaliEvent = await GetEventById(EventId) ?? throw new EventNotFoundException();
         if (citlaliEvent.Status == "closed")
             throw new EventClosedException();
 
@@ -511,7 +540,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
     public async Task<List<Event>> GetPaginatedEvents(int start, int end, string sortBy = "newest")
     {
-        var query =_supabaseClient
+        var query = _supabaseClient
             .From<Event>()
             .Select("*")
             .Where(row => row.Deleted == false)
@@ -735,7 +764,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
             .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
             .Count(Supabase.Postgrest.Constants.CountType.Exact);
-    
+
         return response;
     }
 
@@ -817,13 +846,15 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     {
         var currentUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
+        var userId = Guid.Parse(currentUser.Id ?? throw new UnauthorizedAccessException("User not found"));
 
-        var user = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id ?? throw new UnauthorizedAccessException("User not found")));
-        if (user == null)
-            throw new KeyNotFoundException("User not found");
+        var userTask = _userService.GetUserByUserId(userId);
+        var eventTask = GetEventById(eventId);
 
-        var ev = await GetEventById(eventId)
-                ?? throw new KeyNotFoundException("Event not found");
+        await Task.WhenAll(userTask, eventTask);
+
+        var user = userTask.Result ?? throw new KeyNotFoundException("User not found");
+        var ev = eventTask.Result ?? throw new KeyNotFoundException("Event not found");
 
         if (ev.CreatorUserId.ToString() != currentUser.Id)
         {
@@ -832,74 +863,90 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         var locationTagTask = GetLocationTagById(ev.EventLocationTagId);
         var eventCategoryTagTask = GetTagById(ev.EventCategoryTagId);
-        var registrantsTask = GetRegistrantsByEventId(ev.EventId);
-
-        await Task.WhenAll(locationTagTask, eventCategoryTagTask, registrantsTask);
-
-        var locationTag = locationTagTask.Result ?? new LocationTag();
-        var eventCategoryTag = eventCategoryTagTask.Result ?? new EventCategoryTag();
-        var registrants = registrantsTask.Result;
-
-        var eventQuestions = (await _supabaseClient
+        var currentParticipantCountTask = GetRegistrationCountByEventId(ev.EventId);
+        var eventQuestionsTask = _supabaseClient
             .From<EventQuestion>()
             .Select("*")
             .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, ev.EventId.ToString())
-            .Get()).Models;
+            .Get();
+
+        var registrationsTask = _supabaseClient
+            .From<Registration>()
+            .Select("*")
+            .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, ev.EventId.ToString())
+            .Get();
+
+        await Task.WhenAll(locationTagTask, eventCategoryTagTask, currentParticipantCountTask,
+                        eventQuestionsTask, registrationsTask);
+
+        var locationTag = locationTagTask.Result ?? new LocationTag();
+        var eventCategoryTag = eventCategoryTagTask.Result ?? new EventCategoryTag();
+        var eventQuestions = eventQuestionsTask.Result.Models;
+        var registrations = registrationsTask.Result.Models;
 
         var questionLookup = eventQuestions.ToDictionary(q => q.EventQuestionId, q => q.Question);
 
+        var registrationIds = registrations.Select(r => r.RegistrationId).ToList();
+
+        var userIds = registrations.Select(r => r.UserId).Distinct().ToList();
+        var usersTask = Task.WhenAll(userIds.Select(uid => _userService.GetUserByUserId(uid)));
+
+        var answersTask = _supabaseClient
+            .From<RegistrationAnswer>()
+            .Select("*")
+            .Filter(x => x.RegistrationAnswerId, Supabase.Postgrest.Constants.Operator.In,
+                registrationIds.Select(id => id.ToString()).ToList())
+            .Get();
+
+        await Task.WhenAll(usersTask, answersTask);
+
+        var allUsers = usersTask.Result.Where(u => u != null).ToDictionary(u => u?.UserId ?? Guid.Empty);
+        var allAnswers = answersTask.Result.Models;
+        var answersByRegistration = allAnswers
+            .GroupBy(a => a.RegistrationId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
         var answerSet = new List<EventManagementAnswerCollection>();
-        var ConfirmedParticipant = new List<BriefUser>();
-        var AwaitingConfirmationParticipant = new List<BriefUser>();
-        var RejectedConfirmationParticipant = new List<BriefUser>();
-        var currentParticipantCount = await GetRegistrationCountByEventId(ev.EventId);
+        var confirmedParticipant = new List<BriefUser>();
+        var awaitingConfirmationParticipant = new List<BriefUser>();
+        var rejectedConfirmationParticipant = new List<BriefUser>();
 
-        foreach (var registrant in registrants)
+        foreach (var registration in registrations)
         {
-            var registration = await _supabaseClient
-                .From<Registration>()
-                .Select("*")
-                .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, ev.EventId.ToString())
-                .Filter("UserId", Supabase.Postgrest.Constants.Operator.Equals, registrant.UserId.ToString())
-                .Single();
+            if (!allUsers.TryGetValue(registration.UserId, out var registrant))
+                continue;
 
-            if (registration == null) continue;
-
-            var registrationId = registration.RegistrationId;
-
-            BriefUser briefUser = new BriefUser
+            var briefUser = new BriefUser
             {
-                UserId = registrant.UserId,
+                UserId = registrant?.UserId ?? throw new GetUserException(),
                 Username = registrant.Username,
                 ProfileImageUrl = registrant.ProfileImageUrl,
                 DisplayName = registrant.DisplayName
             };
 
-            if (registration.Status == "confirmed")
+            switch (registration.Status)
             {
-                ConfirmedParticipant.Add(briefUser);
-            }
-            else if (registration.Status == "awaiting-confirmation")
-            {
-                AwaitingConfirmationParticipant.Add(briefUser);
-            }
-            else if (registration.Status == "rejected-invitation")
-            {
-                RejectedConfirmationParticipant.Add(briefUser);
+                case "confirmed":
+                    confirmedParticipant.Add(briefUser);
+                    break;
+                case "awaiting-confirmation":
+                    awaitingConfirmationParticipant.Add(briefUser);
+                    break;
+                case "rejected-invitation":
+                    rejectedConfirmationParticipant.Add(briefUser);
+                    break;
             }
 
-            var answers = (await _supabaseClient
-                .From<RegistrationAnswer>()
-                .Select("*")
-                .Filter("RegistrationId", Supabase.Postgrest.Constants.Operator.Equals, registrationId.ToString())
-                .Get()).Models;
-
-            var registrationAnswers = answers.Select(answer => new RegistrationAnswerSimplify
+            var registrationAnswers = new List<RegistrationAnswerSimplify>();
+            if (answersByRegistration.TryGetValue(registration.RegistrationId, out var answers))
             {
-                EventQuestionId = answer.EventQuestionId,
-                Question = questionLookup.GetValueOrDefault(answer.EventQuestionId, ""),
-                Answer = answer.Answer
-            }).ToList();
+                registrationAnswers = answers.Select(answer => new RegistrationAnswerSimplify
+                {
+                    EventQuestionId = answer.EventQuestionId,
+                    Question = questionLookup.GetValueOrDefault(answer.EventQuestionId, ""),
+                    Answer = answer.Answer
+                }).ToList();
+            }
 
             answerSet.Add(new EventManagementAnswerCollection
             {
@@ -908,13 +955,6 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                 RegistrationAnswers = registrationAnswers
             });
         }
-
-        var questionList = questionLookup.Select(q => new QuestionViewModel
-        {
-            EventQuestionId = q.Key,
-            Question = q.Value,
-            Answer = ""
-        }).ToList();
 
         return new EventManagementViewModel
         {
@@ -926,18 +966,75 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             CreatorProfileImageUrl = user.ProfileImageUrl,
             LocationTag = locationTag,
             EventCategoryTag = eventCategoryTag,
-            CurrentParticipant = currentParticipantCount,
+            CurrentParticipant = currentParticipantCountTask.Result,
             MaxParticipant = ev.MaxParticipant,
             Cost = ev.Cost,
             EventDate = ev.EventDate,
             PostExpiryDate = ev.PostExpiryDate,
             EventStatus = ev.Status,
             CreatedAt = ev.CreatedAt,
-            Questions = questionList,
+            Questions = questionLookup.Select(q => new QuestionViewModel
+            {
+                EventQuestionId = q.Key,
+                Question = q.Value,
+                Answer = ""
+            }).ToList(),
             AnswerSet = answerSet,
-            ConfirmedParticipant = ConfirmedParticipant,
-            AwaitingConfirmationParticipant = AwaitingConfirmationParticipant,
-            RejectedConfirmationParticipant = RejectedConfirmationParticipant
+            ConfirmedParticipant = confirmedParticipant,
+            AwaitingConfirmationParticipant = awaitingConfirmationParticipant,
+            RejectedConfirmationParticipant = rejectedConfirmationParticipant
+        };
+    }
+
+    public async Task<EditEventViewModel> GetEventEditPage(Guid eventId)
+    {
+        var currentUser = _userService.CurrentSession.User
+                        ?? throw new UnauthorizedAccessException("User not authenticated");
+        var userId = Guid.Parse(currentUser.Id
+                        ?? throw new UnauthorizedAccessException("User ID not found"));
+
+        var eventTask = GetEventById(eventId);
+        var ev = await eventTask ?? throw new KeyNotFoundException("Event not found");
+
+        if (ev.CreatorUserId != userId)
+            throw new UnauthorizedAccessException("User not authorized to edit this event");
+
+        var tasks = new Task[]
+        {
+            Task.CompletedTask,
+            GetLocationTagById(ev.EventLocationTagId),
+            GetTagById(ev.EventCategoryTagId),
+            GetLocationTags(),
+            GetTags(),
+            GetQuestionsByEventId(eventId),
+            GetRegistrationCountByEventId(eventId)
+
+        };
+
+        await Task.WhenAll(tasks);
+
+        var locationTag = await (Task<LocationTag?>)tasks[1] ?? new LocationTag();
+        var categoryTag = await (Task<EventCategoryTag?>)tasks[2] ?? new EventCategoryTag();
+        var locationTags = await (Task<List<Location>>)tasks[3];
+        var categoryTags = await (Task<List<Tag>>)tasks[4];
+        var questions = await (Task<List<QuestionViewModel>>)tasks[5];
+        var currentParticipant = await (Task<int>)tasks[6];
+
+        return new EditEventViewModel
+        {
+            EventId = ev.EventId,
+            EventTitle = ev.EventTitle,
+            EventDescription = ev.EventDescription,
+            EventCategoryTag = categoryTag,
+            EventLocationTag = locationTag,
+            MaxParticipant = ev.MaxParticipant,
+            CurrentParticipant = currentParticipant,
+            Cost = ev.Cost,
+            EventDate = ev.EventDate,
+            PostExpiryDate = ev.PostExpiryDate,
+            LocationTagsList = locationTags,
+            EventCategoryTagsList = categoryTags,
+            Questions = questions
         };
     }
 
@@ -1077,7 +1174,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
 
     //GetRegistrantsConfirmedByEventId
-    public async Task<List<Registration?>> GetRegistrantsConfirmedByEventId(Guid eventId)
+    public async Task<List<Registration>> GetRegistrantsConfirmedByEventId(Guid eventId)
     {
         var response = await _supabaseClient
             .From<Registration>()
@@ -1095,7 +1192,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     {
         var supabaseUser = _userService.CurrentSession.User
                         ?? throw new UnauthorizedAccessException("User not authenticated");
-        var userId = Guid.Parse(supabaseUser.Id);
+        var userId = Guid.Parse(supabaseUser.Id ?? throw new GetUserException());
 
         var Event = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
 
@@ -1171,21 +1268,57 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return historyList;
     }
 
-    public async Task<List<Event>> GetTrendingEvents()
+    public async Task<List<EventBriefCardData>> GetTrendingEvents()
     {
-        var allActiveEvents = await _supabaseClient
-                    .From<Event>()
-                    .Select("*")
-                    .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
-                    .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
-                    .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
-                    .Range(0, 5)
-                    .Get();
+        try
+        {
+            // Get events created in the last week that are active
+            var allActiveEvents = await _supabaseClient
+                .From<Event>()
+                .Select("*")
+                .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
+                .Filter("CreatedAt", Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.AddDays(-7).ToString("yyyy-MM-ddTHH:mm:ssZ"))
+                .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+                .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
+                .Get();
 
-        return allActiveEvents.Models;
+            if (allActiveEvents?.Models == null || allActiveEvents.Models.Count == 0)
+                return new List<EventBriefCardData>();
+
+            // Get participant count for each event concurrently
+            var eventWithParticipants = new List<(Event Event, int Count)>();
+            var tasks = allActiveEvents.Models.Select(async e =>
+            {
+                var count = await GetRegistrationCountByEventId(e.EventId);
+                return (e, count);
+            });
+
+            eventWithParticipants = (await Task.WhenAll(tasks)).ToList();
+
+            // Sort events by participant count and take top 5
+            var sortedEvents = eventWithParticipants
+                .OrderByDescending(x => x.Count)
+                .Take(5)
+                .Select(x => x.Event)
+                .ToList();
+
+            if (sortedEvents.Count == 0)
+                return new List<EventBriefCardData>();
+
+            // Convert to brief card data
+            var eventBriefCardDataTasks = sortedEvents.Select(EventToBriefCard);
+            var eventBriefCardData = await Task.WhenAll(eventBriefCardDataTasks);
+
+            return eventBriefCardData.ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting trending events: {ex.Message}");
+            return new List<EventBriefCardData>();
+        }
     }
 
-    public async Task<List<EventCategoryTag>> GetPopularTags()
+    public async Task<List<PopularTag>> GetPopularTags()
     {
         // Get all active events
         var allActiveEvents = await _supabaseClient
@@ -1216,18 +1349,64 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                                     .Select(tc => tc.Key)
                                     .ToList();
 
-        // Fetch all popular tags in a single query
-        if (popularTagsId.Count == 0)
-            return null;
+        // Fetch all popular tags individually
+        var popularTags = new List<PopularTag>();
+        foreach (var tagId in popularTagsId)
+        {
+            var tagResponse = await _supabaseClient
+                .From<EventCategoryTag>()
+                .Select("*")
+                .Filter(tag => tag.EventCategoryTagId, Supabase.Postgrest.Constants.Operator.Equals, tagId.ToString())
+                .Single();
 
-        var tagResponse = await _supabaseClient
-            .From<EventCategoryTag>()
-            .Filter(tag => tag.EventCategoryTagId, Supabase.Postgrest.Constants.Operator.In, string.Join(",", popularTagsId))
-            .Get();
+            if (tagResponse != null)
+            {
+                popularTags.Add(new PopularTag
+                {
+                    EventCategoryTagId = tagResponse.EventCategoryTagId,
+                    EventCategoryTagName = tagResponse.EventCategoryTagName,
+                    EventCategoryTagEmoji = tagResponse.EventCategoryTagEmoji,
+                    EventCount = tagCounts[tagResponse.EventCategoryTagId]
+                });
+            }
+        }
 
-        return tagResponse.Models;
+        return popularTags;
     }
 
+
+    public async Task<List<Event>> GetEventsByLocationId(Guid locationId)
+    {
+        try
+        {
+            var response = await _supabaseClient
+                .From<Event>()
+                .Where(e => e.EventLocationTagId == locationId)
+                .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
+                .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+                .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
+                .Get();
+
+            return response.Models;
+        }
+        catch (Exception)
+        {
+            return new List<Event>();
+        }
+    }
+
+    public async Task<int> GetEventCountByLocationId(Guid locationId)
+    {
+        var response = await _supabaseClient
+            .From<Event>()
+            .Filter("EventLocationTagId", Supabase.Postgrest.Constants.Operator.Equals, locationId.ToString())
+            .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
+            .Filter(row => row.PostExpiryDate, Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+            .Filter(row => row.Status, Supabase.Postgrest.Constants.Operator.Equals, "active")
+            .Count(Supabase.Postgrest.Constants.CountType.Exact);
+
+        return response;
+    }
 
     public async Task<List<Event>> GetEventsFromFollowed(Guid userId)
     {
@@ -1370,5 +1549,25 @@ public class EventClosedException : Exception
     public EventClosedException(string message) : base(message) { }
 
     public EventClosedException(string message, Exception innerException)
+        : base(message, innerException) { }
+}
+
+public class MaximumParticipantExceedException : Exception
+{
+    public MaximumParticipantExceedException() : base("Maximum participant has been exceeded.") { }
+
+    public MaximumParticipantExceedException(string message) : base(message) { }
+
+    public MaximumParticipantExceedException(string message, Exception innerException)
+        : base(message, innerException) { }
+}
+
+public class EventNotFoundException : Exception
+{
+    public EventNotFoundException() : base("Event not found!") { }
+
+    public EventNotFoundException(string message) : base(message) { }
+
+    public EventNotFoundException(string message, Exception innerException)
         : base(message, innerException) { }
 }
