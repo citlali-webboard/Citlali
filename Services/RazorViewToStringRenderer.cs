@@ -1,3 +1,6 @@
+// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
 using System;
 using System.IO;
 using System.Linq;
@@ -11,63 +14,62 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Citlali.Services
 {
     public class RazorViewToStringRenderer
     {
-        private readonly IServiceProvider _serviceProvider;
+        private IRazorViewEngine _viewEngine;
+        private ITempDataProvider _tempDataProvider;
+        private IServiceProvider _serviceProvider;
 
-        public RazorViewToStringRenderer(IServiceProvider serviceProvider)
+        public RazorViewToStringRenderer(
+            IRazorViewEngine viewEngine,
+            ITempDataProvider tempDataProvider,
+            IServiceProvider serviceProvider)
         {
+            _viewEngine = viewEngine;
+            _tempDataProvider = tempDataProvider;
             _serviceProvider = serviceProvider;
         }
 
         public async Task<string> RenderViewToStringAsync<TModel>(string viewName, TModel model)
         {
-            using (var scope = _serviceProvider.CreateScope())
+            var actionContext = GetActionContext();
+            var view = FindView(actionContext, viewName);
+
+            using (var output = new StringWriter())
             {
-                var scopedServiceProvider = scope.ServiceProvider;
-                var viewEngine = scopedServiceProvider.GetRequiredService<IRazorViewEngine>();
-                var tempDataProvider = scopedServiceProvider.GetRequiredService<ITempDataProvider>();
+                var viewContext = new ViewContext(
+                    actionContext,
+                    view,
+                    new ViewDataDictionary<TModel>(
+                        metadataProvider: new EmptyModelMetadataProvider(),
+                        modelState: new ModelStateDictionary())
+                    {
+                        Model = model
+                    },
+                    new TempDataDictionary(
+                        actionContext.HttpContext,
+                        _tempDataProvider),
+                    output,
+                    new HtmlHelperOptions());
 
-                var actionContext = GetActionContext(scopedServiceProvider);
-                var view = FindView(viewEngine, actionContext, viewName);
+                await view.RenderAsync(viewContext);
 
-                using (var output = new StringWriter())
-                {
-                    var viewContext = new ViewContext(
-                        actionContext,
-                        view,
-                        new ViewDataDictionary<TModel>(
-                            metadataProvider: new EmptyModelMetadataProvider(),
-                            modelState: new ModelStateDictionary())
-                        {
-                            Model = model
-                        },
-                        new TempDataDictionary(
-                            actionContext.HttpContext,
-                            tempDataProvider),
-                        output,
-                        new HtmlHelperOptions());
-
-                    await view.RenderAsync(viewContext);
-
-                    return output.ToString();
-                }
+                return output.ToString();
             }
         }
 
-        private IView FindView(IRazorViewEngine viewEngine, ActionContext actionContext, string viewName)
+        private IView FindView(ActionContext actionContext, string viewName)
         {
-            var getViewResult = viewEngine.GetView(executingFilePath: null, viewPath: viewName, isMainPage: true);
+            var getViewResult = _viewEngine.GetView(executingFilePath: null, viewPath: viewName, isMainPage: true);
             if (getViewResult.Success)
             {
                 return getViewResult.View;
             }
 
-            var findViewResult = viewEngine.FindView(actionContext, viewName, isMainPage: true);
+            var findViewResult = _viewEngine.FindView(actionContext, viewName, isMainPage: true);
             if (findViewResult.Success)
             {
                 return findViewResult.View;
@@ -76,15 +78,15 @@ namespace Citlali.Services
             var searchedLocations = getViewResult.SearchedLocations.Concat(findViewResult.SearchedLocations);
             var errorMessage = string.Join(
                 Environment.NewLine,
-                new[] { $"Unable to find view '{viewName}'. The following locations were searched:" }.Concat(searchedLocations));
+                new[] { $"Unable to find view '{viewName}'. The following locations were searched:" }.Concat(searchedLocations)); ;
 
             throw new InvalidOperationException(errorMessage);
         }
 
-        private ActionContext GetActionContext(IServiceProvider serviceProvider)
+        private ActionContext GetActionContext()
         {
             var httpContext = new DefaultHttpContext();
-            httpContext.RequestServices = serviceProvider;
+            httpContext.RequestServices = _serviceProvider;
             return new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
         }
     }
