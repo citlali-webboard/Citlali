@@ -1,11 +1,22 @@
+.center-wrapper {
+    width: 100%;
+    min-height: calc(100vh - var(--navbar-size));
+    margin-top: var(--navbar-size);
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    /* background-color: #f0f0f0; */
+}
 
 .container{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 80vw;
-    margin: 2% 0 2% 0;
+    width: 80%;
+    margin-top: 2rem;
 }
 
 header {
@@ -52,6 +63,7 @@ main .notification-container{
     border: 1px solid #d2d1d1;
     border-radius: 8px;
     position: relative;
+    background-color: #fefefe;
 }
 
 .notification-card #title {
@@ -102,6 +114,7 @@ main .notification-container{
 
 
 .default-notification{
+    background-color: #fefefe;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
     border-radius: 12px;
     width: 80%;
@@ -120,6 +133,7 @@ main .notification-container{
 }
 
 .notification-detail{
+    background-color: #fefefe;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
     border-radius: 12px;
     width: 80%;
@@ -233,6 +247,11 @@ main .notification-container{
     font-size: 1.2rem;
     font-weight: bold;
     margin: 0.5rem 1rem 0rem 1rem;
+}
+
+.notification-detail .content .content-title p{
+    text-wrap: wrap;
+    overflow-wrap: anywhere;
 }
 
 .notification-detail .content .content-body{
@@ -380,6 +399,7 @@ main .notification-container{
     }
 
     .container-detail-mobile{
+        background-color: #fefefe;
         width: 100%;
         height: auto;
         display: flex;

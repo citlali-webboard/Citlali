@@ -6,11 +6,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
+    background-color: #f0f0f0;
 }
 
 #title {
     font-weight: bold;
-    color: var(--color-primary);
+    color: var(--pink-saturated);
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
 }
 
@@ -49,7 +51,7 @@
     padding: 2rem;
     margin: 2rem;
     border-radius: 10px;
-    background-color: var(--bg-color);
+    background-color: #fefefe;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 

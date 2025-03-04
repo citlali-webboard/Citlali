@@ -1,8 +1,8 @@
 .card {
   width: 100%;
-  border: 2px solid var(--color-muted);
   padding: 1rem;
   border-radius: 1rem;
+  background-color: #fefefe;
 }
 
 .card:hover {
