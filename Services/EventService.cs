@@ -894,7 +894,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var answersTask = _supabaseClient
             .From<RegistrationAnswer>()
             .Select("*")
-            .Filter(x => x.RegistrationAnswerId, Supabase.Postgrest.Constants.Operator.In,
+            .Filter(x => x.RegistrationId, Supabase.Postgrest.Constants.Operator.In,
                 registrationIds.Select(id => id.ToString()).ToList())
             .Get();
 
