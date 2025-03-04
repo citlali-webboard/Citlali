@@ -197,24 +197,31 @@ public class NotificationService(Client supabaseClient, UserService userService,
             .From<Notification>()
             .Insert(notification);
 
+        if (_configuration.Mail.NotificationLevel == MailNotificationLevel.ImportantOnly && level == NotificationLevel.Important)
+        {
+            SendNotificationEmail(title, message, url, toUserId);
+        }
+        else
+        {
+            SendNotificationEmail(title, message, url, toUserId);
+        }
+
+        await addToDbTask;
+
+        return true;
+    }
+
+    public async void SendNotificationEmail(string title, string message, string url, Guid targetUserId)
+    {
+        var targetUserTask = _userService.GetUserByUserId(targetUserId);
         var mailModel = new MailNotificationViewModel {
             Title = EscapeInput(title),
             Body = EscapeInput(message),
             Url = $"{_configuration.App.Url}{EscapeInput(url)}"
         };
+
         var targetUser = await targetUserTask ?? throw new KeyNotFoundException("Can't query target user");
-        if (_configuration.Mail.NotificationLevel == MailNotificationLevel.ImportantOnly && level == NotificationLevel.Important)
-        {
-            _mailService.SendNotificationEmail(mailModel)
-        }
-
-
-        return true;
-    }
-
-    public async Task<bool> SendNotificationEmail(string title, string message, string url)
-    {
-
+        _mailService.SendNotificationEmail(mailModel, targetUser.Email);
     }
 
     //GetUnreadNotificationsNumber

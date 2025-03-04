@@ -236,7 +236,6 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         var eventToInviteTask = GetEventById(eventId);
         var registrationTask = GetRegistrationByEventIdAndUserId(eventId, userId);
-        var targetUserTask = _userService.GetUserByUserId(userId);
         var invitedRegistrantCountTask = _supabaseClient
             .From<Registration>()
             .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
@@ -272,7 +271,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             Url = $"{_configuration.App.Url}{absoluteUrl}"
         };
 
-        var notificaionTask = _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl);
+        var notificaionTask = _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl, NotificationLevel.Important);
 
         return true;
     }
