@@ -533,15 +533,16 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             throw new JoinOwnerException();
         }
 
-        var statusRegistration = Event.FirstComeFirstServed ? "awaiting-confirmation" : "pending";
+        // var statusRegistration = Event.FirstComeFirstServed ? "awaiting-confirmation" : "pending";
 
         var newRegistration = new Registration
         {
             RegistrationId = Guid.NewGuid(),
             EventId = EventId,
             UserId = userId,
-            Status = statusRegistration
         };
+
+        await UpdateInviteRegistration(EventId);
 
         await _supabaseClient
             .From<Registration>()
