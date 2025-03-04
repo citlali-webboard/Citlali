@@ -261,6 +261,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .From<Registration>()
             .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "awaiting-confirmation")
+            .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
 
         var notificationTitle = "You have been invited to an event! 🎉";
@@ -300,6 +301,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .From<Registration>()
             .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "rejected")
+            .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
 
         var notificationTitle = "Your request has been rejected. ❌";
@@ -1121,6 +1123,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .From<Registration>()
             .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "rejected-invitation")
+            .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
 
         var CreatorUserId = await GetCreatorEventIdByEventId(eventId);
@@ -1156,6 +1159,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .From<Registration>()
             .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "confirmed")
+            .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
 
         var CreatorUserId = await GetCreatorEventIdByEventId(eventId);
@@ -1418,6 +1422,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .From<Registration>()
             .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "confirmed")
+            .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
 
         await UpdateEventStatus(eventId);
