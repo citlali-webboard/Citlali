@@ -11,10 +11,12 @@ using System.Threading.Tasks;
 
 namespace Citlali.Services;
 
-public class NotificationService(Client supabaseClient, UserService userService)
+public class NotificationService(Client supabaseClient, UserService userService, MailService mailService, Configuration configuration)
 {
     private readonly Client _supabaseClient = supabaseClient;
     private readonly UserService _userService = userService;
+    private readonly MailService _mailService = mailService;
+    private readonly Configuration _configuration = configuration;
 
     public string EscapeInput(string input)
     {
@@ -162,7 +164,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
     }
 
     //Create Notification with title and message
-    public async Task<bool> CreateNotification(Guid toUserId, string title, string message, string url)
+    public async Task<bool> CreateNotification(Guid toUserId, string title, string message, string url, NotificationLevel level = NotificationLevel.Normal)
     {
 
         var supabaseUser = _userService.CurrentSession.User
@@ -191,14 +193,39 @@ public class NotificationService(Client supabaseClient, UserService userService)
             CreatedAt = DateTime.UtcNow,
             Read = false
         };
-
-        await _supabaseClient
+        var addToDbTask = _supabaseClient
             .From<Notification>()
             .Insert(notification);
+
+        var emailTask = Task.Run(async () =>
+        {
+            if (_configuration.Mail.NotificationLevel == MailNotificationLevel.ImportantOnly && level == NotificationLevel.Important)
+            {
+            await SendNotificationEmail(title, message, url, toUserId);
+            }
+            else
+            {
+            await SendNotificationEmail(title, message, url, toUserId);
+            }
+        });
+
+        await Task.WhenAll(addToDbTask, emailTask);
 
         return true;
     }
 
+    public async Task SendNotificationEmail(string title, string message, string url, Guid targetUserId)
+    {
+        var targetUserTask = _userService.GetUserByUserId(targetUserId);
+        var mailModel = new MailNotificationViewModel {
+            Title = EscapeInput(title),
+            Body = EscapeInput(message),
+            Url = $"{_configuration.App.Url}{EscapeInput(url)}"
+        };
+
+        var targetUser = await targetUserTask ?? throw new KeyNotFoundException("Can't query target user");
+        await _mailService.SendNotificationEmail(mailModel, targetUser.Email);
+    }
 
     //GetUnreadNotificationsNumber
     public async Task<int> GetUnreadNotificationsNumber()

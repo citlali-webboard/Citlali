@@ -236,7 +236,6 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         var eventToInviteTask = GetEventById(eventId);
         var registrationTask = GetRegistrationByEventIdAndUserId(eventId, userId);
-        var targetUserTask = _userService.GetUserByUserId(userId);
         var invitedRegistrantCountTask = _supabaseClient
             .From<Registration>()
             .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
@@ -272,9 +271,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             Url = $"{_configuration.App.Url}{absoluteUrl}"
         };
 
-        var targetUser = await targetUserTask ?? throw new KeyNotFoundException("Can't query target user");
-        var notificaionTask = _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl);
-        _mailService.SendNotificationEmail(mailModel, targetUser.Email);
+        var notificaionTask = await _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl, NotificationLevel.Important);
 
         return true;
     }
@@ -1077,8 +1074,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var registrants = await GetRegistrantsConfirmedByEventId(eventId);
 
         if (registrants != null && registrants.Count > 0) {
-            var notificationTasks = registrants.Select(registrant =>
-                _notificationService.CreateNotification(registrant.UserId, title, message, $"/event/detail/{eventId}")
+            var notificationTasks = registrants.Select(async registrant =>
+               await  _notificationService.CreateNotification(registrant.UserId, title, message, $"/event/detail/{eventId}")
             );
 
             await Task.WhenAll(notificationTasks);
