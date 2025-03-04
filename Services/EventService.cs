@@ -271,7 +271,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             Url = $"{_configuration.App.Url}{absoluteUrl}"
         };
 
-        var notificaionTask = _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl, NotificationLevel.Important);
+        var notificaionTask = await _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl, NotificationLevel.Important);
 
         return true;
     }
@@ -1074,8 +1074,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var registrants = await GetRegistrantsConfirmedByEventId(eventId);
 
         if (registrants != null && registrants.Count > 0) {
-            var notificationTasks = registrants.Select(registrant =>
-                _notificationService.CreateNotification(registrant.UserId, title, message, $"/event/detail/{eventId}")
+            var notificationTasks = registrants.Select(async registrant =>
+               await  _notificationService.CreateNotification(registrant.UserId, title, message, $"/event/detail/{eventId}")
             );
 
             await Task.WhenAll(notificationTasks);
