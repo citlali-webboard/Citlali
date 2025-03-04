@@ -335,7 +335,7 @@ public class UserService
     {
         var response = await _supabaseClient
             .From<UserFollowedCategory>()
-            .Filter("USER_ID", Operator.Equals, userId)
+            .Filter("UserId", Operator.Equals, userId)
             .Select("*")
             .Get();
 
