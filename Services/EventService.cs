@@ -306,7 +306,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Count(Supabase.Postgrest.Constants.CountType.Exact);
 
         var eventToInvite = await eventToInviteTask ?? throw new KeyNotFoundException("Event not found");
-        if (eventToInvite.CreatorUserId.ToString() != supabaseUser.Id)
+        if (eventToInvite.CreatorUserId.ToString() != supabaseUser.Id && (eventToInvite.FirstComeFirstServed == false) && (supabaseUser.Id != userId.ToString()))
         {
             throw new UnauthorizedAccessException("User not authorized to invite to this event");
         }
