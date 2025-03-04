@@ -132,7 +132,27 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.PostExpiryDate, createEventViewModel.PostExpiryDate)
             .Set(row => row.FirstComeFirstServed, createEventViewModel.FirstComeFirstServed)
             .Update();
+        
+        if( createEventViewModel.FirstComeFirstServed )
+        {
+            await UpdateRegistrationStatus(eventId);
+        } 
 
+        return true;
+    }
+
+    public async Task<bool> UpdateRegistrationStatus(Guid eventId)
+    {
+        //get all registration with status pending
+        var registrationsPending = await _supabaseClient
+            .From<Registration>()
+            .Select("*")
+            .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
+            .Filter("Status", Supabase.Postgrest.Constants.Operator.Equals, "pending")
+            .Set(row => row.Status, "awaiting-confirmation")
+            .Set(row => row.UpdatedAt, DateTime.UtcNow)
+            .Update();
+            
         return true;
     }
 
@@ -479,7 +499,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             throw new JoinOwnerException();
         }
 
-        var statusRegistration = Event.FirstComeFirstServed ? "confirmed" : "pending";
+        var statusRegistration = Event.FirstComeFirstServed ? "awaiting-confirmation" : "pending";
 
         var newRegistration = new Registration
         {
