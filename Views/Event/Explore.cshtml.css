@@ -410,27 +410,40 @@
   gap: 0.5rem;
   max-width: 60%;
   position: relative;
+  flex-grow: 1;
 }
 
 .name-popular-user {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.3rem;
+  flex-direction: column-reverse;
+  gap: 0.0rem;
   max-width: 100%;
-}
-
-.name-popular-user span:nth-child(1) {
+  width: 100%;
   text-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
 }
 
-.name-popular-user span:nth-child(2) {
-  opacity: 0.5;
-  font-size: 0.9rem;
-  max-width: 100%;
+/* display name */
+.name-popular-user span:nth-child(1) {
+  max-width: calc(100% - 32px);
   text-wrap: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  justify-self: flex-start;
+  width: 100%;
+}
+
+/* username */
+.name-popular-user span:nth-child(2) {
+  max-width: calc(100% - 32px);
+  opacity: 0.5;
+  font-size: 0.7rem;
+  text-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  justify-self: flex-start;
+  width: 70%;
 }
 
 .superstars-card-right {
@@ -447,7 +460,7 @@
   content: '';
   position: absolute;
   left: 15px;
-  top: -14px;
+  top: -8px;
   width: 20px;
   height: 20px;
   display: flex;
@@ -570,7 +583,7 @@
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: 250px 1fr;
+    grid-template-columns: 25% 1fr;
     grid-template-areas: 
       "left-sidebar main-content"
       "right-sidebar main-content";

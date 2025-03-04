@@ -9,14 +9,14 @@
     ViewData["Title"] = "Explore";
 
     var imageUrls = new List<string>
-    {
-        "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2024/12/genshin-30.jpg",
-        "https://img.4gamers.com.tw/ckfinder-th/image2/auto/2025-01/Citlali_Introduction_Banner-250102-181140.png?versionId=r4yCiZ0mpYQb4la101fQUFNeaAW0mcgl",
-        "https://static1.thegamerimages.com/wordpress/wp-content/uploads/wm/2025/01/citlali-is-in-her-burst-animation-in-genshin-impact.jpg",
-        "https://shop.ldrescdn.com/rms/ld-space/process/img/2299c5454c564d8f941a68de6ccbad7c1735637742.png?1735637751071",
-        "https://staticg.sportskeeda.com/editor/2024/11/c89e4-17318266801921-1920.jpg?w=640",
-        
-    };
+{
+"https://static0.gamerantimages.com/wordpress/wp-content/uploads/2024/12/genshin-30.jpg",
+"https://img.4gamers.com.tw/ckfinder-th/image2/auto/2025-01/Citlali_Introduction_Banner-250102-181140.png?versionId=r4yCiZ0mpYQb4la101fQUFNeaAW0mcgl",
+"https://static1.thegamerimages.com/wordpress/wp-content/uploads/wm/2025/01/citlali-is-in-her-burst-animation-in-genshin-impact.jpg",
+"https://shop.ldrescdn.com/rms/ld-space/process/img/2299c5454c564d8f941a68de6ccbad7c1735637742.png?1735637751071",
+"https://staticg.sportskeeda.com/editor/2024/11/c89e4-17318266801921-1920.jpg?w=640",
+
+};
 
     var imageSlider = new Citlali.Models.ImageSliderModel
     {
@@ -40,24 +40,26 @@
                         int initialTagsToShow = 10;
                         bool hasMoreTags = Model.Tags.Count() > initialTagsToShow;
                     }
-                    
+
                     @for (int i = 0; i < Model.Tags.Count(); i++)
                     {
                         var tag = Model.Tags.ElementAt(i);
                         var isHidden = i >= initialTagsToShow;
-                        
+
                         <div class="tag @(isHidden ? "tag-hidden" : "")" data-index="@i">
                             <a href="/event/tag/@tag.TagId">@tag.TagEmoji @tag.TagName</a>
                         </div>
                     }
                 </div>
-                
+
                 @if (hasMoreTags)
                 {
                     <div class="tags-toggle">
                         <button id="tags-toggle-btn" class="tags-toggle-btn">
                             <span class="tags-toggle-text">See more</span>
-                            <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
                         </button>
@@ -70,12 +72,12 @@
                     @{
                         bool hasMoreLocations = Model.Locations.Count() > initialTagsToShow;
                     }
-                    
+
                     @for (int i = 0; i < Model.Locations.Count(); i++)
                     {
                         var location = Model.Locations.ElementAt(i);
                         var isHidden = i >= initialTagsToShow;
-                        
+
                         <div class="tag @(isHidden ? "tag-hidden" : "")" data-index="@i">
                             <a href="/event/location/@location.EventLocationTagId">@location.EventLocationTagName</a>
                         </div>
@@ -87,7 +89,9 @@
                     <div class="location-toggle">
                         <button id="location-toggle-btn" class="tags-toggle-btn">
                             <span class="location-toggle-text">See more</span>
-                            <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
                         </button>
@@ -98,47 +102,60 @@
 
         <div class="main-content">
             <div class="main-header">
-            <div class="controls-row">
+                <div class="controls-row">
                     <div class="button-group">
                         <button class="sort-btn @(ViewBag.SortBy == "newest" ? "active" : "")" data-sort="newest">
-                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Clock>>(RenderMode.ServerPrerendered, new { Color = Color.Custom, Style = "fill: currentColor;" }))
+                            @(await
+                                                        Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Clock>>(RenderMode.ServerPrerendered,
+                                                        new { Color = Color.Custom, Style = "fill: currentColor;" }))
                             Newest
                         </button>
                         <button class="sort-btn @(ViewBag.SortBy == "date" ? "active" : "")" data-sort="date">
-                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Calendar>>(RenderMode.ServerPrerendered, new { Color = Color.Custom, Style = "fill: currentColor;" }))
+                            @(await
+                                                        Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Calendar>>(RenderMode.ServerPrerendered,
+                                                        new { Color = Color.Custom, Style = "fill: currentColor;" }))
                             Event Date
                         </button>
-                        <button class="sort-btn @(ViewBag.SortBy == "popularity" ? "active" : "")" data-sort="popularity">
-                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Star>>(RenderMode.ServerPrerendered, new { Color = Color.Custom, Style = "fill: currentColor;" }))
+                        <button class="sort-btn @(ViewBag.SortBy == "popularity" ? "active" : "")"
+                            data-sort="popularity">
+                            @(await
+                                                        Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Star>>(RenderMode.ServerPrerendered,
+                                                        new { Color = Color.Custom, Style = "fill: currentColor;" }))
                             Popularity
                         </button>
                     </div>
 
                     <a href="/event/create" class="create-btn">
                         Create event
-                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Add>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+                        @(await
+                                                Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Add>>(RenderMode.ServerPrerendered,
+                                                new { Color = Color.Neutral }))
                     </a>
                 </div>
             </div>
             <div class="event-list">
-                @foreach (var eventItem in Model.EventBriefCardDatas) {
+                @foreach (var eventItem in Model.EventBriefCardDatas)
+                {
                     <partial name="_EventBriefCard" model=eventItem />
                 }
             </div>
             <div class="pagination">
                 @if (Model.CurrentPage > 1)
                 {
-                    <a href="@Url.Action("Explore", new { page = Model.CurrentPage - 1, sortBy = ViewBag.SortBy })" class="pagination-link">Previous</a>
+                    <a href="@Url.Action("Explore", new { page = Model.CurrentPage - 1, sortBy = ViewBag.SortBy })"
+                        class="pagination-link">Previous</a>
                 }
 
                 @for (var i = 1; i <= Model.TotalPage; i++)
                 {
-                    <a href="@Url.Action("Explore", new { page = i, sortBy = ViewBag.SortBy })" class="@(i == Model.CurrentPage ? "pagination-current-page" : "pagination-link")">@i</a>
+                    <a href="@Url.Action("Explore", new { page = i, sortBy = ViewBag.SortBy })"
+                        class="@(i == Model.CurrentPage ? "pagination-current-page" : "pagination-link")">@i</a>
                 }
 
                 @if (Model.CurrentPage < Model.TotalPage)
                 {
-                    <a href="@Url.Action("Explore", new { page = Model.CurrentPage + 1, sortBy = ViewBag.SortBy })" class="pagination-link">Next</a>
+                    <a href="@Url.Action("Explore", new { page = Model.CurrentPage + 1, sortBy = ViewBag.SortBy })"
+                        class="pagination-link">Next</a>
                 }
             </div>
         </div>
@@ -146,11 +163,12 @@
             <div class="sidebar-card">
                 <h2>Trending events 🔥</h2>
                 <div class="container-popular">
-                    @foreach (var eventItem in Model.TrendingEvents) {  
-                                        
+                    @foreach (var eventItem in Model.TrendingEvents)
+                    {
+
                         var displayParticipants = $"{eventItem.CurrentParticipant}/{eventItem.MaxParticipant}";
                         var herfPath = $"/event/detail/{eventItem.EventId}";
-                    
+
                         <a href="@herfPath">
                             <div class="card-popular">
                                 <div class="trending-events-card-left">
@@ -173,14 +191,15 @@
             <div class="sidebar-card">
                 <h2>Popular tags 🏷️</h2>
                 <div class="container-popular">
-                    @foreach (var tag in Model.PopularTags) {
+                    @foreach (var tag in Model.PopularTags)
+                    {
                         var path = $"/event/tag/{tag.EventCategoryTagId}";
                         <a href="@path">
                             <div class="card-popular">
                                 <div class="tags-popular-card-left">
                                     <div class="tags-popular">
                                         <span>@tag.EventCategoryTagEmoji</span>
-                                        <span>@tag.EventCategoryTagName</span>  
+                                        <span>@tag.EventCategoryTagName</span>
                                     </div>
                                 </div>
                                 <div class="tags-popular-card-right">
@@ -198,19 +217,20 @@
                     @{
                         var rank = 1;
                     }
-                    @foreach (var user in Model.Superstars) {
+                    @foreach (var user in Model.Superstars)
+                    {
                         var path = $"/user/{user.Username}";
 
                         <a href="@path">
-                            <div class="card-popular"> 
-                                <div class="superstars-card-left " data-rank="@rank"> 
+                            <div class="card-popular">
+                                <div class="superstars-card-left " data-rank="@rank">
                                     <img class="img-popular" src="@user.ProfileImageUrl" alt="Profile Creator">
-                                    <div class="name-popular-user">
-                                        <span> @user.DisplayName</span>
-                                        <span>(@user.Username) </span>
+                                    <div class="name-popular-user" type="">
+                                        <span> @user.DisplayName </span>
+                                        <span >@user.Username </span>
                                     </div>
                                 </div>
-                                <div class="superstars-card-right"> 
+                                <div class="superstars-card-right">
                                     <span> @user.FollowersCount </span>
                                     <span> Followers </span>
                                 </div>
@@ -226,10 +246,13 @@
                 <h3>
                     Dev with 🩷 by code4dad
                     <a href="https://github.com/citlali-webboard/Citlali">
-                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Code>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+                        @(await
+                                                Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Code>>(RenderMode.ServerPrerendered,
+                                                new { Color = Color.Neutral }))
                     </a>
                 </h3>
-                <p>This project is a part of 01076120 WEB APPLICATION DEVELOPMENT PROJECT - Computer Engineering KMITL</p>
+                <p>This project is a part of 01076120 WEB APPLICATION DEVELOPMENT PROJECT - Computer Engineering KMITL
+                </p>
             </div>
         </div>
     </div>
