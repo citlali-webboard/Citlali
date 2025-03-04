@@ -1,4 +1,17 @@
 @model Citlali.Models.FollowViewModel
+@using Microsoft.AspNetCore.Http
+@using System
+@inject Supabase.Client SupabaseClient
+
+@{
+    var isCurrentUserProfile = false;
+    var currentUser = SupabaseClient.Auth.CurrentUser;
+    
+    if (currentUser != null && Model.User != null)
+    {
+        isCurrentUserProfile = currentUser.Id == Model.User.UserId.ToString();
+    }
+}
 
 <head>
     <link rel="stylesheet" href="~/css/Follow.css" />
@@ -19,12 +32,19 @@
         @foreach (var user in Model.Users)
         {
             <div class="follow-item">
-                <img src="@user.ProfileImageUrl" alt="@user.DisplayName" />
                 <div class="follow-info">
+                    <img src="@user.ProfileImageUrl" alt="@user.DisplayName" />
                     <h2>@user.DisplayName</h2>
                     <p>@user.Username</p>
                 </div>
-                <button class="follow-btn" onclick="toggleUnFollow('@user.Username')">Remove</button>
+                @if (isCurrentUserProfile)
+                {
+                    <button class="follow-btn" onclick="toggleUnFollow('@user.Username')">Remove</button>
+                }
+                else
+                {
+                    <a href="/user/@user.Username" class="follow-btn view-profile-btn">View Profile</a>
+                }
             </div>
         }
     </div>

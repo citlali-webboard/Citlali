@@ -132,3 +132,21 @@ body {
 .follow-header h1, .follow-item h2, .follow-item p {
     font-weight: normal;
 }
+
+.view-profile-btn {
+    text-decoration: none;
+    display: inline-block;
+    padding: 6px 16px;
+    font-size: 14px;
+    background-color: #f0f0f0;
+    color: #333;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-align: center;
+}
+
+.view-profile-btn:hover {
+    background-color: #e0e0e0;
+}

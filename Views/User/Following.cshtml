@@ -1,4 +1,17 @@
 @model Citlali.Models.FollowViewModel
+@using Microsoft.AspNetCore.Http
+@using System
+@inject Supabase.Client SupabaseClient
+
+@{
+    var isCurrentUserProfile = false;
+    var currentUser = SupabaseClient.Auth.CurrentUser;
+    
+    if (currentUser != null && Model.User != null)
+    {
+        isCurrentUserProfile = currentUser.Id == Model.User.UserId.ToString();
+    }
+}
 
 <head>
     <link rel="stylesheet" href="~/css/Follow.css" />
@@ -25,7 +38,14 @@
                     <h2>@user.DisplayName</h2>
                     <p>@user.Username</p>
                 </div>
-                <button class="follow-btn" onclick="toggleFollow('@user.Username', false)">Unfollow</button>
+                @if (isCurrentUserProfile)
+                {
+                    <button class="follow-btn" onclick="toggleFollow('@user.Username', false)">Unfollow</button>
+                }
+                else
+                {
+                    <a href="/user/@user.Username" class="follow-btn view-profile-btn">View Profile</a>
+                }
             </div>
         }
         <h2>Tags</h2>
@@ -35,7 +55,14 @@
                 <div class="follow-info">
                     <h2>@tag.TagEmoji @tag.TagName</h2>
                 </div>
-                <button class="follow-btn" onclick="toggleFollowTag('@tag.TagId', false)">Unfollow</button>
+                @if (isCurrentUserProfile)
+                {
+                    <button class="follow-btn" onclick="toggleFollowTag('@tag.TagId', false)">Unfollow</button>
+                }
+                else
+                {
+                    <a href="/events?tag=@tag.TagId" class="follow-btn view-profile-btn">View Events</a>
+                }
             </div>
         }
     </div>
