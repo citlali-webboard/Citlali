@@ -478,11 +478,14 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             throw new JoinOwnerException();
         }
 
+        var statusRegistration = Event.FirstComeFirstServed ? "confirmed" : "pending";
+
         var newRegistration = new Registration
         {
             RegistrationId = Guid.NewGuid(),
             EventId = EventId,
             UserId = userId,
+            Status = statusRegistration
         };
 
         await _supabaseClient
@@ -1414,7 +1417,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     }
 
     // bypass confirmation 
-    public async Task<bool> BypassConfirmation(Guid eventId, Guid userId)
+    public async Task<Registration> BypassConfirmation(Guid eventId, Guid userId)
     {
         var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
                 ?? throw new KeyNotFoundException("Registration not found");
@@ -1428,7 +1431,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         await UpdateEventStatus(eventId);
 
-        return true;
+        return registration;
     }
 
 }
