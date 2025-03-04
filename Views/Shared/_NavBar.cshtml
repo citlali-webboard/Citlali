@@ -49,6 +49,10 @@
         @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
         <p id="notification-icon">Notification</p>
       </a>
+      <a href="/about" class="nav-item">
+        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Info>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+        <p>About</p>
+      </a>
     </div>
 
     <div class="nav-group" id="auth-section">
