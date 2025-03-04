@@ -132,27 +132,48 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.PostExpiryDate, createEventViewModel.PostExpiryDate)
             .Set(row => row.FirstComeFirstServed, createEventViewModel.FirstComeFirstServed)
             .Update();
-        
-        if( createEventViewModel.FirstComeFirstServed )
+
+        if (createEventViewModel.FirstComeFirstServed)
         {
-            await UpdateRegistrationStatus(eventId);
-        } 
+            await UpdateInviteRegistration(eventId, currentParticipant, createEventViewModel.MaxParticipant);
+        }
 
         return true;
     }
 
-    public async Task<bool> UpdateRegistrationStatus(Guid eventId)
+    public async Task<bool> UpdateInviteRegistration(Guid eventId, int currentParticipant, int maxParticipant)
     {
-        //get all registration with status pending
-        var registrationsPending = await _supabaseClient
+        int countUserToInvite = maxParticipant - currentParticipant;
+
+        if (countUserToInvite <= 0)
+            return true;
+
+        // Get pending registrations sorted by creation time (oldest first)
+        var pendingRegistrations = await _supabaseClient
             .From<Registration>()
             .Select("*")
             .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
             .Filter("Status", Supabase.Postgrest.Constants.Operator.Equals, "pending")
+            .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Ascending)
+            .Get();
+
+        // Take only the number of registrations we can invite
+        var registrationsToUpdate = pendingRegistrations.Models
+            .Take(countUserToInvite)
+            .Select(r => r.RegistrationId)
+            .ToList();
+
+        if (registrationsToUpdate.Count == 0)
+            return true; // No registrations to update
+
+        // Update status for selected registrations
+        await _supabaseClient
+            .From<Registration>()
+            .Filter("RegistrationId", Supabase.Postgrest.Constants.Operator.In, registrationsToUpdate)
             .Set(row => row.Status, "awaiting-confirmation")
             .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
-            
+
         return true;
     }
 
