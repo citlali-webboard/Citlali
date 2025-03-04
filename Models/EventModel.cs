@@ -47,6 +47,9 @@ public class Event : BaseModel
 
     [Column("Status")]
     public string Status { get; set; } = "active";
+
+    [Column("FirstComeFirstServed")]
+    public bool FirstComeFirstServed { get; set; } = false;
 }
 
 [Table("EVENT_QUESTION")]
@@ -253,6 +256,9 @@ public class Registration : BaseModel
 
     [Column("CreatedAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    [Column("UpdatedAt")]
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     
 }
 
