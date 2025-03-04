@@ -1,3 +1,4 @@
+// Update the toggleFollow function to update counter
 async function toggleFollow(username, shouldFollow) {
     try {
         shouldFollow = shouldFollow === true || shouldFollow === 'true';
@@ -31,6 +32,9 @@ async function toggleFollow(username, shouldFollow) {
                 userElement.style.opacity = "0";
                 userElement.style.transform = "translateX(20px)";
                 
+                // Update the following count
+                updateFollowingCount(-1);
+                
                 setTimeout(() => {
                     userElement.remove();
                 }, 300);
@@ -41,6 +45,9 @@ async function toggleFollow(username, shouldFollow) {
                 button.onclick = function() { 
                     toggleFollow(username, false); 
                 };
+                
+                // Update the following count
+                updateFollowingCount(1);
             }
         } else {
             button.textContent = originalText;
@@ -57,6 +64,7 @@ async function toggleFollow(username, shouldFollow) {
     }
 }
 
+// Update the toggleFollowTag function to update counter
 async function toggleFollowTag(tagId, shouldFollow) {
     try {
         shouldFollow = shouldFollow === true || shouldFollow === 'true';
@@ -90,6 +98,9 @@ async function toggleFollowTag(tagId, shouldFollow) {
                 tagElement.style.opacity = "0";
                 tagElement.style.transform = "translateX(20px)";
                 
+                // Update the following count
+                updateFollowingCount(-1);
+                
                 setTimeout(() => {
                     tagElement.remove();
                 }, 300);
@@ -100,6 +111,9 @@ async function toggleFollowTag(tagId, shouldFollow) {
                 button.onclick = function() { 
                     toggleFollowTag(tagId, false); 
                 };
+                
+                // Update the following count
+                updateFollowingCount(1);
             }
         } else {
             button.textContent = originalText;
@@ -116,6 +130,144 @@ async function toggleFollowTag(tagId, shouldFollow) {
     }
 }
 
+// Update the toggleUnFollow function to update counter
+async function toggleUnFollow(username) {
+    try {
+        const button = event.target;
+        const userElement = button.closest('.follow-item');
+        
+        const originalText = button.textContent;
+        button.textContent = "Removing...";
+        button.disabled = true;
+        button.style.opacity = 0.7;
+        
+        const url = `/user/removeFollower/${username}`;
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+        
+        if (!token) {
+            throw new Error("CSRF token not found");
+        }
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            }
+        });
+
+        if (response.ok) {
+            userElement.style.transition = "opacity 0.3s, transform 0.3s";
+            userElement.style.opacity = "0";
+            userElement.style.transform = "translateX(20px)";
+            
+            // Update the follower count
+            updateFollowerCount(-1);
+            
+            setTimeout(() => {
+                userElement.remove();
+            }, 300);
+        } else {
+            button.textContent = originalText;
+            button.disabled = false;
+            button.style.opacity = 1;
+            
+            const errorText = await response.text();
+            console.error('Error:', errorText);
+            alert('Failed to remove follower. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while processing your request.');
+    }
+}
+
+// Helper function to update the follower count in the UI
+function updateFollowerCount(change) {
+    const followerTab = document.querySelector('.tab-button:nth-child(1)');
+    if (followerTab) {
+        const countSpan = followerTab.querySelector('.count');
+        if (countSpan) {
+            const currentCount = parseInt(countSpan.textContent);
+            countSpan.textContent = Math.max(0, currentCount + change);
+            
+            // Check if we need to show empty state
+            const followList = document.getElementById('followersList');
+            if (followList && currentCount + change === 0) {
+                // All followers were removed, show empty state
+                const items = followList.querySelectorAll('.follow-item');
+                if (items.length === 0) {
+                    const emptyState = createEmptyState('follower');
+                    followList.innerHTML = '';
+                    followList.appendChild(emptyState);
+                }
+            }
+        }
+    }
+}
+
+// Helper function to update the following count in the UI
+function updateFollowingCount(change) {
+    const followingTab = document.querySelector('.tab-button:nth-child(2)');
+    if (followingTab) {
+        const countSpan = followingTab.querySelector('.count');
+        if (countSpan) {
+            const currentCount = parseInt(countSpan.textContent);
+            countSpan.textContent = Math.max(0, currentCount + change);
+            
+            // Check if we need to show empty state
+            const followingList = document.getElementById('followingList');
+            if (followingList && currentCount + change === 0) {
+                // All following items were removed, show empty state
+                const items = followingList.querySelectorAll('.follow-item');
+                if (items.length === 0) {
+                    const emptyState = createEmptyState('following');
+                    followingList.innerHTML = '';
+                    followingList.appendChild(emptyState);
+                }
+            }
+        }
+    }
+}
+
+// Helper function to create empty state elements
+function createEmptyState(type) {
+    const emptyState = document.createElement('div');
+    emptyState.className = 'empty-state';
+    
+    const emptyIcon = document.createElement('div');
+    emptyIcon.className = 'empty-icon';
+    
+    const emptyTitle = document.createElement('h3');
+    const emptyText = document.createElement('p');
+    
+    if (type === 'follower') {
+        emptyIcon.textContent = '👤';
+        emptyTitle.textContent = 'No followers yet';
+        
+        // Get username from profile or use generic message
+        const displayName = document.querySelector('.user-profile h1')?.textContent?.trim() || 'This user';
+        const isCurrentUser = document.querySelector('.follows-container').getAttribute('data-is-current-user') === 'true';
+        
+        emptyText.textContent = `When people follow ${isCurrentUser ? 'you' : displayName}, they'll appear here.`;
+    } else {
+        emptyIcon.textContent = '🔍';
+        emptyTitle.textContent = 'Not following anyone';
+        
+        // Get username from profile or use generic message
+        const displayName = document.querySelector('.user-profile h1')?.textContent?.trim() || 'This user';
+        const isCurrentUser = document.querySelector('.follows-container').getAttribute('data-is-current-user') === 'true';
+        
+        emptyText.textContent = `${isCurrentUser ? 'You aren\'t' : displayName + ' isn\'t'} following anyone or any tags yet.`;
+    }
+    
+    emptyState.appendChild(emptyIcon);
+    emptyState.appendChild(emptyTitle);
+    emptyState.appendChild(emptyText);
+    
+    return emptyState;
+}
+
 function filterUsersandTags() {
     const searchInput = document.getElementById('searchInput').value.toLowerCase();
     
@@ -124,52 +276,47 @@ function filterUsersandTags() {
     let visibleUsers = 0;
     let visibleTags = 0;
     
-    const sectionHeaders = document.querySelectorAll('.follow-list > h2');
-    const usersHeader = sectionHeaders[0];
-    const tagsHeader = sectionHeaders[1];
+    const sectionHeaders = document.querySelectorAll('.section-header');
+    let usersHeader, tagsHeader;
+    
+    if (sectionHeaders.length >= 2) {
+        usersHeader = sectionHeaders[0];
+        tagsHeader = sectionHeaders[1];
+    } else if (sectionHeaders.length === 1) {
+        // Determine if the only header is for users or tags
+        const headerText = sectionHeaders[0].querySelector('h2').textContent.toLowerCase();
+        if (headerText.includes('people')) {
+            usersHeader = sectionHeaders[0];
+        } else if (headerText.includes('tag')) {
+            tagsHeader = sectionHeaders[0];
+        }
+    }
     
     // First identify all user and tag elements and check visibility
     followItems.forEach(item => {
-        // Better method to determine if item is a user or tag
-        // Check if the item is before tagsHeader in the DOM tree
-        const itemIndex = Array.from(item.parentNode.children).indexOf(item);
-        const tagsHeaderIndex = Array.from(item.parentNode.children).indexOf(tagsHeader);
-        const isUserItem = itemIndex < tagsHeaderIndex;
+        const type = item.getAttribute('data-type');
+        const dataName = item.getAttribute('data-name') || '';
+        let shouldShow = dataName.includes(searchInput);
         
-        let shouldShow = false;
-        
-        if (isUserItem) {
-            // For user items
-            const displayName = item.querySelector('.follow-info h2')?.textContent.toLowerCase() || '';
-            const username = item.querySelector('.follow-info p')?.textContent.toLowerCase() || '';
-            shouldShow = displayName.includes(searchInput) || username.includes(searchInput);
-            
-            if (shouldShow) visibleUsers++;
-        } 
-        else {
-            // For tag items
-            const tagName = item.querySelector('div h2')?.textContent.toLowerCase() || '';
-            shouldShow = tagName.includes(searchInput);
-            
+        if (type === 'tag') {
             if (shouldShow) visibleTags++;
+        } else {
+            if (shouldShow) visibleUsers++;
         }
         
         item.style.display = shouldShow ? 'flex' : 'none';
     });
     
     // Handle section visibility
-    // If searching for something, show relevant sections
-    if (searchInput) {
-        // Show/hide based on results
-        usersHeader.style.display = visibleUsers > 0 ? 'block' : 'none';
-        tagsHeader.style.display = visibleTags > 0 ? 'block' : 'none';
-    } else {
-        // If not searching, show all sections
-        usersHeader.style.display = 'block';
-        tagsHeader.style.display = 'block';
+    if (usersHeader) {
+        usersHeader.style.display = (searchInput && visibleUsers === 0) ? 'none' : 'block';
     }
     
-    const followList = document.getElementById('followList');
+    if (tagsHeader) {
+        tagsHeader.style.display = (searchInput && visibleTags === 0) ? 'none' : 'block';
+    }
+    
+    const followList = document.getElementById('followingList');
     
     // Remove existing "no results" message if any
     const existingNoResults = followList.querySelector('.no-results-message');
@@ -235,50 +382,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-async function toggleUnFollow(username) {
-    try {
-        const button = event.target;
-        const userElement = button.closest('.follow-item');
-        
-        const originalText = button.textContent;
-        button.textContent = "Removing...";
-        button.disabled = true;
-        button.style.opacity = 0.7;
-        
-        const url = `/user/removeFollower/${username}`;
-        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
-        
-        if (!token) {
-            throw new Error("CSRF token not found");
-        }
-        
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': token
-            }
-        });
-
-        if (response.ok) {
-            userElement.style.transition = "opacity 0.3s, transform 0.3s";
-            userElement.style.opacity = "0";
-            userElement.style.transform = "translateX(20px)";
-            
-            setTimeout(() => {
-                userElement.remove();
-            }, 300);
-        } else {
-            button.textContent = originalText;
-            button.disabled = false;
-            button.style.opacity = 1;
-            
-            const errorText = await response.text();
-            console.error('Error:', errorText);
-            alert('Failed to remove follower. Please try again.');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while processing your request.');
-    }
-}

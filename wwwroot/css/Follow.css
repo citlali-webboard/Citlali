@@ -1,19 +1,20 @@
-/* Follow.css */
-body {
-    /* font-family: 'Arial', sans-serif; */
-    background-color: #fafafa;
-    color: #333;
-    margin: 0;
-    padding: 0;
+.center-wrapper {
+    width: 100%;
+    min-height: calc(100vh - var(--navbar-size));
+    margin-top: var(--navbar-size);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    background-color: #f0f0f0;
 }
 
 .follow-page {
-    width: 100%;
-    max-width: 600px;
-    margin: 20px auto;
-    margin-top: 5rem;
-    background-color: white;
-    border-radius: 8px;
+    width: 50%;
+    margin-top: 2rem;
+    background-color: #fefefe;
+    border-radius: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
@@ -29,12 +30,20 @@ body {
 
 .follow-header h1 {
     margin: 0;
-    font-size: 18px;
-    color: #262626;
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    color: #444;
+    font-weight: 600 !important;
+}
+
+#header-display-name {
+    font-size: 1.5rem;
+    color: #444;
+    font-weight: bold !important;
 }
 
 .close-btn {
-    font-size: 24px;
+    font-size: 1.5rem;
     color: #999;
     background: none;
     border: none;
@@ -50,9 +59,9 @@ body {
 }
 
 .search-box input {
-    width: 90%;
-    padding: 8px;
-    font-size: 16px;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
     border: 1px solid #ddd;
     border-radius: 16px;
     background-color: #f8f8f8;
@@ -65,7 +74,7 @@ body {
 }
 
 .follow-list {
-    padding: 16px;
+    padding: 1rem 2rem;
     max-height: 500px;
     overflow-y: auto;
 }
@@ -90,24 +99,26 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    margin-right: 16px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .follow-info{
     display: flex;
     justify-content: center;
+    gap: 0.8rem;
 }
 
 .follow-info h2 {
     margin: 0;
-    font-size: 14px;
-    color: #999;
+    font-size: 1.1rem;
+    color: #333;
     text-align: left;
+    font-weight: 500 !important;    
 }
 
 .follow-info p {
-    font-size: 12px;
-    color: #262626;
+    font-size: 0.8rem;
+    color: #666;
 }
 
 .follow-btn {

@@ -398,44 +398,53 @@ public class UserController : Controller
         return Json(new { isFollowing });
     }
 
-    [HttpGet("followers/{username}")]
-    public async Task<IActionResult> Followers(string username)
+    [HttpGet("follows/{username}")]
+    public async Task<IActionResult> Follows(string username, string ActiveTab = "followers")
     {
-        var user = await _userService.GetUserByUsername(username);
-        if (user == null)
+        if (ActiveTab != "followers" && ActiveTab != "following")
         {
-            return NotFound();
+            ActiveTab = "followers"; // Default to followers if invalid
+        }
+        
+        ViewData["ActiveTab"] = ActiveTab;
+
+        try {
+            var user = await _userService.GetUserByUsername(username);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found");
+            }
+
+            var followers = await _userService.GetFollowers(user.UserId);
+            var followingUsers = await _userService.GetFollowingUsers(user.UserId);
+            var followingTags = await _userService.GetFollowingTags(user.UserId);
+            var isCurrentUser = _userService.CurrentSession.User?.Id == user.UserId.ToString();
+            var model = new FollowViewModel
+            {
+                User = user,
+                IsCurrentUser = isCurrentUser,
+                Followers = followers,
+                Following = new FollowingModel
+                {
+                    FollowingUsers = followingUsers,
+                    FollowedTags = followingTags
+                }
+            };
+
+            return View(model);
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["Error"] = "User not found.";
+            return RedirectToAction("explore", "event");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            TempData["Error"] = "Something went wrong. Please try again.";
+            return RedirectToAction("explore", "event");
         }
 
-        var followers = await _userService.GetFollowers(user.UserId);
-        var model = new FollowViewModel
-        {
-            User = user,  // Add this line
-            Users = followers
-        };
-
-        return View(model);
-    }
-
-    [HttpGet("following/{username}")]
-    public async Task<IActionResult> Following(string username)
-    {
-        var user = await _userService.GetUserByUsername(username);
-        if (user == null)
-        {
-            return NotFound();
-        }
-
-        var followingUsers = await _userService.GetFollowingUsers(user.UserId);
-        var followingTags = await _userService.GetFollowingTags(user.UserId);
-        var model = new FollowViewModel
-        {
-            User = user,  // Add this line
-            Users = followingUsers,
-            Tags = followingTags
-        };
-
-        return View(model);
     }
 
     [HttpPost("removeFollower/{username}")]

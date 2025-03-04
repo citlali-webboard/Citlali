@@ -121,7 +121,7 @@
             <h3>@Model.UserEvents.Count</h3>
             <p>Events</p>
           </div>
-          <a href="@Url.Action("Followers", "User", new { username = Model.Username })">
+          <a href="/user/follows/@Model.Username">
             <div class="data">
               <h3 class="followers-count">
                 @FormatNumber(Model.FollowersCount)
@@ -129,7 +129,7 @@
               <p>Followers</p>
             </div>
           </a>
-          <a href="@Url.Action("Following", "User", new { username = Model.Username })">
+          <a href="/user/follows/@Model.Username?ActiveTab=following">
             <div class="data">
               <h3>
                 @FormatNumber(Model.FollowingCount)
