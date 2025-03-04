@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Attributes;
+using Citlali.Models;
 
 namespace Citlali.Models;
 
@@ -134,15 +135,27 @@ public class EventExploreViewModel
 {
     public EventBriefCardData[] EventBriefCardDatas = [new()];
     public Tag[] Tags = [new()];
+    public Location[] Locations = [new()];
     public int CurrentPage { get; set; } = 1;
     public int TotalPage { get; set; }
+    public EventBriefCardData[] TrendingEvents = [new()];
+    public PopularTag[] PopularTags = [new()];
+    public PopularUser[] Superstars = [new()];
 }
 
 public class TagEventExploreViewModel : EventExploreViewModel
 {
     public Guid TagId { get; set; } = new();
     public string TagName { get; set; } = "";
+    public int EventCount { get; set; } = 0;
+    public int TagFollowers { get; set; } = 0;
     public string TagEmoji { get; set; } = "";
+    public bool IsFollowing { get; set; }
+    public new List<Tag> Tags { get; set; } = new List<Tag>();
+    public new List<Location> Locations { get; set; } = new List<Location>();
+    public new EventBriefCardData[] EventBriefCardDatas { get; set; } = new EventBriefCardData[0];
+    public new int CurrentPage { get; set; }
+    public new int TotalPage { get; set; }
 }
 
 [Table("EVENT_CATEGORY_TAG")]
@@ -311,4 +324,22 @@ public class RegistrationHistoryCardModel
 public class RegistrationHistoryData
 {
     public List<RegistrationHistoryCardModel> RegistrationHistoryCardModels { get; set; } = [];
+}
+
+
+public class PopularTag : EventCategoryTag
+{
+    public int EventCount { get; set; } = 0;
+}
+
+public class LocationEventExploreViewModel
+{
+    public Guid LocationId { get; set; }
+    public string LocationName { get; set; }
+    public int EventCount { get; set; }
+    public List<Tag> Tags { get; set; } = new();
+    public List<Location> Locations { get; set; } = new();
+    public EventBriefCardData[] EventBriefCardDatas { get; set; } = [];
+    public int CurrentPage { get; set; }
+    public int TotalPage { get; set; }
 }

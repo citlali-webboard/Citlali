@@ -373,9 +373,15 @@
 /* Responsive styling */
 @media (max-width: 900px) {
   .center-wrapper {
+    /* margin-top: 0 !important; */
     flex-direction: column;
     padding: 1rem;
     padding-top: 2rem;
+    justify-content: flex-start !important;
+  }
+
+  .main-content {
+    overflow: visible !important;
   }
   
   .sidebar-left {
@@ -405,8 +411,8 @@
     justify-content: center;
   }
 
-  #location-card {
-    display: none;
+  #tag-card {
+    display: none !important;
   }
 }
 

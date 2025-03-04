@@ -1,0 +1,33 @@
+@model Citlali.Models.AdminCategoriesViewModel;
+
+<ul>
+  @foreach (var tag in Model.Tags)
+  {
+    <li value="@tag.TagId">
+      <span>
+        @tag.TagEmoji @tag.TagName
+      </span>
+      <form asp-action="CategoryDelete" method="post">
+        <input asp-for="DeleteDto.TagId" name="tagId" type="text" value=@tag.TagId hidden />
+        <span asp-validation-for="DeleteDto.TagId"></span>
+        <button type="submit">Delete</button>
+      </form>
+    </li>
+  }
+</ul>
+
+<form asp-action="CategoryCreate" method="post">
+  <fieldset>
+    <label asp-for="CreateDto.TagName">Tag Name</label>
+    <input asp-for="CreateDto.TagName" class="form-control" name="tagName"/>
+    <span asp-validation-for="CreateDto.TagName" class="text-danger"></span>
+  </fieldset>
+
+  <fieldset>
+    <label asp-for="CreateDto.TagEmoji">Tag Emoji</label>
+    <input asp-for="CreateDto.TagEmoji" class="form-control" name="tagEmoji" />
+    <span asp-validation-for="CreateDto.TagEmoji" class="text-danger"></span>
+  </fieldset>
+
+  <button type="submit">Create</button>
+</form>

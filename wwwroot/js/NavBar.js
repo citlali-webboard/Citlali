@@ -22,18 +22,24 @@ function GetNumberNotification() {
 function SetNumberNotification(number) {
   if(number > 99){ number = "99+"; }
   let notificationIcon = document.getElementById("notification-icon");
+  let mobileNavToggle = document.getElementById("mobile-nav-toggle");
 
+  // Remove existing notification badges
   let countNotificationsBadge = document.querySelectorAll(".count-notifications");
   countNotificationsBadge.forEach(badge => badge.remove());
 
   if (number != 0) {
+    // Add badge to notification icon
     let div_count_notifications = document.createElement("div");
     div_count_notifications.classList.add("count-notifications");
     div_count_notifications.innerHTML = number;
-
     notificationIcon.appendChild(div_count_notifications);
-  } else {
-    return;
+    
+    // Add badge to mobile hamburger menu
+    let mobile_badge = document.createElement("div");
+    mobile_badge.classList.add("count-notifications", "mobile-badge");
+    mobile_badge.innerHTML = number;
+    mobileNavToggle.appendChild(mobile_badge);
   }
 }
 

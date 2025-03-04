@@ -1,0 +1,125 @@
+.center-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: calc(100vh - var(--navbar-size));
+    margin-top: var(--navbar-size);
+
+    background-color: #f0f0f0;
+}
+
+.content {
+    width: 80%;
+}
+
+.admin-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    background-color: #fefefe;
+    padding: 1rem 2rem;
+    border-radius: 15px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.admin-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.admin-header p {
+    font-size: 1rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.dashboard-card {
+    display: flex;
+    align-items: center;
+    background-color: #fefefe;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+    text-decoration: none;
+    border: 1px solid #ccc;
+}
+
+.dashboard-card:hover {
+    background-color: #f8f8f8;
+}
+
+.card-icon {
+    flex: 0 0 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ccc;
+    color: white;
+    border-radius: 15px;
+    margin-right: 1rem;
+}
+
+.card-content {
+    flex: 1;
+}
+
+.card-content h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.card-content p {
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .center-wrapper {
+        padding: 1rem;
+    }
+
+    .content {
+        width: 100%;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-header h1 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-card {
+        padding: 1rem;
+    }
+
+    .card-icon {
+        flex: 0 0 40px;
+        height: 40px;
+    }
+
+    .card-content h2 {
+        font-size: 1.1rem;
+    }
+
+    .admin-header {
+        margin-bottom: 1rem;
+    }
+}
