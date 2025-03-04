@@ -272,9 +272,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             Url = $"{_configuration.App.Url}{absoluteUrl}"
         };
 
-        var targetUser = await targetUserTask ?? throw new KeyNotFoundException("Can't query target user");
         var notificaionTask = _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl);
-        _mailService.SendNotificationEmail(mailModel, targetUser.Email);
 
         return true;
     }
