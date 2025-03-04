@@ -130,6 +130,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.Cost, createEventViewModel.Cost)
             .Set(row => row.EventDate, createEventViewModel.EventDate)
             .Set(row => row.PostExpiryDate, createEventViewModel.PostExpiryDate)
+            .Set(row => row.FirstComeFirstServed, createEventViewModel.FirstComeFirstServed)
             .Update();
 
         return true;
@@ -1040,7 +1041,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             PostExpiryDate = ev.PostExpiryDate,
             LocationTagsList = locationTags,
             EventCategoryTagsList = categoryTags,
-            Questions = questions
+            Questions = questions,
+            FirstComeFirstServed = ev.FirstComeFirstServed
         };
     }
 
