@@ -346,6 +346,26 @@ public class NotificationService(Client supabaseClient, UserService userService)
             Console.WriteLine($"Exception: {ex.Message}");
         }
     }
+
+    //ReadAllNotifications
+    public async Task<bool> ReadAllNotifications()
+    {
+        var currentUser = _userService.CurrentSession.User;
+        if (currentUser == null)
+        {
+            throw new UnauthorizedAccessException("User is not authenticated.");
+        }
+
+        Guid userId = Guid.Parse(currentUser.Id ?? "");
+
+        await _supabaseClient
+            .From<Notification>()
+            .Filter("ToUserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
+            .Set(row => row.Read, true)
+            .Update();
+
+        return true;
+    }
 }
 
 public class GetNotificationException : Exception
