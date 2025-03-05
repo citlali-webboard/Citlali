@@ -458,3 +458,18 @@ function deleteNotificationMobile(id){
     return;
 
 }
+// read-all-btn
+function readAllNotification(){
+    if(window.confirm("Are you sure you want to read all notifications?")){
+        let URL = window.location.href + "/readAll";
+        let xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("POST", URL, true);
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                location.reload();
+            }
+        };
+        xmlhttp.send();
+    }
+    return;
+}
