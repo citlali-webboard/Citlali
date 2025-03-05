@@ -61,6 +61,7 @@ main .notification-container{
     border: 1px solid #d2d1d1;
     border-radius: 8px;
     background-color: #fefefe;
+    min-width: 250px;
 }
 
 .notification-card #title {
