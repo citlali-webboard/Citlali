@@ -364,6 +364,9 @@ function handleMobileClick() {
 document.addEventListener("DOMContentLoaded", function () {
     let deleteAllBtn = document.querySelector("#delete-all-btn");
     deleteAllBtn.addEventListener("click", deleteAllNotification);
+
+    let readAllBtn = document.querySelector("#read-all-btn");
+    readAllBtn.addEventListener("click", readAllNotification);
 });
 
 
@@ -458,7 +461,7 @@ function deleteNotificationMobile(id){
     return;
 
 }
-// read-all-btn
+
 function readAllNotification(){
     if(window.confirm("Are you sure you want to read all notifications?")){
         let URL = window.location.href + "/readAll";
