@@ -53,35 +53,33 @@ main .notification-container{
 
 .notification-card{
     width: 100%;
-    min-width: 250px;
-    height: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    /* box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3); */
-    padding: 0.5rem 0.75rem 0.5rem 0.75rem;
+    display: grid;
+    grid-template-columns: 1fr auto; /* Two columns: content and time */
+    grid-gap: 0.5rem;
+    align-items: flex-end;
+    padding: 0.5rem 0.75rem;
     border: 1px solid #d2d1d1;
     border-radius: 8px;
-    position: relative;
     background-color: #fefefe;
 }
 
 .notification-card #title {
+    grid-column: 2;
+    grid-row: 1; /* Explicitly place in first row */
     font-size: 1rem;
     font-weight: bold;
-    opacity: 1;
-    justify-self: flex-start;
     display: -webkit-box;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
-    overflow: hidden; 
+    overflow: hidden;
+    align-self: center; /* Center vertically */
 }
 
 .notification-time {
-    position: absolute;
-    bottom: 10%;
-    right: 3%;
-    text-overflow: ellipsis;
+    justify-self: flex-end; 
+    font-size: 0.7rem;
+    color: #666;
+    white-space: nowrap;
 }
 
 .notification-card:hover{
@@ -93,7 +91,7 @@ main .notification-container{
 .notification-card-source-user{
     display: flex;
     align-items: center;
-    column-gap: 0.5rem;
+    gap: 0.5rem;
 }
 
 .notification-card-source-user img {
@@ -182,6 +180,14 @@ main .notification-container{
     opacity: 0.6;
 }
 
+.active-btn-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    column-gap: 0.5rem;
+    width: 100%;
+}
+
 .delete-all-btn {
     width: fit-content;
     height: fit-content;
@@ -219,11 +225,48 @@ main .notification-container{
     fill: white !important;
 }
 
+.read-all-btn {
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    justify-self: flex-start;
+    align-self: flex-start;
+    gap: 0.5rem; 
+    
+    padding: 0.3rem 1rem; 
+
+    border: 1px solid #1beb00;
+    border-radius: 20px;
+
+    font-size: 0.8rem;
+    text-decoration: none;
+    color: #1beb00;
+    white-space: nowrap;
+    margin-bottom: 0.75rem;
+}
+
+.read-all-btn span svg{
+    fill: #1beb00 !important;
+}
+
+.read-all-btn:hover {
+    span {
+        color: rgb(255, 255, 255) !important;
+    }
+    
+    background-color: #1beb00;
+    color: white;
+}
+
+.read-all-btn:hover svg {
+    fill: white !important;
+}
+
 .notification-detail .header .delete-btn {
     display: flex;
     justify-content: center;
     align-items: center;
-    fill: red !important;
+    fill: #1beb00 !important;
     height: fit-content;
     align-self: center;
     position: absolute;
@@ -233,7 +276,7 @@ main .notification-container{
 }
 
 .notification-detail .header .delete-btn:hover svg{
-    fill: red !important;
+    fill: #1beb00 !important;
 }
 
 .notification-detail .content{
