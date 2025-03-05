@@ -12,6 +12,7 @@ namespace Citlali.Services;
 
 public class UserService
 {
+    private const int MAX_USER_BIO_LENGTH = 500;
     private readonly Client _supabaseClient;
     private readonly Configuration _configuration;
     private readonly UtilitiesService _utilityService;
@@ -81,6 +82,11 @@ public class UserService
                 throw new InvalidUsernameException();
             }
 
+            if (userOnboardingDto.UserBio != null && userOnboardingDto.UserBio.Length > MAX_USER_BIO_LENGTH)
+            {
+                throw new Exception("User bio is too long");
+            }
+
             var dbUser = new User
             {
                 UserId = Guid.Parse(supabaseUser.Id),
@@ -113,10 +119,20 @@ public class UserService
         }
         catch (Exception e)
         {
-            var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
-            string msgError = errorJson.GetProperty("msg").GetString() ?? "";
-            Console.WriteLine(msgError);
-            throw new Exception(msgError);
+                try
+                {
+                    // Try to parse as JSON
+                    var errorJson = JsonSerializer.Deserialize<JsonElement>(e.Message);
+                    string msgError = errorJson.GetProperty("msg").GetString() ?? "";
+                    Console.WriteLine(msgError);
+                    throw new Exception(msgError);
+                }
+                catch (JsonException)
+                {
+                    // If not valid JSON, use the original message
+                    Console.WriteLine(e.Message);
+                    throw new Exception(e.Message);
+                }
         }
     }
 

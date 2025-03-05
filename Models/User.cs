@@ -27,7 +27,7 @@ public class User : BaseModel
         public string DisplayName { get; set; } = "";
 
         [Column("UserBio")]
-        public string UserBio { get; set; } = "";
+        public string? UserBio { get; set; } = "";
 
         [Column("CreatedAt")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
