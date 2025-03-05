@@ -88,13 +88,22 @@
                     </div>
                 </div>
             </div>
+
+            <div class="sub-detail">
+                <div class="fcfs">
+                    <label for="FirstComeFirstServed" class="text-fcfs">First Come First Served Mode </label>
+                    <label class="slide-btn">
+                        <input type="checkbox" asp-for="FirstComeFirstServed"/>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
             <div class="question">
                 <div class="question-list" id="question-list">
                     <div class="form-group">
                         <div class="added-question">
-                            <input type="checkbox" asp-for="FirstComeFirstServed" style="scale: 5;"  />
-                            <label for="FirstComeFirstServed">...........First come first served</label>
-
+        
                             <h5>Current questions</h5>
                             <p>These questions cannot be modified once the event is created.</p>
                             <ul>

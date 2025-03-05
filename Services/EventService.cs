@@ -178,12 +178,6 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         // Batch update all registrations at once
         var registrationIds = registrationsToUpdate.Select(r => r.RegistrationId).ToList();
-        await _supabaseClient
-            .From<Registration>()
-            .Filter("RegistrationId", Supabase.Postgrest.Constants.Operator.In, registrationIds)
-            .Set(row => row.Status, "awaiting-confirmation")
-            .Set(row => row.UpdatedAt, DateTime.UtcNow)
-            .Update();
 
         // Now send notifications to each user (this still needs to be per-user)
         var batchNotificationTasks = new List<Task>();
@@ -319,12 +313,15 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         var registration = await registrationTask ?? throw new KeyNotFoundException("Registration not found");
 
+    
+
         await _supabaseClient
             .From<Registration>()
             .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "awaiting-confirmation")
             .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
+
 
         var notificationTitle = "You have been invited to an event! 🎉";
         var notificationBody = $"Congratulations! Your request to join the event {eventToInvite.EventTitle} has been reviewed and accepted! To confirm or reject the invitation, please visit the event page.";
@@ -339,6 +336,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var targetUser = await targetUserTask ?? throw new KeyNotFoundException("Can't query target user");
         var notificaionTask = _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl);
         _mailService.SendNotificationEmail(mailModel, targetUser.Email);
+
+        Console.WriteLine($"User {userId} invited to event {eventId}");
 
         return true;
     }

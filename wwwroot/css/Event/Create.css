@@ -268,7 +268,7 @@
 .slide-btn {
     position: relative;
     display: inline-block;
-    width: 3rem;
+    width: 3.5rem;
     height: 1.7rem;
   }
   
@@ -294,10 +294,10 @@
   .slider:before {
     position: absolute;
     content: "";
-    height: 1.25rem;
-    width: 1.25rem;
+    height: 1.3rem;
+    width: 1.3rem;
     left: 4px;
-    bottom: 4px;
+    bottom: 3px;
     background-color: white;
     -webkit-transition: .3s;
     transition: .3s;
@@ -308,16 +308,37 @@
     background-color: var(--pink-saturated);;
   }
   
-  .slide-btn input:focus + .slider {
-    box-shadow: 0 0 1px ;
-  }
-  
   .slide-btn input:checked + .slider:before {
-    -webkit-transform: translateX(21px);
-    -ms-transform: translateX(21px);
-    transform: translateX(21px);
+    -webkit-transform: translateX(1.7rem);
+    -ms-transform: translateX(1.7rem);
+    transform: translateX(1.7rem);
+  }
+
+  .sub-detail{
+    width: 100%;
+    height: auto;
+
+    display: flex;
+    flex-direction: row;
+    margin-top: 1rem;
+    align-items: stretch;
+    justify-content: flex-end;
+  }
+
+  .fcfs{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.7rem;
   }
   
+  .fcfs .text-fcfs{
+    font-size: 0.8rem;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #555;
+  }
 
 @media screen and (max-width: 768px) {
     .content {
@@ -370,7 +391,7 @@
     }
 
     .question {
-        margin-top: 4rem;
+        margin-top: 2rem;
     }
 
     .question h3 {
