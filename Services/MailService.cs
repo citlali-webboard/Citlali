@@ -41,7 +41,7 @@ namespace Citlali.Services
 
             // Create mail processing queue with one mail at a time
             _mailQueue = new ActionBlock<MailRequest>(
-                async request => await ProcessMailRequest(request),
+                ProcessMailRequest,
                 new ExecutionDataflowBlockOptions
                 {
                     MaxDegreeOfParallelism = 1,
@@ -52,13 +52,13 @@ namespace Citlali.Services
 
         private class MailRequest
         {
-            public MailBaseViewModel Model { get; set; }
-            public string Body { get; set; }
-            public string ReceivingAddress { get; set; }
-            public TaskCompletionSource<bool> CompletionSource { get; set; }
+            public MailBaseViewModel Model { get; set; } = new();
+            public string Body { get; set; } = "";
+            public string ReceivingAddress { get; set; } = "";
+            public TaskCompletionSource<bool> CompletionSource { get; set; } = new();
         }
 
-        private async Task ProcessMailRequest(MailRequest request)
+        private void ProcessMailRequest(MailRequest request)
         {
             try
             {
