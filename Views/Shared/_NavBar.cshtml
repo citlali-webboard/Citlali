@@ -7,7 +7,7 @@
 
     if (string.IsNullOrEmpty(profileImageUrl))
     {
-        profileImageUrl = "/images/default-profile.png";
+        profileImageUrl = "https://citlali-supabase.code4.dad/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.webp";
     }
     var timestamp = DateTime.Now.Ticks;
     profileImageUrl = $"{profileImageUrl}?v={timestamp}";
@@ -37,18 +37,21 @@
         @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Home>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
         <p>Home</p>
       </a>
-      <a href="/event/followed" class="nav-item">
-        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Star>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
-        <p>Following</p>
-      </a>
-      <a href="/user/history" class="nav-item">
-        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.History>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
-        <p>Registration History</p>
-      </a>
-      <a href="/notification" class="nav-item">
-        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
-        <p id="notification-icon">Notification</p>
-      </a>
+      @if (IsAuthenticated) 
+      {
+        <a href="/event/explore" class="nav-item">
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Star>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          <p>Following</p>
+        </a>
+        <a href="/user/history" class="nav-item">
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.History>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          <p>Registration History</p>
+        </a>
+        <a href="/notification" class="nav-item">
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          <p id="notification-icon">Notification</p>
+        </a>
+      }
       <a href="/about" class="nav-item">
         @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Info>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
         <p>About</p>

@@ -47,6 +47,9 @@ public class Event : BaseModel
 
     [Column("Status")]
     public string Status { get; set; } = "active";
+
+    [Column("FirstComeFirstServed")]
+    public bool FirstComeFirstServed { get; set; } = false;
 }
 
 [Table("EVENT_QUESTION")]
@@ -223,10 +226,11 @@ public class CreateEventViewModel
     public Guid EventLocationTagId { get; set; } = new();
     public int MaxParticipant { get; set; } = 0;
     public int Cost { get; set; } = 0;
-    public DateTime EventDate { get; set; } = new();
-    public DateTime PostExpiryDate { get; set; } = new();
+    public DateTime EventDate { get; set; } = DateTime.UtcNow;
+    public DateTime PostExpiryDate { get; set; } = DateTime.UtcNow;
     public List<Tag> Tags { get; set; } = [];
     public List<string> Questions { get; set; } = [];
+    public bool FirstComeFirstServed { get; set; } = false;
 }
 
 public class EditEventViewModel
@@ -244,6 +248,7 @@ public class EditEventViewModel
     public DateTime PostExpiryDate { get; set; } = new();
     public List<Tag> EventCategoryTagsList { get; set; } = [];
     public List<QuestionViewModel> Questions { get; set; } = [];
+    public bool FirstComeFirstServed { get; set; } = false;
 }
 
 [Table("REGISTRATION")]
@@ -264,6 +269,9 @@ public class Registration : BaseModel
 
     [Column("CreatedAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    [Column("UpdatedAt")]
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     
 }
 
@@ -307,6 +315,7 @@ public class RegistrationAnswerSimplify
 public class EventManagementAnswerCollection
 {
     public User User { get; set; } = new();
+    public DateTime RegistrationTime { get; set; } = new();
     public string Status { get; set; } = "pending";
     public List<RegistrationAnswerSimplify> RegistrationAnswers { get; set; } = [];
 }

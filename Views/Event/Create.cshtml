@@ -7,7 +7,11 @@
 
 @{
     ViewData["Title"] = "Create";
+    var EventDate = Model.EventDate.ToString("yyyy-MM-ddTHH:mm");
+    var PostExpiryDate = Model.PostExpiryDate.ToString("yyyy-MM-ddTHH:mm");
 }
+
+<partial name="_ValidationScriptsPartial" />
 
 <div class="window">
     <div class="content">
@@ -16,12 +20,12 @@
         <form asp-action="createEvent" method="post" enctype="multipart/form-data">
             <div class="header">
                 <div class="form-group" id="eventTitle">
-                    <label for="EventTitle">Event Title</label>
-                    <input asp-for="EventTitle" class="form-control" />
+                    <label for="EventTitle" class="required">Event Title</label>
+                    <input asp-for="EventTitle" class="form-control" required data-msg-required="Event title is required" />
                     <span asp-validation-for="EventTitle" class="text-danger"></span>
                 </div>
                 <div class="form-group" id="eventTag">
-                    <label for="EventTag">Event Tag</label>
+                    <label for="EventTag" class="required">Event Tag</label>
                     <select name="EventCategoryTagId" id="EventCategoryTagId" asp-for="EventCategoryTagId" class="form-control">
                             <option value="" disabled selected>🎯 Select event category tag</option>
                             @foreach (var tag in Model.Tags)
@@ -32,7 +36,7 @@
                     <span asp-validation-for="EventCategoryTagId" class="text-danger"></span>
                 </div>
                 <div class="form-group" id="eventLocation">
-                    <label for="EventLocation">Location</label>
+                    <label for="EventLocation" class="required">Location</label>
                     <select name="EventLocationTagId" id="EventLocationTagId" asp-for="EventLocationTagId" class="form-control">
                         <option value="" disabled selected>📍 Select event location</option>
                             @foreach (var location in Model.LocationTags)
@@ -46,46 +50,58 @@
             <div class="detail">
                 <div class="description">
                     <div class="form-group" id="eventDescription">
-                        <label for="EventDescription">Description</label>
-                        <textarea asp-for="EventDescription" class="form-control"></textarea>
+                        <label for="EventDescription" class="required">Description</label>
+                        <textarea asp-for="EventDescription" class="form-control" required></textarea>
                         <span asp-validation-for="EventDescription" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="meta-data">
                     <div class="form-group" id="eventDate">
-                        <label for="EventDate">Event Date</label>
-                        <input asp-for="EventDate" class="form-control" id="EventDate" type="datetime-local" />
+                        <label for="EventDate" class="required">Event Date</label>
+                        <input asp-for="EventDate" class="form-control" id="EventDate" type="datetime-local" value=@EventDate />
                         <span asp-validation-for="EventDate" class="text-danger"></span>
                     </div>
                     <div class="form-group" id="postExpiryDate">
-                        <label for="PostExpiryDate">Post Expiry Date</label>
-                        <input asp-for="PostExpiryDate" class="form-control" id="PostExpiryDate" type="datetime-local" />
+                        <label for="PostExpiryDate" class="required">Post Expiry Date</label>
+                        <input asp-for="PostExpiryDate" class="form-control" id="PostExpiryDate" type="datetime-local" required value="@PostExpiryDate" />
                         <span asp-validation-for="PostExpiryDate" class="text-danger"></span>
                     </div>
                     <div class="participate-detail">
+                        <div class="form-group">
+                            <label for="MaxParticipant" class="required">Max Participant</label>
+                            <input asp-for="MaxParticipant" class="form-control" required />
+                            <span asp-validation-for="MaxParticipant" class="text-danger"></span>
+                        </div>
                         <div class="form-group">
                             <label for="Cost">Participation Cost (THB) / Person </label>
                             <input asp-for="Cost" class="form-control" />
                             <span asp-validation-for="Cost" class="text-danger"></span>
                         </div>
-                        <div class="form-group">
-                            <label for="MaxParticipant">Max Participant</label>
-                            <input asp-for="MaxParticipant" class="form-control" />
-                            <span asp-validation-for="MaxParticipant" class="text-danger"></span>
-                        </div>
                     </div>
                 </div>
             </div>
+
+            <div class="sub-detail">
+                <div class="fcfs">
+                    <label for="FirstComeFirstServed" class="text-fcfs">First Come First Served Mode </label>
+                    <label class="slide-btn">
+                        <input type="checkbox" asp-for="FirstComeFirstServed"/>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
             <div class="question">
+
                 <h3>Want to get to know your participants better?</h3>
                 <p>Create some fun and insightful questions to help you learn more about them and make the best selections!</p>
                 <div class="question-list" id="question-list">
                     <div class="form-group">
                         <div class="add-question-control">
-                            <input type="text" id="new-question" class="question-input" placeholder="Type your question here" />
+                            <input type="text" id="new-question" class="question-input" placeholder="Why do you want to participate on this event?" />
                             <button type="button" id="add-question" class="add-button">Add</button>
                         </div>
-                        <div class="added-question">
+                        <div class="added-question no-questions">
                             <h5>Current questions</h5>
                             <p>Once the event is created, these questions cannot be changed. Please take your time to choose the best ones!</p>
                             <ol>

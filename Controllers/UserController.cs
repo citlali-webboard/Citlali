@@ -135,10 +135,13 @@ public class UserController : Controller
 
     [HttpGet("history")]
     [Authorize]
-    public async Task<IActionResult> History()
+    public async Task<IActionResult> History(string status = "all")
     {
         try {
+            ViewData["SelectedStatus"] = status;
+            
             var historyList = await _eventService.GetHistory();
+            
             return View(historyList);
         }
         catch (UnauthorizedAccessException ex)
