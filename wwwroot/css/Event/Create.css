@@ -264,6 +264,42 @@ select.touched:invalid {
     overflow-wrap: anywhere; 
 }
 
+.added-question.no-questions {
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.question-item.highlight {
+    font-weight: bold;
+}
+
+/* Style the empty question state */
+.added-question ol:empty::before {
+    content: "No questions added yet. Add your first question above!";
+    display: block;
+    color: #888;
+    font-style: italic;
+    padding: 1rem 0;
+}
+
+/* Make question list look nicer */
+.added-question ol {
+    padding-left: 1.5rem;
+    margin-top: 1rem;
+}
+
+.added-question h5 {
+    margin-bottom: 0.5rem;
+}
+
+/* Hide the Current questions section and its description when no questions */
+.added-question.no-questions h5,
+.added-question.no-questions p {
+    display: none;
+}
+
 .submit {
     margin-top: 2rem;
     width: 100%;

@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    updateQuestionsVisibility();
+
     addQuestionBtn.addEventListener("click", function () {
         let questionText = newQuestionInput.value.trim();
         
@@ -41,6 +43,13 @@ document.addEventListener('DOMContentLoaded', function () {
             
             questionList.appendChild(newQuestionItem);
             newQuestionInput.value = '';
+
+            updateQuestionsVisibility();
+
+            newQuestionItem.classList.add('highlight');
+            setTimeout(() => {
+                newQuestionItem.classList.remove('highlight');
+            }, 1000);
         } else {
             // Show validation error for empty question
             showFieldError(newQuestionInput, "Please enter a valid question");
@@ -220,8 +229,22 @@ function removeQuestion(button) {
     // Get the parent list item of the clicked remove button
     let questionItem = button.closest(".question-item");
     
-    // Remove the question item from the list
-    questionItem.remove();
+    // Add fade-out animation
+    questionItem.classList.add('removing');
+    
+    // Remove after animation completes
+    questionItem.addEventListener('transitionend', function() {
+        questionItem.remove();
+        updateQuestionsVisibility();
+    });
+    
+    // Fallback in case transition doesn't trigger the event
+    setTimeout(() => {
+        if (questionItem.parentNode) {
+            questionItem.remove();
+            updateQuestionsVisibility();
+        }
+    }, 300);
 }
 
 // Add custom validators
@@ -353,4 +376,15 @@ function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(() => func.apply(this, args), wait);
     };
+}
+
+function updateQuestionsVisibility() {
+    const questionContainer = document.querySelector('.added-question');
+    const questionItems = document.querySelectorAll('.question-item');
+    
+    if (questionItems.length > 0) {
+        questionContainer.classList.remove('no-questions');
+    } else {
+        questionContainer.classList.add('no-questions');
+    }
 }
