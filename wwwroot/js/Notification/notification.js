@@ -35,7 +35,11 @@ function setting_desktop() {
 }
 
 function handleDeleteClick() {
-    deleteNotification();
+    if(window.confirm("Are you sure you want to delete this notification?")){
+        deleteNotification();
+    }
+
+    return;
 }
 
 function handleDesktopClick() {
@@ -416,33 +420,41 @@ function deleteNotification(){
 }
 
 function deleteAllNotification(){
-    let URL = window.location.href + "/deleteAll";
-    let xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("POST", URL, true);
-    xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            location.reload();
-        }
-    };
-    xmlhttp.send();
-    console.log("delete all");
+    if(window.confirm("Are you sure you want to delete all notifications?")){
+        let URL = window.location.href + "/deleteAll";
+        let xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("POST", URL, true);
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                location.reload();
+            }
+        };
+        xmlhttp.send();
+    }
+    return;
 }
 
 function deleteNotificationMobile(id){
-    let URL = window.location.href + "/delete/" + id;
-    let xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("GET", URL, true);
-    xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            //set card hidden select card from data-id 
-            let card = document.querySelector(`[data-id="${id}"]`);
-            let containerDetail = document.querySelector(`[container-id="${id}"]`);
-            
-            card.classList.add("hidden");
-            containerDetail.classList.add("hidden");
 
+    if(window.confirm("Are you sure you want to delete this notification?")){
+        let URL = window.location.href + "/delete/" + id;
+        let xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("GET", URL, true);
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                //set card hidden select card from data-id 
+                let card = document.querySelector(`[data-id="${id}"]`);
+                let containerDetail = document.querySelector(`[container-id="${id}"]`);
+                
+                card.classList.add("hidden");
+                containerDetail.classList.add("hidden");
+    
+    
+            }
+        };
+        xmlhttp.send();
+    }
 
-        }
-    };
-    xmlhttp.send();
+    return;
+
 }
