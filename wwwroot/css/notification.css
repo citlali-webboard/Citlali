@@ -54,9 +54,9 @@ main .notification-container{
 .notification-card{
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr auto; /* Two columns: content and time */
+    grid-template-columns: 1fr auto; /* First column for content, second for time */
     grid-gap: 0.5rem;
-    align-items: flex-end;
+    align-items: start; /* Change from flex-end to start */
     padding: 0.5rem 0.75rem;
     border: 1px solid #d2d1d1;
     border-radius: 8px;
@@ -76,10 +76,12 @@ main .notification-container{
 }
 
 .notification-time {
-    justify-self: flex-end; 
+    justify-self: flex-end;
+    align-self: flex-end; 
     font-size: 0.7rem;
     color: #666;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .notification-card:hover{
@@ -92,6 +94,14 @@ main .notification-container{
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    overflow: hidden; /* Prevent overflow */
+    width: 100%; /* Take full width of parent */
+}
+
+.notification-card-source-user > div {
+    min-width: 0; /* Allow content to shrink below min-content width */
+    width: 100%; /* Take full width */
+    overflow: hidden; /* Prevent overflow */
 }
 
 .notification-card-source-user img {
@@ -108,6 +118,10 @@ main .notification-container{
 
 #display-name{
     opacity: 0.5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Add ellipsis for text truncation */
+    width: 100%;
 }
 
 
