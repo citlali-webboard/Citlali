@@ -1066,16 +1066,16 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                         ?? throw new UnauthorizedAccessException("User not authenticated");
         var userId = Guid.Parse(supabaseUser.Id ?? throw new GetUserException());
 
-        var Event = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
+        var citlaliEvent = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
 
-        if (Event.CreatorUserId.ToString() != userId.ToString())
+        if (citlaliEvent.CreatorUserId.ToString() != userId.ToString())
             throw new UnauthorizedAccessException("User not authorized to broadcast this event");
 
         var registrants = await GetRegistrantsConfirmedByEventId(eventId);
 
         if (registrants != null && registrants.Count > 0) {
             var notificationTasks = registrants.Select(async registrant =>
-               await  _notificationService.CreateNotification(registrant.UserId, title, message, $"/event/detail/{eventId}")
+               await  _notificationService.CreateNotification(registrant.UserId, $"Broadcast from event {citlaliEvent.EventTitle}: {title}", message, $"/event/detail/{eventId}")
             );
 
             await Task.WhenAll(notificationTasks);
