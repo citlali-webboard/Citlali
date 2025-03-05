@@ -5,6 +5,7 @@
 
   width: 50%;
   max-width: 320px;
+  z-index: 999;
 }
 
 .toast {

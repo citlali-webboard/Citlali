@@ -21,11 +21,10 @@ public class NotificationService(Client supabaseClient, UserService userService)
         return input.Replace("&", "&amp;")
             .Replace("<", "&lt;")
             .Replace(">", "&gt;")
-            .Replace("\"", "&quot;")
-            .Replace("'", "&#039;");
+            .Replace("\"", "&quot;");
+        // .Replace("'", "&#039;");
     }
 
-    //GetNotifications
     public async Task<List<NotificationModel>> GetNotifications()
     {
         var currentUser = _userService.CurrentSession.User;
@@ -36,53 +35,55 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         Guid userId = Guid.Parse(currentUser.Id ?? "");
 
-        var deleteTask = _supabaseClient
+        // First, delete old read notifications
+        await _supabaseClient
             .From<Notification>()
             .Filter("ToUserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
             .Filter("Read", Supabase.Postgrest.Constants.Operator.Equals, "true")
             .Filter("CreatedAt", Supabase.Postgrest.Constants.Operator.LessThan, DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-ddTHH:mm:ssZ"))
             .Delete();
 
-        var notificationsTask = _supabaseClient
+        // Then get all remaining notifications
+        var notificationsResponse = await _supabaseClient
             .From<Notification>()
-            .Select("NotificationId, FromUserId, ToUserId, Read, Title, CreatedAt")
+            .Select("*") // Select all fields to avoid potential issues with missing data
             .Filter("ToUserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
             .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
             .Get();
-
-
-        await Task.WhenAll(deleteTask, notificationsTask);
-
-        var notificationsResponse = await notificationsTask;
-
-
 
         if (notificationsResponse == null)
         {
             throw new GetNotificationException("Failed to get notifications.");
         }
 
-        if (notificationsResponse.Models.Count != 0 && notificationsResponse.Models[0].ToUserId != userId)
+        if (notificationsResponse.Models.Count > 0 && notificationsResponse.Models[0].ToUserId != userId)
         {
             throw new UnauthorizedAccessException("User is not authorized to view notifications.");
         }
 
+        // If no notifications, return empty list
+        if (notificationsResponse.Models.Count == 0)
+        {
+            return new List<NotificationModel>();
+        }
+
+        // Get unique user IDs from notifications
         var uniqueUserIds = notificationsResponse.Models
             .Select(n => n.FromUserId)
             .Distinct()
             .ToList();
 
-        var usersDictionary = new Dictionary<Guid, User>();
+        // Fetch all users in batch
+        var usersResponse = await _supabaseClient
+            .From<User>()
+            .Filter("UserId", Supabase.Postgrest.Constants.Operator.In, uniqueUserIds)
+            .Get();
 
-        var userTasks = uniqueUserIds.Select(uid => _userService.GetUserByUserId(uid));
-        var users = await Task.WhenAll(userTasks);
+        // Create user dictionary for quick lookups
+        var usersDictionary = usersResponse.Models
+            .ToDictionary(u => u.UserId);
 
-        foreach (var user in users.Where(u => u != null))
-        {
-            if (user == null) throw new GetUserException();
-            usersDictionary[user.UserId] = user;
-        }
-
+        // Transform notifications into view models
         var notifications = new List<NotificationModel>();
         foreach (var notification in notificationsResponse.Models)
         {
@@ -108,7 +109,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
     //GetNotificationDetails
     public async Task<NotificationDetailModel> GetNotificationDetails(Guid notificationId)
     {
-        var currentUser = _userService.CurrentSession.User;;
+        var currentUser = _userService.CurrentSession.User; ;
         if (currentUser == null)
         {
             throw new UnauthorizedAccessException("User is not authenticated.");
@@ -116,7 +117,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
 
         Guid userId = Guid.Parse(currentUser.Id ?? "");
 
-        var notification =  await _supabaseClient
+        var notification = await _supabaseClient
             .From<Notification>()
             .Select("FromUserId, ToUserId, Title, Message, CreatedAt, Url")
             .Filter("NotificationId", Supabase.Postgrest.Constants.Operator.Equals, notificationId.ToString())
@@ -282,7 +283,8 @@ public class NotificationService(Client supabaseClient, UserService userService)
             .Delete();
     }
 
-    public async Task<NotificationModel> NotificationRowToModel (Notification notificationRow) {
+    public async Task<NotificationModel> NotificationRowToModel(Notification notificationRow)
+    {
         var sourceUser = await _userService.GetUserByUserId(notificationRow.FromUserId) ?? throw new GetUserException("Source user not found");
 
         return new NotificationModel
@@ -345,6 +347,26 @@ public class NotificationService(Client supabaseClient, UserService userService)
         {
             Console.WriteLine($"Exception: {ex.Message}");
         }
+    }
+
+    //ReadAllNotifications
+    public async Task<bool> ReadAllNotifications()
+    {
+        var currentUser = _userService.CurrentSession.User;
+        if (currentUser == null)
+        {
+            throw new UnauthorizedAccessException("User is not authenticated.");
+        }
+
+        Guid userId = Guid.Parse(currentUser.Id ?? "");
+
+        await _supabaseClient
+            .From<Notification>()
+            .Filter("ToUserId", Supabase.Postgrest.Constants.Operator.Equals, userId.ToString())
+            .Set(row => row.Read, true)
+            .Update();
+
+        return true;
     }
 }
 

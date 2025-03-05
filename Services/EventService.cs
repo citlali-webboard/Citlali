@@ -82,6 +82,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             Cost = createEventViewModel.Cost,
             EventDate = createEventViewModel.EventDate,
             PostExpiryDate = createEventViewModel.PostExpiryDate,
+            FirstComeFirstServed = createEventViewModel.FirstComeFirstServed,
         };
         await _supabaseClient
             .From<Event>()
@@ -129,7 +130,62 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.Cost, createEventViewModel.Cost)
             .Set(row => row.EventDate, createEventViewModel.EventDate)
             .Set(row => row.PostExpiryDate, createEventViewModel.PostExpiryDate)
+            .Set(row => row.FirstComeFirstServed, createEventViewModel.FirstComeFirstServed)
             .Update();
+
+        if (createEventViewModel.FirstComeFirstServed)
+        {
+            await UpdateInviteRegistration(eventId);
+        }
+
+        return true;
+    }
+
+    public async Task<bool> UpdateInviteRegistration(Guid eventId)
+    {
+        var Event = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
+
+        if (!Event.FirstComeFirstServed)
+            return true;
+
+        var currentParticipant = await _supabaseClient
+            .From<Registration>()
+            .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
+            .Filter("Status", Supabase.Postgrest.Constants.Operator.In, new[] {"awaiting-confirmation", "confirmed"})
+            .Count(Supabase.Postgrest.Constants.CountType.Exact);
+
+        int countUserToInvite = Event.MaxParticipant - currentParticipant;
+
+        if (countUserToInvite <= 0)
+            return true;
+
+        // Get pending registrations sorted by creation time (oldest first)
+        var pendingRegistrations = await _supabaseClient
+            .From<Registration>()
+            .Select("*")
+            .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
+            .Filter("Status", Supabase.Postgrest.Constants.Operator.Equals, "pending")
+            .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Ascending)
+            .Get();
+
+        // Take only the number of registrations we can invite
+        var registrationsToUpdate = pendingRegistrations.Models
+            .Take(countUserToInvite)
+            .ToList();
+
+        if (registrationsToUpdate.Count == 0)
+            return true; // No registrations to update
+
+        // Batch update all registrations at once
+        var registrationIds = registrationsToUpdate.Select(r => r.RegistrationId).ToList();
+
+        // Now send notifications to each user (this still needs to be per-user)
+        var batchNotificationTasks = new List<Task>();
+        foreach (var registration in registrationsToUpdate)
+        {
+            batchNotificationTasks.Add(InviteUser(Event.EventId, registration.UserId));
+        }
+        await Task.WhenAll(batchNotificationTasks);
 
         return true;
     }
@@ -244,7 +300,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Count(Supabase.Postgrest.Constants.CountType.Exact);
 
         var eventToInvite = await eventToInviteTask ?? throw new KeyNotFoundException("Event not found");
-        if (eventToInvite.CreatorUserId.ToString() != supabaseUser.Id)
+        if (eventToInvite.CreatorUserId.ToString() != supabaseUser.Id && (eventToInvite.FirstComeFirstServed == false) && (supabaseUser.Id != userId.ToString()))
         {
             throw new UnauthorizedAccessException("User not authorized to invite to this event");
         }
@@ -257,11 +313,15 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         var registration = await registrationTask ?? throw new KeyNotFoundException("Registration not found");
 
+    
+
         await _supabaseClient
             .From<Registration>()
             .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "awaiting-confirmation")
+            .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
+
 
         var notificationTitle = "You have been invited to an event! 🎉";
         var notificationBody = $"Congratulations! Your request to join the event {eventToInvite.EventTitle} has been reviewed and accepted! To confirm or reject the invitation, please visit the event page.";
@@ -276,6 +336,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var targetUser = await targetUserTask ?? throw new KeyNotFoundException("Can't query target user");
         var notificaionTask = _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl);
         _mailService.SendNotificationEmail(mailModel, targetUser.Email);
+
+        Console.WriteLine($"User {userId} invited to event {eventId}");
 
         return true;
     }
@@ -300,6 +362,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .From<Registration>()
             .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "rejected")
+            .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
 
         var notificationTitle = "Your request has been rejected. ❌";
@@ -475,6 +538,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             throw new JoinOwnerException();
         }
 
+        // var statusRegistration = Event.FirstComeFirstServed ? "awaiting-confirmation" : "pending";
+
         var newRegistration = new Registration
         {
             RegistrationId = Guid.NewGuid(),
@@ -485,6 +550,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         await _supabaseClient
             .From<Registration>()
             .Insert(newRegistration);
+
+        await UpdateInviteRegistration(EventId);
 
         var eventQuestions = await eventQuestionsTask;
         if (eventQuestions.Models.Count > 0)
@@ -1035,7 +1102,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             PostExpiryDate = ev.PostExpiryDate,
             LocationTagsList = locationTags,
             EventCategoryTagsList = categoryTags,
-            Questions = questions
+            Questions = questions,
+            FirstComeFirstServed = ev.FirstComeFirstServed
         };
     }
 
@@ -1122,7 +1190,11 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .From<Registration>()
             .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "rejected-invitation")
+            .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
+
+
+        await UpdateInviteRegistration(eventId);
 
         var CreatorUserId = await GetCreatorEventIdByEventId(eventId);
 
@@ -1157,6 +1229,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .From<Registration>()
             .Where(row => row.RegistrationId == registration.RegistrationId)
             .Set(row => row.Status, "confirmed")
+            .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
 
         var CreatorUserId = await GetCreatorEventIdByEventId(eventId);
@@ -1407,6 +1480,24 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Count(Supabase.Postgrest.Constants.CountType.Exact);
 
         return response;
+    }
+
+    // bypass confirmation 
+    public async Task<Registration> BypassConfirmation(Guid eventId, Guid userId)
+    {
+        var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)
+                ?? throw new KeyNotFoundException("Registration not found");
+
+        await _supabaseClient
+            .From<Registration>()
+            .Where(row => row.RegistrationId == registration.RegistrationId)
+            .Set(row => row.Status, "confirmed")
+            .Set(row => row.UpdatedAt, DateTime.UtcNow)
+            .Update();
+
+        await UpdateEventStatus(eventId);
+
+        return registration;
     }
 
 }

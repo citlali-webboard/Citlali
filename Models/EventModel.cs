@@ -47,6 +47,9 @@ public class Event : BaseModel
 
     [Column("Status")]
     public string Status { get; set; } = "active";
+
+    [Column("FirstComeFirstServed")]
+    public bool FirstComeFirstServed { get; set; } = false;
 }
 
 [Table("EVENT_QUESTION")]
@@ -216,6 +219,7 @@ public class CreateEventViewModel
     public DateTime PostExpiryDate { get; set; } = DateTime.UtcNow;
     public List<Tag> Tags { get; set; } = [];
     public List<string> Questions { get; set; } = [];
+    public bool FirstComeFirstServed { get; set; } = false;
 }
 
 public class EditEventViewModel
@@ -233,6 +237,7 @@ public class EditEventViewModel
     public DateTime PostExpiryDate { get; set; } = new();
     public List<Tag> EventCategoryTagsList { get; set; } = [];
     public List<QuestionViewModel> Questions { get; set; } = [];
+    public bool FirstComeFirstServed { get; set; } = false;
 }
 
 [Table("REGISTRATION")]
@@ -253,6 +258,9 @@ public class Registration : BaseModel
 
     [Column("CreatedAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    [Column("UpdatedAt")]
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     
 }
 
