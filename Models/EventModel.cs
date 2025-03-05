@@ -212,8 +212,8 @@ public class CreateEventViewModel
     public Guid EventLocationTagId { get; set; } = new();
     public int MaxParticipant { get; set; } = 0;
     public int Cost { get; set; } = 0;
-    public DateTime EventDate { get; set; } = new();
-    public DateTime PostExpiryDate { get; set; } = new();
+    public DateTime EventDate { get; set; } = DateTime.UtcNow;
+    public DateTime PostExpiryDate { get; set; } = DateTime.UtcNow;
     public List<Tag> Tags { get; set; } = [];
     public List<string> Questions { get; set; } = [];
 }

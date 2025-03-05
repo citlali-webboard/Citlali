@@ -81,6 +81,11 @@
     color: #555;
 }
 
+.form-group label.required::after {
+    content: " *";
+    color: red;
+}
+
 #eventTag select,
 #eventLocation select,
 .form-group input,textarea {
@@ -131,6 +136,28 @@
     margin-top: 1rem;
     gap: 2rem;
     align-items: stretch;
+}
+
+/* Replace your current invalid CSS with this */
+textarea.touched:invalid,
+input.touched:invalid,
+select.touched:invalid {
+    border: 1px solid red;
+    box-shadow: 0 0 3px rgba(255, 0, 0, 0.3);
+}
+
+/* Add styles for validation messages */
+.field-validation-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: none; /* Hidden by default */
+}
+
+/* Only show validation messages for touched fields */
+.touched + .field-validation-error,
+.touched ~ .field-validation-error {
+    display: block;
 }
 
 .description {
