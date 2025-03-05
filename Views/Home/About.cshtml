@@ -1,0 +1,115 @@
+@{
+    ViewData["Title"] = "About Citlali";
+    
+    // Define developers data in an array
+    var developers = new[]
+    {
+        new {
+            Name = "Paratpanu Pechsaman",
+            Role = "Project Manager, Full Stack Developer, Kita Ikuyou",
+            Bio = "Somehow ended up as a project manager by accident. Used to be a backend developer, now a full-stack (and fully stuck) developer. Also, hopelessly in love with Kita Ikuyou. Send help!",
+            GitHubUsername = "paratpanu18",
+            AvatarUrl = "https://i.ytimg.com/vi/FU8agUakqIY/maxresdefault.jpg"
+        },
+        new {
+            Name = "Phuwit Puthipairoj",
+            Role = "Backend Developer, Deployment Manager, Full-time Tinkerer",
+            Bio = "hey there hello its me phuwit isnt it. my project manager needs me to write something to fill this and i dont know what to write here. bazinga.",
+            GitHubUsername = "phuwit",
+            AvatarUrl = "https://avatars.githubusercontent.com/u/26784267?v=4"
+        },
+        new {
+            Name = "Pipatpong Panpruake",
+            Role = "Backend Developer...",
+            Bio = "I am a normal human, and the sentence I don't want to hear is 'I have a new feature'.",
+            GitHubUsername = "PpoH2233",
+            AvatarUrl = "https://i.pinimg.com/736x/bd/0c/40/bd0c40563deaa69e3695317a44d87baf.jpg"
+        },
+        new {
+            Name = "Prompipat Thongtub",
+            Role = "Frontend Developer",
+            Bio = "we don't talk animal.",
+            GitHubUsername = "PrompipatJa",
+            AvatarUrl = "https://avatars.githubusercontent.com/u/144836590?s=400&u=1e1b29c95890bdded1a6239d320447f15226dc3d&v=4"
+        },
+        new {
+            Name = "Pearapat Kumsing",
+            Role = "FullStack Developer",
+            Bio = "A respiratory cell refers to any cell in the body that actively participates in the process of gas exchange, meaning it takes in oxygen from the bloodstream and releases carbon dioxide, essentially carrying out the function of cellular respiration 🧬🦠💥",
+            GitHubUsername = "PPraapatZZ",
+            AvatarUrl = "https://avatars.githubusercontent.com/u/138387155?v=4"
+        },
+    };
+    
+    // Project details
+    var projectDetails = new Dictionary<string, string>
+    {
+        { "Course", "01076120 Web Application Development Project" },
+        { "Institution", "Computer Engineering, KMITL" },
+        { "Year", "2024" },
+        { "License", "MIT" },
+        { "Expected Grade", "A" },
+    };
+}
+
+<div class="center-wrapper">
+    <div class="hero-section">
+        <h1>Citlali</h1>
+        <p class="subtitle">A cute webboard which brings people together~</p>
+    </div>
+    
+    <div class="content">
+        <section class="team-section">
+            <h2>Meeting developers</h2>
+            <p class="team-intro">
+                Citlali was developed as part of the Computer Engineering course at KMITL (King Mongkut's Institute of Technology Ladkrabang).
+                Meet our talented developers who brought this project to life.
+            </p>
+            
+            <div class="team-grid">
+                @foreach (var dev in developers)
+                {
+                    <div class="dev-card">
+                        <div class="dev-avatar">
+                            <img src="@dev.AvatarUrl" alt="@dev.Name">
+                        </div>
+                        <div class="dev-info">
+                            <h3>@dev.Name</h3>
+                            <p class="dev-role">@dev.Role</p>
+                            <p class="dev-bio">@dev.Bio</p>
+                            <div class="dev-links">
+                                <a href="https://github.com/@dev.GitHubUsername" target="_blank" class="github-link">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                                    </svg>
+                                    GitHub
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+        
+        <section class="project-section">
+            <h2>Project Information</h2>
+            <div class="project-details">
+                @foreach (var detail in projectDetails)
+                {
+                    <div class="detail-item">
+                        <strong>@detail.Key:</strong> @detail.Value
+                    </div>
+                }
+            </div>
+            
+            <div class="repo-link">
+                <a href="https://github.com/citlali-webboard/Citlali" class="btn btn-large" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                    </svg>
+                    View Repository
+                </a>
+            </div>
+        </section>
+    </div>
+</div>
