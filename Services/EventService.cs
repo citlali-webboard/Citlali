@@ -268,7 +268,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var mailModel = new MailNotificationViewModel {
             Title = notificationTitle,
             Body = notificationBody,
-            Url = $"{_configuration.App.Url}{absoluteUrl}"
+            BaseUrl = _configuration.App.Url,
+            AbsoluteEventUrl = absoluteUrl,
         };
 
         var notificaionTask = await _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl, NotificationLevel.Important);

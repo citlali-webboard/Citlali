@@ -214,13 +214,14 @@ public class NotificationService(Client supabaseClient, UserService userService,
         return true;
     }
 
-    public async Task SendNotificationEmail(string title, string message, string url, Guid targetUserId)
+    public async Task SendNotificationEmail(string title, string message, string absoluteUrl, Guid targetUserId)
     {
         var targetUserTask = _userService.GetUserByUserId(targetUserId);
         var mailModel = new MailNotificationViewModel {
             Title = EscapeInput(title),
             Body = EscapeInput(message),
-            Url = $"{_configuration.App.Url}{EscapeInput(url)}"
+            BaseUrl = _configuration.App.Url,
+            AbsoluteEventUrl = absoluteUrl,
         };
 
         var targetUser = await targetUserTask ?? throw new KeyNotFoundException("Can't query target user");

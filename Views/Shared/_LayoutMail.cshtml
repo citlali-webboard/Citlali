@@ -13,19 +13,24 @@
       <td align="center">
         <table role="presentation" width="500" cellspacing="0" cellpadding="0" border="0"
           style="background: #ffffff; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
-          <tr>
+          <tr id="center-this">
             <td align="center">
-              <div style="width: 60px; height: 60px;">
+              <table cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
+              <tr>
+                <td width="48" valign="middle">
                 <img
                   src="http://citlali-supabase.bigblahaj.com/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.jpeg"
-                  alt="Logo" width="100%" height="100%"
-                  style="border-radius: 50%; display: block; margin-bottom: 20px; object-fit: cover;">
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td align="center" style="color: #3a3a3a; font-size: 26px; font-weight: 600; padding: 1rem 0;">
-              @ViewData["Title"]
+                  alt="Logo" width="48" height="48"
+                  style="border-radius: 50%; display: block; object-fit: cover;">
+                </td>
+                <td width="16"></td>
+                <td valign="middle" style="text-align: center;">
+                  <span style="font-size: 18px; font-weight: bold; color: #333333; display: inline-block;">
+                    Citlali Webboard
+                  </span>
+                </td>
+              </tr>
+              </table>
             </td>
           </tr>
           @RenderBody()

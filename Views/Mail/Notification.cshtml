@@ -6,19 +6,39 @@
 }
 
 <tr>
+  <td align="center" style="color: #3a3a3a; font-size: 24px; font-weight: 600; padding: 1rem 0;">
+    You got a notification!
+  </td>
+</tr>
+<tr>
+  <td align="center" style="color: #3a3a3a; font-size: 18px; font-weight: 600; padding: 1rem 0;">
+    @Model.Title
+  </td>
+</tr>
+<tr>
   <td align="center" style="color: #555; font-size: 14px; line-height: 1.5; white-space: pre-wrap;">@Model.Body</td>
 </tr>
-@{
-  if(Model.Url != null) {
-    <tr>
-      <td align="center" style="padding-top: 1.5rem;">
-        <a href="@Model.Url">
-          <div
-            style="font-size: 1rem; font-weight: 700; color: white; background-color: black; padding: 1rem; border-radius: 1rem; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: inline-block;">
-            View Event
-          </div>
-        </a>
-      </td>
-    </tr>
-  }
+
+<tr>
+  <td align="center" style="padding-top: 1.5rem;">
+    <a href="@Model.BaseUrl/notification">
+      <div
+        style="font-size: 1rem; font-weight: 700; color: black; background-color: white; border-style: solid; border-width: 2px; padding: 1rem; border-radius: 1rem; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: inline-block;">
+        View Notifications
+      </div>
+    </a>
+  </td>
+</tr>
+@if (Model.AbsoluteEventUrl != null)
+{
+  <tr>
+    <td align="center" style="padding-top: 1.5rem;">
+      <a href="@Model.BaseUrl@Model.AbsoluteEventUrl">
+        <div
+          style="font-size: 1rem; font-weight: 700; color: white; background-color: black; padding: 1rem; border-radius: 1rem; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: inline-block;">
+          View Event
+        </div>
+      </a>
+    </td>
+  </tr>
 }
