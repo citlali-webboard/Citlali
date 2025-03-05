@@ -42,17 +42,13 @@
       <div class="popup-content">
         <form class="edit_form" asp-controller="User" asp-action="edit" method="post" enctype="multipart/form-data">
           <div class="popup-navigation">
+            <div class="popup-left-space"></div>
+            <h1>Edit Profile</h1>
             <a class="popup-action-button" onclick="closeDialog()">
               <span>
                 @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.DismissCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
               </span>
             </a>
-            <h1>Edit Profile</h1>
-            <button type="submit" class="popup-action-button">
-              <span>
-                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Save>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
-              </span>
-            </button>
           </div>
 
           <div class="popup-body">
@@ -84,7 +80,7 @@
 
                 <div class="form-group">
                     <label for="DisplayName">Display Name</label>
-                    <input asp-for="DisplayName" class="form-control" id="DisplayName" />
+                    <input asp-for="DisplayName" class="form-control" id="DisplayName" required />
                     <span asp-validation-for="DisplayName" class="text-danger"></span>
                 </div>
 
@@ -93,6 +89,12 @@
                     <textarea asp-for="UserBio" id="UserBio" rows="3"></textarea>
                     <span asp-validation-for="UserBio" class="text-danger"></span>
                 </div>
+                <button type="submit" class="submit-btn">
+                  <span>
+                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Save>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                  </span>
+                  <span>Save</span>
+                </button>
             </div>
           </div>
         </form>
