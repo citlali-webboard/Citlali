@@ -39,20 +39,16 @@
             <div class="popup-content">
                 <form class="popup-form" asp-controller="Event" asp-action="Broadcast" method="post" enctype="multipart/form-data">
                     <div class="popup-navigation">
+                        <div class="popup-left-space"></div>
+                        <div class="popup-title">
+                            <h1>Broadcast</h1>
+                            <description>Broadcast a message to all confirmed participants.</description>
+                        </div>
                         <a class="popup-action-button" onclick="closeDialog()">
                             <span>
                                 @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.DismissCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
                             </span>
                         </a>
-                        <div class="popup-title">
-                            <h1>Broadcast</h1>
-                            <description>Broadcast a message to all confirmed participants.</description>
-                        </div>
-                        <button type="submit" class="popup-action-button">
-                            <span>
-                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Send>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
-                            </span>
-                        </button>
                     </div>
 
                     <div class="popup-body">
@@ -62,12 +58,14 @@
                             <div class="popup-confirmed-participants-list">
                                 @foreach (var confirmedParticipant in Model.ConfirmedParticipant)
                                 {
-                                    <div class="popup-each-confirmed-participant">
-                                        <img src="@confirmedParticipant.ProfileImageUrl" alt="Profile" class="profile-img">
-                                        <span>
-                                            @confirmedParticipant.DisplayName
-                                        </span>
-                                    </div>
+                                    <a href="/user/@confirmedParticipant.Username" target="_blank">
+                                        <div class="popup-each-confirmed-participant">
+                                            <img src="@confirmedParticipant.ProfileImageUrl" alt="Profile" class="profile-img">
+                                            <span>
+                                                @confirmedParticipant.DisplayName
+                                            </span>
+                                        </div>
+                                    </a>
                                 }
                             </div>
                         </div>
@@ -109,7 +107,7 @@
                                 @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Pause>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
                             </span>
                             <span>
-                                Close event
+                                Pause Registration
                             </span>
                         </button>
                     </form>
@@ -122,7 +120,7 @@
                                 @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Play>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
                             </span>
                             <span>
-                                Re-open event
+                                Resume Registration
                             </span>
                         </button>
                     </form>
