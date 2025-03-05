@@ -265,12 +265,6 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var notificationTitle = "You have been invited to an event! 🎉";
         var notificationBody = $"Congratulations! Your request to join the event {eventToInvite.EventTitle} has been reviewed and accepted! To confirm or reject the invitation, please visit the event page.";
         var absoluteUrl = $"/event/detail/{eventId}";
-        var mailModel = new MailNotificationViewModel {
-            Title = notificationTitle,
-            Body = notificationBody,
-            BaseUrl = _configuration.App.Url,
-            AbsoluteEventUrl = absoluteUrl,
-        };
 
         var notificaionTask = await _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl, NotificationLevel.Important);
 

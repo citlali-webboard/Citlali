@@ -201,11 +201,11 @@ public class NotificationService(Client supabaseClient, UserService userService,
         {
             if (_configuration.Mail.NotificationLevel == MailNotificationLevel.ImportantOnly && level == NotificationLevel.Important)
             {
-            await SendNotificationEmail(title, message, url, toUserId);
+                await SendNotificationEmail(title, message, url, fromUserId, toUserId);
             }
             else
             {
-            await SendNotificationEmail(title, message, url, toUserId);
+                await SendNotificationEmail(title, message, url, fromUserId, toUserId);
             }
         });
 
@@ -214,14 +214,19 @@ public class NotificationService(Client supabaseClient, UserService userService,
         return true;
     }
 
-    public async Task SendNotificationEmail(string title, string message, string absoluteUrl, Guid targetUserId)
+    public async Task SendNotificationEmail(string title, string message, string absoluteUrl, Guid fromUserId, Guid targetUserId)
     {
         var targetUserTask = _userService.GetUserByUserId(targetUserId);
+        var fromUser = await _userService.GetUserByUserId(fromUserId) ?? throw new KeyNotFoundException("Can't query origin user");
+
         var mailModel = new MailNotificationViewModel {
             Title = EscapeInput(title),
             Body = EscapeInput(message),
             BaseUrl = _configuration.App.Url,
             AbsoluteEventUrl = absoluteUrl,
+            FromDisplayName = fromUser.DisplayName,
+            FromUsername = fromUser.Username,
+            FromProfileImage = fromUser.ProfileImageUrl,
         };
 
         var targetUser = await targetUserTask ?? throw new KeyNotFoundException("Can't query target user");
