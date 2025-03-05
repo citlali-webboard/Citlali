@@ -494,7 +494,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             CreatedAt = citlaliEvent.CreatedAt,
             CreatorUsername = creator.Username,
             CreatorDisplayName = creator.DisplayName,
-            CreatorProfileImageUrl = creator.ProfileImageUrl
+            CreatorProfileImageUrl = creator.ProfileImageUrl,
+            FirstComeFirstServed = citlaliEvent.FirstComeFirstServed,
         };
         var eventFormDto = new EventFormDto
         {
@@ -745,6 +746,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             EventDate = citlaliEvent.EventDate,
             PostExpiryDate = citlaliEvent.PostExpiryDate,
             CreatedAt = citlaliEvent.CreatedAt,
+            FirstComeFirstServed = citlaliEvent.FirstComeFirstServed,
         };
     }
 
@@ -777,6 +779,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             EventDate = citlaliEvent.EventDate,
             PostExpiryDate = citlaliEvent.PostExpiryDate,
             CreatedAt = citlaliEvent.CreatedAt,
+            FirstComeFirstServed = citlaliEvent.FirstComeFirstServed,
         };
     }
 
@@ -1039,8 +1042,9 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             Cost = ev.Cost,
             EventDate = ev.EventDate,
             PostExpiryDate = ev.PostExpiryDate,
-            EventStatus = ev.Status,
             CreatedAt = ev.CreatedAt,
+            FirstComeFirstServed = ev.FirstComeFirstServed,
+            EventStatus = ev.Status,
             Questions = questionLookup.Select(q => new QuestionViewModel
             {
                 EventQuestionId = q.Key,

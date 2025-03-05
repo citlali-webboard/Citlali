@@ -97,6 +97,7 @@ public class EventBriefCardData
     public DateTime EventDate {get ; set;} = new();
     public DateTime PostExpiryDate {get ; set;} = new();
     public DateTime CreatedAt {get ; set;} = new();
+    public bool FirstComeFirstServed { get; set; } = false;
 
 }
 
