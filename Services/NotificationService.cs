@@ -21,8 +21,8 @@ public class NotificationService(Client supabaseClient, UserService userService)
         return input.Replace("&", "&amp;")
             .Replace("<", "&lt;")
             .Replace(">", "&gt;")
-            .Replace("\"", "&quot;")
-            .Replace("'", "&#039;");
+            .Replace("\"", "&quot;");
+            // .Replace("'", "&#039;");
     }
 
     //GetNotifications
