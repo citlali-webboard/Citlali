@@ -125,6 +125,8 @@ main .notification-container{
     row-gap: 2rem;
     justify-content: center;
     align-items: center;
+    position: sticky;
+    top: calc(var(--navbar-size) + 2rem);
 }
 
 .default-notification div {
