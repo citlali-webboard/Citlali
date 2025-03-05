@@ -163,7 +163,7 @@ public class NotificationService(Client supabaseClient, UserService userService)
     }
 
     //Create Notification with title and message
-    public async Task<bool> CreateNotification(Guid toUserId, string title, string message, string url)
+    public async Task<bool> CreateNotification(Guid toUserId, string title, string message, string url, Guid fromUser = default)
     {
 
         var supabaseUser = _userService.CurrentSession.User
@@ -174,6 +174,11 @@ public class NotificationService(Client supabaseClient, UserService userService)
         if (fromUserId == Guid.Empty || toUserId == Guid.Empty)
         {
             throw new SameSourceAndDestinationException("Source and destination are the same.");
+        }
+
+        if (fromUser != default)
+        {
+            fromUserId = fromUser; // fromUser is Id
         }
 
         if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(message))

@@ -314,7 +314,6 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var registration = await registrationTask ?? throw new KeyNotFoundException("Registration not found");
 
     
-
         await _supabaseClient
             .From<Registration>()
             .Where(row => row.RegistrationId == registration.RegistrationId)
@@ -322,6 +321,11 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
 
+        
+        if(eventToInvite.FirstComeFirstServed && userId.ToString() == supabaseUser.Id)
+        {
+           return true;
+        }
 
         var notificationTitle = "You have been invited to an event! 🎉";
         var notificationBody = $"Congratulations! Your request to join the event {eventToInvite.EventTitle} has been reviewed and accepted! To confirm or reject the invitation, please visit the event page.";
@@ -334,11 +338,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         };
 
         var targetUser = await targetUserTask ?? throw new KeyNotFoundException("Can't query target user");
-        var notificaionTask = _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl);
+        var notificaionTask = _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl, eventToInvite.CreatorUserId);
         _mailService.SendNotificationEmail(mailModel, targetUser.Email);
 
-        Console.WriteLine($"User {userId} invited to event {eventId}");
-
+        
         return true;
     }
 
@@ -494,7 +497,8 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             CreatedAt = citlaliEvent.CreatedAt,
             CreatorUsername = creator.Username,
             CreatorDisplayName = creator.DisplayName,
-            CreatorProfileImageUrl = creator.ProfileImageUrl
+            CreatorProfileImageUrl = creator.ProfileImageUrl,
+            FirstComeFirstServed = citlaliEvent.FirstComeFirstServed,
         };
         var eventFormDto = new EventFormDto
         {
@@ -745,6 +749,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             EventDate = citlaliEvent.EventDate,
             PostExpiryDate = citlaliEvent.PostExpiryDate,
             CreatedAt = citlaliEvent.CreatedAt,
+            FirstComeFirstServed = citlaliEvent.FirstComeFirstServed,
         };
     }
 
@@ -777,6 +782,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             EventDate = citlaliEvent.EventDate,
             PostExpiryDate = citlaliEvent.PostExpiryDate,
             CreatedAt = citlaliEvent.CreatedAt,
+            FirstComeFirstServed = citlaliEvent.FirstComeFirstServed,
         };
     }
 
@@ -1039,8 +1045,9 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             Cost = ev.Cost,
             EventDate = ev.EventDate,
             PostExpiryDate = ev.PostExpiryDate,
-            EventStatus = ev.Status,
             CreatedAt = ev.CreatedAt,
+            FirstComeFirstServed = ev.FirstComeFirstServed,
+            EventStatus = ev.Status,
             Questions = questionLookup.Select(q => new QuestionViewModel
             {
                 EventQuestionId = q.Key,
