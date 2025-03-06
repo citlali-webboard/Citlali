@@ -114,6 +114,13 @@
     font-weight: 600;
 }
 
+.data h3 a{
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
 .data p {
     margin: 0;
     font-size: 0.85rem;
@@ -390,7 +397,7 @@
 
 .popup-content {
     width: 90%;
-    max-width: 700px;
+    max-width: 768px;
     background-color: var(--card-bg);
     border-radius: var(--border-radius);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
@@ -403,7 +410,17 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.popup-navigation h1 {
+    font-size: 1.5rem;
+    color: #333;
+    font-weight: bold;
+}
+
+.popup-left-space {
+    width: 40px;
 }
 
 .popup-action-button {
@@ -417,11 +434,11 @@
 
 .popup-body {
     display: flex;
-    gap: 2rem;
+    gap: 4rem;
 }
 
 .popup-profile-image {
-    flex: 0 0 35%;
+    flex: 0 0 25%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -480,6 +497,26 @@
 .form-group textarea {
     resize: none;
     min-height: 100px;
+}
+
+.submit-btn {
+    width: 100%;
+    display: inline-flex;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    background-color: #333;
+    color: #fff;
+    border-radius: 4px;
+} 
+
+.submit-btn svg {
+    fill: #fff !important;
+}
+
+.submit-btn:hover {
+    background-color: #444;
 }
 
 .disabled-input {

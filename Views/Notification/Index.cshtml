@@ -63,14 +63,25 @@
                 <h1>Notification 🔔</h1>
                 <p>Stay updated with important news and alerts. Don't miss out on the latest updates! 📢</p>
             </header>
-            <button class="delete-all-btn" id="delete-all-btn">
-                <span>
-                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
-                </span>
-                <span>
-                    Clear all read notifications
-                </span>
-            </button>
+            <div class="active-btn-container">
+                <button class="read-all-btn" id="read-all-btn">
+                    <span>
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.MailRead>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                    </span>
+                    <span>
+                        Read all notifications
+                    </span>
+                </button>
+                <button class="delete-all-btn" id="delete-all-btn">
+                    <span>
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                    </span>
+                    <span>
+                        Clear all read notifications
+                    </span>
+                </button>
+
+            </div>
             <main>
                 <div class="notification-container">
                     @for (var i = 0; i < Model.Notifications.Count; i++)

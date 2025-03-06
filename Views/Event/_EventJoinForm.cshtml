@@ -37,8 +37,8 @@
         <div class="justify-flex-end">
             @if (Model.IsClosed == false) {
                 <button class="form-submit" type="submit">
+                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.ArrowCircleRight>>(RenderMode.ServerPrerendered, new { Color = Color.Lightweight}))
                     Request to join
-                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.AirplaneTakeOff>>(RenderMode.ServerPrerendered, new { Color = Color.Lightweight}))
                 </button>
             }
         </div>

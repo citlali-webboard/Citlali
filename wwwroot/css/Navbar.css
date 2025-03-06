@@ -258,7 +258,7 @@ body nav ul .nav-group .logo p {
     z-index: 1020;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
     nav ul {
         padding: 0 1rem;
         height: var(--navbar-size);

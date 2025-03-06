@@ -18,15 +18,17 @@ public class EventController : Controller
     private readonly UserService _userService;
     private readonly NotificationService _notificationService;
     private readonly Supabase.Client _supabaseClient;
+    private readonly Configuration _configuration;
 
 
-    public EventController(ILogger<EventController> logger, EventService eventService, UserService userService, Supabase.Client supabaseClient, NotificationService notificationService)
+    public EventController(ILogger<EventController> logger, EventService eventService, UserService userService, Supabase.Client supabaseClient, NotificationService notificationService, Configuration configuration)
     {
         _logger = logger;
         _eventService = eventService;
         _userService = userService;
         _supabaseClient = supabaseClient;
         _notificationService = notificationService;
+        _configuration = configuration;
     }
 
     [HttpGet("")]
@@ -865,4 +867,174 @@ public class EventController : Controller
     }
 
 
+    [HttpGet("followed")]
+    public async Task<IActionResult> Followed(int page = 1, int pageSize = 10, string sortBy = "newest")
+    {
+        try
+        {
+            ViewBag.SortBy = sortBy;
+
+            if (_userService.CurrentSession.User == null || string.IsNullOrEmpty(_userService.CurrentSession.User.Id))
+            {
+                return RedirectToAction("SignIn", "Auth");
+            }
+            
+            var userId = Guid.Parse(_userService.CurrentSession.User.Id);
+            
+            // Start all independent queries in parallel for better performance
+            var followedTagsTask = _userService.GetFollowedTags(userId.ToString());
+            var followedUsersTask = _userService.GetFollowingUsers(userId);
+            var tagsTask = _eventService.GetTags();
+            var locationsTask = _eventService.GetLocationTags();
+            var eventsTask = _eventService.GetEventsFromFollowed(userId);
+            var hasFollowedUsersTask = _userService.GetFollowingCount(userId).ContinueWith(t => t.Result > 0);
+
+            // Wait for all initial tasks to complete
+            await Task.WhenAll(followedTagsTask, tagsTask, eventsTask, locationsTask, hasFollowedUsersTask, followedUsersTask);            
+            
+            var followedTags = await followedTagsTask;
+            var tags = (await tagsTask).ToArray();
+            var locations = await locationsTask;
+            var events = await eventsTask;
+            bool hasFollowedTags = followedTags != null && followedTags.Count > 0;
+            bool hasFollowedUsers = await hasFollowedUsersTask;
+            var followedUsers = await followedUsersTask;
+            
+            // If no events found, return early with empty data
+            if (events.Count == 0)
+            {
+                return View(new FollowedExploreViewModel
+                {
+                    EventBriefCardDatas = Array.Empty<EventBriefCardData>(),
+                    Tags = tags,
+                    Locations = locations.ToArray(),
+                    CurrentPage = 1,
+                    TotalPage = 0,
+                    HasFollowedTags = hasFollowedTags,
+                    HasFollowedUsers = hasFollowedUsers,
+                    UserFollowingContents = new UserFollowingContents
+                    {
+                        Tags = followedTags ?? new List<Tag>(),
+                        User = followedUsers ?? new List<BriefUser>()
+                    }
+                });
+            }
+            
+            // Apply sorting based on user preference
+            switch (sortBy)
+            {
+                case "date":
+                    events = events.OrderBy(e => e.EventDate).ToList();
+                    break;
+                case "popularity":
+                    var popularityCountTasks = events.Select(async ev => {
+                        var count = await _eventService.GetRegistrationCountByEventId(ev.EventId);
+                        return (ev, count);
+                    }).ToList();
+                    
+                    var eventWithCounts = await Task.WhenAll(popularityCountTasks);
+
+                    events = eventWithCounts
+                        .OrderByDescending(p => p.count)
+                        .ThenByDescending(p => p.ev.CreatedAt) // Secondary sort by creation date
+                        .Select(p => p.ev)
+                        .ToList();
+                    break;
+                case "oldest":
+                    events = events.OrderBy(e => e.CreatedAt).ToList();
+                    break;
+                case "newest":
+                default:
+                    events = events.OrderByDescending(e => e.CreatedAt).ToList();
+                    break;
+            }
+            
+            // Apply pagination after sorting
+            var totalCount = events.Count;
+            var paginatedEvents = events
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToArray();
+            
+            // Create a list to store all tasks for event card processing
+            var processingTasks = new List<Task>();
+            var eventCards = new EventBriefCardData[paginatedEvents.Length];
+            
+            // Process each event in parallel to build card data
+            for (int i = 0; i < paginatedEvents.Length; i++)
+            {
+                var ev = paginatedEvents[i];
+                var index = i;
+                
+                // Start all data fetching tasks for this event in parallel
+                var creatorTask = _userService.GetUserByUserId(ev.CreatorUserId);
+                var locationTagTask = _eventService.GetLocationTagById(ev.EventLocationTagId);
+                var categoryTagTask = _eventService.GetTagById(ev.EventCategoryTagId);
+                var participantCountTask = _eventService.GetRegistrationCountByEventId(ev.EventId);
+                
+                // Create a task that will await all the data and build the card
+                var cardTask = Task.WhenAll(creatorTask, locationTagTask, categoryTagTask, participantCountTask)
+                    .ContinueWith(_ => {
+                        // Get results with null handling
+                        var creator = creatorTask.Result ?? new User
+                        {
+                            DisplayName = "Unknown User",
+                            ProfileImageUrl = "/images/default-profile.png"
+                        };
+                        
+                        var locationTag = locationTagTask.Result ?? new LocationTag();
+                        var categoryTag = categoryTagTask.Result ?? new EventCategoryTag();
+                        var participantCount = participantCountTask.Result;
+                        
+                        // Create the card data
+                        eventCards[index] = new EventBriefCardData
+                        {
+                            EventId = ev.EventId,
+                            EventTitle = ev.EventTitle,
+                            EventDescription = ev.EventDescription,
+                            CreatorDisplayName = creator.DisplayName,
+                            CreatorProfileImageUrl = creator.ProfileImageUrl,
+                            LocationTag = locationTag,
+                            EventCategoryTag = categoryTag,
+                            CurrentParticipant = participantCount,
+                            MaxParticipant = ev.MaxParticipant,
+                            Cost = ev.Cost,
+                            EventDate = ev.EventDate,
+                            PostExpiryDate = ev.PostExpiryDate,
+                            CreatedAt = ev.CreatedAt,
+                        };
+                    });
+                    
+                processingTasks.Add(cardTask);
+            }
+            
+            await Task.WhenAll(processingTasks);
+
+            var model = new FollowedExploreViewModel
+            {
+                Locations = locations.ToArray(),
+                UserFollowingContents = new UserFollowingContents
+                {
+                    Tags = followedTags ?? new List<Tag>(),
+                    User = followedUsers ?? new List<BriefUser>()
+                },
+                Tags = tags,
+                EventBriefCardDatas = eventCards,
+                CurrentPage = page,
+                TotalPage = (int)Math.Ceiling(totalCount / (double)pageSize),
+                HasFollowedTags = hasFollowedTags,
+                HasFollowedUsers = hasFollowedUsers
+            };
+
+            return View(model);
+        }
+        catch (Exception e)
+        {
+            TempData["Error"] = e.Message;
+            _logger.LogError(e, "Error in Followed action");
+            return RedirectToAction("Explore");
+        }
+    }
+
+    
 }

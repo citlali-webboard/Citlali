@@ -420,7 +420,13 @@ ul {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    position: relative;
 }
+
+.popup-left-space {
+    width: 40px; /* Same width as close button to balance the centering */
+}
+
 
 .popup-navigation h1 {
     font-size: 1.5rem;
@@ -502,9 +508,12 @@ ul {
 }
 
 .popup-title {
+    flex-grow: 1;
+    text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin: 0 auto;
 }
 
 .popup-title description {
@@ -585,6 +594,168 @@ ul {
     text-overflow: ellipsis;
 }
 
+/* Participant controls container */
+.participant-controls {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1rem 0;
+    justify-content: flex-end;
+    align-items: center;
+    border-radius: 8px;
+    position: relative;
+}
+
+/* Search container */
+.search-container {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    min-width: 200px;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 0.6rem 1rem 0.6rem 2.5rem;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.search-container input:focus {
+    outline: none;
+    border-color: #333;
+}
+
+.search-icon {
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+.participant-control-button-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/* Filter and sort containers */
+.participant-filter,
+.participant-sort {
+    position: relative;
+}
+
+/* Buttons for filter and sort */
+.filter-button,
+.sort-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--bg-color, #f0f0f0);
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-primary, #333);
+}
+
+.filter-button:hover,
+.sort-button:hover {
+    background-color: #e0e0e0;
+}
+
+.filter-button svg,
+.sort-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Dropdown menus */
+.filter-menu,
+.sort-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    display: none;
+    z-index: 1000;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 0.75rem;
+    min-width: 200px;
+    margin-top: 0.5rem;
+}
+
+/* Filter option group */
+.filter-group h4 {
+    font-size: 0.85rem;
+    margin: 0 0 8px 0;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Filter and sort options */
+.filter-option,
+.sort-option {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    text-align: left;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+.filter-option:hover,
+.sort-option:hover {
+    background-color: #f5f5f5;
+}
+
+.filter-option.active,
+.sort-option.active {
+    background-color: #f8f8f8;
+    color: #000;
+    font-weight: 600;
+}
+
+/* No results message */
+.no-results {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.no-results p {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* Search result highlighting */
+.highlight-search {
+    background-color: rgba(253, 0, 227, 0.05);
+    transition: background-color 0.3s ease;
+}
+
+/* Hide elements */
+.hidden {
+    display: none !important;
+}
+
 @media (max-width: 768px) {
     .registrants {
         display: flex;
@@ -641,5 +812,62 @@ ul {
 
     .event-status {
         width: 100%;
+    }
+
+    .participant-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-container {
+        max-width: none;
+        flex: 1 1 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .participant-filter,
+    .participant-sort {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+    
+    .filter-button,
+    .sort-button {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .filter-menu,
+    .sort-menu {
+        width: 100%;
+        right: 0;
+    }
+    
+    .registrant-card {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .participant-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .participant-filter,
+    .participant-sort {
+        width: 100%;
+    }
+    
+    .filter-button,
+    .sort-button {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .filter-menu,
+    .sort-menu {
+        width: 100%;
+        right: 0;
     }
 }
