@@ -1,0 +1,501 @@
+.center-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 2rem;
+    min-height: calc(100vh - var(--navbar-size));
+    margin-top: var(--navbar-size);
+    background-color: #f0f0f0;
+}
+
+.content {
+    margin-top: 2rem;
+    padding: 0 2rem;
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Main container styling */
+.follows-container {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 768px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+/* Header styling */
+.follows-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #eee;
+}
+
+.follows-header h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.follows-header a {
+    display: flex;
+    justify-content: space-between;
+}
+
+#username {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.close-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #333;
+}
+
+/* Tabs styling */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #eee;
+    background-color: #f8f8f8;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 12px;
+    background: none;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    color: #666;
+}
+
+.tab-button:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+.tab-button.active {
+    color: #333;
+    font-weight: 600;
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #333;
+}
+
+.count {
+    display: inline-block;
+    background-color: rgba(0, 0, 0, 0.05);
+    font-size: 0.8rem;
+    border-radius: 10px;
+    padding: 2px 8px;
+    margin-left: 5px;
+    font-weight: normal;
+}
+
+.tab-button.active .count {
+    /* background-color: #; */
+}
+
+/* Search box styling */
+.search-box {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eee;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.search-box input:focus {
+    border-color: #333;
+}
+
+/* Tab content styling */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Follow list styling */
+.follow-list {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.follow-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s ease;
+}
+
+.follow-item:hover {
+    background-color: #f9f9f9;
+}
+
+.follow-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.tag-emoji {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.follow-info h2 {
+    margin: 0;
+    font-size: 1.1rem !important;
+    font-weight: 600;
+}
+
+.follow-info p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.follow-btn {
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #333;
+    text-decoration: none;
+}
+
+.follow-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.view-profile-btn {
+    display: inline-block;
+}
+
+/* Section header styling */
+.section-header {
+    padding: 12px 16px 8px;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #eee;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #666;
+}
+
+/* Empty state styling */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    margin: 0 0 8px;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.empty-state p {
+    color: #666;
+    margin: 0;
+    max-width: 250px;
+}
+
+/* No results message */
+.no-results-message {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+
+@media (max-width: 1024px) {
+    .content {
+        width: 95%;
+        padding: 0 1rem;
+    }
+    
+    .follows-container {
+        max-width: 100%;
+    }
+    
+    .user-profile h1 {
+        font-size: 1.1rem;
+    }
+    
+    #username {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .center-wrapper {
+        padding: 0 1rem;
+    }
+    
+    .content {
+        width: 100%;
+        margin-top: 1rem;
+        padding: 0;
+    }
+    
+    .follows-container {
+        border-radius: 8px;
+    }
+    
+    .follow-list {
+        max-height: 70vh;
+    }
+    
+    .follow-info h2 {
+        font-size: 0.95rem !important;
+    }
+    
+    .empty-state {
+        padding: 30px 15px;
+    }
+    
+    .empty-icon {
+        font-size: 40px;
+    }
+}
+
+@media (max-width: 767px) and (orientation: landscape) {
+    .content {
+        margin-top: 0.5rem;
+    }
+    
+    .follow-list {
+        max-height: 50vh;
+    }
+    
+    .follows-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .tab-button {
+        padding: 10px 8px;
+    }
+    
+    .empty-state {
+        padding: 20px 15px;
+    }
+    
+    .follow-item {
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .center-wrapper {
+        padding: 0;
+    }
+    
+    .content {
+        margin-top: 0;
+    }
+    
+    .follows-container {
+        border-radius: 0;
+        box-shadow: none;
+        min-height: calc(100vh - var(--navbar-size));
+    }
+    
+    .follows-header {
+        padding: 0.75rem 1rem;
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 10;
+    }
+    
+    .user-profile {
+        gap: 0.5rem;
+    }
+    
+    .user-profile h1 {
+        font-size: 1rem;
+    }
+    
+    .profile-image {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .tag-emoji {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+    
+    .tab-button {
+        padding: 10px 5px;
+        font-size: 0.85rem;
+    }
+    
+    .count {
+        padding: 1px 6px;
+        font-size: 0.7rem;
+    }
+    
+    .search-box {
+        padding: 8px 12px;
+    }
+    
+    .search-box input {
+        padding: 6px 10px;
+    }
+    
+    .follow-info {
+        gap: 8px;
+    }
+    
+    .follow-info h2 {
+        font-size: 0.9rem !important;
+    }
+    
+    .follow-info p {
+        font-size: 0.7rem;
+    }
+    
+    .follow-btn {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+    }
+    
+    .follow-item {
+        padding: 10px 12px;
+    }
+    
+    .section-header {
+        padding: 8px 12px 6px;
+    }
+    
+    .section-header h2 {
+        font-size: 0.8rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 0.95rem;
+    }
+    
+    .empty-state p {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 320px) {
+    .user-profile h1 {
+        font-size: 0.9rem;
+    }
+    
+    #username {
+        display: none;
+    }
+    
+    .follow-info h2 {
+        font-size: 0.85rem !important;
+    }
+    
+    .tab-button {
+        font-size: 0.8rem;
+    }
+    
+    .count {
+        margin-left: 2px;
+    }
+}
+
+@media (max-height: 600px) {
+    .follow-list {
+        max-height: 60vh;
+    }
+}
+
+@media screen and (max-width: 480px) and (display-mode: standalone) {
+    .follows-header {
+        padding-top: env(safe-area-inset-top, 0.75rem);
+        padding-left: env(safe-area-inset-left, 1rem);
+        padding-right: env(safe-area-inset-right, 1rem);
+    }
+}

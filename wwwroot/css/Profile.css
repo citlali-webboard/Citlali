@@ -114,6 +114,13 @@
     font-weight: 600;
 }
 
+.data h3 a{
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
 .data p {
     margin: 0;
     font-size: 0.85rem;

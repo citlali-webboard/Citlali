@@ -162,6 +162,24 @@ public class TagEventExploreViewModel : EventExploreViewModel
     public new int TotalPage { get; set; }
 }
 
+public class FollowedExploreViewModel : EventExploreViewModel
+{
+    public bool HasFollowedTags { get; set; } = false;
+    public bool HasFollowedUsers { get; set; } = false;
+    public UserFollowingContents UserFollowingContents { get; set; } = new();
+    public new EventBriefCardData[] EventBriefCardDatas { get; set; } = [];
+    public new Location[] Locations { get; set; } = [];
+    public new Tag[] Tags { get; set; } = [];
+    public new int CurrentPage { get; set; }
+    public new int TotalPage { get; set; }
+}
+
+public class UserFollowingContents
+{
+    public List<Tag> Tags { get; set; } = [];
+    public List<BriefUser> User { get; set; } = [];
+}
+
 [Table("EVENT_CATEGORY_TAG")]
 public class EventCategoryTag : BaseModel
 {

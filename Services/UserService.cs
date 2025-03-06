@@ -351,7 +351,7 @@ public class UserService
     {
         var response = await _supabaseClient
             .From<UserFollowedCategory>()
-            .Filter("USER_ID", Operator.Equals, userId)
+            .Filter("UserId", Operator.Equals, userId)
             .Select("*")
             .Get();
 
@@ -538,6 +538,99 @@ public class UserService
         {
             Console.WriteLine($"Error getting superstars: {ex.Message}");
             return new List<PopularUser>();
+        }
+    }
+
+    public async Task<List<BriefUser>> GetFollowers(Guid userId)
+    {
+        var response = await _supabaseClient
+            .From<UserFollowed>()
+            .Where(f => f.FollowedUserId == userId)
+            .Get();
+
+        var followers = new List<BriefUser>();
+        foreach (var follow in response.Models)
+        {
+            var user = await GetUserByUserId(follow.FollowerUserId);
+            if (user != null)
+            {
+                followers.Add(new BriefUser
+                {
+                    UserId = user.UserId,
+                    Username = user.Username,
+                    ProfileImageUrl = user.ProfileImageUrl,
+                    DisplayName = user.DisplayName
+                });
+            }
+        }
+
+        return followers;
+    }
+
+    public async Task<List<BriefUser>> GetFollowingUsers(Guid userId)
+    {
+        var response = await _supabaseClient
+            .From<UserFollowed>()
+            .Where(f => f.FollowerUserId == userId)
+            .Get();
+
+        var following = new List<BriefUser>();
+        foreach (var follow in response.Models)
+        {
+            var user = await GetUserByUserId(follow.FollowedUserId);
+            if (user != null)
+            {
+                following.Add(new BriefUser
+                {
+                    UserId = user.UserId,
+                    Username = user.Username,
+                    ProfileImageUrl = user.ProfileImageUrl,
+                    DisplayName = user.DisplayName
+                });
+            }
+        }
+
+        return following;
+    }
+
+    public async Task<List<Tag>> GetFollowingTags(Guid userId)
+    {
+        var response = await _supabaseClient
+            .From<UserFollowedCategory>()
+            .Where(f => f.UserId == userId)
+            .Get();
+
+        var tags = new List<Tag>();
+        foreach (var follow in response.Models)
+        {
+            var tag = await _supabaseClient
+                .From<EventCategoryTag>()
+                .Where(t => t.EventCategoryTagId == follow.EventCategoryTagId)
+                .Single();
+
+            if (tag != null)
+            {
+                tags.Add(new Tag
+                {
+                    TagId = tag.EventCategoryTagId,
+                    TagEmoji = tag.EventCategoryTagEmoji,
+                    TagName = tag.EventCategoryTagName
+                });
+            }
+        }
+
+        return tags;
+    }
+
+    public async Task RemoveFollower(Guid followerId, Guid userId)
+    {
+        var followings = await _supabaseClient.From<UserFollowed>()
+            .Where(f => f.FollowerUserId == followerId && f.FollowedUserId == userId)
+            .Get();
+        
+        if (followings.Models.Any())
+        {
+            await _supabaseClient.From<UserFollowed>().Delete(followings.Models.First());
         }
     }
 

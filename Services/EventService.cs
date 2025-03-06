@@ -1489,6 +1489,98 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return response;
     }
 
+    public async Task<List<Event>> GetEventsFromFollowed(Guid userId)
+    {
+        try {
+            // Use string-based filter to avoid null reference exceptions
+            var followedTagsTask = _supabaseClient
+                .From<UserFollowedCategory>()
+                .Where(f => f.UserId == userId)
+                .Get();
+            
+            // Use string-based filter for UserFollowed table as well
+            var followedUsersTask = _supabaseClient
+                .From<UserFollowed>()
+                .Where(f => f.FollowerUserId == userId)
+                .Get();
+            
+            await Task.WhenAll(followedTagsTask, followedUsersTask);
+            
+            var followedTagIds = followedTagsTask.Result.Models
+                .Select(x => x.EventCategoryTagId)
+                .ToList();
+            
+            var followedUserIds = followedUsersTask.Result.Models
+                .Select(x => x.FollowedUserId)
+                .ToList();
+            
+            var eventTasks = new List<Task<List<Event>>>();
+            
+            if (followedTagIds.Any())
+            {
+                var tagEventTasks = followedTagIds.Select(tagId => GetEventsByTagId(tagId)).ToList();
+                eventTasks.AddRange(tagEventTasks);
+            }
+            
+            // Get events from followed users (in parallel with tag queries)
+            if (followedUserIds.Any())
+            {
+                var userEventTasks = new List<Task<Supabase.Postgrest.Responses.ModeledResponse<Event>>>();
+                
+                foreach (var followedUserId in followedUserIds)
+                {
+                    // Use string-based filter for the CreatorUserId field
+                    var userEventsTask = _supabaseClient
+                        .From<Event>()
+                        .Filter("CreatorUserId", Supabase.Postgrest.Constants.Operator.Equals, followedUserId.ToString())
+                        .Filter("Deleted", Supabase.Postgrest.Constants.Operator.Equals, "false")
+                        .Filter("PostExpiryDate", Supabase.Postgrest.Constants.Operator.GreaterThan, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+                        .Filter("Status", Supabase.Postgrest.Constants.Operator.Equals, "active")
+                        .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
+                        .Get();
+                        
+                    userEventTasks.Add(userEventsTask);
+                }
+                
+                // Wait for all user event tasks to complete
+                await Task.WhenAll(userEventTasks);
+                
+                // Process results
+                foreach (var task in userEventTasks)
+                {
+                    if (task.Result.Models.Count > 0)
+                    {
+                        eventTasks.Add(Task.FromResult(task.Result.Models));
+                    }
+                }
+            }
+            
+            // Wait for all event tasks to complete
+            await Task.WhenAll(eventTasks);
+            
+            // Combine all events
+            var allEvents = new List<Event>();
+            foreach (var task in eventTasks)
+            {
+                allEvents.AddRange(task.Result);
+            }
+            
+            // Remove duplicates
+            var uniqueEvents = allEvents
+                .GroupBy(e => e.EventId)
+                .Select(g => g.First())
+                .ToList();
+            
+            return uniqueEvents
+                .OrderByDescending(e => e.CreatedAt)
+                .ToList();
+        }
+        catch (Exception ex) {
+            Console.Error.WriteLine($"Error in GetEventsFromFollowed: {ex.Message}");
+            Console.Error.WriteLine(ex.StackTrace);
+            return new List<Event>();
+        }
+    }
     // bypass confirmation 
     public async Task<Registration> BypassConfirmation(Guid eventId, Guid userId)
     {

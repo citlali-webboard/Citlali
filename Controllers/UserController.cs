@@ -400,4 +400,110 @@ public class UserController : Controller
         var isFollowing = await _userService.IsFollowingTag(tagId);
         return Json(new { isFollowing });
     }
+
+    [HttpGet("follows")]
+    [Authorize]
+    public async Task<IActionResult> Follows(string ActiveTab = "followers")
+    {
+        if (ActiveTab != "followers" && ActiveTab != "following")
+        {
+            ActiveTab = "followers"; 
+        }
+        
+        ViewData["ActiveTab"] = ActiveTab;
+
+        var currentUser = _userService.CurrentSession.User;
+        if (currentUser == null || string.IsNullOrEmpty(currentUser.Id))
+        {
+            return RedirectToAction("SignIn", "Auth", new { returnUrl = Url.Action("Follows", "User") });
+        }
+
+        var user = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id));
+        
+        if (user != null)
+        {
+            return RedirectToAction("Follows", new { username = user.Username, ActiveTab });
+        }
+
+        return RedirectToAction("SignIn", "Auth", new { returnUrl = Url.Action("Follows", "User") });
+    }
+
+    [HttpGet("follows/{username}")]
+    public async Task<IActionResult> Follows(string username, string ActiveTab = "followers")
+    {
+        if (ActiveTab != "followers" && ActiveTab != "following")
+        {
+            ActiveTab = "followers"; 
+        }
+        
+        ViewData["ActiveTab"] = ActiveTab;
+
+        try {
+            var user = await _userService.GetUserByUsername(username);
+            if (user == null)
+            {
+                TempData["Error"] = "User not found.";
+                return RedirectToAction("explore", "event");
+            }
+
+            var followers = await _userService.GetFollowers(user.UserId);
+            var followingUsers = await _userService.GetFollowingUsers(user.UserId);
+            var followingTags = await _userService.GetFollowingTags(user.UserId);
+            var isCurrentUser = _userService.CurrentSession.User?.Id == user.UserId.ToString();
+            var model = new FollowViewModel
+            {
+                User = user,
+                IsCurrentUser = isCurrentUser,
+                Followers = followers,
+                Following = new FollowingModel
+                {
+                    FollowingUsers = followingUsers,
+                    FollowedTags = followingTags
+                }
+            };
+
+            return View(model);
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["Error"] = "User not found.";
+            return RedirectToAction("explore", "event");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            TempData["Error"] = "Something went wrong. Please try again.";
+            return RedirectToAction("explore", "event");
+        }
+
+    }
+
+    [HttpPost("removeFollower/{username}")]
+    [Authorize]
+    public async Task<IActionResult> RemoveFollower(string username)
+    {
+        var currentUser = _supabaseClient.Auth.CurrentUser;
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        var followerToRemove = await _userService.GetUserByUsername(username);
+        if (followerToRemove == null)
+        {
+            return NotFound();
+        }
+
+        var userId = currentUser.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        // This removes the follower (they will no longer follow the current user)
+        await _userService.UnfollowUser(followerToRemove.UserId, Guid.Parse(userId));
+
+        return Ok();
+    }
+
 }

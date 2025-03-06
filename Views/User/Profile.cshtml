@@ -123,14 +123,22 @@
             <h3>@Model.UserEvents.Count</h3>
             <p>Events</p>
           </div>
-          <div class="data">
-            <h3 class="followers-count">@FormatNumber(Model.FollowersCount)</h3>
-            <p>Followers</p>
-          </div>
-          <div class="data">
-            <h3>@FormatNumber(Model.FollowingCount)</h3>
-            <p>Followings</p>
-          </div>
+          <a href="/user/follows/@Model.Username">
+            <div class="data">
+              <h3 class="followers-count">
+                @FormatNumber(Model.FollowersCount)
+              </h3>
+              <p>Followers</p>
+            </div>
+          </a>
+          <a href="/user/follows/@Model.Username?ActiveTab=following">
+            <div class="data">
+              <h3>
+                @FormatNumber(Model.FollowingCount)
+              </h3>
+              <p>Followings</p>
+            </div>
+          </a>
         </div>
         
         <div class="user-bio">

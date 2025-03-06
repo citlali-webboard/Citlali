@@ -1,0 +1,169 @@
+.center-wrapper {
+    width: 100%;
+    min-height: calc(100vh - var(--navbar-size));
+    margin-top: var(--navbar-size);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    background-color: #f0f0f0;
+}
+
+.follow-page {
+    width: 50%;
+    margin-top: 2rem;
+    background-color: #fefefe;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.follow-header {
+    background-color: #fafafa;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+}
+
+.follow-header h1 {
+    margin: 0;
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    color: #444;
+    font-weight: 600 !important;
+}
+
+#header-display-name {
+    font-size: 1.5rem;
+    color: #444;
+    font-weight: bold !important;
+}
+
+.close-btn {
+    font-size: 1.5rem;
+    color: #999;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.search-box {
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    background-color: #fafafa;
+    border-bottom: 1px solid #eee;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+    background-color: #f8f8f8;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+    border-color: #3b5998;
+}
+
+.follow-list {
+    padding: 1rem 2rem;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.follow-list h2 {
+    text-align: center; /* ทำให้ข้อความอยู่กลางกล่อง */
+    font-size: 16px;
+    color: #262626;
+    margin: 20px 0;
+}
+
+.follow-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 16px;
+}
+
+.follow-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.follow-info{
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+.follow-info h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #333;
+    text-align: left;
+    font-weight: 500 !important;    
+}
+
+.follow-info p {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.follow-btn {
+    padding: 6px 16px;
+    font-size: 14px;
+    background-color: #f0ecec; /* สีเทา */
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.follow-btn:hover {
+    background-color: #dbdbdb;
+}
+
+.follow-item:last-child {
+    border-bottom: none;
+}
+
+.follow-item .follow-info h2, .follow-item .follow-info p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.follow-header h1, .follow-item h2, .follow-item p {
+    font-weight: normal;
+}
+
+.view-profile-btn {
+    text-decoration: none;
+    display: inline-block;
+    padding: 6px 16px;
+    font-size: 14px;
+    background-color: #f0f0f0;
+    color: #333;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-align: center;
+}
+
+.view-profile-btn:hover {
+    background-color: #e0e0e0;
+}
