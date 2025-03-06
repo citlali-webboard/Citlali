@@ -53,7 +53,7 @@
                     <span class="creator-name">@Model.CreatorDisplayName</span>
                 </a>
                 <div class="meta-info">
-                    <span class="created-time">@Model.CreatedAt.ToString("MMM d, yyyy • h:mm tt")</span>
+                    <span class="created-time">@Model.CreatedAt.ToString("dd/MM/yy • h:mm tt")</span>
                     <a href="/event/location/@Model.LocationTag.LocationTagId">
                         <span class="location">
                             @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Location>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
