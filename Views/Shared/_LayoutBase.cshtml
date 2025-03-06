@@ -1,8 +1,35 @@
-﻿<!DOCTYPE html>
+﻿@using Citlali.Models
+@{
+    var navModel = new NavModel
+    {
+        profileImageUrl = ViewBag.profileImageUrl as string
+    };
+
+    var ogTitle = ViewData["ogTitle"] ?? "Citlali 🩷";
+    var ogDescription = ViewData["ogDescription"] ?? "Cute webboard which brings people together~ Let's explore events and find what suits you the best !";
+    var ogUrl = ViewData["ogUrl"] ?? "citlali.code4.dad";
+    var ogImage = ViewData["ogImage"] ?? "https://img.4gamers.com.tw/ckfinder-th/image2/auto/2025-01/Citlali_Introduction_Banner-250102-181140.png?versionId=r4yCiZ0mpYQb4la101fQUFNeaAW0mcgl";
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="twitter:site" content="Citlali">
+    <meta name="twitter:title" content="@ogTitle">
+    <meta name="twitter:description" content="@ogDescription">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image:src" content="@ogImage">
+
+    <meta property="og:site_name" content="Citlali" />
+    <meta property="og:title" content="@ogTitle" />
+    <meta property="og:description" content="@ogDescription" />
+    <meta property="og:type" content="object" />
+    <meta property="og:url" content="@ogUrl" />
+    <meta property="og:image" content="@ogImage" />
+
     <title>@ViewData["Title"] • Citlali</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/css/TailwindDefaults.css" asp-append-version="true" />
@@ -10,30 +37,37 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/ErrorHandle.css">
     <link rel="stylesheet" href="~/css/FluentUiVariables.css">
+    <link rel="stylesheet" href="~/css/Toast.css">
     <link rel="stylesheet" href="~/Citlali.styles.css" asp-append-version="true" />
     @RenderSection("head", required: false)
 </head>
 
-
 <body>
-    @if (TempData["Error"] != null)
-    {
-        <div id="error-popup" class="error-popup">
-            <span >@TempData["Error"]</span>
-            <button onclick="closePopup()">✖</button>
-        </div>
-    }
+    <div id="toasts">
+    </div>
+
     <div class="main-container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-    <script src="~/js/ErrorHandle.js"></script>
+
+    <script src="~/js/Toast.js"></script>
+    <script src="~/js/NavBar.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="_framework/blazor.server.js"></script>
+    <script src="~/js/Notification/realtime.js" asp-append-version="true"></script>
     <script src="_content/Microsoft.FluentUI.AspNetCore.Components/Microsoft.FluentUI.AspNetCore.Components.lib.module.js" type="module" async></script>
+
+    @if (TempData["Error"] != null)
+    {
+        <script>
+            addDestructiveToast("An Error Occured!", "@TempData["Error"]");
+        </script>
+    }
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>
