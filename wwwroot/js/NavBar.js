@@ -4,13 +4,10 @@ function GetNumberNotification() {
   let xmlhttp = new XMLHttpRequest();
   let URL = "/Notification/count";
 
-  console.log("URL : " + URL);
-
   xmlhttp.open("GET", URL, true);
   xmlhttp.onreadystatechange = function () {
     if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
       var data = JSON.parse(xmlhttp.responseText);
-      console.log(data);
 
       numberOfNotification = data.unreadNotifications;
       SetNumberNotification(numberOfNotification);

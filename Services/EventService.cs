@@ -294,7 +294,6 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         var eventToInviteTask = GetEventById(eventId);
         var registrationTask = GetRegistrationByEventIdAndUserId(eventId, userId);
-        var targetUserTask = _userService.GetUserByUserId(userId);
         var invitedRegistrantCountTask = _supabaseClient
             .From<Registration>()
             .Filter("EventId", Supabase.Postgrest.Constants.Operator.Equals, eventId.ToString())
@@ -315,7 +314,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
 
         var registration = await registrationTask ?? throw new KeyNotFoundException("Registration not found");
 
-    
+
         await _supabaseClient
             .From<Registration>()
             .Where(row => row.RegistrationId == registration.RegistrationId)
@@ -323,7 +322,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             .Set(row => row.UpdatedAt, DateTime.UtcNow)
             .Update();
 
-        
+
         if(eventToInvite.FirstComeFirstServed && userId.ToString() == supabaseUser.Id)
         {
            return true;
@@ -332,18 +331,10 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var notificationTitle = "You have been invited to an event! 🎉";
         var notificationBody = $"Congratulations! Your request to join the event {eventToInvite.EventTitle} has been reviewed and accepted! To confirm or reject the invitation, please visit the event page.";
         var absoluteUrl = $"/event/detail/{eventId}";
-        var mailModel = new MailNotificationViewModel
-        {
-            Title = notificationTitle,
-            Body = notificationBody,
-            Url = $"{_configuration.App.Url}{absoluteUrl}"
-        };
 
-        var targetUser = await targetUserTask ?? throw new KeyNotFoundException("Can't query target user");
-        var notificaionTask = _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl, eventToInvite.CreatorUserId);
-        _mailService.SendNotificationEmail(mailModel, targetUser.Email);
+        var notificaionTask = await _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl, eventToInvite.CreatorUserId, NotificationLevel.Important);
 
-        
+
         return true;
     }
 
@@ -1277,17 +1268,16 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                         ?? throw new UnauthorizedAccessException("User not authenticated");
         var userId = Guid.Parse(supabaseUser.Id ?? throw new GetUserException());
 
-        var Event = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
+        var citlaliEvent = await GetEventById(eventId) ?? throw new KeyNotFoundException("Event not found");
 
-        if (Event.CreatorUserId.ToString() != userId.ToString())
+        if (citlaliEvent.CreatorUserId.ToString() != userId.ToString())
             throw new UnauthorizedAccessException("User not authorized to broadcast this event");
 
         var registrants = await GetRegistrantsConfirmedByEventId(eventId);
 
-        if (registrants != null && registrants.Count > 0)
-        {
-            var notificationTasks = registrants.Select(registrant =>
-                _notificationService.CreateNotification(registrant.UserId, title, message, $"/event/detail/{eventId}")
+        if (registrants != null && registrants.Count > 0) {
+            var notificationTasks = registrants.Select(async registrant =>
+               await  _notificationService.CreateNotification(registrant.UserId, $"Broadcast from event {citlaliEvent.EventTitle}: {title}", message, $"/event/detail/{eventId}")
             );
 
             await Task.WhenAll(notificationTasks);
@@ -1499,36 +1489,36 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                 .From<UserFollowedCategory>()
                 .Where(f => f.UserId == userId)
                 .Get();
-            
+
             // Use string-based filter for UserFollowed table as well
             var followedUsersTask = _supabaseClient
                 .From<UserFollowed>()
                 .Where(f => f.FollowerUserId == userId)
                 .Get();
-            
+
             await Task.WhenAll(followedTagsTask, followedUsersTask);
-            
+
             var followedTagIds = followedTagsTask.Result.Models
                 .Select(x => x.EventCategoryTagId)
                 .ToList();
-            
+
             var followedUserIds = followedUsersTask.Result.Models
                 .Select(x => x.FollowedUserId)
                 .ToList();
-            
+
             var eventTasks = new List<Task<List<Event>>>();
-            
+
             if (followedTagIds.Any())
             {
                 var tagEventTasks = followedTagIds.Select(tagId => GetEventsByTagId(tagId)).ToList();
                 eventTasks.AddRange(tagEventTasks);
             }
-            
+
             // Get events from followed users (in parallel with tag queries)
             if (followedUserIds.Any())
             {
                 var userEventTasks = new List<Task<Supabase.Postgrest.Responses.ModeledResponse<Event>>>();
-                
+
                 foreach (var followedUserId in followedUserIds)
                 {
                     // Use string-based filter for the CreatorUserId field
@@ -1540,13 +1530,13 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                         .Filter("Status", Supabase.Postgrest.Constants.Operator.Equals, "active")
                         .Order("CreatedAt", Supabase.Postgrest.Constants.Ordering.Descending)
                         .Get();
-                        
+
                     userEventTasks.Add(userEventsTask);
                 }
-                
+
                 // Wait for all user event tasks to complete
                 await Task.WhenAll(userEventTasks);
-                
+
                 // Process results
                 foreach (var task in userEventTasks)
                 {
@@ -1556,23 +1546,23 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
                     }
                 }
             }
-            
+
             // Wait for all event tasks to complete
             await Task.WhenAll(eventTasks);
-            
+
             // Combine all events
             var allEvents = new List<Event>();
             foreach (var task in eventTasks)
             {
                 allEvents.AddRange(task.Result);
             }
-            
+
             // Remove duplicates
             var uniqueEvents = allEvents
                 .GroupBy(e => e.EventId)
                 .Select(g => g.First())
                 .ToList();
-            
+
             return uniqueEvents
                 .OrderByDescending(e => e.CreatedAt)
                 .ToList();
@@ -1583,7 +1573,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             return new List<Event>();
         }
     }
-    // bypass confirmation 
+    // bypass confirmation
     public async Task<Registration> BypassConfirmation(Guid eventId, Guid userId)
     {
         var registration = await GetRegistrationByEventIdAndUserId(eventId, userId)

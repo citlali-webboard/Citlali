@@ -67,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // Make sure the toggle works correctly by adding direct event listeners
         fcfsCheckbox.addEventListener('change', function() {
             // No need to update hidden inputs - ASP.NET will handle this automatically
-            console.log('FCFS toggle changed to:', this.checked);
         });
 
         // Add click handler for the parent label to prevent click blocking

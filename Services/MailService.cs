@@ -12,98 +12,105 @@ using Microsoft.AspNetCore.Routing;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-namespace Citlali.Services;
+using System.Collections.Concurrent;
+using System.Threading.Tasks.Dataflow;
 
-public class MailService(
-    Configuration configuration,
-    SmtpClient smtpClient,
-    IRazorViewEngine viewEngine,
-    ITempDataProvider tempDataProvider,
-    IServiceProvider serviceProvider)
+namespace Citlali.Services
 {
-    private readonly Configuration _configuration = configuration;
-    private readonly SmtpClient _smtpClient = smtpClient;
-    private readonly MailAddress _sendFrom = new(configuration.Mail.SendAddress, configuration.Mail.SendDisplayName);
-    private readonly IRazorViewEngine _viewEngine = viewEngine;
-    private readonly ITempDataProvider _tempDataProvider = tempDataProvider;
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
-
-    // Code from: https://github.com/aspnet/Entropy/blob/master/samples/Mvc.RenderViewToString/RazorViewToStringRenderer.cs
-    public async Task<string> RenderViewToStringAsync<TModel>(string viewName, TModel model)
+    public class MailService : IDisposable
     {
-        var actionContext = GetActionContext();
-        var view = FindView(actionContext, viewName);
+        private readonly Configuration _configuration;
+        private readonly SmtpClient _smtpClient;
+        private readonly MailAddress _sendFrom;
+        private readonly RazorViewToStringRenderer _razorViewToStringRenderer;
+        private readonly ActionBlock<MailRequest> _mailQueue;
+        private readonly CancellationTokenSource _cancellationTokenSource;
 
-        await using var output = new StringWriter();
-        var viewContext = new ViewContext(
-            actionContext,
-            view,
-            new ViewDataDictionary<TModel>(
-                metadataProvider: new EmptyModelMetadataProvider(),
-                modelState: new ModelStateDictionary())
+        public MailService(
+            Configuration configuration,
+            SmtpClient smtpClient,
+            RazorViewToStringRenderer razorViewToStringRenderer)
+        {
+            _configuration = configuration;
+            _smtpClient = smtpClient;
+            _sendFrom = new MailAddress(configuration.Mail.SendAddress, configuration.Mail.SendDisplayName);
+            _razorViewToStringRenderer = razorViewToStringRenderer;
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            // Create mail processing queue with one mail at a time
+            _mailQueue = new ActionBlock<MailRequest>(
+                ProcessMailRequest,
+                new ExecutionDataflowBlockOptions
+                {
+                    MaxDegreeOfParallelism = 1,
+                    CancellationToken = _cancellationTokenSource.Token
+                }
+            );
+        }
+
+        private class MailRequest
+        {
+            public MailBaseViewModel Model { get; set; } = new();
+            public string Body { get; set; } = "";
+            public string ReceivingAddress { get; set; } = "";
+            public TaskCompletionSource<bool> CompletionSource { get; set; } = new();
+        }
+
+        private void ProcessMailRequest(MailRequest request)
+        {
+            try
             {
-                Model = model
-            },
-            new TempDataDictionary(
-                actionContext.HttpContext,
-                _tempDataProvider),
-            output,
-            new HtmlHelperOptions());
+                MailAddress sendTo = new(request.ReceivingAddress);
+                MailMessage mailMessage = new(_sendFrom, sendTo)
+                {
+                    Subject = $"{request.Model.Title} • Citlali",
+                    BodyEncoding = System.Text.Encoding.UTF8,
+                    IsBodyHtml = true,
+                    Body = request.Body
+                };
 
-        await view.RenderAsync(viewContext);
-
-        return output.ToString();
-    }
-
-    private IView FindView(ActionContext actionContext, string viewName)
-    {
-        var getViewResult = _viewEngine.GetView(executingFilePath: null, viewPath: viewName, isMainPage: true);
-        if (getViewResult.Success)
-        {
-            return getViewResult.View;
+                _smtpClient.Send(mailMessage);
+                request.CompletionSource.SetResult(true);
+            }
+            catch (Exception ex)
+            {
+                request.CompletionSource.SetException(ex);
+            }
         }
 
-        var findViewResult = _viewEngine.FindView(actionContext, viewName, isMainPage: true);
-        if (findViewResult.Success)
+        public async Task<bool> SendAsync(MailBaseViewModel model, string body, string receivingAddress)
         {
-            return findViewResult.View;
+            var completionSource = new TaskCompletionSource<bool>();
+            var request = new MailRequest
+            {
+                Model = model,
+                Body = body,
+                ReceivingAddress = receivingAddress,
+                CompletionSource = completionSource
+            };
+
+            await _mailQueue.SendAsync(request);
+            return await completionSource.Task;
         }
 
-        var searchedLocations = getViewResult.SearchedLocations.Concat(findViewResult.SearchedLocations);
-        var errorMessage = string.Join(
-            Environment.NewLine,
-            new[] { $"Unable to find view '{viewName}'. The following locations were searched:" }.Concat(searchedLocations));
-
-        throw new InvalidOperationException(errorMessage);
-    }
-
-    private ActionContext GetActionContext()
-    {
-        var httpContext = new DefaultHttpContext
+        // This remains synchronous for backward compatibility
+        public void Send(MailBaseViewModel model, string body, string receivingAddress)
         {
-            RequestServices = _serviceProvider
-        };
-        return new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
-    }
+            SendAsync(model, body, receivingAddress).GetAwaiter().GetResult();
+        }
 
-    public async Task Send(MailBaseViewModel model, string body, string recievingAddress)
-    {
-        MailAddress sendTo = new(recievingAddress);
-        MailMessage mailMessage = new(_sendFrom, sendTo)
+        public async Task<bool> SendNotificationEmail(MailNotificationViewModel model, string receivingAddress)
         {
-            Subject = $"{model.Title} • Citlali",
-            BodyEncoding = System.Text.Encoding.UTF8,
-            IsBodyHtml = true,
-            Body = body
-        };
+            var body = await _razorViewToStringRenderer.RenderViewToStringAsync("~/Views/Mail/Notification.cshtml", model);
+            return await SendAsync(model, body, receivingAddress);
+        }
 
-        await _smtpClient.SendMailAsync(mailMessage);
-    }
-
-    public async void SendNotificationEmail(MailNotificationViewModel model, string recievingAddress)
-    {
-        var body = await RenderViewToStringAsync("~/Views/Mail/Notification.cshtml", model);
-        await Send(model, body, recievingAddress);
+        public void Dispose()
+        {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+        }
     }
 }
