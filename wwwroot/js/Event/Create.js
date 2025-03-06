@@ -61,6 +61,32 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Add custom validators
     addCustomValidators();
+
+    const fcfsCheckbox = document.querySelector('.fcfs input[type="checkbox"]');
+    if (fcfsCheckbox) {
+        // Make sure the toggle works correctly by adding direct event listeners
+        fcfsCheckbox.addEventListener('change', function() {
+            // No need to update hidden inputs - ASP.NET will handle this automatically
+            console.log('FCFS toggle changed to:', this.checked);
+        });
+
+        // Add click handler for the parent label to prevent click blocking
+        const slideBtn = document.querySelector('.slide-btn');
+        if (slideBtn) {
+            slideBtn.addEventListener('click', function(e) {
+                // Prevent default only if clicking directly on the label (not the checkbox)
+                if (e.target !== fcfsCheckbox) {
+                    e.preventDefault();
+                    // Toggle checkbox state
+                    fcfsCheckbox.checked = !fcfsCheckbox.checked;
+                    // Trigger change event
+                    fcfsCheckbox.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+    }
+
+
 });
 
 // Form validation setup
