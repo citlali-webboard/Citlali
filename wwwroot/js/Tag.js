@@ -75,7 +75,6 @@ function toggleFollowTag(tagId, shouldFollow) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
         if (data.success) {
             // Update UI
             if (shouldFollow) {
@@ -84,7 +83,6 @@ function toggleFollowTag(tagId, shouldFollow) {
             } else {
                 followButton.innerHTML = `<span class="icon-container"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></span><span>Follow</span>`;
                 followButton.classList.remove('following');
-                console.log('Unfollowed');
             }
             
             // Update follower count
