@@ -9,10 +9,12 @@
             </a>
             <div class="creator-meta">
                 <span class="created-time">@Model.CreatedAt.ToString("dd/MM/yy • h:mm tt")</span>
-                <span class="location">
-                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Location>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
-                    @Model.LocationTag.LocationTagName
-                </span>
+                <a href="/event/location/@Model.LocationTag.LocationTagId">
+                    <span class="location">
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Location>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                        @Model.LocationTag.LocationTagName
+                    </span>
+                </a>
             </div>
             
             <!-- Mobile meta container -->
@@ -31,10 +33,12 @@
                     }
                     <span>@Model.CurrentParticipant / @Model.MaxParticipant</span>
                 </div>
-                <div class="tag">
-                    <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
-                    <span>@Model.EventCategoryTag.EventCategoryTagName</span>
-                </div>
+                <a href="/event/tag/@Model.EventCategoryTag.EventCategoryTagId">
+                    <div class="tag">
+                        <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
+                        <span>@Model.EventCategoryTag.EventCategoryTagName</span>
+                    </div>
+                </a>
             </div>
         </div>
         
@@ -56,10 +60,12 @@
     <div class="title-section">
         <h1 class="title-text">@Model.EventTitle</h1>
         <!-- Desktop tag -->
-        <div class="tag desktop-tag">
-            <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
-            <span>@Model.EventCategoryTag.EventCategoryTagName</span>
-        </div>
+        <a href="/event/tag/@Model.EventCategoryTag.EventCategoryTagId">
+            <div class="tag desktop-tag">
+                <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
+                <span>@Model.EventCategoryTag.EventCategoryTagName</span>
+            </div>
+        </a>
     </div>
 
     <div class="meta-section">

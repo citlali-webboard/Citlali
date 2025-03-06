@@ -51,7 +51,7 @@
   color: inherit;
 }
 
-.creator > a:hover span#creator-name {
+.location:hover {
   text-decoration: underline;
 }
 
@@ -196,42 +196,6 @@
   flex-wrap: wrap;
   width: 100%;
   margin-top: 0.5rem;
-}
-
-/* Register button styling */
-.action-area {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-.full-event {
-  color: #e53935;
-  font-weight: 500;
-}
-
-.register-button {
-  padding: 0.625rem 1.25rem;
-  background-color: #2e7d32;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.register-button:hover:not(:disabled) {
-  background-color: #1b5e20;
-}
-
-.register-button:disabled {
-  background-color: #e0e0e0;
-  color: #9e9e9e;
-  cursor: not-allowed;
 }
 
 /* Responsive adjustments */
