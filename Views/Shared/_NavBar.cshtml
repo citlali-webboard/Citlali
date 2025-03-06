@@ -16,10 +16,12 @@
 <link rel="stylesheet" href="~/css/NavBar.css" asp-append-version="true" />
 
 <nav>
-  <div class="mobile-nav-toggle" id="mobile-nav-toggle">
-    <span class="bar"></span>
-    <span class="bar"></span>
-    <span class="bar"></span>
+  <div class="mobile-nav-toggle-container">
+    <div class="mobile-nav-toggle" id="mobile-nav-toggle">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </div>
   </div>
 
   <ul>
@@ -37,7 +39,7 @@
         @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Home>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
         <p>Home</p>
       </a>
-      @if (IsAuthenticated) 
+      @if (IsAuthenticated)
       {
         <a href="/event/followed" class="nav-item">
           @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Star>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
@@ -95,25 +97,25 @@
     // Profile dropdown functionality
     const toggleButton = document.getElementById('profile-dropdown-toggle');
     const dropdown = document.getElementById('profile-dropdown-menu');
-    
+
     if (toggleButton && dropdown) {
       toggleButton.addEventListener('click', function(e) {
         e.stopPropagation();
         dropdown.classList.toggle('show');
       });
-      
+
       document.addEventListener('click', function(e) {
         if (!dropdown.contains(e.target) && !toggleButton.contains(e.target)) {
           dropdown.classList.remove('show');
         }
       });
     }
-    
+
     // Mobile menu functionality
     const mobileToggle = document.getElementById('mobile-nav-toggle');
     const navLinks = document.getElementById('navigation-links');
     const authSection = document.getElementById('auth-section');
-    
+
     mobileToggle.addEventListener('click', function() {
       this.classList.toggle('active');
       document.body.classList.toggle('menu-open');

@@ -196,17 +196,23 @@ body nav ul .nav-group .logo p {
     transform: translateX(5px);
 }
 
+.mobile-nav-toggle-container {
+    width: 30px;
+    height: 100%;
+    cursor: pointer;
+    z-index: 1010;
+    position: absolute;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+}
+
 .mobile-nav-toggle {
     display: none;
     flex-direction: column;
     justify-content: space-between;
-    width: 30px;
+    width: 100%;
     height: 21px;
-    cursor: pointer;
-    z-index: 1010;
-    position: absolute;
-    top: 20px;
-    right: 20px;
 }
 
 .mobile-nav-toggle .bar {
@@ -344,7 +350,7 @@ body nav ul .nav-group .logo p {
     .mobile-nav-toggle .count-notifications.mobile-badge {
         display: flex;
     }
-    
+
     body.menu-open #notification-icon .count-notifications {
         display: flex;
     }
