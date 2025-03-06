@@ -98,8 +98,6 @@ function setupFormValidation() {
             if (!isFormValid()) {
                 e.preventDefault();
                 
-                // Show validation summary
-                showValidationSummary();
                 
                 // Scroll to the first invalid field
                 const firstInvalid = document.querySelector('.touched:invalid');
@@ -189,46 +187,6 @@ function showFieldError(field, message) {
 function isFormValid() {
     const invalidFields = document.querySelectorAll('.touched:invalid');
     return invalidFields.length === 0;
-}
-
-// Show validation summary at top of form
-function showValidationSummary() {
-    // Remove existing summary if present
-    const existingSummary = document.querySelector('.validation-summary-errors');
-    if (existingSummary) {
-        existingSummary.remove();
-    }
-    
-    // Get all invalid fields
-    const invalidFields = document.querySelectorAll('.touched:invalid');
-    if (invalidFields.length === 0) return;
-    
-    // Create summary element
-    const summary = document.createElement('div');
-    summary.className = 'validation-summary-errors';
-    
-    // Create title and list
-    const title = document.createElement('p');
-    title.textContent = 'Please fix the following errors:';
-    summary.appendChild(title);
-    
-    const list = document.createElement('ul');
-    invalidFields.forEach(field => {
-        const item = document.createElement('li');
-        
-        // Get field label text
-        const labelElement = document.querySelector(`label[for="${field.id}"]`);
-        const fieldName = labelElement ? labelElement.textContent.replace(' *', '') : field.id;
-        
-        item.textContent = `${fieldName}: ${field.validationMessage || 'Invalid value'}`;
-        list.appendChild(item);
-    });
-    
-    summary.appendChild(list);
-    
-    // Insert at top of form
-    const form = document.querySelector('form');
-    form.insertBefore(summary, form.firstChild);
 }
 
 // Add custom validators
