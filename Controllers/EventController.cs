@@ -328,6 +328,8 @@ public class EventController : Controller
     {
         try
         {
+            // Validate the sortBy parameter using the service method
+            sortBy = _eventService.ValidateSortBy(sortBy);
             // Store sortBy in ViewBag for active button highlighting
             ViewBag.SortBy = sortBy;
 
@@ -382,6 +384,8 @@ public class EventController : Controller
                 throw new Exception("Invalid Tag id");
             }
 
+            // Validate the sortBy parameter using the service method
+            sortBy = _eventService.ValidateSortBy(sortBy);
             ViewBag.SortBy = sortBy;
 
             var eventsTask = _eventService.GetEventsByTagId(tagId);
@@ -486,6 +490,8 @@ public class EventController : Controller
                 throw new Exception("Invalid Location id");
             }
 
+            // Validate the sortBy parameter using the service method
+            sortBy = _eventService.ValidateSortBy(sortBy);
             ViewBag.SortBy = sortBy;
 
             // Create tasks for parallel execution of independent queries
@@ -872,6 +878,8 @@ public class EventController : Controller
     {
         try
         {
+            // Validate the sortBy parameter using the service method
+            sortBy = _eventService.ValidateSortBy(sortBy);
             ViewBag.SortBy = sortBy;
 
             if (_userService.CurrentSession.User == null || string.IsNullOrEmpty(_userService.CurrentSession.User.Id))

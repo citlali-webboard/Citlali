@@ -55,6 +55,20 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = currentUrl.toString();
         });
     });
+
+    // Get the current URL and parameters
+    const url = new URL(window.location.href);
+    const sortBy = url.searchParams.get('sortBy');
+    
+    // Define valid sort options
+    const validSortOptions = ['newest', 'date', 'popularity'];
+    
+    // Check if sortBy parameter exists and is invalid
+    if (sortBy && !validSortOptions.includes(sortBy)) {
+        // Replace with default 'newest' and update URL without reloading the page
+        url.searchParams.set('sortBy', 'newest');
+        window.history.replaceState({}, '', url.toString());
+    }
     
 });
 
@@ -146,4 +160,20 @@ function initImageSlider() {
         // Restart the timer
         slideInterval = setInterval(nextSlide, INTERVAL);
     }, {passive: true});
+}
+
+// Helper function to update URL parameters (can be used by other functions)
+function updateUrlParameter(url, param, value) {
+    const urlObj = new URL(url);
+    
+    // Only set valid sort options for sortBy parameter
+    if (param === 'sortBy') {
+        const validSortOptions = ['newest', 'date', 'popularity'];
+        if (!validSortOptions.includes(value)) {
+            value = 'newest';
+        }
+    }
+    
+    urlObj.searchParams.set(param, value);
+    return urlObj.toString();
 }

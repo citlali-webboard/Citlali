@@ -42,6 +42,20 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = updateUrlParameter(window.location.href, 'sortBy', sortBy);
         });
     });
+
+    // Get the current URL and parameters
+    const url = new URL(window.location.href);
+    const sortBy = url.searchParams.get('sortBy');
+    
+    // Define valid sort options
+    const validSortOptions = ['newest', 'date', 'popularity'];
+    
+    // Check if sortBy parameter exists and is invalid
+    if (sortBy && !validSortOptions.includes(sortBy)) {
+        // Replace with default 'newest' and update URL without reloading the page
+        url.searchParams.set('sortBy', 'newest');
+        window.history.replaceState({}, '', url.toString());
+    }
 });
 
 // Helper function to toggle tag following
@@ -93,5 +107,12 @@ function toggleFollowTag(tagId, shouldFollow) {
 function updateUrlParameter(url, param, value) {
     const urlObj = new URL(url);
     urlObj.searchParams.set(param, value);
+    // Only set valid sort options for sortBy parameter
+    if (param === 'sortBy') {
+        const validSortOptions = ['newest', 'date', 'popularity'];
+        if (!validSortOptions.includes(value)) {
+            value = 'newest';
+        }
+    }
     return urlObj.toString();
 }

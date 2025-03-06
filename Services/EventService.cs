@@ -1601,6 +1601,15 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return registration;
     }
 
+    public string ValidateSortBy(string sortBy)
+    {
+        // List of valid sort options
+        string[] validSortOptions = { "newest", "date", "popularity" };
+        
+        // Return the input if it's valid, otherwise return default "newest"
+        return validSortOptions.Contains(sortBy) ? sortBy : "newest";
+    }
+
 }
 
 public class UserAlreadyRegisteredException : Exception
