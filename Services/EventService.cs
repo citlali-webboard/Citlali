@@ -332,7 +332,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var notificationBody = $"Congratulations! Your request to join the event {eventToInvite.EventTitle} has been reviewed and accepted! To confirm or reject the invitation, please visit the event page.";
         var absoluteUrl = $"/event/detail/{eventId}";
 
-        var notificaionTask = await _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl, NotificationLevel.Important);
+        var notificaionTask = await _notificationService.CreateNotification(userId, notificationTitle, notificationBody, absoluteUrl, eventToInvite.CreatorUserId, NotificationLevel.Important);
 
 
         return true;

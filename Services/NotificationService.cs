@@ -165,7 +165,7 @@ public class NotificationService(Client supabaseClient, UserService userService,
     }
 
     //Create Notification with title and message
-    public async Task<bool> CreateNotification(Guid toUserId, string title, string message, string url, NotificationLevel level = NotificationLevel.Normal)
+    public async Task<bool> CreateNotification(Guid toUserId, string title, string message, string url, Guid fromUser = default, NotificationLevel level = NotificationLevel.Normal)
     {
 
         var supabaseUser = _userService.CurrentSession.User
