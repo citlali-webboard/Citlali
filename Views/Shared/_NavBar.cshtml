@@ -59,7 +59,6 @@
         <p>About</p>
       </a>
     </div>
-
     <div class="nav-group" id="auth-section">
       @if (IsAuthenticated)
       {
@@ -89,10 +88,15 @@
         </a>
       }
     </div>
+
   </ul>
 </nav>
 
 <script>
+
+  // I know this is real shit
+  // But CSS fucks me hard
+
   document.addEventListener('DOMContentLoaded', function() {
     // Profile dropdown functionality
     const toggleButton = document.getElementById('profile-dropdown-toggle');
@@ -115,12 +119,43 @@
     const mobileToggle = document.getElementById('mobile-nav-toggle');
     const navLinks = document.getElementById('navigation-links');
     const authSection = document.getElementById('auth-section');
+    const aboutLink = document.querySelector('a[href="/about"]');
+    const navUl = document.querySelector('nav > ul');
+    let isMobile = false;
 
+    // Function to handle mobile element positioning
+    function handleMobileLayout() {
+      const windowWidth = window.innerWidth;
+      
+      // Mobile breakpoint
+      if (windowWidth <= 1000 && !isMobile) {
+        // Move auth section after about link in mobile view
+        if (aboutLink && navLinks && authSection) {
+          navLinks.insertBefore(authSection, aboutLink.nextSibling);
+        }
+        isMobile = true;
+      } 
+      // Desktop breakpoint
+      else if (windowWidth > 1000 && isMobile) {
+        // Move auth section back to original position
+        if (navUl && authSection) {
+          navUl.appendChild(authSection);
+        }
+        isMobile = false;
+      }
+    }
+
+    // Initial check
+    handleMobileLayout();
+
+    // Listen for window resize
+    window.addEventListener('resize', handleMobileLayout);
+
+    // Toggle menu functionality
     mobileToggle.addEventListener('click', function() {
       this.classList.toggle('active');
       document.body.classList.toggle('menu-open');
       navLinks.classList.toggle('show-mobile');
-      authSection.classList.toggle('show-mobile');
     });
   });
 </script>
