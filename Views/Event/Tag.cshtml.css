@@ -374,8 +374,13 @@
 @media (max-width: 900px) {
   .center-wrapper {
     flex-direction: column;
-    padding: 1rem;
-    padding-top: 2rem;
+    /* padding: 1rem;
+    padding-top: calc(var(--navbar-size) + 1rem); */
+  }
+
+  .main-content {
+    flex: 0 1 auto;
+    overflow: auto;
   }
   
   .sidebar-left {
@@ -397,7 +402,9 @@
   
   .button-group {
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    row-gap: 1rem;
   }
   
   .action-button {
