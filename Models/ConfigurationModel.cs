@@ -41,6 +41,11 @@ public class JwtConfig
     public required string Secret { get; set; }
 }
 
+public enum MailNotificationLevel {
+    AllNotifications,
+    ImportantOnly
+}
+
 public class MailConfig{
     public required string SendAddress { get; set; }
     public required string SendDisplayName { get; set; }
@@ -48,4 +53,5 @@ public class MailConfig{
     public required int SmtpPort { get; set; }
     public required string SmtpUsername { get; set; }
     public required string SmtpPassword { get; set; }
+    public required MailNotificationLevel NotificationLevel { get; set; }
 }

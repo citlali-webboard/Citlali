@@ -44,6 +44,7 @@ builder.Services.AddScoped<EventService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<UtilitiesService>();
 builder.Services.AddScoped<MailService>();
+builder.Services.AddTransient<RazorViewToStringRenderer>();
 builder.Services.AddScoped<AdminService>();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllersWithViews();
