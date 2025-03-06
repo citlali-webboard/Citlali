@@ -60,7 +60,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Helper function to toggle tag following
 function toggleFollowTag(tagId, shouldFollow) {
-    const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
     const followButton = document.getElementById('followButton');
 
     shouldFollow = shouldFollow === 'true' || shouldFollow === true;
@@ -70,10 +69,15 @@ function toggleFollowTag(tagId, shouldFollow) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'RequestVerificationToken': csrfToken
         },
     })
-    .then(response => response.json())
+    .then(response => {
+        if (response.redirected) {
+            window.location.href = response.url;
+            return;
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             // Update UI
