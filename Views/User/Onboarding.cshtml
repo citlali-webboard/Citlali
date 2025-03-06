@@ -19,20 +19,24 @@
         </div>
         <form class="form-container" asp-action="onboarding" method="post" enctype="multipart/form-data">
             <div class="profile-wrapper">
-                <div class="profile-img">
-                    <img src="@profileImageUrl" class="profileImage" id="profileImage" alt="Profile Picture">
-                    <input type="file" asp-for="ProfileImage" id="ProfileImageInput" hidden />
+                <div class="profile-edit-wrapper">
+                    <div class="profile-img">
+                        <img src="@profileImageUrl" class="profileImage" id="profileImage" alt="Profile Picture">
+                    </div>
+                    <div class="upload-button-wrapper">
+                        <input type="file" asp-for="ProfileImage" id="ProfileImageInput" hidden />
 
-                    <label for="ProfileImageInput" class="upload-button">
-                        <span>
-                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Image>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
-                        </span>
-                        <span>
-                            Upload image...
-                        </span>
-                    </label>
+                        <label for="ProfileImageInput" class="upload-button">
+                            <span>
+                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Image>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                            </span>
+                            <span>
+                                Upload image...
+                            </span>
+                        </label>
 
-                    <p class="description">Support jpeg / jpg / png file with the size less than 10 MB</p>
+                        <p class="description">Support jpeg / jpg / png file with the size less than 10 MB</p>
+                    </div>
                 </div>
                 <div class="profile-info">
                     <div class="form-group">

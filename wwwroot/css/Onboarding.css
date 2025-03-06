@@ -40,7 +40,7 @@ h1, p {
 }
 
 .header {
-    width: 80%;
+    width: 90%;
 
     display: flex;
     flex-direction: column;
@@ -52,7 +52,7 @@ h1, p {
 }
 
 .form-container {
-    width: 80%;
+    width: 90%;
     margin-top: 2rem;
 
     display: flex;
@@ -66,19 +66,18 @@ h1, p {
 
     display: flex;
     flex-direction: row;
+    gap: 2rem;
 }
 
 .profile-img {
-    flex: 0 0 20%;
     display: flex;
     justify-content: flex-start;
     align-items: center;
     flex-direction: column;
 
-    width: 20%;
+    width: 80%;
     height: auto;
     aspect-ratio: 1 / 1;
-    margin-right: 1rem;
 }
 
 .profile-img img {
@@ -89,8 +88,15 @@ h1, p {
     border-radius: 50%;
 }
 
+.upload-button-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
 .upload-button {
-    width: 100%;
+    width: fit-content;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -128,9 +134,16 @@ input[type="file"] {
     color: #555;
 }
 
+.profile-edit-wrapper {
+    flex: 0 0 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
 .profile-info {
     flex: 1;
-    margin-left: 4rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -295,10 +308,11 @@ input.touched:invalid {
 
 @media screen and (max-width: 1150px) {
     .content {
-        width: 80%;
+        width: 100%;
         height: 100%;
         border-radius: 0;
         box-shadow: none;
+        padding: 1rem 2rem;
     }
 
     .form-container {
@@ -318,6 +332,7 @@ input.touched:invalid {
         height: 100%;
         border-radius: 0;
         box-shadow: none;
+        padding: 0;
     }
 
     .form-container {
@@ -343,9 +358,11 @@ input.touched:invalid {
     .profile-wrapper {
         flex-direction: column;
         align-items: center;
+        gap: 2rem;
     }
 
     .profile-img {
+        flex: 0 1 auto;
         width: 30%;
     }
 
@@ -358,8 +375,8 @@ input.touched:invalid {
         margin-left: 0;
     }
 
-    .profile-info {
-        margin-top: 2rem;
+    .profile-edit-wrapper {
+        flex: 0 1 auto;
     }
 
 }
