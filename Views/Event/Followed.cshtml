@@ -85,7 +85,40 @@
     <div class="main-content">
         <div class="main-header">
             <div class="title-section">
-                <h1>💖 Following</h1>
+                <div class="following-header">
+                    <h1>💖 Following</h1>
+                    <div class="following-circles">
+                        <!-- User circles -->
+                        @foreach (var user in Model.UserFollowingContents.User.Take(4))
+                        {
+                            <a class="following-circle user-circle" href="/user/@user.Username"-->
+                                <div class="following-circle user-circle" title="@user.DisplayName">
+                                    <img src="@user.ProfileImageUrl" alt="@user.DisplayName" />
+                                </div>
+                            </a>
+                        }
+
+                        <!-- Tag circles -->
+                        @foreach (var tag in Model.UserFollowingContents.Tags.Take(3))
+                        {
+                            <a class="following-circle tag-circle" href="/event/tag/@tag.TagId">
+                                <div class="following-circle tag-circle" title="@tag.TagName">
+                                    <span>@tag.TagEmoji</span>
+                                </div>
+                            </a>
+                        }
+
+                        <!-- More indicator if needed -->
+                        @if (Model.UserFollowingContents.User.Count + Model.UserFollowingContents.Tags.Count > 7)
+                        {
+                            <a href="/user/follows/?ActiveTab=following">
+                                <div class="following-circle more-circle" title="More following">
+                                    <span>...</span>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </div>
                 <p>Here are the events from the tags and creators you are following</p>
             </div>
             

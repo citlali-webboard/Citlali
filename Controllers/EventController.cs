@@ -883,13 +883,14 @@ public class EventController : Controller
             
             // Start all independent queries in parallel for better performance
             var followedTagsTask = _userService.GetFollowedTags(userId.ToString());
+            var followedUsersTask = _userService.GetFollowingUsers(userId);
             var tagsTask = _eventService.GetTags();
             var locationsTask = _eventService.GetLocationTags();
             var eventsTask = _eventService.GetEventsFromFollowed(userId);
             var hasFollowedUsersTask = _userService.GetFollowingCount(userId).ContinueWith(t => t.Result > 0);
-            
+
             // Wait for all initial tasks to complete
-            await Task.WhenAll(followedTagsTask, tagsTask, eventsTask, locationsTask, hasFollowedUsersTask);
+            await Task.WhenAll(followedTagsTask, tagsTask, eventsTask, locationsTask, hasFollowedUsersTask, followedUsersTask);            
             
             var followedTags = await followedTagsTask;
             var tags = (await tagsTask).ToArray();
@@ -897,6 +898,7 @@ public class EventController : Controller
             var events = await eventsTask;
             bool hasFollowedTags = followedTags != null && followedTags.Count > 0;
             bool hasFollowedUsers = await hasFollowedUsersTask;
+            var followedUsers = await followedUsersTask;
             
             // If no events found, return early with empty data
             if (events.Count == 0)
@@ -909,7 +911,12 @@ public class EventController : Controller
                     CurrentPage = 1,
                     TotalPage = 0,
                     HasFollowedTags = hasFollowedTags,
-                    HasFollowedUsers = hasFollowedUsers
+                    HasFollowedUsers = hasFollowedUsers,
+                    UserFollowingContents = new UserFollowingContents
+                    {
+                        Tags = followedTags ?? new List<Tag>(),
+                        User = followedUsers ?? new List<BriefUser>()
+                    }
                 });
             }
             
@@ -1006,6 +1013,11 @@ public class EventController : Controller
             var model = new FollowedExploreViewModel
             {
                 Locations = locations.ToArray(),
+                UserFollowingContents = new UserFollowingContents
+                {
+                    Tags = followedTags ?? new List<Tag>(),
+                    User = followedUsers ?? new List<BriefUser>()
+                },
                 Tags = tags,
                 EventBriefCardDatas = eventCards,
                 CurrentPage = page,

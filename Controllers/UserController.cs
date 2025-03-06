@@ -401,12 +401,39 @@ public class UserController : Controller
         return Json(new { isFollowing });
     }
 
+    [HttpGet("follows")]
+    [Authorize]
+    public async Task<IActionResult> Follows(string ActiveTab = "followers")
+    {
+        if (ActiveTab != "followers" && ActiveTab != "following")
+        {
+            ActiveTab = "followers"; 
+        }
+        
+        ViewData["ActiveTab"] = ActiveTab;
+
+        var currentUser = _userService.CurrentSession.User;
+        if (currentUser == null || string.IsNullOrEmpty(currentUser.Id))
+        {
+            return RedirectToAction("SignIn", "Auth", new { returnUrl = Url.Action("Follows", "User") });
+        }
+
+        var user = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id));
+        
+        if (user != null)
+        {
+            return RedirectToAction("Follows", new { username = user.Username, ActiveTab });
+        }
+
+        return RedirectToAction("SignIn", "Auth", new { returnUrl = Url.Action("Follows", "User") });
+    }
+
     [HttpGet("follows/{username}")]
     public async Task<IActionResult> Follows(string username, string ActiveTab = "followers")
     {
         if (ActiveTab != "followers" && ActiveTab != "following")
         {
-            ActiveTab = "followers"; // Default to followers if invalid
+            ActiveTab = "followers"; 
         }
         
         ViewData["ActiveTab"] = ActiveTab;
@@ -415,7 +442,8 @@ public class UserController : Controller
             var user = await _userService.GetUserByUsername(username);
             if (user == null)
             {
-                throw new KeyNotFoundException("User not found");
+                TempData["Error"] = "User not found.";
+                return RedirectToAction("explore", "event");
             }
 
             var followers = await _userService.GetFollowers(user.UserId);
