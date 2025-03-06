@@ -91,8 +91,9 @@ document.addEventListener('DOMContentLoaded', function () {
 // Form validation setup
 function setupFormValidation() {
     // Get all form inputs, textareas and selects
-    const formElements = document.querySelectorAll('input:not([type="hidden"]), textarea, select');
-    
+    const formElements = document.querySelector('#create-event-form').querySelectorAll('input:not([type="hidden"]), textarea, select');
+    console.log(formElements);
+
     // Add blur (focus lost) event listener to each form element
     formElements.forEach(element => {
         element.addEventListener('blur', function() {
@@ -120,7 +121,7 @@ function setupFormValidation() {
     });
     
     // Add form submit handler
-    const form = document.querySelector('form');
+    const form = document.querySelector('#create-event-form');
     if (form) {
         form.addEventListener('submit', function(e) {
             // Mark all fields as touched

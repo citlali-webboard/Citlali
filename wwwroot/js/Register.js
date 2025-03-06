@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Form validation setup
 function setupFormValidation() {
     // Get all form inputs and textareas
-    const formElements = document.querySelectorAll('input:not([type="hidden"]):not([disabled]), textarea');
+    const formElements = document.querySelector('#onboarding-form').querySelectorAll('input:not([type="hidden"]):not([disabled]), textarea');
     
     // Add blur (focus lost) event listener to each form element
     formElements.forEach(element => {
@@ -85,7 +85,7 @@ function setupFormValidation() {
     });
     
     // Add form submit handler
-    const form = document.querySelector('form');
+    const form = document.querySelector('#onboarding-form');
     if (form) {
         form.addEventListener('submit', function(e) {
             // Mark all fields as touched
