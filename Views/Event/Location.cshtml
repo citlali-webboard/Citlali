@@ -8,18 +8,47 @@
 
 @{
     string ExploreTagName = Model.LocationName;
-
+    int initialTagsToShow = 10;
     ViewData["Title"] = "Explore " + ExploreTagName;
 }
 
 <div class="center-wrapper">
     <!-- Left sidebar -->
     <div class="sidebar-left">
+        <div class="sidebar-card" id="tag-card">
+            <h2>Explore by tags 🏷️</h2>
+            <div class="tags-container" id="tags-container">
+                @{
+                    bool hasMoreTags = Model.Tags.Count() > initialTagsToShow;
+                }
+                
+                @for (int i = 0; i < Model.Tags.Count(); i++)
+                {
+                    var tag = Model.Tags.ElementAt(i);
+                    var isHidden = i >= initialTagsToShow;
+                    
+                    <div class="tag @(isHidden ? "tag-hidden" : "")" data-index="@i">
+                        <a href="/event/tag/@tag.TagId">@tag.TagEmoji @tag.TagName</a>
+                    </div>
+                }
+            </div>
+            
+            @if (hasMoreTags)
+            {
+                <div class="tags-toggle">
+                    <button id="tags-toggle-btn" class="tags-toggle-btn">
+                        <span class="tags-toggle-text">See more</span>
+                        <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                </div>
+            }
+        </div>
         <div class="sidebar-card" id="location-card">
             <h2>Explore by locations 📍</h2>
             <div class="tags-container" id="location-container">
                 @{
-                    int initialTagsToShow = 10;
                     bool hasMoreLocations = Model.Locations?.Count() > initialTagsToShow;
                     var tagsExceptCurrent = Model.Locations?.Where(t => t.EventLocationTagId != Model.LocationId) ?? Enumerable.Empty<Location>();
                 }
@@ -46,37 +75,6 @@
                 <div class="location-toggle">
                     <button id="location-toggle-btn" class="tags-toggle-btn">
                         <span class="location-toggle-text">See more</span>
-                        <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                    </button>
-                </div>
-            }
-        </div>
-
-        <div class="sidebar-card" id="tag-card">
-            <h2>Explore by tags 🏷️</h2>
-            <div class="tags-container" id="tags-container">
-                @{
-                    bool hasMoreTags = Model.Tags.Count() > initialTagsToShow;
-                }
-                
-                @for (int i = 0; i < Model.Tags.Count(); i++)
-                {
-                    var tag = Model.Tags.ElementAt(i);
-                    var isHidden = i >= initialTagsToShow;
-                    
-                    <div class="tag @(isHidden ? "tag-hidden" : "")" data-index="@i">
-                        <a href="/event/tag/@tag.TagId">@tag.TagEmoji @tag.TagName</a>
-                    </div>
-                }
-            </div>
-            
-            @if (hasMoreTags)
-            {
-                <div class="tags-toggle">
-                    <button id="tags-toggle-btn" class="tags-toggle-btn">
-                        <span class="tags-toggle-text">See more</span>
                         <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
