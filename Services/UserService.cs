@@ -262,6 +262,17 @@ public class UserService
         return Regex.IsMatch(username, @"^[A-Za-z][A-Za-z0-9_]{3,29}$");
     }
 
+    public bool IsUserAdmin() {
+        try {
+            var role = CurrentSession.User?.AppMetadata["app_role"].ToString();
+            if (role == "admin") {
+                return true;
+            }
+            return false;
+        } catch {
+            return false;
+        }
+    }
     public async Task<bool> FollowTag(Guid tagId)
     {
         var currentUser = CurrentSession.User;
