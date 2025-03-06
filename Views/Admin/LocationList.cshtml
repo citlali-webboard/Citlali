@@ -1,0 +1,130 @@
+@model Citlali.Models.AdminLocationsViewModel;
+
+@section head {
+  <link rel="stylesheet" href="~/css/Admin/CategoryList.css" />
+  <script src="~/js/Admin/locationList.js" defer></script>
+}
+
+<div class="center-wrapper">
+  <div class="content">
+    <a href="/admin" class="back-btn">Back</a>
+    <div class="admin-header">
+      <h1>Location Management</h1>
+      <p>Manage event locations that users can select when creating events.</p>
+    </div>
+    <div class="admin-card">
+      <div class="card-header">
+        <h2>Create New Location</h2>
+      </div>
+      
+      <form asp-action="LocationCreate" method="post" class="create-form">
+        <div class="form-input-group">
+          <div class="form-group tag-name-group" style="width: 100%">
+            <label asp-for="CreateDto.EventLocationTagName">Location Name</label>
+            <input asp-for="CreateDto.EventLocationTagName" class="form-control" name="tagName" placeholder="Enter location name" required />
+            <span asp-validation-for="CreateDto.EventLocationTagName" class="text-danger"></span>
+          </div>
+        </div>
+
+        <button type="submit" class="create-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+          </svg>
+          Create
+        </button>
+      </form>
+    </div>
+
+    <div class="admin-card">
+      <div class="card-header">
+        <h2>Existing Locations</h2>
+        <span class="tag-count">@Model.Locations.Count() locations</span>
+      </div>
+      
+      <div class="tags-container">
+        @foreach (var location in Model.Locations)
+        {
+          <div class="tag-item" data-location-id="@location.EventLocationTagId">
+            <div class="tag-content">
+              <div class="tag-name">@location.EventLocationTagName</div>
+            </div>
+            <form asp-action="LocationDelete" method="post" class="delete-form">
+              <input asp-for="DeleteDto.EventLocationTagId" name="tagId" type="hidden" value="@location.EventLocationTagId" />
+              <button type="button" class="delete-btn" onclick="confirmDelete(this)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                  <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                </svg>
+              </button>
+            </form>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+      <div class="modal-content">
+        <h3>Confirm Deletion</h3>
+        <p>Are you sure you want to delete this location? This action cannot be undone.</p>
+        <div class="modal-actions">
+          <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+          <button class="confirm-delete-btn" onclick="submitDelete()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentForm = null;
+
+function confirmDelete(button) {
+    // Store reference to the form
+    currentForm = button.closest('form');
+    
+    // Get location details to show in modal
+    const tagItem = button.closest('.tag-item');
+    const locationName = tagItem.querySelector('.tag-name').textContent;
+    
+    // Update modal content
+    const modal = document.getElementById('deleteModal');
+    const modalMessage = modal.querySelector('p');
+    modalMessage.innerHTML = `Are you sure you want to delete the location <strong>${locationName}</strong>? This action cannot be undone.`;
+    
+    // Show modal
+    modal.style.display = 'flex';
+    
+    // Focus confirm button
+    setTimeout(() => {
+        modal.querySelector('.confirm-delete-btn').focus();
+    }, 100);
+}
+
+function closeModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+    currentForm = null;
+}
+
+function submitDelete() {
+    if (currentForm) {
+        currentForm.submit();
+    }
+    closeModal();
+}
+
+// Close modal if user clicks outside
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('deleteModal');
+    if (event.target === modal) {
+        closeModal();
+    }
+});
+
+// Close modal with ESC key
+window.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeModal();
+    }
+});
+</script>

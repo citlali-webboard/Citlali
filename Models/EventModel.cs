@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Attributes;
+using Citlali.Models;
 
 namespace Citlali.Models;
 
@@ -46,6 +47,9 @@ public class Event : BaseModel
 
     [Column("Status")]
     public string Status { get; set; } = "active";
+
+    [Column("FirstComeFirstServed")]
+    public bool FirstComeFirstServed { get; set; } = false;
 }
 
 [Table("EVENT_QUESTION")]
@@ -93,6 +97,7 @@ public class EventBriefCardData
     public DateTime EventDate {get ; set;} = new();
     public DateTime PostExpiryDate {get ; set;} = new();
     public DateTime CreatedAt {get ; set;} = new();
+    public bool FirstComeFirstServed { get; set; } = false;
 
 }
 
@@ -134,15 +139,45 @@ public class EventExploreViewModel
 {
     public EventBriefCardData[] EventBriefCardDatas = [new()];
     public Tag[] Tags = [new()];
+    public Location[] Locations = [new()];
     public int CurrentPage { get; set; } = 1;
     public int TotalPage { get; set; }
+    public EventBriefCardData[] TrendingEvents = [new()];
+    public PopularTag[] PopularTags = [new()];
+    public PopularUser[] Superstars = [new()];
 }
 
 public class TagEventExploreViewModel : EventExploreViewModel
 {
     public Guid TagId { get; set; } = new();
     public string TagName { get; set; } = "";
+    public int EventCount { get; set; } = 0;
+    public int TagFollowers { get; set; } = 0;
     public string TagEmoji { get; set; } = "";
+    public bool IsFollowing { get; set; }
+    public new List<Tag> Tags { get; set; } = new List<Tag>();
+    public new List<Location> Locations { get; set; } = new List<Location>();
+    public new EventBriefCardData[] EventBriefCardDatas { get; set; } = new EventBriefCardData[0];
+    public new int CurrentPage { get; set; }
+    public new int TotalPage { get; set; }
+}
+
+public class FollowedExploreViewModel : EventExploreViewModel
+{
+    public bool HasFollowedTags { get; set; } = false;
+    public bool HasFollowedUsers { get; set; } = false;
+    public UserFollowingContents UserFollowingContents { get; set; } = new();
+    public new EventBriefCardData[] EventBriefCardDatas { get; set; } = [];
+    public new Location[] Locations { get; set; } = [];
+    public new Tag[] Tags { get; set; } = [];
+    public new int CurrentPage { get; set; }
+    public new int TotalPage { get; set; }
+}
+
+public class UserFollowingContents
+{
+    public List<Tag> Tags { get; set; } = [];
+    public List<BriefUser> User { get; set; } = [];
 }
 
 [Table("EVENT_CATEGORY_TAG")]
@@ -199,10 +234,11 @@ public class CreateEventViewModel
     public Guid EventLocationTagId { get; set; } = new();
     public int MaxParticipant { get; set; } = 0;
     public int Cost { get; set; } = 0;
-    public DateTime EventDate { get; set; } = new();
-    public DateTime PostExpiryDate { get; set; } = new();
+    public DateTime EventDate { get; set; } = DateTime.UtcNow;
+    public DateTime PostExpiryDate { get; set; } = DateTime.UtcNow;
     public List<Tag> Tags { get; set; } = [];
     public List<string> Questions { get; set; } = [];
+    public bool FirstComeFirstServed { get; set; } = false;
 }
 
 public class EditEventViewModel
@@ -220,6 +256,7 @@ public class EditEventViewModel
     public DateTime PostExpiryDate { get; set; } = new();
     public List<Tag> EventCategoryTagsList { get; set; } = [];
     public List<QuestionViewModel> Questions { get; set; } = [];
+    public bool FirstComeFirstServed { get; set; } = false;
 }
 
 [Table("REGISTRATION")]
@@ -240,6 +277,9 @@ public class Registration : BaseModel
 
     [Column("CreatedAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    [Column("UpdatedAt")]
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     
 }
 
@@ -283,6 +323,7 @@ public class RegistrationAnswerSimplify
 public class EventManagementAnswerCollection
 {
     public User User { get; set; } = new();
+    public DateTime RegistrationTime { get; set; } = new();
     public string Status { get; set; } = "pending";
     public List<RegistrationAnswerSimplify> RegistrationAnswers { get; set; } = [];
 }
@@ -311,4 +352,22 @@ public class RegistrationHistoryCardModel
 public class RegistrationHistoryData
 {
     public List<RegistrationHistoryCardModel> RegistrationHistoryCardModels { get; set; } = [];
+}
+
+
+public class PopularTag : EventCategoryTag
+{
+    public int EventCount { get; set; } = 0;
+}
+
+public class LocationEventExploreViewModel
+{
+    public Guid LocationId { get; set; }
+    public string LocationName { get; set; }
+    public int EventCount { get; set; }
+    public List<Tag> Tags { get; set; } = new();
+    public List<Location> Locations { get; set; } = new();
+    public EventBriefCardData[] EventBriefCardDatas { get; set; } = [];
+    public int CurrentPage { get; set; }
+    public int TotalPage { get; set; }
 }

@@ -20,7 +20,7 @@
   --max-text-width: 65ch;
   /* --max-screen-width: 786px; */
   --max-screen-width: 1024px;
-  --navbar-size: 3rem;
+  --navbar-size: 5rem;
 }
 
 .error-popup {
@@ -65,12 +65,12 @@
   justify-content: center;
   align-items: center;
   top: 0;
-  right: 0;
+  right: -1rem;
   background-color: red;
   border-radius: 50%;
-  height: 20px;
-  width: 20px;
-  font-size: 13px;
+  height: 15px;
+  width: 15px;
+  font-size: 10px;
   font-weight: 800;
   color : white;
   margin-top: -5px;

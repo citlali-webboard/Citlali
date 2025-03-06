@@ -5,6 +5,24 @@
   <script src="~/js/Profile.js" asp-append-version="true"></script>
 }
 
+@functions {
+  public string FormatNumber(int number)
+  {
+    if (number >= 1000000)
+    {
+      return (number / 1000000D).ToString("0.##M");
+    }
+    else if (number >= 1000)
+    {
+      return (number / 1000D).ToString("0.##k");
+    }
+    else
+    {
+      return number.ToString();
+    }
+  }
+}
+
 @{
   ViewData["Title"] = @Model.DisplayName;
   var navModel = new Citlali.Models.NavModel
@@ -14,30 +32,23 @@
   ViewBag.profileImageUrl = Model.ProfileImageUrl ?? "";
 
   ViewData["ogTitle"] = Model.DisplayName + " • Citlali";
-
-
   ViewData["ogDescription"] = Model.UserBio != null ? (Model.UserBio.Length > 100 ? Model.UserBio.Substring(0, 100) + "..." : Model.UserBio) : "";
   ViewData["ogImage"] = Model.ProfileImageUrl;
 }
 
-<div class="window">
-
+<div class="profile-wrapper">
   @if (Model.IsCurrentUser) {
     <div class="edit-popup" id="edit-popup">
       <div class="popup-content">
         <form class="edit_form" asp-controller="User" asp-action="edit" method="post" enctype="multipart/form-data">
           <div class="popup-navigation">
+            <div class="popup-left-space"></div>
+            <h1>Edit Profile</h1>
             <a class="popup-action-button" onclick="closeDialog()">
               <span>
                 @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.DismissCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
               </span>
             </a>
-            <h1>Edit Profile</h1>
-            <button type="submit" class="popup-action-button">
-              <span>
-                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Save>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
-              </span>
-            </button>
           </div>
 
           <div class="popup-body">
@@ -69,7 +80,7 @@
 
                 <div class="form-group">
                     <label for="DisplayName">Display Name</label>
-                    <input asp-for="DisplayName" class="form-control" id="DisplayName" />
+                    <input asp-for="DisplayName" class="form-control" id="DisplayName" required />
                     <span asp-validation-for="DisplayName" class="text-danger"></span>
                 </div>
 
@@ -78,93 +89,181 @@
                     <textarea asp-for="UserBio" id="UserBio" rows="3"></textarea>
                     <span asp-validation-for="UserBio" class="text-danger"></span>
                 </div>
+                <button type="submit" class="submit-btn">
+                  <span>
+                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Save>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                  </span>
+                  <span>Save</span>
+                </button>
             </div>
-
           </div>
         </form>
       </div>
     </div>
   }
 
-  <div class="profile-card">
-    <div class="profile-header">
+  <div class="profile-sidebar">
+    <div class="profile-card">
       <div class="profile-image">
-        <img src=@Model.ProfileImageUrl alt="Profile Image" />
+        <img src="@Model.ProfileImageUrl" alt="Profile Image" />
       </div>
+      
       <div class="user-info">
         <h1>@Model.DisplayName</h1>
-        <div class="display-name">
-          <p class="username">
-            <span>
-              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.ContactCard>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
-            </span>
-            <span>
-              @Model.Username
-            </span>
-          </p>
-          <div class="button-group">
-            @if (@Model.IsCurrentUser) {
-              <a class="action-button" id="edit-button" onclick="openDialog()">
-                <span>
-                  @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Edit>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
-                </span>
-                <span>
-                  Edit profile...
-                </span>
-              </a>
-            }
-            else {
-              <a class="action-button">
-                <span>
-                  @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.AddCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
-                </span>
-                <span>
-                  Follow
-                </span>
-              </a>
-            }
-          </div>
+        
+        <div class="username">
+          <span>
+            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.ContactCard>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+          </span>
+          <span>@Model.Username</span>
         </div>
+        
         <div class="meta-data">
           <div class="data">
             <h3>@Model.UserEvents.Count</h3>
             <p>Events</p>
           </div>
-          <div class="data">
-            <h3>1332</h3>
-            <p>Followers</p>
-          </div>
-          <div class="data">
-            <h3>6969</h3>
-            <p>Followings</p>
-          </div>
+          <a href="/user/follows/@Model.Username">
+            <div class="data">
+              <h3 class="followers-count">
+                @FormatNumber(Model.FollowersCount)
+              </h3>
+              <p>Followers</p>
+            </div>
+          </a>
+          <a href="/user/follows/@Model.Username?ActiveTab=following">
+            <div class="data">
+              <h3>
+                @FormatNumber(Model.FollowingCount)
+              </h3>
+              <p>Followings</p>
+            </div>
+          </a>
         </div>
+        
         <div class="user-bio">
-          <p>
-            @Model.UserBio
-          </p>
+          <p>@Model.UserBio</p>
+        </div>
+        
+        <div class="button-group">
+          @if (@Model.IsCurrentUser) {
+            <a class="action-button" id="edit-button" onclick="openDialog()">
+              <span>
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Edit>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+              </span>
+              <span>Edit profile</span>
+            </a>
+          }
+          else {
+            <button class="action-button follow-btn @(Model.IsFollowing ? "following" : "")" onclick="toggleFollow('@Model.Username', @(Model.IsFollowing ? "false" : "true"))" id="follow-button">
+              <span>
+                @if (Model.IsFollowing)
+                {
+                  @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.CheckmarkCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                }
+                else
+                {
+                  @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.AddCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                }
+              </span>
+              <span>@(Model.IsFollowing ? "Following" : "Follow")</span>
+            </button>
+          }
         </div>
       </div>
     </div>
   </div>
 
-  <hr />
-
-  <div class="content">
-    <div class="event-wrap">
-      <div class="header">
-        <h1 class="event-header">@Model.DisplayName's Events 🎉</h1>
-        <p>Here you can find all the events that @Model.DisplayName has created. Stay updated with the latest events and join in to connect with others!</p>
+  <div class="events-content">
+    <div class="events-header">
+      <div class="title-section">
+        <h1>@Model.DisplayName's Events 🎉</h1>
+        <p>Here you can find all the events that @Model.DisplayName has created.</p>
       </div>
-      <div class="event-list">
-          @foreach (var userEvent in Model.UserEvents)
-          {
-              <div class="event-card">
-                  <partial name="~/Views/Event/_EventBriefCard.cshtml" model=userEvent />
-              </div>
-          }
+      
+      <div class="filters-section">
+        <div class="filters-dropdown">
+          <button class="filter-button" id="filterToggle">
+            <span>
+              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Filter>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+            </span>
+            <span>Filter</span> 
+            @if (!string.IsNullOrEmpty(ViewBag.Filter))
+            {
+              <span class="filter-badge">@ViewBag.Filter</span>
+            }
+          </button>
+          
+          <div class="filters-menu" id="filtersMenu">
+            <div class="filter-group">
+              <h4>Status</h4>
+              <a href="@Url.Action("Profile", new { username = Model.Username, filter = "all", sort = ViewBag.Sort, page = 1 })" 
+                class="filter-option @(ViewBag.Filter == "all" || ViewBag.Filter == null ? "active" : "")">All Events</a>
+              <a href="@Url.Action("Profile", new { username = Model.Username, filter = "active", sort = ViewBag.Sort, page = 1 })" 
+                class="filter-option @(ViewBag.Filter == "active" ? "active" : "")">Active</a>
+              <a href="@Url.Action("Profile", new { username = Model.Username, filter = "closed", sort = ViewBag.Sort, page = 1 })" 
+                class="filter-option @(ViewBag.Filter == "closed" ? "active" : "")">Closed / Expired</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="sort-dropdown">
+          <button class="sort-button" id="sortToggle">
+            <span>
+              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.ArrowSort>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+            </span>
+            <span>Sort: @(ViewBag.Sort ?? "newest")</span>
+          </button>
+          
+          <div class="sort-menu" id="sortMenu">
+            <a href="@Url.Action("Profile", new { username = Model.Username, filter = ViewBag.Filter, sort = "newest", page = 1 })" 
+              class="sort-option @(ViewBag.Sort == "newest" || ViewBag.Sort == null ? "active" : "")">Newest first</a>
+            <a href="@Url.Action("Profile", new { username = Model.Username, filter = ViewBag.Filter, sort = "oldest", page = 1 })" 
+              class="sort-option @(ViewBag.Sort == "oldest" ? "active" : "")">Oldest first</a>
+            <a href="@Url.Action("Profile", new { username = Model.Username, filter = ViewBag.Filter, sort = "popular", page = 1 })" 
+              class="sort-option @(ViewBag.Sort == "popular" ? "active" : "")">Most popular</a>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+    
+    <div class="events-list">
+      @if(Model.UserEvents.Count > 0) {
+        @foreach (var userEvent in Model.UserEvents)
+        {
+          <div class="event-card">
+            <partial name="~/Views/Event/_EventBriefCard.cshtml" model=userEvent />
+          </div>
+        }
+      }
+      else {
+        <div class="no-events">
+          <p>No events yet.</p>
+        </div>
+      }
+    </div>
 
+    <div class="pagination">
+        @{
+          int currentPage = ViewBag.CurrentPage ?? 1;
+          int totalPages = ViewBag.TotalPages ?? 1;
+        }
+
+        @if (currentPage > 1)
+        {
+          <a href="@Url.Action("Profile", new { username = Model.Username, page = currentPage - 1, filter = ViewBag.Filter, sort = ViewBag.Sort })" class="pagination-link">Previous</a>
+        }
+
+        @for (var i = 1; i <= totalPages; i++)
+        {
+          <a href="@Url.Action("Profile", new { username = Model.Username, page = i, filter = ViewBag.Filter, sort = ViewBag.Sort })" 
+            class="@(i == currentPage ? "pagination-current-page" : "pagination-link")">@i</a>
+        }
+
+        @if (currentPage < totalPages)
+        {
+          <a href="@Url.Action("Profile", new { username = Model.Username, page = currentPage + 1, filter = ViewBag.Filter, sort = ViewBag.Sort })" class="pagination-link">Next</a>
+        }
+    </div>
+  </div>
 </div>

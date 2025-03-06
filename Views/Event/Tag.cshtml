@@ -1,8 +1,10 @@
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
 @model Citlali.Models.TagEventExploreViewModel;
 
-@* @section head {
-    <link rel="stylesheet" href="~/css/Form.css" asp-append-version="true" />
-} *@
+@section head {
+    <script src="~/js/Tag.js" asp-append-version="true"></script>
+}
 
 @{
     string ExploreTagName = Model.TagName;
@@ -11,77 +13,162 @@
     ViewData["Title"] = "Explore " + ExploreTagName;
 }
 
-
 <div class="center-wrapper">
-    <div class="container">
-        <header>
-            <div class="title">
-                @* <h1>Welcome to Citlali 🩷</h1> *@
-                <h1>Explore  @ExploreTagName @ExploreTagEmoji</h1>
-                <p>Cute webboard which brings people together~ Let's explore events and find what suits you the best !</p>
-            </div>
-            @* /* Search Bar: Change this later */ *@
-            @* <div class="search-bar">
-                <input type="text" name="search" placeholder="Search events..." />
-                <button type="submit">Search</button>
-            </div> *@
-            @* /* Search Bar: Change this later */ *@
-            <div class="tags">
-                @foreach (var tag in Model.Tags)
+    <!-- Left sidebar -->
+    <div class="sidebar-left">
+        <div class="sidebar-card">
+            <h2>Explore by tags 🏷️</h2>
+            <div class="tags-container" id="tags-container">
+                <div class="tag current-tag">
+                    <a href="/event/explore">@Model.TagEmoji @Model.TagName</a>
+                </div>
+                @{
+                    int initialTagsToShow = 10;
+                    bool hasMoreTags = Model.Tags.Count() > initialTagsToShow;
+                    var tagsExceptCurrent = Model.Tags.Where(t => t.TagId != Model.TagId);
+                }
+                
+                @for (int i = 0; i < tagsExceptCurrent.Count(); i++)
                 {
-                    @if (tag.TagId == Model.TagId)
-                    {
-                        <a href="/event/explore">
-                            <span class="tag explore-tag">
-                                <span>@tag.TagEmoji</span>
-                                <span>@tag.TagName</span>
-                            </span>
-                        </a>
-                    }
-                    else
-                    {
-                        <a href="/event/tag/@tag.TagId">
-                            <span class="tag">
-                                <span>@tag.TagEmoji</span>
-                                <span>@tag.TagName</span>
-                            </span>
-                        </a>
-                    }
+                    var tag = tagsExceptCurrent.ElementAt(i);
+                    var isHidden = i >= initialTagsToShow - 1; // -1 because current tag is always shown
+                    
+                    <div class="tag @(isHidden ? "tag-hidden" : "")" data-index="@i">
+                        <a href="/event/tag/@tag.TagId">@tag.TagEmoji @tag.TagName</a>
+                    </div>
                 }
             </div>
-        </header>
-        <div class="event-list">
-            @for (var i = 0; i < Model.EventBriefCardDatas.Length; i++)
+            
+            @if (hasMoreTags)
             {
-                <div>
-                    <partial name="_EventBriefCard" model=@Model.EventBriefCardDatas[i] />
+                <div class="tags-toggle">
+                    <button id="tags-toggle-btn" class="tags-toggle-btn">
+                        <span class="tags-toggle-text">See more</span>
+                        <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                </div>
+            }
+        </div>
+        
+        <div class="sidebar-card" id="location-card">
+            <h2>Explore by locations 📍</h2>
+            <div class="tags-container" id="location-container">
+                @{
+                    bool hasMoreLocations = Model.Locations?.Count() > initialTagsToShow;
+                }
+                
+                @if (Model.Locations != null)
+                {
+                    @for (int i = 0; i < Model.Locations.Count(); i++)
+                    {
+                        var location = Model.Locations.ElementAt(i);
+                        var isHidden = i >= initialTagsToShow;
+                        
+                        <div class="tag @(isHidden ? "tag-hidden" : "")" data-index="@i">
+                            <a href="/event/location/@location.EventLocationTagId">@location.EventLocationTagName</a>
+                        </div>
+                    }
+                }
+
+            </div>
+            @if (hasMoreLocations)
+            {
+                <div class="location-toggle">
+                    <button id="location-toggle-btn" class="tags-toggle-btn">
+                        <span class="location-toggle-text">See more</span>
+                        <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
                 </div>
             }
         </div>
     </div>
-    <div class="pagination">
-        @if (Model.CurrentPage > 1)
-        {
-            <a href="@Url.Action("Tag", new { page = Model.CurrentPage - 1 })">Previous</a>
-        }
 
-        @for (var i = 1; i <= Model.TotalPage; i++)
-        {
-            <a href="@Url.Action("Tag", new { page = i })" class="@(i == Model.CurrentPage ? "active" : "")">@i</a>
-        }
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="main-header">
+            <div class="title-section">
+                <h1>@ExploreTagEmoji @ExploreTagName</h1>
+                <p class="tag-stats">
+                    <span class="follower-count">@Model.TagFollowers followers</span>
+                    <span class="event-count">@Model.EventCount events</span>
+                </p>
+            </div>
+            
+            <div class="controls-row">
+                <div class="button-group">
+                    <button class="sort-btn @(ViewBag.SortBy == "newest" ? "active" : "")" data-sort="newest">
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Clock>>(RenderMode.ServerPrerendered, new { Color = Color.Custom }))
+                        Newest
+                    </button>
+                    <button class="sort-btn @(ViewBag.SortBy == "date" ? "active" : "")" data-sort="date">
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Calendar>>(RenderMode.ServerPrerendered, new { Color = Color.Custom }))
+                        Event Date
+                    </button>
+                    <button class="sort-btn @(ViewBag.SortBy == "popularity" ? "active" : "")" data-sort="popularity">
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Star>>(RenderMode.ServerPrerendered, new { Color = Color.Custom }))
+                        Popularity
+                    </button>
+                </div>
 
-        @if (Model.CurrentPage < Model.TotalPage)
+                <button id="followButton" class="action-button @(Model.IsFollowing ? "following" : "")" 
+                        data-tag-id="@Model.TagId" 
+                        onclick="toggleFollowTag('@Model.TagId', @(Model.IsFollowing ? "false" : "true"))">
+                    @if (Model.IsFollowing)
+                    {
+                        <span class="icon-container">
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.CheckmarkCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+                        </span>
+                        <span>Following</span>
+                    }
+                    else
+                    {
+                        <span class="icon-container">
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Add>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+                        </span>
+                        <span>Follow</span>
+                    }
+                </button>
+            </div>
+        </div>
+        
+        @if (Model.EventBriefCardDatas.Length > 0)
         {
-            <a href="@Url.Action("Tag", new { page = Model.CurrentPage + 1 })">Next</a>
+            <div class="event-list">
+                @foreach (var eventItem in Model.EventBriefCardDatas)
+                {
+                    <partial name="_EventBriefCard" model="eventItem" />
+                }
+            </div>
+            
+            <div class="pagination">
+                @if (Model.CurrentPage > 1)
+                {
+                    <a href="@Url.Action("Tag", new { id = Model.TagId, page = Model.CurrentPage - 1, sortBy = ViewBag.SortBy })" class="pagination-link">Previous</a>
+                }
+
+                @for (var i = 1; i <= Model.TotalPage; i++)
+                {
+                    <a href="@Url.Action("Tag", new { id = Model.TagId, page = i, sortBy = ViewBag.SortBy })" class="@(i == Model.CurrentPage ? "pagination-current-page" : "pagination-link")">@i</a>
+                }
+
+                @if (Model.CurrentPage < Model.TotalPage)
+                {
+                    <a href="@Url.Action("Tag", new { id = Model.TagId, page = Model.CurrentPage + 1, sortBy = ViewBag.SortBy })" class="pagination-link">Next</a>
+                }
+            </div>
+        }
+        else 
+        {
+            <div class="event-not-found">
+                <h1>Event not found</h1>
+                <p>Oops! No events are available for this tag right now. Please check back later!</p>
+            </div>
         }
     </div>
-
-    @if (Model.EventBriefCardDatas.Length == 0)
-    {
-        <div class="event-not-found">
-            <h1>Event not found</h1>
-            <p>Oops! No events are available for this tag right now. Please check back later!</p>
-
-        </div>
-    }
 </div>
+
+@* <input type="hidden" name="__RequestVerificationToken" value="@Antiforgery.GetAndStoreTokens(Context).RequestToken" /> *@

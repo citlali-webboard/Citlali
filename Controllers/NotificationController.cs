@@ -181,4 +181,22 @@ public class NotificationController : Controller
             return RedirectToAction("Index");
         }
     }
+
+    [HttpPost("readAll")]
+    [Authorize]
+    public async Task<IActionResult> ReadAllNotifications()
+    {
+        try
+        {
+            await _notificationService.ReadAllNotifications();
+            return RedirectToAction("Index");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            TempData["error"] = ex.Message;
+            return RedirectToAction("Index");
+        }
+    }
+
 }

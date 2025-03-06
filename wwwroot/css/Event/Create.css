@@ -6,11 +6,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
+    background-color: #f0f0f0;
 }
 
 #title {
     font-weight: bold;
-    color: var(--color-primary);
+    color: var(--pink-saturated);
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
 }
 
@@ -49,7 +51,7 @@
     padding: 2rem;
     margin: 2rem;
     border-radius: 10px;
-    background-color: var(--bg-color);
+    background-color: #fefefe;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -77,6 +79,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     color: #555;
+}
+
+.form-group label.required::after {
+    content: " *";
+    color: red;
 }
 
 #eventTag select,
@@ -129,6 +136,28 @@
     margin-top: 1rem;
     gap: 2rem;
     align-items: stretch;
+}
+
+/* Replace your current invalid CSS with this */
+textarea.touched:invalid,
+input.touched:invalid,
+select.touched:invalid {
+    border: 1px solid red;
+    box-shadow: 0 0 3px rgba(255, 0, 0, 0.3);
+}
+
+/* Add styles for validation messages */
+.field-validation-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: none; /* Hidden by default */
+}
+
+/* Only show validation messages for touched fields */
+.touched + .field-validation-error,
+.touched ~ .field-validation-error {
+    display: block;
 }
 
 .description {
@@ -235,6 +264,42 @@
     overflow-wrap: anywhere; 
 }
 
+.added-question.no-questions {
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.question-item.highlight {
+    font-weight: bold;
+}
+
+/* Style the empty question state */
+.added-question ol:empty::before {
+    content: "No questions added yet. Add your first question above!";
+    display: block;
+    color: #888;
+    font-style: italic;
+    padding: 1rem 0;
+}
+
+/* Make question list look nicer */
+.added-question ol {
+    padding-left: 1.5rem;
+    margin-top: 1rem;
+}
+
+.added-question h5 {
+    margin-bottom: 0.5rem;
+}
+
+/* Hide the Current questions section and its description when no questions */
+.added-question.no-questions h5,
+.added-question.no-questions p {
+    display: none;
+}
+
 .submit {
     margin-top: 2rem;
     width: 100%;
@@ -261,6 +326,82 @@
 .submit-button:hover {
     background-color: #333;
 }
+
+
+.slide-btn {
+    position: relative;
+    display: inline-block;
+    width: 3.5rem;
+    height: 1.7rem;
+  }
+  
+  .slide-btn input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .3s;
+    transition: .3s;
+    border-radius: 15px;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 1.3rem;
+    width: 1.3rem;
+    left: 4px;
+    bottom: 3px;
+    background-color: white;
+    -webkit-transition: .3s;
+    transition: .3s;
+    border-radius: 15px;
+  }
+  
+  .slide-btn input:checked + .slider {
+    background-color: var(--pink-saturated);;
+  }
+  
+  .slide-btn input:checked + .slider:before {
+    -webkit-transform: translateX(1.7rem);
+    -ms-transform: translateX(1.7rem);
+    transform: translateX(1.7rem);
+  }
+
+  .sub-detail{
+    width: 100%;
+    height: auto;
+
+    display: flex;
+    flex-direction: row;
+    margin-top: 1rem;
+    align-items: stretch;
+    justify-content: flex-end;
+  }
+
+  .fcfs{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  
+  .fcfs .text-fcfs{
+    font-size: 0.8rem;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #555;
+  }
 
 @media screen and (max-width: 768px) {
     .content {
@@ -313,7 +454,7 @@
     }
 
     .question {
-        margin-top: 4rem;
+        margin-top: 2rem;
     }
 
     .question h3 {

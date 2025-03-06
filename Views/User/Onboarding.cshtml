@@ -3,6 +3,7 @@
 @{
     string userEmail = ViewBag.Email ?? "No email provided";
     string profileImageUrl = ViewBag.ProfileImageUrl ?? "";
+    List<Tag> tags = ViewBag.Tags ?? new List<Tag>();
 }
 
 @section head{
@@ -35,39 +36,52 @@
                 </div>
                 <div class="profile-info">
                     <div class="form-group">
-                        <label for="Email">Email</label>
+                        <label for="Email" class="required">Email</label>
                         <input asp-for="Email" class="form-control disabled-input" value=@userEmail id="Email" disabled />
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
-
                     <div class="form-group">
-                        <label for="Username">Username</label>
-                        <input asp-for="Username" class="form-control" id="Username" />
+                        <label for="Username" class="required">Username</label>
+                        <input asp-for="Username" class="form-control" id="Username" required 
+                            pattern="^[A-Za-z][A-Za-z0-9_]{3,29}$" 
+                            title="Username can only contain letters, numbers and underscores" />
                         <span asp-validation-for="Username" class="text-danger"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="DisplayName">Display Name</label>
-                        <input asp-for="DisplayName" class="form-control" id="DisplayName" />
+                        <label for="DisplayName" class="required">Display Name</label>
+                        <input asp-for="DisplayName" class="form-control" id="DisplayName" required 
+                            minlength="2" maxlength="50"
+                            title="Display name must be between 2-50 characters" />
                         <span asp-validation-for="DisplayName" class="text-danger"></span>
                     </div>
 
                     <div class="form-group" id="bio">
                         <label for="UserBio">User Bio</label>
-                        <textarea asp-for="UserBio" id="UserBio" rows="3"></textarea>
+                        <textarea asp-for="UserBio" id="UserBio" rows="3" maxlength="500"></textarea>
                         <span asp-validation-for="UserBio" class="text-danger"></span>
+                        <div class="bio-char-count"><span id="bioCharCount">0</span>/500 characters</div>
                     </div>
                     <div class="tag-selecting">
                         <h3>What are you interested in?</h3>
-                        <div class="tags" id="tags"></div>
+                        <div class="tags" id="tags">
+                            @foreach (var tag in tags)
+                            {
+                                <div class="tag" id="@tag.TagId" name="" onclick="toggleTagSelection(this, '@tag.TagId')">
+                                    <span>@tag.TagEmoji</span>
+                                    <span>@tag.TagName</span>
+                                    <input type="hidden" name="SelectedTags" value="" id="tagInput_@tag.TagId" />
+                                </div>
+                            }
+                        </div>
                     </div>
                     <div class="continue">
                         <button class="continue-button" type="submit">
                             <span>
-                                Continue
+                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.AirplaneTakeOff>>(RenderMode.ServerPrerendered))
                             </span>
                             <span>
-                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.ArrowCircleRight>>(RenderMode.ServerPrerendered))
+                                Continue
                             </span>
                         </button>
                 </div>
