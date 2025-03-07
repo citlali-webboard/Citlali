@@ -4,6 +4,7 @@
     string userEmail = ViewBag.Email ?? "No email provided";
     string profileImageUrl = ViewBag.ProfileImageUrl ?? "";
     List<Tag> tags = ViewBag.Tags ?? new List<Tag>();
+    ViewData["Title"] = "Onboarding";
 }
 
 @section head{
@@ -17,22 +18,26 @@
             <h1>Setup your basic profile 🎉</h1>
             <p>This profile represents you in the community and will be shown to others when you engage with events. Take a moment to personalize it as you wish ! </p>
         </div>
-        <form class="form-container" asp-action="onboarding" method="post" enctype="multipart/form-data">
+        <form class="form-container" asp-action="onboarding" method="post" enctype="multipart/form-data" id="onboarding-form">
             <div class="profile-wrapper">
-                <div class="profile-img">
-                    <img src="@profileImageUrl" class="profileImage" id="profileImage" alt="Profile Picture">
-                    <input type="file" asp-for="ProfileImage" id="ProfileImageInput" hidden />
+                <div class="profile-edit-wrapper">
+                    <div class="profile-img">
+                        <img src="@profileImageUrl" class="profileImage" id="profileImage" alt="Profile Picture">
+                    </div>
+                    <div class="upload-button-wrapper">
+                        <input type="file" asp-for="ProfileImage" id="ProfileImageInput" hidden />
 
-                    <label for="ProfileImageInput" class="upload-button">
-                        <span>
-                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Image>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
-                        </span>
-                        <span>
-                            Upload image...
-                        </span>
-                    </label>
+                        <label for="ProfileImageInput" class="upload-button">
+                            <span>
+                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Image>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                            </span>
+                            <span>
+                                Upload image...
+                            </span>
+                        </label>
 
-                    <p class="description">Support jpeg / jpg / png file with the size less than 10 MB</p>
+                        <p class="description">Support jpeg / jpg / png file with the size less than 10 MB</p>
+                    </div>
                 </div>
                 <div class="profile-info">
                     <div class="form-group">
@@ -42,15 +47,15 @@
                     </div>
                     <div class="form-group">
                         <label for="Username" class="required">Username</label>
-                        <input asp-for="Username" class="form-control" id="Username" required 
-                            pattern="^[A-Za-z][A-Za-z0-9_]{3,29}$" 
+                        <input asp-for="Username" class="form-control" id="Username" required
+                            pattern="^[A-Za-z][A-Za-z0-9_]{3,29}$"
                             title="Username can only contain letters, numbers and underscores" />
                         <span asp-validation-for="Username" class="text-danger"></span>
                     </div>
 
                     <div class="form-group">
                         <label for="DisplayName" class="required">Display Name</label>
-                        <input asp-for="DisplayName" class="form-control" id="DisplayName" required 
+                        <input asp-for="DisplayName" class="form-control" id="DisplayName" required
                             minlength="2" maxlength="50"
                             title="Display name must be between 2-50 characters" />
                         <span asp-validation-for="DisplayName" class="text-danger"></span>

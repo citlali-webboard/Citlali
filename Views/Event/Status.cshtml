@@ -1,7 +1,7 @@
 @model Citlali.Models.EventStatusViewModel
 
 @{
-    ViewData["Title"] = "Event Status";
+    ViewData["Title"] = $"Status of {Model.EventDetailCardData.EventTitle}";
     var eventStatus = Model.Status.ToLower();
 
     // Use this for debugging

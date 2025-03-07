@@ -341,6 +341,7 @@ public class EventController : Controller
             var eventsTrendingTask = _eventService.GetTrendingEvents();
             var popularTagsTask = _eventService.GetPopularTags();
             var superstarsTask = _userService.GetSuperstars();
+            var locationsTask =  _eventService.GetLocationTags();
 
             await Task.WhenAll(eventsTask, eventsCountTask, tagsTask, eventsTrendingTask,  popularTagsTask, superstarsTask);
 
@@ -350,9 +351,9 @@ public class EventController : Controller
             var eventsTrending = (await eventsTrendingTask).ToArray();
             var popularTags = (await popularTagsTask).ToArray();
             var superstars = (await superstarsTask).ToArray();
+            var locations = (await locationsTask).ToArray();
 
             var briefCardDatas = await _eventService.EventsToBriefCardArray(events);
-            var locations = (await _eventService.GetLocationTags()).ToArray();
 
             var model = new EventExploreViewModel
             {
