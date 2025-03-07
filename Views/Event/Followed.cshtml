@@ -109,7 +109,7 @@
                         }
 
                         <!-- More indicator if needed -->
-                        @if (Model.UserFollowingContents.User.Count + Model.UserFollowingContents.Tags.Count > 7)
+                        @if (Model.UserFollowingContents.User.Count > 4 || Model.UserFollowingContents.Tags.Count > 3)
                         {
                             <a href="/user/follows/?ActiveTab=following">
                                 <div class="following-circle more-circle" title="More following">
