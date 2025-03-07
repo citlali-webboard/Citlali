@@ -98,8 +98,6 @@
     text-decoration: none;
     color: #000;
     white-space: nowrap;
-    
-    margin-top: 1rem;
 }
 
 .action-button:hover {
@@ -161,9 +159,13 @@
 }
 
 .button-group {
+    margin-top: 1rem;
     display: flex;
     flex-direction: row;
     gap: 1rem;
+    flex-wrap: wrap;
+    row-gap: 1rem;
+    justify-content: center;
 }
 
 @media screen and (max-width: 768px) {
@@ -193,10 +195,6 @@
     .action-button {
         padding: 0.3rem 1rem;
         font-size: 0.7rem;
-    }
-
-    .button-group {
-        flex-direction: column;
     }
 
     .event-wrapper {
