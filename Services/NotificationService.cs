@@ -20,11 +20,7 @@ public class NotificationService(Client supabaseClient, UserService userService,
 
     public string EscapeInput(string input)
     {
-        return input.Replace("&", "&amp;")
-            .Replace("<", "&lt;")
-            .Replace(">", "&gt;")
-            .Replace("\"", "&quot;");
-        // .Replace("'", "&#039;");
+        return input;
     }
 
     public async Task<List<NotificationModel>> GetNotifications()
