@@ -99,7 +99,7 @@ public class UserController : Controller
                 return RedirectToAction("Onboarding");
             }
 
-            HttpContext.Response.Cookies.Append("ProfileImageURL", userCreated.ProfileImageUrl, new CookieOptions
+            HttpContext.Response.Cookies.Append("ProfileImageUrl", userCreated.ProfileImageUrl, new CookieOptions
             {
                 HttpOnly = false,
                 Secure = true,
