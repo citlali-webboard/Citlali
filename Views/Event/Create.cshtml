@@ -9,6 +9,8 @@
     ViewData["Title"] = "Create Event";
     var EventDate = Model.EventDate.ToString("yyyy-MM-ddTHH:mm");
     var PostExpiryDate = Model.PostExpiryDate.ToString("yyyy-MM-ddTHH:mm");
+    var EventDateISO = Model.EventDate.ToString("o");
+    var PostExpiryDateISO = Model.PostExpiryDate.ToString("o");
 }
 
 <partial name="_ValidationScriptsPartial" />
@@ -126,3 +128,37 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // Set event date
+    const eventDateInput = document.getElementById('EventDate');
+    if (eventDateInput) {
+        const eventDate = new Date('@Html.Raw(EventDateISO)');
+
+        // Format date in local timezone
+        const year = eventDate.getFullYear();
+        const month = String(eventDate.getMonth() + 1).padStart(2, '0');
+        const day = String(eventDate.getDate()).padStart(2, '0');
+        const hours = String(eventDate.getHours()).padStart(2, '0');
+        const minutes = String(eventDate.getMinutes()).padStart(2, '0');
+
+        eventDateInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    // Set post expiry date
+    const expiryDateInput = document.getElementById('PostExpiryDate');
+    if (expiryDateInput) {
+        const expiryDate = new Date('@Html.Raw(PostExpiryDateISO)');
+
+        // Format date in local timezone
+        const year = expiryDate.getFullYear();
+        const month = String(expiryDate.getMonth() + 1).padStart(2, '0');
+        const day = String(expiryDate.getDate()).padStart(2, '0');
+        const hours = String(expiryDate.getHours()).padStart(2, '0');
+        const minutes = String(expiryDate.getMinutes()).padStart(2, '0');
+
+        expiryDateInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+});
+</script>
