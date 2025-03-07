@@ -732,6 +732,7 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             EventId = citlaliEvent.EventId,
             EventTitle = citlaliEvent.EventTitle,
             EventDescription = citlaliEvent.EventDescription,
+            CreatorUsername = creator.Username,
             CreatorDisplayName = creator.DisplayName,
             CreatorProfileImageUrl = creator.ProfileImageUrl,
             LocationTag = locationTag,
