@@ -34,6 +34,8 @@
 .status-title {
     font-size: 1.5rem;
     font-weight: 600;
+    text-align: center;
+    text-wrap: balance;
 }
 
 .status-description {
@@ -166,10 +168,14 @@
 
 @media screen and (max-width: 768px) {
     .status-page {
-        margin-top: 1rem;
-        margin-bottom: 1rem;
         width: 100%;
         height: 100%;
+        margin: 0;
+        padding: 1rem 1rem;
+    }
+
+    .status {
+        width: 90%;
     }
 
     .status-symbol {
@@ -191,5 +197,9 @@
 
     .button-group {
         flex-direction: column;
+    }
+
+    .event-wrapper {
+        width: 100%;
     }
 }
