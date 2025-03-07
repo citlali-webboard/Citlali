@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function setupFormValidation() {
-    const formElements = document.querySelector('#edit-event-form').querySelectorAll('input:not([type="hidden"]), textarea, select');
+    const formElements = document.querySelector('#create-event-form').querySelectorAll('input:not([type="hidden"]):not([id="FirstComeFirstServed"]), textarea, select');
 
     // Add blur (focus lost) event listener to each form element
     formElements.forEach(element => {
