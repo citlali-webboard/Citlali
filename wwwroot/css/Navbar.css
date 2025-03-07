@@ -276,7 +276,6 @@ body nav ul .nav-group .logo p {
         display: flex;
     }
 
-    /* Mobile navigation container */
     .nav-group#navigation-links {
         position: fixed;
         top: var(--navbar-size);
@@ -289,13 +288,14 @@ body nav ul .nav-group .logo p {
         padding: 1rem 0;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         
-        /* Hide by default */
+        /* Improved hiding technique */
         transform: translateY(-100%);
         opacity: 0;
         visibility: hidden;
         height: auto;
         transition: all 0.3s ease;
         z-index: 1000;
+        pointer-events: none; /* Critical fix to prevent hidden menu from capturing clicks */
     }
 
     /* Show mobile menu when active */
@@ -303,6 +303,7 @@ body nav ul .nav-group .logo p {
         transform: translateY(0);
         opacity: 1;
         visibility: visible;
+        pointer-events: all; /* Re-enable pointer events when visible */
     }
 
     /* Auth section styling when in mobile view */
