@@ -77,7 +77,7 @@ builder.Services.AddAuthentication()
                                     userService.CurrentSession = await supabaseClient.Auth.SetSession(accessToken, refreshToken);
 
                                     if (userService.CurrentSession.AccessToken != null) context.Response.Cookies.Append(configuration.Jwt.AccessCookie, userService.CurrentSession.AccessToken);
-                                    if (userService.CurrentSession.RefreshToken != null) context.Response.Cookies.Append(configuration.Jwt.AccessCookie, userService.CurrentSession.RefreshToken);
+                                    if (userService.CurrentSession.RefreshToken != null) context.Response.Cookies.Append(configuration.Jwt.RefreshCookie, userService.CurrentSession.RefreshToken);
                                     // await supabaseClient.Auth.RefreshSession();
                                     // return Task.CompletedTask;
                                 }
