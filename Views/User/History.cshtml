@@ -3,14 +3,21 @@
 @{
     ViewData["Title"] = "History";
     var statusMapper = new Dictionary<string, string> {
+        { "all", "All Registrations"},
         { "pending", "Pending" },
         { "awaiting-confirmation", "Awaiting Confirmation" },
         { "rejected", "Rejected" },
         { "rejected-invitation", "Rejected Invitation" },
         { "confirmed", "Confirmed" }
     };
-    
-    var selectedStatus = ViewData["SelectedStatus"] as string ?? "all";
+
+    var selectedStatus = "all";
+
+    if (!String.IsNullOrEmpty(ViewData["SelectedStatus"] as string) && statusMapper.ContainsKey(ViewData["SelectedStatus"] as string ?? "all"))
+    {
+        selectedStatus = ViewData["SelectedStatus"]?.ToString();
+    }
+
 }
 
 <div class="window">
@@ -18,29 +25,34 @@
         <div class="page-header">
             <h1>Registration History ⏳</h1>
             <p>Here you can find all your past events, including detailed information about each event's date, time, and description.</p>
-            
+
             <div class="filter-controls">
                 <div class="status-filter">
                     <label for="status-select">Filter by status:</label>
                     <select id="status-select" onchange="filterByStatus(this.value)">
-                        <option value="all" selected="@(selectedStatus == "all")">All Registrations</option>
-                        <option value="pending" selected="@(selectedStatus == "pending")">Pending</option>
-                        <option value="awaiting-confirmation" selected="@(selectedStatus == "awaiting-confirmation")">Awaiting Confirmation</option>
-                        <option value="confirmed" selected="@(selectedStatus == "confirmed")">Confirmed</option>
-                        <option value="rejected" selected="@(selectedStatus == "rejected")">Rejected</option>
-                        <option value="rejected-invitation" selected="@(selectedStatus == "rejected-invitation")">Rejected Invitation</option>
+                        @foreach(var item in statusMapper) {
+                            var description = "";
+                            try
+                            {
+                                description = statusMapper[item.Key];
+                            }
+                            catch {
+                                description = item.Key;
+                            }
+                            <option value=@item.Key selected="@(selectedStatus == @item.Key)">@description</option>
+                        }
                     </select>
                 </div>
             </div>
         </div>
-        
+
         <div class="registration-history">
             @{
-                var filteredRegistrations = selectedStatus == "all" 
-                    ? Model.RegistrationHistoryCardModels.ToArray() 
+                var filteredRegistrations = selectedStatus == "all"
+                    ? Model.RegistrationHistoryCardModels.ToArray()
                     : Model.RegistrationHistoryCardModels.Where(r => r.Status == selectedStatus).ToArray();
             }
-            
+
             @if (filteredRegistrations.Any())
             {
                 @foreach (var registration in filteredRegistrations) {
@@ -105,19 +117,30 @@
                 <div class="empty-history">
                     <div class="empty-icon">📭</div>
                     <h2>No registrations found</h2>
-                    @if (selectedStatus != "all")
-                    {
-                        <p>You don't have any registrations with status "@statusMapper[selectedStatus]". Try a different filter or explore new events!</p>
-                    }
-                    else
-                    {
-                        <p>You haven't registered for any events yet. Start exploring and join some events!</p>
+                    @{
+                        var filterDescription = "";
+                        try
+                        {
+                            filterDescription = statusMapper[selectedStatus];
+                        }
+                        catch {
+                            filterDescription = selectedStatus;
+                        }
+
+                        @if (selectedStatus != "all")
+                        {
+                            <p>You don't have any registrations with status "@filterDescription". Try a different filter or explore new events!</p>
+                        }
+                        else
+                        {
+                            <p>You haven't registered for any events yet. Start exploring and join some events!</p>
+                        }
                     }
                     <a href="/event/explore" class="explore-btn">Explore Events</a>
                 </div>
             }
         </div>
-    </div>  
+    </div>
 </div>
 
 @section Scripts {
