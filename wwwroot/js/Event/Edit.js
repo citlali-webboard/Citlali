@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function setupFormValidation() {
-    const formElements = document.querySelectorAll('input:not([type="hidden"]), textarea, select');
+    const formElements = document.querySelector('#edit-event-form').querySelectorAll('input:not([type="hidden"]), textarea, select');
 
     // Add blur (focus lost) event listener to each form element
     formElements.forEach(element => {
@@ -68,7 +68,7 @@ function setupFormValidation() {
     });
 
     // Add form submit handler
-    const form = document.querySelector('form');
+    const form = document.querySelector('#edit-event-form');
     if (form) {
         form.addEventListener('submit', function (e) {
             // Mark all fields as touched

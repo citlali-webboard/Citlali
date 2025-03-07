@@ -18,7 +18,7 @@
         </a>
         <h2>Edit your event ✏️</h2>
         <p>Update your event details below to ensure everything is accurate and up-to-date.</p>
-        <form asp-action="EditEvent" asp-route-eventId="@Model.EventId" method="post" enctype="multipart/form-data">
+        <form asp-action="EditEvent" asp-route-eventId="@Model.EventId" method="post" enctype="multipart/form-data" id="edit-event-form">
             <input type="hidden" asp-for="EventId" />
             <div class="header">
                 <div class="form-group" id="eventTitle">
