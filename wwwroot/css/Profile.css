@@ -615,10 +615,6 @@
         row-gap: 1rem;
     }
 
-    .data {
-        flex: 0 0 45%;
-    }
-
     .popup-content {
         width: 95%;
         padding: 1rem;
