@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "History";
     var statusMapper = new Dictionary<string, string> {
+        { "all", "All Registrations"},
         { "pending", "Pending" },
         { "awaiting-confirmation", "Awaiting Confirmation" },
         { "rejected", "Rejected" },
@@ -10,7 +11,13 @@
         { "confirmed", "Confirmed" }
     };
 
-    var selectedStatus = ViewData["SelectedStatus"] as string ?? "all";
+    var selectedStatus = "all";
+
+    if (!String.IsNullOrEmpty(ViewData["SelectedStatus"] as string) && statusMapper.ContainsKey(ViewData["SelectedStatus"] as string ?? "all"))
+    {
+        selectedStatus = ViewData["SelectedStatus"]?.ToString();
+    }
+
 }
 
 <div class="window">
@@ -23,12 +30,17 @@
                 <div class="status-filter">
                     <label for="status-select">Filter by status:</label>
                     <select id="status-select" onchange="filterByStatus(this.value)">
-                        <option value="all" selected="@(selectedStatus == "all")">All Registrations</option>
-                        <option value="pending" selected="@(selectedStatus == "pending")">Pending</option>
-                        <option value="awaiting-confirmation" selected="@(selectedStatus == "awaiting-confirmation")">Awaiting Confirmation</option>
-                        <option value="confirmed" selected="@(selectedStatus == "confirmed")">Confirmed</option>
-                        <option value="rejected" selected="@(selectedStatus == "rejected")">Rejected</option>
-                        <option value="rejected-invitation" selected="@(selectedStatus == "rejected-invitation")">Rejected Invitation</option>
+                        @foreach(var item in statusMapper) {
+                            var description = "";
+                            try
+                            {
+                                description = statusMapper[item.Key];
+                            }
+                            catch {
+                                description = item.Key;
+                            }
+                            <option value=@item.Key selected="@(selectedStatus == @item.Key)">@description</option>
+                        }
                     </select>
                 </div>
             </div>
