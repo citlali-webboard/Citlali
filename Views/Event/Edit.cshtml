@@ -6,7 +6,7 @@
 }
 
 @{
-    ViewData["Title"] = "Edit Event";
+    ViewData["Title"] = $"Edit {Model.EventTitle}";
 }
 
 <div class="window">
@@ -73,7 +73,7 @@
                     <div class="form-group" id="postExpiryDate">
                         <label for="PostExpiryDate" class="required">Post Expiry Date</label>
                         <input asp-for="PostExpiryDate" class="form-control" id="PostExpiryDate" type="datetime-local"
-                            value="@Model.PostExpiryDate.ToString("yyyy-MM-ddTHH:mm")" 
+                            value="@Model.PostExpiryDate.ToString("yyyy-MM-ddTHH:mm")"
                             data-original-date="@Model.PostExpiryDate.ToString("yyyy-MM-ddTHH:mm")"
                             required />
                         <span asp-validation-for="PostExpiryDate" class="text-danger"></span>
@@ -107,7 +107,7 @@
                 <div class="question-list" id="question-list">
                     <div class="form-group">
                         <div class="added-question">
-        
+
                             <h5>Current questions</h5>
                             <p>These questions cannot be modified once the event is created.</p>
                             <ul>

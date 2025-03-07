@@ -5,6 +5,10 @@
   <script src="~/js/Admin/categoryList.js" defer></script>
 }
 
+@{
+  ViewData["Title"] = "Manage Categories";
+}
+
 <div class="center-wrapper">
   <div class="content">
     <a href="/admin" class="back-btn">Back</a>
@@ -16,7 +20,7 @@
       <div class="card-header">
         <h2>Create New Category</h2>
       </div>
-      
+
       <form asp-action="CategoryCreate" method="post" class="create-form">
         <div class="form-input-group">
           <div class="form-group tag-emoji-group">
@@ -46,7 +50,7 @@
         <h2>Existing Categories</h2>
         <span class="tag-count">@Model.Tags.Count() categories</span>
       </div>
-      
+
       <div class="tags-container">
         @foreach (var tag in Model.Tags)
         {
@@ -90,20 +94,20 @@
 function confirmDelete(button) {
     // Store reference to the form
     currentForm = button.closest('form');
-    
+
     // Get tag details to show in modal
     const tagItem = button.closest('.tag-item');
     const tagName = tagItem.querySelector('.tag-name').textContent;
     const tagEmoji = tagItem.querySelector('.tag-emoji').textContent;
-    
+
     // Update modal content
     const modal = document.getElementById('deleteModal');
     const modalMessage = modal.querySelector('p');
     modalMessage.innerHTML = `Are you sure you want to delete the <strong>${tagEmoji} ${tagName}</strong> category? This action cannot be undone.`;
-    
+
     // Show modal
     modal.style.display = 'flex';
-    
+
     // Focus confirm button
     setTimeout(() => {
         modal.querySelector('.confirm-delete-btn').focus();

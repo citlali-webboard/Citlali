@@ -6,7 +6,7 @@
 }
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Event";
     var EventDate = Model.EventDate.ToString("yyyy-MM-ddTHH:mm");
     var PostExpiryDate = Model.PostExpiryDate.ToString("yyyy-MM-ddTHH:mm");
 }
@@ -106,7 +106,7 @@
                             <p>Once the event is created, these questions cannot be changed. Please take your time to choose the best ones!</p>
                             <ol>
                                 @for (int i = 0; i < Model.Questions.Count; i++)
-                                {   
+                                {
                                     <li class="question-item">
                                         <input type="hidden" name="Questions[]" value="@Model.Questions[@i]" />
                                         <a class="popup-action-button" href="javascript:void(0);" onclick="removeQuestion(this)">

@@ -4,6 +4,7 @@
     ViewData["ogTitle"] = Model.EventDetailCardData.EventTitle + " • Citlali";
     ViewData["ogDescription"] = Model.EventDetailCardData.EventDescription != null ? (Model.EventDetailCardData.EventDescription.Length > 100 ? Model.EventDetailCardData.EventDescription.Substring(0, 100) + "..." : Model.EventDetailCardData.EventDescription) : "";
     Model.EventFormDto.IsClosed = Model.IsClosed;
+    ViewData["Title"] = Model.EventDetailCardData.EventTitle;
 }
 
 @section head {

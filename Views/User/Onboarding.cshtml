@@ -4,6 +4,7 @@
     string userEmail = ViewBag.Email ?? "No email provided";
     string profileImageUrl = ViewBag.ProfileImageUrl ?? "";
     List<Tag> tags = ViewBag.Tags ?? new List<Tag>();
+    ViewData["Title"] = "Onboarding";
 }
 
 @section head{
@@ -42,15 +43,15 @@
                     </div>
                     <div class="form-group">
                         <label for="Username" class="required">Username</label>
-                        <input asp-for="Username" class="form-control" id="Username" required 
-                            pattern="^[A-Za-z][A-Za-z0-9_]{3,29}$" 
+                        <input asp-for="Username" class="form-control" id="Username" required
+                            pattern="^[A-Za-z][A-Za-z0-9_]{3,29}$"
                             title="Username can only contain letters, numbers and underscores" />
                         <span asp-validation-for="Username" class="text-danger"></span>
                     </div>
 
                     <div class="form-group">
                         <label for="DisplayName" class="required">Display Name</label>
-                        <input asp-for="DisplayName" class="form-control" id="DisplayName" required 
+                        <input asp-for="DisplayName" class="form-control" id="DisplayName" required
                             minlength="2" maxlength="50"
                             title="Display name must be between 2-50 characters" />
                         <span asp-validation-for="DisplayName" class="text-danger"></span>
