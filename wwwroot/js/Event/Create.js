@@ -61,13 +61,38 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Add custom validators
     addCustomValidators();
+
+    const fcfsCheckbox = document.querySelector('.fcfs input[type="checkbox"]');
+    if (fcfsCheckbox) {
+        // Make sure the toggle works correctly by adding direct event listeners
+        fcfsCheckbox.addEventListener('change', function() {
+            // No need to update hidden inputs - ASP.NET will handle this automatically
+        });
+
+        // Add click handler for the parent label to prevent click blocking
+        const slideBtn = document.querySelector('.slide-btn');
+        if (slideBtn) {
+            slideBtn.addEventListener('click', function(e) {
+                // Prevent default only if clicking directly on the label (not the checkbox)
+                if (e.target !== fcfsCheckbox) {
+                    e.preventDefault();
+                    // Toggle checkbox state
+                    fcfsCheckbox.checked = !fcfsCheckbox.checked;
+                    // Trigger change event
+                    fcfsCheckbox.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+    }
+
+
 });
 
 // Form validation setup
 function setupFormValidation() {
     // Get all form inputs, textareas and selects
-    const formElements = document.querySelectorAll('input:not([type="hidden"]), textarea, select');
-    
+    const formElements = document.querySelector('#create-event-form').querySelectorAll('input:not([type="hidden"]):not([id="FirstComeFirstServed"]), textarea, select');
+
     // Add blur (focus lost) event listener to each form element
     formElements.forEach(element => {
         element.addEventListener('blur', function() {
@@ -95,7 +120,7 @@ function setupFormValidation() {
     });
     
     // Add form submit handler
-    const form = document.querySelector('form');
+    const form = document.querySelector('#create-event-form');
     if (form) {
         form.addEventListener('submit', function(e) {
             // Mark all fields as touched
@@ -108,22 +133,11 @@ function setupFormValidation() {
             if (!isFormValid()) {
                 e.preventDefault();
                 
-                // Show validation summary
-                showValidationSummary();
-                
                 // Scroll to the first invalid field
                 const firstInvalid = document.querySelector('.touched:invalid');
                 if (firstInvalid) {
                     firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     firstInvalid.focus();
-                }
-            } else {
-                // Check for at least one question (if questions are required)
-                const questions = document.querySelectorAll('input[name="Questions[]"]');
-                if (questions.length === 0) {
-                    e.preventDefault();
-                    showFieldError(document.getElementById('new-question'), 'Please add at least one question for participants');
-                    document.getElementById('new-question').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }
         });
@@ -182,46 +196,6 @@ function showFieldError(field, message) {
 function isFormValid() {
     const invalidFields = document.querySelectorAll('.touched:invalid');
     return invalidFields.length === 0;
-}
-
-// Show validation summary at top of form
-function showValidationSummary() {
-    // Remove existing summary if present
-    const existingSummary = document.querySelector('.validation-summary-errors');
-    if (existingSummary) {
-        existingSummary.remove();
-    }
-    
-    // Get all invalid fields
-    const invalidFields = document.querySelectorAll('.touched:invalid');
-    if (invalidFields.length === 0) return;
-    
-    // Create summary element
-    const summary = document.createElement('div');
-    summary.className = 'validation-summary-errors';
-    
-    // Create title and list
-    const title = document.createElement('p');
-    title.textContent = 'Please fix the following errors:';
-    summary.appendChild(title);
-    
-    const list = document.createElement('ul');
-    invalidFields.forEach(field => {
-        const item = document.createElement('li');
-        
-        // Get field label text
-        const labelElement = document.querySelector(`label[for="${field.id}"]`);
-        const fieldName = labelElement ? labelElement.textContent.replace(' *', '') : field.name;
-        
-        item.textContent = `${fieldName}: ${field.validationMessage || 'Invalid value'}`;
-        list.appendChild(item);
-    });
-    
-    summary.appendChild(list);
-    
-    // Insert at top of form
-    const form = document.querySelector('form');
-    form.insertBefore(summary, form.firstChild);
 }
 
 // Remove Question functionality

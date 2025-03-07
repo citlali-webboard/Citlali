@@ -1,7 +1,7 @@
 @model Citlali.Models.EventManagementViewModel
 
 @{
-    ViewData["Title"] = Model.EventTitle;
+    ViewData["Title"] = $"Manage {Model.EventTitle}";
 
     var eventDetailCardData = new Citlali.Models.EventDetailCardData
     {
@@ -70,7 +70,7 @@
                                 }
                             </div>
                         </div>
-                        
+
                         <div class="popup-info">
                             <div class="form-group">
                                 <input type="hidden" name="eventId" value="@Model.EventId" />
@@ -176,7 +176,7 @@
             <div class="registered-participants">
                 <h3>🛫 Registered Participants (@totalRegisteredParticipant) </h3>
                 <description>The following individuals have requested to participate in your event. Please take the time to review their responses to your questions.</description>
-                
+
                 <div class="participant-controls">
                     <div class="participant-control-button-container">
 
@@ -197,7 +197,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="participant-sort">
                             <button class="sort-button" id="sort-button">
                                 <span>Registration (Newest first)</span>
@@ -217,9 +217,9 @@
                         </span>
                         <input type="text" id="participant-search" placeholder="Search participants..." />
                     </div>
-                    
+
                 </div>
-                
+
                 @if (Model.AnswerSet.Count > 0)
                 {
                     <div class="registrants-container">
@@ -228,8 +228,8 @@
                             var collapseId = "collapse_" + participant.User.UserId; // Unique ID for each dropdown
                             var participantTime = participant.RegistrationTime;
 
-                            <div class="registrant-card" 
-                                data-name="@participant.User.DisplayName.ToLower() @participant.User.Username.ToLower()" 
+                            <div class="registrant-card"
+                                data-name="@participant.User.DisplayName.ToLower() @participant.User.Username.ToLower()"
                                 data-status="@participant.Status"
                                 data-date="@participantTime.ToString("yyyy-MM-ddTHH:mm:ss")">
                                 <div class="registrant-header" onclick="toggleDropdown('@collapseId')">
@@ -309,12 +309,12 @@
                     <p class="text-muted">No participants have registered yet.</p>
                 }
             </div>
-            
+
             <!-- Invited Participants -->
             <div class="selected-participants">
                 <h3>Invited participants (@totalInvitedParticipant/@Model.MaxParticipant) 💌</h3>
                 <description>These are people your have been selected and invited.</description>
-                
+
                 <!-- Confirmed Participants -->
                 <div class="confirmed-participants">
                     <div class="confirm-text-header">
@@ -322,7 +322,7 @@
                         <button onclick="openBroadcastPopup()" class="action-button">
                             <span>
                                 @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
-                            </span> 
+                            </span>
                             <span>
                                 Broadcast
                             </span>
@@ -343,7 +343,7 @@
                         }
                     </div>
                 </div>
-                
+
                 <!-- Awaiting Confirmation -->
                 <div class="await-confirmation">
                     <h4>📨 Awaiting Confirmation (@awaitingConfirmationParticipantCount)</h4>
@@ -362,7 +362,7 @@
                         }
                     </div>
                 </div>
-                
+
                 <!-- Rejected Invitation -->
                 <div class="rejected-invitation">
                     <h4>❌ Rejected Invitation (@rejectedConfirmationParticipantCount)</h4>

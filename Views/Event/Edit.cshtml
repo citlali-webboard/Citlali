@@ -2,33 +2,33 @@
 
 @section head {
     <link rel="stylesheet" href="~/css/Event/Edit.css" asp-append-version="true" />
+    <script src="~/js/Event/Edit.js" asp-append-version="true"></script>
 }
 
 @{
-    ViewData["Title"] = "Edit Event";
+    ViewData["Title"] = $"Edit {Model.EventTitle}";
 }
 
 <div class="window">
     <div class="content">
-        <a href="/event/manage/@Model.EventId" class="action-button"
-            onclick="return confirm('Are you sure you want to go back? Unsaved changes will be lost.');">
+        <a href="/event/manage/@Model.EventId" class="action-button">
             @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.ArrowLeft>>(RenderMode.ServerPrerendered,
                         new { Color = Color.Neutral }))
             Back to manage
         </a>
         <h2>Edit your event ✏️</h2>
         <p>Update your event details below to ensure everything is accurate and up-to-date.</p>
-        <form asp-action="EditEvent" asp-route-eventId="@Model.EventId" method="post" enctype="multipart/form-data">
+        <form asp-action="EditEvent" asp-route-eventId="@Model.EventId" method="post" enctype="multipart/form-data" id="edit-event-form">
             <input type="hidden" asp-for="EventId" />
             <div class="header">
                 <div class="form-group" id="eventTitle">
-                    <label for="EventTitle">Event Title</label>
-                    <input asp-for="EventTitle" class="form-control" />
+                    <label for="EventTitle" class="required">Event Title</label>
+                    <input asp-for="EventTitle" class="form-control" required data-msg-required="Event title is required" />
                     <span asp-validation-for="EventTitle" class="text-danger"></span>
                 </div>
                 <div class="form-group" id="eventTag">
-                    <label for="EventCategoryTagId">Event Tag</label>
-                    <select name="EventCategoryTagId" id="EventCategoryTagId" class="form-control">
+                    <label for="EventCategoryTagId" class="required">Event Tag</label>
+                    <select name="EventCategoryTagId" id="EventCategoryTagId" class="form-control" required>
                         <option value="" disabled>🎯 Select event category tag</option>
                         @foreach (var tag in Model.EventCategoryTagsList)
                         {
@@ -38,10 +38,11 @@
                             </option>
                         }
                     </select>
+                    <span asp-validation-for="EventCategoryTag" class="text-danger"></span>
                 </div>
                 <div class="form-group" id="eventLocation">
-                    <label for="EventLocationTagId">Location</label>
-                    <select name="EventLocationTagId" id="EventLocationTagId" class="form-control">
+                    <label for="EventLocationTagId" class="required">Location</label>
+                    <select name="EventLocationTagId" id="EventLocationTagId" class="form-control" required>
                         <option value="" disabled>📍 Select event location</option>
                         @foreach (var location in Model.LocationTagsList)
                         {
@@ -51,27 +52,30 @@
                             </option>
                         }
                     </select>
+                    <span asp-validation-for="EventLocationTag" class="text-danger"></span>
                 </div>
             </div>
             <div class="detail">
                 <div class="description">
                     <div class="form-group" id="eventDescription">
-                        <label for="EventDescription">Description</label>
-                        <textarea asp-for="EventDescription" class="form-control"></textarea>
+                        <label for="EventDescription" class="required">Description</label>
+                        <textarea asp-for="EventDescription" class="form-control" required></textarea>
                         <span asp-validation-for="EventDescription" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="meta-data">
                     <div class="form-group" id="eventDate">
-                        <label for="EventDate">Event Date</label>
+                        <label for="EventDate" class="required">Event Date</label>
                         <input asp-for="EventDate" class="form-control" id="EventDate" type="datetime-local"
-                            value="@Model.EventDate.ToString("yyyy-MM-ddTHH:mm")" />
+                            value="@Model.EventDate.ToString("yyyy-MM-ddTHH:mm")" required />
                         <span asp-validation-for="EventDate" class="text-danger"></span>
                     </div>
                     <div class="form-group" id="postExpiryDate">
-                        <label for="PostExpiryDate">Post Expiry Date</label>
+                        <label for="PostExpiryDate" class="required">Post Expiry Date</label>
                         <input asp-for="PostExpiryDate" class="form-control" id="PostExpiryDate" type="datetime-local"
-                            value="@Model.PostExpiryDate.ToString("yyyy-MM-ddTHH:mm")" />
+                            value="@Model.PostExpiryDate.ToString("yyyy-MM-ddTHH:mm")"
+                            data-original-date="@Model.PostExpiryDate.ToString("yyyy-MM-ddTHH:mm")"
+                            required />
                         <span asp-validation-for="PostExpiryDate" class="text-danger"></span>
                     </div>
                     <div class="participate-detail">
@@ -81,8 +85,8 @@
                             <span asp-validation-for="Cost" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label for="MaxParticipant">Max Participant (Current: @Model.CurrentParticipant)</label>
-                            <input asp-for="MaxParticipant" class="form-control" />
+                            <label for="MaxParticipant" class="required">Max Participant (Current: @Model.CurrentParticipant)</label>
+                            <input asp-for="MaxParticipant" class="form-control" required />
                             <span asp-validation-for="MaxParticipant" class="text-danger"></span>
                         </div>
                     </div>
@@ -103,7 +107,7 @@
                 <div class="question-list" id="question-list">
                     <div class="form-group">
                         <div class="added-question">
-        
+
                             <h5>Current questions</h5>
                             <p>These questions cannot be modified once the event is created.</p>
                             <ul>

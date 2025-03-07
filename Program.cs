@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.Mail;
 using System.Security;
+using Citlali.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,8 +45,9 @@ builder.Services.AddScoped<EventService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<UtilitiesService>();
 builder.Services.AddScoped<MailService>();
-builder.Services.AddTransient<RazorViewToStringRenderer>();
 builder.Services.AddScoped<AdminService>();
+builder.Services.AddScoped<OnboardingFilter>();
+builder.Services.AddTransient<RazorViewToStringRenderer>();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication()
@@ -73,6 +75,9 @@ builder.Services.AddAuthentication()
                                 {
                                     context.Token = accessToken;
                                     userService.CurrentSession = await supabaseClient.Auth.SetSession(accessToken, refreshToken);
+
+                                    if (userService.CurrentSession.AccessToken != null) context.Response.Cookies.Append(configuration.Jwt.AccessCookie, userService.CurrentSession.AccessToken);
+                                    if (userService.CurrentSession.RefreshToken != null) context.Response.Cookies.Append(configuration.Jwt.RefreshCookie, userService.CurrentSession.RefreshToken);
                                     // await supabaseClient.Auth.RefreshSession();
                                     // return Task.CompletedTask;
                                 }

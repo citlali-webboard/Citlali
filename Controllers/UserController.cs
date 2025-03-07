@@ -1,10 +1,8 @@
-using Supabase;
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Citlali.Models;
 using Citlali.Services;
+using Citlali.Filters;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components.Routing;
 
 namespace Citlali.Controllers;
 
@@ -26,6 +24,8 @@ public class UserController : Controller
         _configuration = configuration;
     }
 
+    [ServiceFilter(typeof(OnboardingFilter))]
+
     public async Task<IActionResult> Index()
     {
         var currentUser = _userService.CurrentSession.User;
@@ -40,12 +40,7 @@ public class UserController : Controller
             return RedirectToAction("explore", "event");
         }
 
-        var dbUser = await _userService.GetUserByUserId(Guid.Parse(userId));
-        if (dbUser == null)
-        {
-            return RedirectToAction("Onboarding");
-        }
-
+        var dbUser = await _userService.GetUserByUserId(Guid.Parse(userId)) ?? throw new GetUserException();
         var username = dbUser.Username;
 
         return RedirectToAction("Profile", new { username });
@@ -59,11 +54,6 @@ public class UserController : Controller
         if (currentUser == null)
         {
             return RedirectToAction("SignIn", "Auth");
-        }
-
-        if (!await _userService.RedirectToOnboarding())
-        {
-            return RedirectToAction("Index");
         }
 
         ViewBag.Email = currentUser.Email;
@@ -109,7 +99,7 @@ public class UserController : Controller
                 return RedirectToAction("Onboarding");
             }
 
-            HttpContext.Response.Cookies.Append("ProfileImageURL", userCreated.ProfileImageUrl, new CookieOptions
+            HttpContext.Response.Cookies.Append("ProfileImageUrl", userCreated.ProfileImageUrl, new CookieOptions
             {
                 HttpOnly = false,
                 Secure = true,
@@ -135,13 +125,14 @@ public class UserController : Controller
 
     [HttpGet("history")]
     [Authorize]
+    [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> History(string status = "all")
     {
         try {
             ViewData["SelectedStatus"] = status;
-            
+
             var historyList = await _eventService.GetHistory();
-            
+
             return View(historyList);
         }
         catch (UnauthorizedAccessException ex)
@@ -158,10 +149,11 @@ public class UserController : Controller
     }
 
     [HttpGet("{username}")]
+    [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> Profile(string username, int page = 1, string filter = null, string sort = "newest")
     {
         const int pageSize = 10;
-        
+
         var user = await _userService.GetUserByUsername(username);
         if (user == null)
         {
@@ -195,7 +187,7 @@ public class UserController : Controller
                 events = events.Where(e => e.Status == "closed" || e.PostExpiryDate <= DateTime.Now).ToList();
             }
         }
-        
+
         switch (sort)
         {
             case "oldest":
@@ -215,14 +207,14 @@ public class UserController : Controller
                 events = events.OrderByDescending(e => e.CreatedAt).ToList();
                 break;
         }
-        
+
         // Calculate total pages
         int totalEvents = events.Count;
         int totalPages = (int)Math.Ceiling(totalEvents / (double)pageSize);
-        
+
         // Ensure page is within valid range
         page = Math.Max(1, Math.Min(page, totalPages == 0 ? 1 : totalPages));
-        
+
         // Apply pagination
         events = events.Skip((page - 1) * pageSize).Take(pageSize).ToList();
         var userEventBriefCards = (await _eventService.EventsToBriefCardArray(events)).ToList();
@@ -252,6 +244,7 @@ public class UserController : Controller
 
     [HttpPost("edit")]
     [Authorize]
+    [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> ProfileEdit(UserOnboardingDto userOnboardingDto)
     {
         if (string.IsNullOrEmpty(userOnboardingDto.DisplayName))
@@ -259,7 +252,7 @@ public class UserController : Controller
             TempData["Error"] = "Display name is required.";
             return RedirectToAction("Index");
         }
-            
+
         var updatedUser = await _userService.EditUser(userOnboardingDto);
 
         Response.Cookies.Append("ProfileImageUrl", updatedUser.ProfileImageUrl, new CookieOptions
@@ -272,77 +265,108 @@ public class UserController : Controller
 
         return RedirectToAction("Index");
     }
-    
+
     [HttpPost("follow/{username}")]
     [Authorize]
+    [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> Follow(string username)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
-        if (currentUser == null)
-        {
-            return Unauthorized();
+        try {
+
+            var currentUser = _userService.CurrentSession.User;
+            if (currentUser == null)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            var userToFollow = await _userService.GetUserByUsername(username);
+            if (userToFollow == null)
+            {
+                TempData["Error"] = "User not found.";
+                return RedirectToAction("explore", "event");
+            }
+
+            var userId = currentUser.Id;
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            await _userService.FollowUser(Guid.Parse(userId), userToFollow.UserId);
+
+            var followersCount = await _userService.GetFollowersCount(userToFollow.UserId);
+            return Json(new { followersCount });
         }
-
-        var userToFollow = await _userService.GetUserByUsername(username);
-        if (userToFollow == null)
+        catch (UnauthorizedAccessException)
         {
-            return NotFound();
+            TempData["Error"] = "You must be logged in to follow users.";
+            return RedirectToAction("signin", "auth");
         }
-
-        var userId = currentUser.Id;
-        if (string.IsNullOrEmpty(userId))
+        catch (Exception ex)
         {
-            return Unauthorized();
+            _logger.LogError(ex, "Error following user");
+            return StatusCode(500, "Internal server error");
         }
-
-        await _userService.FollowUser(Guid.Parse(userId), userToFollow.UserId);
-
-        var followersCount = await _userService.GetFollowersCount(userToFollow.UserId);
-        return Json(new { followersCount });
     }
 
     [HttpPost("unfollow/{username}")]
     [Authorize]
+    [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> Unfollow(string username)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
-        if (currentUser == null)
+        try {
+            var currentUser = _userService.CurrentSession.User;
+            if (currentUser == null)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            var userToUnfollow = await _userService.GetUserByUsername(username);
+            if (userToUnfollow == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+            var userId = currentUser.Id;
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            await _userService.UnfollowUser(Guid.Parse(userId), userToUnfollow.UserId);
+
+            var followersCount = await _userService.GetFollowersCount(userToUnfollow.UserId);
+            return Json(new { followersCount });
+        } catch (UnauthorizedAccessException)
         {
-            return Unauthorized();
+            TempData["Error"] = "You must be logged in to unfollow users.";
+            return RedirectToAction("signin", "auth");
         }
-
-        var userToUnfollow = await _userService.GetUserByUsername(username);
-        if (userToUnfollow == null)
+        catch (Exception ex)
         {
-            return NotFound();
+            _logger.LogError(ex, "Error unfollowing user");
+            return StatusCode(500, "Internal server error");
         }
-
-        var userId = currentUser.Id;
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized();
-        }
-
-        await _userService.UnfollowUser(Guid.Parse(userId), userToUnfollow.UserId);
-
-        var followersCount = await _userService.GetFollowersCount(userToUnfollow.UserId);
-        return Json(new { followersCount });
     }
 
     [HttpPost("followTag/{tagId}")]
     [Authorize]
+    [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> FollowTag(Guid tagId)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
-        if (currentUser == null)
-        {
-            return Unauthorized();
-        }
+        try {
+            var currentUser = _userService.CurrentSession.User;
+            if (currentUser == null)
+            {
+                throw new UnauthorizedAccessException();
+            }
 
-        try
-        {
             var success = await _userService.FollowTag(tagId);
             return Json(new { success });
+        } catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "You must be logged in to follow tags.";
+            return RedirectToAction("signin", "auth");
         }
         catch (Exception ex)
         {
@@ -353,18 +377,22 @@ public class UserController : Controller
 
     [HttpPost("unfollowTag/{tagId}")]
     [Authorize]
+    [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> UnfollowTag(Guid tagId)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
-        if (currentUser == null)
-        {
-            return Unauthorized();
-        }
+        try {
+            var currentUser = _userService.CurrentSession.User;
+            if (currentUser == null)
+            {
+                throw new UnauthorizedAccessException();
+            }
 
-        try
-        {
             var success = await _userService.UnfollowTag(tagId);
             return Json(new { success });
+        } catch (UnauthorizedAccessException)
+        {
+            TempData["Error"] = "You must be logged in to follow tags.";
+            return RedirectToAction("signin", "auth");
         }
         catch (Exception ex)
         {
@@ -375,9 +403,10 @@ public class UserController : Controller
 
     [HttpGet("followedTags")]
     [Authorize]
+    [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> GetFollowedTags()
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
         {
             return Unauthorized();
@@ -389,9 +418,10 @@ public class UserController : Controller
 
     [HttpGet("isFollowingTag/{tagId}")]
     [Authorize]
+    [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> IsFollowingTag(Guid tagId)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
         {
             return Unauthorized();
@@ -403,13 +433,14 @@ public class UserController : Controller
 
     [HttpGet("follows")]
     [Authorize]
+    [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> Follows(string ActiveTab = "followers")
     {
         if (ActiveTab != "followers" && ActiveTab != "following")
         {
-            ActiveTab = "followers"; 
+            ActiveTab = "followers";
         }
-        
+
         ViewData["ActiveTab"] = ActiveTab;
 
         var currentUser = _userService.CurrentSession.User;
@@ -419,7 +450,7 @@ public class UserController : Controller
         }
 
         var user = await _userService.GetUserByUserId(Guid.Parse(currentUser.Id));
-        
+
         if (user != null)
         {
             return RedirectToAction("Follows", new { username = user.Username, ActiveTab });
@@ -429,13 +460,14 @@ public class UserController : Controller
     }
 
     [HttpGet("follows/{username}")]
+    [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> Follows(string username, string ActiveTab = "followers")
     {
         if (ActiveTab != "followers" && ActiveTab != "following")
         {
-            ActiveTab = "followers"; 
+            ActiveTab = "followers";
         }
-        
+
         ViewData["ActiveTab"] = ActiveTab;
 
         try {
@@ -480,9 +512,10 @@ public class UserController : Controller
 
     [HttpPost("removeFollower/{username}")]
     [Authorize]
+    [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> RemoveFollower(string username)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
         {
             return Unauthorized();

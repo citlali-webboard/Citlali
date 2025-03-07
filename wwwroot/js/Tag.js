@@ -42,11 +42,24 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = updateUrlParameter(window.location.href, 'sortBy', sortBy);
         });
     });
+
+    // Get the current URL and parameters
+    const url = new URL(window.location.href);
+    const sortBy = url.searchParams.get('sortBy');
+    
+    // Define valid sort options
+    const validSortOptions = ['newest', 'date', 'popularity'];
+    
+    // Check if sortBy parameter exists and is invalid
+    if (sortBy && !validSortOptions.includes(sortBy)) {
+        // Replace with default 'newest' and update URL without reloading the page
+        url.searchParams.set('sortBy', 'newest');
+        window.history.replaceState({}, '', url.toString());
+    }
 });
 
 // Helper function to toggle tag following
 function toggleFollowTag(tagId, shouldFollow) {
-    const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
     const followButton = document.getElementById('followButton');
 
     shouldFollow = shouldFollow === 'true' || shouldFollow === true;
@@ -56,12 +69,16 @@ function toggleFollowTag(tagId, shouldFollow) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'RequestVerificationToken': csrfToken
         },
     })
-    .then(response => response.json())
+    .then(response => {
+        if (response.redirected) {
+            window.location.href = response.url;
+            return;
+        }
+        return response.json();
+    })
     .then(data => {
-        console.log(data);
         if (data.success) {
             // Update UI
             if (shouldFollow) {
@@ -70,7 +87,6 @@ function toggleFollowTag(tagId, shouldFollow) {
             } else {
                 followButton.innerHTML = `<span class="icon-container"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></span><span>Follow</span>`;
                 followButton.classList.remove('following');
-                console.log('Unfollowed');
             }
             
             // Update follower count
@@ -93,5 +109,12 @@ function toggleFollowTag(tagId, shouldFollow) {
 function updateUrlParameter(url, param, value) {
     const urlObj = new URL(url);
     urlObj.searchParams.set(param, value);
+    // Only set valid sort options for sortBy parameter
+    if (param === 'sortBy') {
+        const validSortOptions = ['newest', 'date', 'popularity'];
+        if (!validSortOptions.includes(value)) {
+            value = 'newest';
+        }
+    }
     return urlObj.toString();
 }

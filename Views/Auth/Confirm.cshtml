@@ -8,6 +8,7 @@
 
 @{
   Layout= "_LayoutBase";
+  ViewData["Title"] = "Verify your email";
 }
 
 
@@ -18,6 +19,7 @@
     </span>
     <h2>Verification Needed</h2>
     <h3>Please enter the token that was sent to @Model.Email</h3>
+    <p>Note that the email might be sent to your spam inbox.</p>
     <form asp-action="Confirm" method="post" enctype="multipart/form-data">
       <div class="form-group" style="display: none;">
         <label for="Email">Email</label>

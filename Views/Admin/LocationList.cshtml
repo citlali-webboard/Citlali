@@ -5,6 +5,10 @@
   <script src="~/js/Admin/locationList.js" defer></script>
 }
 
+@{
+  ViewData["Title"] = "Manage Locations";
+}
+
 <div class="center-wrapper">
   <div class="content">
     <a href="/admin" class="back-btn">Back</a>
@@ -16,7 +20,7 @@
       <div class="card-header">
         <h2>Create New Location</h2>
       </div>
-      
+
       <form asp-action="LocationCreate" method="post" class="create-form">
         <div class="form-input-group">
           <div class="form-group tag-name-group" style="width: 100%">
@@ -40,7 +44,7 @@
         <h2>Existing Locations</h2>
         <span class="tag-count">@Model.Locations.Count() locations</span>
       </div>
-      
+
       <div class="tags-container">
         @foreach (var location in Model.Locations)
         {
@@ -82,19 +86,19 @@
 function confirmDelete(button) {
     // Store reference to the form
     currentForm = button.closest('form');
-    
+
     // Get location details to show in modal
     const tagItem = button.closest('.tag-item');
     const locationName = tagItem.querySelector('.tag-name').textContent;
-    
+
     // Update modal content
     const modal = document.getElementById('deleteModal');
     const modalMessage = modal.querySelector('p');
     modalMessage.innerHTML = `Are you sure you want to delete the location <strong>${locationName}</strong>? This action cannot be undone.`;
-    
+
     // Show modal
     modal.style.display = 'flex';
-    
+
     // Focus confirm button
     setTimeout(() => {
         modal.querySelector('.confirm-delete-btn').focus();

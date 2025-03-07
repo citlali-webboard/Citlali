@@ -8,11 +8,13 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using System.Runtime.InteropServices.Marshalling;
 using System.Net.WebSockets;
+using Citlali.Filters;
 
 
 namespace Citlali.Controllers;
 
 [Route("notification")]
+[ServiceFilter(typeof(OnboardingFilter))]
 public class NotificationController : Controller
 {
 
@@ -95,7 +97,7 @@ public class NotificationController : Controller
     {
         try
         {
-        
+
             await _notificationService.DeleteAllNotifications();
             return RedirectToAction("Index");
 

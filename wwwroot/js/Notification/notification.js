@@ -58,10 +58,27 @@ function handleDesktopClick() {
             var data = JSON.parse(xmlhttp.responseText);
 
             // Set details
-            document.querySelector("#content-title").innerHTML = data.title;
-            // document.querySelector("#content-body").innerHTML = data.message;
-            document.querySelector("#source-name").innerHTML = `<span style="font-weight: bold;">${data.sourceDisplayName}</span> (${data.sourceUsername})`;
-            document.querySelector("#create-at").href = data.createdAt;
+            // Safe DOM manipulation without innerHTML
+        const contentTitleElement = document.querySelector("#content-title");
+        contentTitleElement.textContent = ""; // Clear existing content
+        contentTitleElement.textContent = data.title;
+
+        const sourceNameElement = document.querySelector("#source-name");
+        sourceNameElement.textContent = ""; // Clear existing content
+
+        // Create the bold element for display name
+        const displayNameElement = document.createElement("span");
+        displayNameElement.textContent = data.sourceDisplayName;
+
+        // Add the display name element to the source name element
+        sourceNameElement.appendChild(displayNameElement);
+
+        // Add the username text
+        const usernameText = document.createTextNode(` (${data.sourceUsername})`);
+        sourceNameElement.appendChild(usernameText);
+
+        // Set the href attribute safely
+        document.querySelector("#create-at").href = encodeURI(data.createdAt);
 
             let source_img = document.querySelector("#source-img");
 
@@ -87,13 +104,13 @@ function handleDesktopClick() {
 
                     let titleElement = document.createElement("p");
                     titleElement.classList.add("title-over-card");
-                    titleElement.textContent = escapeHTML(data.title);
+                    titleElement.textContent = (data.title);
 
                     let messageElement = document.createElement("p");
-                    messageElement.textContent = escapeHTML(data.message);
+                    messageElement.textContent = (data.message);
 
                     let linkElement = document.createElement("a");
-                    linkElement.href = escapeHTML(preview_url);
+                    linkElement.href = (preview_url);
 
                     let previewCardElement = document.createElement("div");
                     previewCardElement.classList.add("preview-card");
@@ -106,13 +123,13 @@ function handleDesktopClick() {
                     previewCardTopicElement.classList.add("preview-card-topic");
 
                     let urlTitleElement = document.createElement("h1");
-                    urlTitleElement.textContent = escapeHTML(data.urlTitle);
+                    urlTitleElement.textContent = (data.urlTitle);
 
                     let urlDescriptionElement = document.createElement("p");
-                    urlDescriptionElement.textContent = escapeHTML(data.urlDescription);
+                    urlDescriptionElement.textContent = (data.urlDescription);
 
                     let previewLinkElement = document.createElement("a");
-                    previewLinkElement.href = escapeHTML(preview_url);
+                    previewLinkElement.href = (preview_url);
                     previewLinkElement.target = "";
 
                     let imageContainerElement = document.createElement("div");
@@ -121,7 +138,7 @@ function handleDesktopClick() {
                     imageContainerElement.style.marginTop = "10px";
 
                     let imageElement = document.createElement("img");
-                    imageElement.src = escapeHTML(data.urlImage);  // ใส่ URL รูปภาพ
+                    imageElement.src = (data.urlImage);  // ใส่ URL รูปภาพ
                     imageElement.style.maxWidth = "100%";
                     imageElement.style.height = "auto";
 
@@ -378,15 +395,7 @@ if (isMobile) {
 
 // ✅ ป้องกัน XSS โดย Escape HTML
 function escapeHTML(str) {
-    return str.replace(/[&<>"']/g, function (match) {
-        return {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#039;"
-        }[match];
-    });
+    return str 
 }
 
 function encodeURL(url) {

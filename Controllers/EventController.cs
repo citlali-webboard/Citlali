@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using System.Runtime.InteropServices.Marshalling;
+using Citlali.Filters;
 
 namespace Citlali.Controllers;
 
 [Route("event")]
+[ServiceFilter(typeof(OnboardingFilter))]
 public class EventController : Controller
 {
     private readonly ILogger<EventController> _logger;
@@ -130,7 +132,7 @@ public class EventController : Controller
             await _eventService.EditEvent(Guid.Parse(eventId), createEventViewModel);
             return RedirectToAction("detail", new { id = eventId });
         }
-        catch (UnauthorizedAccessException) 
+        catch (UnauthorizedAccessException)
         {
             TempData["Error"] = "You are not authorized to edit this event";
             return RedirectToAction("explore");
@@ -328,6 +330,8 @@ public class EventController : Controller
     {
         try
         {
+            // Validate the sortBy parameter using the service method
+            sortBy = _eventService.ValidateSortBy(sortBy);
             // Store sortBy in ViewBag for active button highlighting
             ViewBag.SortBy = sortBy;
 
@@ -337,6 +341,7 @@ public class EventController : Controller
             var eventsTrendingTask = _eventService.GetTrendingEvents();
             var popularTagsTask = _eventService.GetPopularTags();
             var superstarsTask = _userService.GetSuperstars();
+            var locationsTask =  _eventService.GetLocationTags();
 
             await Task.WhenAll(eventsTask, eventsCountTask, tagsTask, eventsTrendingTask,  popularTagsTask, superstarsTask);
 
@@ -346,9 +351,9 @@ public class EventController : Controller
             var eventsTrending = (await eventsTrendingTask).ToArray();
             var popularTags = (await popularTagsTask).ToArray();
             var superstars = (await superstarsTask).ToArray();
+            var locations = (await locationsTask).ToArray();
 
             var briefCardDatas = await _eventService.EventsToBriefCardArray(events);
-            var locations = (await _eventService.GetLocationTags()).ToArray();
 
             var model = new EventExploreViewModel
             {
@@ -382,6 +387,8 @@ public class EventController : Controller
                 throw new Exception("Invalid Tag id");
             }
 
+            // Validate the sortBy parameter using the service method
+            sortBy = _eventService.ValidateSortBy(sortBy);
             ViewBag.SortBy = sortBy;
 
             var eventsTask = _eventService.GetEventsByTagId(tagId);
@@ -411,14 +418,14 @@ public class EventController : Controller
                     break;
                 case "popularity":
                     var eventCountPairs = new List<(Event Event, int Count)>();
-                    var registrationCountTasks = events.Select(ev => 
+                    var registrationCountTasks = events.Select(ev =>
                         Task.Run(async () => {
                             var count = await _eventService.GetRegistrationCountByEventId(ev.EventId);
                             return (ev, count);
                         })).ToArray();
-                    
+
                     var eventWithCounts = await Task.WhenAll(registrationCountTasks);
-                    
+
                     events = eventWithCounts
                         .OrderByDescending(p => p.count)
                         .Select(p => p.ev)
@@ -433,7 +440,7 @@ public class EventController : Controller
             var paginatedEvents = events.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
 
             var eventDataTasks = new Task<EventBriefCardData>[paginatedEvents.Length];
-            
+
             for (int i = 0; i < paginatedEvents.Length; i++)
             {
                 var ev = paginatedEvents[i];
@@ -486,6 +493,8 @@ public class EventController : Controller
                 throw new Exception("Invalid Location id");
             }
 
+            // Validate the sortBy parameter using the service method
+            sortBy = _eventService.ValidateSortBy(sortBy);
             ViewBag.SortBy = sortBy;
 
             // Create tasks for parallel execution of independent queries
@@ -511,14 +520,14 @@ public class EventController : Controller
                     events = events.OrderBy(e => e.EventDate).ToList();
                     break;
                 case "popularity":
-                    var registrationCountTasks = events.Select(ev => 
+                    var registrationCountTasks = events.Select(ev =>
                         Task.Run(async () => {
                             var count = await _eventService.GetRegistrationCountByEventId(ev.EventId);
                             return (ev, count);
                         })).ToArray();
-                    
+
                     var eventWithCounts = await Task.WhenAll(registrationCountTasks);
-                    
+
                     events = eventWithCounts
                         .OrderByDescending(p => p.count)
                         .Select(p => p.ev)
@@ -533,7 +542,7 @@ public class EventController : Controller
             var paginatedEvents = events.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
 
             var eventDataTasks = new Task<EventBriefCardData>[paginatedEvents.Length];
-            
+
             for (int i = 0; i < paginatedEvents.Length; i++)
             {
                 var ev = paginatedEvents[i];
@@ -872,15 +881,17 @@ public class EventController : Controller
     {
         try
         {
+            // Validate the sortBy parameter using the service method
+            sortBy = _eventService.ValidateSortBy(sortBy);
             ViewBag.SortBy = sortBy;
 
             if (_userService.CurrentSession.User == null || string.IsNullOrEmpty(_userService.CurrentSession.User.Id))
             {
                 return RedirectToAction("SignIn", "Auth");
             }
-            
+
             var userId = Guid.Parse(_userService.CurrentSession.User.Id);
-            
+
             // Start all independent queries in parallel for better performance
             var followedTagsTask = _userService.GetFollowedTags(userId.ToString());
             var followedUsersTask = _userService.GetFollowingUsers(userId);
@@ -890,8 +901,8 @@ public class EventController : Controller
             var hasFollowedUsersTask = _userService.GetFollowingCount(userId).ContinueWith(t => t.Result > 0);
 
             // Wait for all initial tasks to complete
-            await Task.WhenAll(followedTagsTask, tagsTask, eventsTask, locationsTask, hasFollowedUsersTask, followedUsersTask);            
-            
+            await Task.WhenAll(followedTagsTask, tagsTask, eventsTask, locationsTask, hasFollowedUsersTask, followedUsersTask);
+
             var followedTags = await followedTagsTask;
             var tags = (await tagsTask).ToArray();
             var locations = await locationsTask;
@@ -899,7 +910,7 @@ public class EventController : Controller
             bool hasFollowedTags = followedTags != null && followedTags.Count > 0;
             bool hasFollowedUsers = await hasFollowedUsersTask;
             var followedUsers = await followedUsersTask;
-            
+
             // If no events found, return early with empty data
             if (events.Count == 0)
             {
@@ -919,7 +930,7 @@ public class EventController : Controller
                     }
                 });
             }
-            
+
             // Apply sorting based on user preference
             switch (sortBy)
             {
@@ -931,7 +942,7 @@ public class EventController : Controller
                         var count = await _eventService.GetRegistrationCountByEventId(ev.EventId);
                         return (ev, count);
                     }).ToList();
-                    
+
                     var eventWithCounts = await Task.WhenAll(popularityCountTasks);
 
                     events = eventWithCounts
@@ -948,30 +959,30 @@ public class EventController : Controller
                     events = events.OrderByDescending(e => e.CreatedAt).ToList();
                     break;
             }
-            
+
             // Apply pagination after sorting
             var totalCount = events.Count;
             var paginatedEvents = events
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToArray();
-            
+
             // Create a list to store all tasks for event card processing
             var processingTasks = new List<Task>();
             var eventCards = new EventBriefCardData[paginatedEvents.Length];
-            
+
             // Process each event in parallel to build card data
             for (int i = 0; i < paginatedEvents.Length; i++)
             {
                 var ev = paginatedEvents[i];
                 var index = i;
-                
+
                 // Start all data fetching tasks for this event in parallel
                 var creatorTask = _userService.GetUserByUserId(ev.CreatorUserId);
                 var locationTagTask = _eventService.GetLocationTagById(ev.EventLocationTagId);
                 var categoryTagTask = _eventService.GetTagById(ev.EventCategoryTagId);
                 var participantCountTask = _eventService.GetRegistrationCountByEventId(ev.EventId);
-                
+
                 // Create a task that will await all the data and build the card
                 var cardTask = Task.WhenAll(creatorTask, locationTagTask, categoryTagTask, participantCountTask)
                     .ContinueWith(_ => {
@@ -981,11 +992,11 @@ public class EventController : Controller
                             DisplayName = "Unknown User",
                             ProfileImageUrl = "/images/default-profile.png"
                         };
-                        
+
                         var locationTag = locationTagTask.Result ?? new LocationTag();
                         var categoryTag = categoryTagTask.Result ?? new EventCategoryTag();
                         var participantCount = participantCountTask.Result;
-                        
+
                         // Create the card data
                         eventCards[index] = new EventBriefCardData
                         {
@@ -1004,10 +1015,10 @@ public class EventController : Controller
                             CreatedAt = ev.CreatedAt,
                         };
                     });
-                    
+
                 processingTasks.Add(cardTask);
             }
-            
+
             await Task.WhenAll(processingTasks);
 
             var model = new FollowedExploreViewModel
@@ -1036,5 +1047,5 @@ public class EventController : Controller
         }
     }
 
-    
+
 }

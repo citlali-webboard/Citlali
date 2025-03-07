@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 async function toggleFollow(username, shouldFollow) {
-
     shouldFollow = shouldFollow === true || shouldFollow === 'true';
 
     const url = shouldFollow ? `/user/follow/${username}` : `/user/unfollow/${username}`;
@@ -38,11 +37,15 @@ async function toggleFollow(username, shouldFollow) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
         }
     });
 
     if (response.ok) {
+        if (response.redirected === true) {
+            window.location.href = response.url;
+            return;
+        }
+
         const result = await response.json();
         const followButton = document.getElementById('follow-button');
         const followersCountElement = document.querySelector('.followers-count');

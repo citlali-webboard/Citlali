@@ -1,10 +1,11 @@
 #toasts {
   position: fixed;
-  right: 0.5rem;
-  top: var(--navbar-size);
+  right: 0;
+  bottom: 0;
+  padding: 0.5rem;
 
-  width: 50%;
-  max-width: 320px;
+  width: 100%;
+  max-width: 480px;
   z-index: 999;
 }
 
@@ -17,12 +18,17 @@
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
 }
 
+.toast > div {
+  width: 100%;
+  overflow: hidden;
+}
+
 .toast-title {
   font-size: 1.25rem;
   font-weight: 600;
   display: inline-block;
 
-  width: 100%;
+  width: calc(100% - 16px);
 }
 
 .toast-close-button {
@@ -31,7 +37,11 @@
   right: 1rem;
 }
 
-.toast-style-neutral .toast-description {
+.toast-style-destructive .toast-description {
+  white-space: unset;
+}
+
+.toast-description {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;

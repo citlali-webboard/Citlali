@@ -59,7 +59,7 @@ public class UserService
     {
         try
         {
-            var supabaseUser = _supabaseClient.Auth.CurrentUser;
+            var supabaseUser = CurrentSession.User;
             string profileImageUrl = _configuration.User.DefaultProfileImage;
 
             if (supabaseUser?.Id == null)
@@ -304,7 +304,7 @@ public class UserService
 
     public async Task<bool> UnfollowTag(Guid tagId)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = CurrentSession.User;
         if (currentUser == null || currentUser.Id == null)
         {
             throw new UnauthorizedAccessException("User is not authenticated.");
@@ -332,7 +332,7 @@ public class UserService
 
     public async Task<bool> IsFollowingTag(Guid tagId)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = CurrentSession.User;
         if (currentUser == null || currentUser.Id == null)
         {
             return false; // User not authenticated, can't be following
@@ -638,7 +638,7 @@ public class UserService
         var followings = await _supabaseClient.From<UserFollowed>()
             .Where(f => f.FollowerUserId == followerId && f.FollowedUserId == userId)
             .Get();
-        
+
         if (followings.Models.Any())
         {
             await _supabaseClient.From<UserFollowed>().Delete(followings.Models.First());

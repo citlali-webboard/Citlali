@@ -20,11 +20,7 @@ public class NotificationService(Client supabaseClient, UserService userService,
 
     public string EscapeInput(string input)
     {
-        return input.Replace("&", "&amp;")
-            .Replace("<", "&lt;")
-            .Replace(">", "&gt;")
-            .Replace("\"", "&quot;");
-        // .Replace("'", "&#039;");
+        return input;
     }
 
     public async Task<List<NotificationModel>> GetNotifications()
@@ -347,6 +343,10 @@ public class NotificationService(Client supabaseClient, UserService userService,
             WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             var tokens = Encoding.UTF8.GetString(buffer, 0, result.Count).Split(";", 2);
 
+            if (tokens.Length != 2) {
+                await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, result.CloseStatusDescription, CancellationToken.None);
+                return;
+            }
             _userService.CurrentSession = await _supabaseClient.Auth.SetSession(tokens[0], tokens[1]);
             var userId = Guid.Parse(_userService.CurrentSession.User?.Id ?? throw new Exception("User ID is not found"));
 
@@ -373,10 +373,7 @@ public class NotificationService(Client supabaseClient, UserService userService,
 
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    if (result.CloseStatus.HasValue)
-                    {
-                        await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-                    }
+                    await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, result.CloseStatusDescription, CancellationToken.None);
                     realtimeChannel.Unsubscribe();
                 }
             }

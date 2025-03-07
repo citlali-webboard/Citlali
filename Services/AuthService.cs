@@ -27,9 +27,9 @@ public class AuthService(Supabase.Client supabaseClient, IConfiguration configur
 
                 throw new Exception(msgError);
             }
-            catch
+            catch (JsonException JsonException)
             {
-                throw new Exception(e.Message);
+                throw new Exception(JsonException.Message);
             }
         }
     }
@@ -51,9 +51,9 @@ public class AuthService(Supabase.Client supabaseClient, IConfiguration configur
 
                 throw new Exception(msgError);
             }
-            catch
+            catch (JsonException JsonException)
             {
-                throw new Exception(e.Message);
+                throw new Exception(JsonException.Message);
             }
         }
     }
@@ -78,9 +78,9 @@ public class AuthService(Supabase.Client supabaseClient, IConfiguration configur
 
                 throw new Exception(msgError);
             }
-            catch
+            catch (JsonException JsonException)
             {
-                throw new Exception(e.Message);
+                throw new Exception(JsonException.Message);
             }
         }
     }
@@ -105,9 +105,9 @@ public class AuthService(Supabase.Client supabaseClient, IConfiguration configur
 
                 throw new Exception(msgError);
             }
-            catch
+            catch (JsonException JsonException)
             {
-                throw new Exception(e.Message);
+                throw new Exception(JsonException.Message);
             }
         }
     }
@@ -129,9 +129,9 @@ public class AuthService(Supabase.Client supabaseClient, IConfiguration configur
 
                 throw new Exception(msgError);
             }
-            catch
+            catch (JsonException JsonException)
             {
-                throw new Exception(e.Message);
+                throw new Exception(JsonException.Message);
             }
         }
     }

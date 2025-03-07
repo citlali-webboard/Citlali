@@ -109,7 +109,7 @@
                         }
 
                         <!-- More indicator if needed -->
-                        @if (Model.UserFollowingContents.User.Count + Model.UserFollowingContents.Tags.Count > 7)
+                        @if (Model.UserFollowingContents.User.Count > 4 || Model.UserFollowingContents.Tags.Count > 3)
                         {
                             <a href="/user/follows/?ActiveTab=following">
                                 <div class="following-circle more-circle" title="More following">
@@ -152,17 +152,17 @@
             <div class="pagination">
                 @if (Model.CurrentPage > 1)
                 {
-                    <a href="@Url.Action("Tag", new { page = Model.CurrentPage - 1, sortBy = ViewBag.SortBy })" class="pagination-link">Previous</a>
+                    <a href="@Url.Action("followed", new { page = Model.CurrentPage - 1, sortBy = ViewBag.SortBy })" class="pagination-link">Previous</a>
                 }
 
                 @for (var i = 1; i <= Model.TotalPage; i++)
                 {
-                    <a href="@Url.Action("Tag", new { page = i, sortBy = ViewBag.SortBy })" class="@(i == Model.CurrentPage ? "pagination-current-page" : "pagination-link")">@i</a>
+                    <a href="@Url.Action("followed", new { page = i, sortBy = ViewBag.SortBy })" class="@(i == Model.CurrentPage ? "pagination-current-page" : "pagination-link")">@i</a>
                 }
 
                 @if (Model.CurrentPage < Model.TotalPage)
                 {
-                    <a href="@Url.Action("Tag", new { page = Model.CurrentPage + 1, sortBy = ViewBag.SortBy })" class="pagination-link">Next</a>
+                    <a href="@Url.Action("followed", new { page = Model.CurrentPage + 1, sortBy = ViewBag.SortBy })" class="pagination-link">Next</a>
                 }
             </div>
         }
