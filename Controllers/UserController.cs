@@ -227,6 +227,7 @@ public class UserController : Controller
             ProfileImageUrl = user.ProfileImageUrl,
             DisplayName = user.DisplayName,
             UserBio = user.UserBio,
+            TotalEventsCount = totalEvents,
             FollowingCount = followingCount,
             FollowersCount = followersCount,
             IsCurrentUser = isCurrentUser,
@@ -273,7 +274,7 @@ public class UserController : Controller
     {
         try {
 
-            var currentUser = _supabaseClient.Auth.CurrentUser;
+            var currentUser = _userService.CurrentSession.User;
             if (currentUser == null)
             {
                 throw new UnauthorizedAccessException();
@@ -406,7 +407,7 @@ public class UserController : Controller
     [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> GetFollowedTags()
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
         {
             return Unauthorized();
@@ -421,7 +422,7 @@ public class UserController : Controller
     [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> IsFollowingTag(Guid tagId)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
         {
             return Unauthorized();
@@ -515,7 +516,7 @@ public class UserController : Controller
     [ServiceFilter(typeof(OnboardingFilter))]
     public async Task<IActionResult> RemoveFollower(string username)
     {
-        var currentUser = _supabaseClient.Auth.CurrentUser;
+        var currentUser = _userService.CurrentSession.User;
         if (currentUser == null)
         {
             return Unauthorized();

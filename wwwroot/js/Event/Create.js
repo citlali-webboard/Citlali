@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // Form validation setup
 function setupFormValidation() {
     // Get all form inputs, textareas and selects
-    const formElements = document.querySelector('#create-event-form').querySelectorAll('input:not([type="hidden"]), textarea, select');
+    const formElements = document.querySelector('#create-event-form').querySelectorAll('input:not([type="hidden"]):not([id="FirstComeFirstServed"]), textarea, select');
 
     // Add blur (focus lost) event listener to each form element
     formElements.forEach(element => {
@@ -138,14 +138,6 @@ function setupFormValidation() {
                 if (firstInvalid) {
                     firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     firstInvalid.focus();
-                }
-            } else {
-                // Check for at least one question (if questions are required)
-                const questions = document.querySelectorAll('input[name="Questions[]"]');
-                if (questions.length === 0) {
-                    e.preventDefault();
-                    showFieldError(document.getElementById('new-question'), 'Please add at least one question for participants');
-                    document.getElementById('new-question').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }
         });
