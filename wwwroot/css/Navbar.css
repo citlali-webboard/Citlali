@@ -209,6 +209,7 @@ body nav ul .nav-group .logo p {
 
 .mobile-nav-toggle {
     display: none;
+    position: relative;
     flex-direction: column;
     justify-content: space-between;
     width: 100%;
@@ -288,7 +289,7 @@ body nav ul .nav-group .logo p {
         align-items: center;
         padding: 1rem 0;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        
+
         /* Hide by default */
         transform: translateY(-100%);
         opacity: 0;
@@ -328,7 +329,7 @@ body nav ul .nav-group .logo p {
         padding: 0;
         margin: 0;
     }
-    
+
     /* Navigation items */
     .nav-item {
         width: 100%;
