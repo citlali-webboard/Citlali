@@ -145,6 +145,7 @@ public class EventExploreViewModel
     public EventBriefCardData[] TrendingEvents = [new()];
     public PopularTag[] PopularTags = [new()];
     public PopularUser[] Superstars = [new()];
+    public List<string> SliderImages = [];
 }
 
 public class TagEventExploreViewModel : EventExploreViewModel
@@ -280,7 +281,7 @@ public class Registration : BaseModel
 
     [Column("UpdatedAt")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    
+
 }
 
 [Table("REGISTRATION_ANSWER")]
@@ -303,7 +304,7 @@ public class RegistrationAnswer : BaseModel
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
 
-public class EventManagementViewModel : EventBriefCardData 
+public class EventManagementViewModel : EventBriefCardData
 {
     public List<QuestionViewModel> Questions { get; set; } = [];
     public List<EventManagementAnswerCollection> AnswerSet { get; set; } = [];

@@ -9,19 +9,7 @@
     ViewData["Title"] = "Explore";
 
     var random = new Random();
-    var imageUrls = new List<string>
-    {
-        "https://citlali-supabase.code4.dad/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/image-slider/banner1.avif",
-        "https://citlali-supabase.code4.dad/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/image-slider/banner2.avif",
-        "https://citlali-supabase.code4.dad/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/image-slider/banner3.avif",
-        "https://citlali-supabase.code4.dad/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/image-slider/banner4.avif",
-        "https://citlali-supabase.code4.dad/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/image-slider/banner5.avif",
-        "https://citlali-supabase.code4.dad/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/image-slider/banner6.avif",
-        "https://citlali-supabase.code4.dad/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/image-slider/banner7.avif",
-        "https://citlali-supabase.code4.dad/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/image-slider/banner8.avif",
-
-    }.OrderBy(x => random.Next()).ToList();
-
+    var imageUrls = Model.SliderImages.OrderBy(x => random.Next());
     var imageSlider = new Citlali.Models.ImageSliderModel
     {
         Images = imageUrls.Select(url => new Citlali.Models.ImageSliderItem

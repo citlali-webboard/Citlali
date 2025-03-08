@@ -1596,10 +1596,30 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
     {
         // List of valid sort options
         string[] validSortOptions = { "newest", "date", "popularity" };
-        
+
         // Return the input if it's valid, otherwise return default "newest"
         return validSortOptions.Contains(sortBy) ? sortBy : "newest";
     }
+
+    public async Task<List<string>> GetExploreSliderImages()
+    {
+        var bucket = _configuration.User.ProfileImageBucket;
+        var path = "public/image-slider";
+        var localUrl = _configuration.Supabase.LocalUrl;
+        var publicUrl = _configuration.Supabase.PublicUrl;
+        try
+        {
+            var files = await _supabaseClient.Storage.From(bucket).List(path);
+            var urls = files?.ConvertAll(file => _supabaseClient.Storage.From(bucket).GetPublicUrl($"{path}/{file.Name}").Replace(localUrl, publicUrl));
+            return urls ?? [];
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting slider images: {ex.Message}");
+            return [];
+        }
+    }
+
 
 }
 

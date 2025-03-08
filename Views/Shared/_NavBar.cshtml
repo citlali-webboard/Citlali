@@ -10,7 +10,6 @@
         profileImageUrl = "https://citlali-supabase.code4.dad/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.webp";
     }
     var timestamp = DateTime.Now.Ticks;
-    profileImageUrl = $"{profileImageUrl}?v={timestamp}";
 }
 
 <link rel="stylesheet" href="~/css/NavBar.css" asp-append-version="true" />
@@ -126,7 +125,7 @@
     // Function to handle mobile element positioning
     function handleMobileLayout() {
       const windowWidth = window.innerWidth;
-      
+
       // Mobile breakpoint
       if (windowWidth <= 1000 && !isMobile) {
         // Move auth section after about link in mobile view
@@ -134,7 +133,7 @@
           navLinks.insertBefore(authSection, aboutLink.nextSibling);
         }
         isMobile = true;
-      } 
+      }
       // Desktop breakpoint
       else if (windowWidth > 1000 && isMobile) {
         // Move auth section back to original position
