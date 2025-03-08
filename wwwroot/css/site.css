@@ -58,8 +58,7 @@
   width: 100dvw;
 }
 
-
-.count-notifications{
+.count-notifications {
   position: absolute;
   display: flex;
   justify-content: center;
@@ -72,7 +71,22 @@
   width: 15px;
   font-size: 10px;
   font-weight: 800;
-  color : white;
+  color: white;
   margin-top: -5px;
   margin-right: -8px;
+}
+
+.scaling-svg-container {
+  position: relative;
+  height: 0;
+  width: 100%;
+  padding: 0;
+  padding-bottom: 100%;
+}
+.scaling-svg-container svg {
+  position: absolute;
+  height: 100% !important;
+  width: 100% !important;
+  left: 0;
+  top: 0;
 }
