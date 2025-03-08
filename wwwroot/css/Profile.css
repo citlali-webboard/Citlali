@@ -94,7 +94,8 @@
 }
 
 .meta-data {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
     width: 100%;
     justify-content: space-evenly;
     margin-top: 1rem;
@@ -167,7 +168,7 @@
 }
 
 /*----------------------------------------------
-  4. Events Section 
+  4. Events Section
 ----------------------------------------------*/
 .events-header {
     background-color: var(--card-bg);
@@ -509,7 +510,7 @@
     background-color: #333;
     color: #fff;
     border-radius: 4px;
-} 
+}
 
 .submit-btn svg {
     fill: #fff !important;
@@ -613,10 +614,6 @@
     .meta-data {
         flex-wrap: wrap;
         row-gap: 1rem;
-    }
-
-    .data {
-        flex: 0 0 45%;
     }
 
     .popup-content {
