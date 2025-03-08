@@ -82,7 +82,7 @@
     max-height: 35px;
     display: flex;
     flex-direction: row;
-    gap: 0.5rem; 
+    gap: 0.5rem;
     align-items: center;
 }
 
@@ -176,7 +176,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    
+
     height: 50%;
     max-height: 100px;
     aspect-ratio: 1/1;
@@ -184,7 +184,7 @@
     margin-bottom: 0.5rem;
 }
 
-.status-symbol svg {
+.status-symbol-size-limiter {
     width: 50%;
     height: 50%;
 }
@@ -201,7 +201,7 @@
     background-color: #22bb33;
 }
 
-.status-symbol.rejected-invitation, 
+.status-symbol.rejected-invitation,
 .status-symbol.rejected  {
     background-color: #bb2124;
 }
@@ -403,22 +403,22 @@
         align-items: stretch;
         padding: 0.75rem;
     }
-    
+
     .status-filter {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.25rem;
     }
-    
+
     .status-filter select {
         width: 100%;
         min-width: unset;
     }
-    
+
     .empty-history h2 {
         font-size: 1.2rem;
     }
-    
+
     .empty-history p {
         font-size: 0.9rem;
     }
