@@ -78,7 +78,7 @@ main .notification-container{
 
 .notification-time {
     justify-self: flex-end;
-    align-self: flex-end; 
+    align-self: flex-end;
     font-size: 0.7rem;
     color: #666;
     white-space: nowrap;
@@ -186,7 +186,7 @@ main .notification-container{
     font-size: 1rem;
     margin-left: 1rem;
     align-self: center;
-} 
+}
 
 .notification-detail .header .source-info .create-at{
     font-size: 0.7rem;
@@ -209,9 +209,9 @@ main .notification-container{
     display: flex;
     justify-self: flex-start;
     align-self: flex-start;
-    gap: 0.5rem; 
-    
-    padding: 0.3rem 1rem; 
+    gap: 0.5rem;
+
+    padding: 0.3rem 1rem;
 
     border: 1px solid #ff0000;
     border-radius: 20px;
@@ -231,7 +231,7 @@ main .notification-container{
     span {
         color: rgb(255, 255, 255) !important;
     }
-    
+
     background-color: #ff0000;
     color: white;
 }
@@ -246,9 +246,9 @@ main .notification-container{
     display: flex;
     justify-self: flex-start;
     align-self: flex-start;
-    gap: 0.5rem; 
-    
-    padding: 0.3rem 1rem; 
+    gap: 0.5rem;
+
+    padding: 0.3rem 1rem;
 
     border: 1px solid #333;
     border-radius: 20px;
@@ -268,7 +268,7 @@ main .notification-container{
     span {
         color: rgb(255, 255, 255) !important;
     }
-    
+
     background-color: #333;
     color: white;
 }
@@ -324,7 +324,7 @@ main .notification-container{
     background-color: #f0f0f0;
     font-size: 0.8rem;
     opacity: 0.6;
-    
+
     /* box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3); */
 }
 
@@ -366,8 +366,8 @@ main .notification-container{
 .preview-card {
     background-image: linear-gradient(0deg, rgba(220, 214, 247, 1) 19%, rgba(255, 199, 199, 0) 100%);
     box-shadow: 0 0 10px 0 rgba(220, 214, 247, 1);
-    padding: 1.5rem; 
-    border-radius: 8px; 
+    padding: 1.5rem;
+    border-radius: 8px;
     margin: 0.5rem 0;
     width: 100%;
     height: auto;
@@ -378,18 +378,18 @@ main .notification-container{
 }
 
 .preview-card-topic h1{
-    font-size: 1.5rem; 
-    font-weight: bold; 
+    font-size: 1.5rem;
+    font-weight: bold;
     margin: 0.5rem 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 .preview-card-topic p {
-    font-size: 1rem; 
-    width: 100%; 
+    font-size: 1rem;
+    width: 100%;
     height: auto;
     margin-bottom: 1rem;
     /* max-width: 400px;  */
@@ -405,14 +405,14 @@ main .notification-container{
 }
 
 .preview-link {
-    font-size: 1.1rem; 
+    font-size: 1.1rem;
     margin-top: 0.5rem;
     color: blue;
     text-decoration: underline;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-    overflow: hidden; 
+    overflow: hidden;
 }
 /* ---------------------------- preview-card ------------------------ */
 /* @media screen and (min-width: 768px) {
@@ -470,7 +470,7 @@ main .notification-container{
         /* box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3); */
         /* background-color: #f0f0f0; */
         border: 1px solid #d2d1d1;
-        border-top: none; 
+        border-top: none;
         margin-top: -0.4rem;
     }
 
@@ -490,7 +490,7 @@ main .notification-container{
         /* margin-left: 2.5rem; */
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
-        overflow: hidden; 
+        overflow: hidden;
     }
 
     .txt-in-box {
@@ -523,8 +523,8 @@ main .notification-container{
 
     .preview-card-mobile {
         background-image: linear-gradient(0deg, rgba(220, 214, 247, 1) 19%, rgba(255, 199, 199, 0) 100%);
-        padding: 1.5rem; 
-        border-radius: 8px; 
+        padding: 1.5rem;
+        border-radius: 8px;
         margin: 0.5rem 0 1rem 0;
         width: 90%;
         height: auto;
@@ -534,26 +534,26 @@ main .notification-container{
     }
 
     .preview-card-topic-mobile h1 {
-        font-size: 1.1rem; 
-        font-weight: bold; 
+        font-size: 1.1rem;
+        font-weight: bold;
         margin: 0.5rem 0;
         display: -webkit-box;
         -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
-        overflow: hidden; 
+        overflow: hidden;
     }
 
     .preview-card-topic-mobile p {
-        font-size: 0.8rem; 
+        font-size: 0.8rem;
         /* white-space: nowrap;  */
-        width: 100%; 
+        width: 100%;
         height: auto;
         /* max-width: 400px;  */
         margin-bottom: 0;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
-        overflow: hidden; 
+        overflow: hidden;
     }
 
     .delete-button-mobile {
@@ -589,15 +589,9 @@ main .notification-container{
     background-color: #d2d1d1;
     border-radius: 50%;
     padding: 2rem;
-    width: 200px;
-    height: auto;
+    width: 10rem;
+    height: 10rem;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
-
-}
-
-.no-noti-icon svg {
-    width: 100%;
-    height: auto;
 }
 
 .no-noti-text {
