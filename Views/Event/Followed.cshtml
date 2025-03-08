@@ -20,18 +20,18 @@
                     int initialTagsToShow = 10;
                     bool hasMoreTags = Model.Tags.Count() > initialTagsToShow;
                 }
-                
+
                 @for (int i = 0; i < Model.Tags.Count(); i++)
                 {
                     var tag = Model.Tags.ElementAt(i);
                     var isHidden = i >= initialTagsToShow;
-                    
+
                     <div class="tag @(isHidden ? "tag-hidden" : "")" data-index="@i">
                         <a href="/event/tag/@tag.TagId">@tag.TagEmoji @tag.TagName</a>
                     </div>
                 }
             </div>
-            
+
             @if (hasMoreTags)
             {
                 <div class="tags-toggle">
@@ -51,14 +51,14 @@
                 @{
                     bool hasMoreLocations = Model.Locations?.Count() > initialTagsToShow;
                 }
-                
+
                 @if (Model.Locations != null)
                 {
                     @for (int i = 0; i < Model.Locations.Count(); i++)
                     {
                         var tag = Model.Locations.ElementAt(i);
                         var isHidden = i >= initialTagsToShow - 1;
-                        
+
                         <div class="tag @(isHidden ? "tag-hidden" : "")" data-index="@i">
                             <a href="/event/location/@tag.EventLocationTagId">@tag.EventLocationTagName</a>
                         </div>
@@ -78,7 +78,7 @@
                 </div>
             }
         </div>
-        
+
     </div>
 
     <!-- Main content -->
@@ -121,7 +121,7 @@
                 </div>
                 <p>Here are the events from the tags and creators you are following</p>
             </div>
-            
+
             <div class="controls-row">
                 <div class="button-group">
                     <button class="sort-btn @(ViewBag.SortBy == "newest" ? "active" : "")" data-sort="newest">
@@ -139,7 +139,7 @@
                 </div>
             </div>
         </div>
-        
+
         @if (Model.EventBriefCardDatas.Length > 0)
         {
             <div class="event-list">
@@ -148,7 +148,7 @@
                     <partial name="_EventBriefCard" model="eventItem" />
                 }
             </div>
-            
+
             <div class="pagination">
                 @if (Model.CurrentPage > 1)
                 {
@@ -166,11 +166,11 @@
                 }
             </div>
         }
-        else 
+        else
         {
             <div class="event-not-found">
                 <h1>Event not found</h1>
-                <p>Oops! No events are available for this tag right now. Please check back later!</p>
+                <p>Oops! No events are available for your request right now. Please check back later or follow more people and tags!</p>
             </div>
         }
     </div>

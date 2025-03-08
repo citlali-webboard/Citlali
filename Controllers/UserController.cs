@@ -150,98 +150,121 @@ public class UserController : Controller
 
     [HttpGet("{username}")]
     [ServiceFilter(typeof(OnboardingFilter))]
-    public async Task<IActionResult> Profile(string username, int page = 1, string filter = null, string sort = "newest")
+    public async Task<IActionResult> Profile(string username, int page = 1, string? filter = null, string sort = "newest")
     {
-        const int pageSize = 10;
-
-        var user = await _userService.GetUserByUsername(username);
-        if (user == null)
+        try
         {
-            return Content("User not found.");
-        }
+            const int pageSize = 10;
 
-        var currentUser = _userService.CurrentSession.User;
-        var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
-        var isAdmin = _userService.IsUserAdmin();
-        var followingCount = await _userService.GetFollowingCount(user.UserId);
-        var followersCount = await _userService.GetFollowersCount(user.UserId);
-        var isFollowing = currentUser != null && await _userService.IsFollowing(Guid.Parse(currentUser.Id ?? string.Empty), user.UserId);
-        if (isCurrentUser) {
-            HttpContext.Response.Cookies.Append("ProfileImageUrl", user.ProfileImageUrl, new CookieOptions
+            var user = await _userService.GetUserByUsername(username);
+            if (user == null)
             {
-                HttpOnly = false,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddDays(30)
-            });
-        }
-
-        var events = await _eventService.GetEventsByUserId(user.UserId);
-        if (!string.IsNullOrEmpty(filter))
-        {
-            if (filter == "active")
-            {
-                events = events.Where(e => e.Status == "active" && e.PostExpiryDate > DateTime.Now).ToList();
+                return Content("User not found.");
             }
-            else if (filter == "closed")
-            {
-                events = events.Where(e => e.Status == "closed" || e.PostExpiryDate <= DateTime.Now).ToList();
-            }
-        }
 
-        switch (sort)
-        {
-            case "oldest":
-                events = events.OrderBy(e => e.CreatedAt).ToList();
-                break;
-            case "popular":
-                var eventsWithCounts = new List<(Event Event, int Count)>();
-                foreach (var e in events)
-                {
-                    var count = await _eventService.GetRegistrationCountByEventId(e.EventId);
-                    eventsWithCounts.Add((e, count));
+            var currentUser = _userService.CurrentSession.User;
+            var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
+            var isFollowingTask = Task.FromResult(false);
+            if (currentUser != null) {
+                isFollowingTask = _userService.IsFollowing(Guid.Parse(currentUser.Id ?? throw new GetUserException()), user.UserId);
+
+                if (isCurrentUser) {
+                    HttpContext.Response.Cookies.Append("ProfileImageUrl", user.ProfileImageUrl, new CookieOptions
+                    {
+                        HttpOnly = false,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTime.UtcNow.AddDays(30)
+                    });
                 }
-                events = eventsWithCounts.OrderByDescending(x => x.Count).Select(x => x.Event).ToList();
-                break;
-            case "newest":
-            default:
-                events = events.OrderByDescending(e => e.CreatedAt).ToList();
-                break;
+            }
+
+            var isAdmin = _userService.IsUserAdmin();
+            var followingCountTask = _userService.GetFollowingCount(user.UserId);
+            var followersCountTask = _userService.GetFollowersCount(user.UserId);
+            var eventsTask = _eventService.GetEventsByUserId(user.UserId);
+
+            await Task.WhenAll(followingCountTask, followersCountTask);
+            var followingCount = await followingCountTask;
+            var followersCount = await followersCountTask;
+            var isFollowing = await isFollowingTask;
+            var events = await eventsTask;
+
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                if (filter == "active")
+                {
+                    events = events.Where(e => e.Status == "active" && e.PostExpiryDate > DateTime.Now).ToList();
+                }
+                else if (filter == "closed")
+                {
+                    events = events.Where(e => e.Status == "closed" || e.PostExpiryDate <= DateTime.Now).ToList();
+                }
+            }
+
+            switch (sort)
+            {
+                case "oldest":
+                    events = events.OrderBy(e => e.CreatedAt).ToList();
+                    break;
+                case "popular":
+                    var eventsWithCounts = new List<(Event Event, int Count)>();
+                    var tasks = events.Select(async e =>
+                    {
+                        var count = await _eventService.GetRegistrationCountByEventId(e.EventId);
+                        return (Event: e, Count: count);
+                    }).ToList();
+
+                    eventsWithCounts = (await Task.WhenAll(tasks)).ToList();
+                    events = eventsWithCounts.OrderByDescending(x => x.Count).Select(x => x.Event).ToList();
+                    break;
+                case "newest":
+                default:
+                    events = events.OrderByDescending(e => e.CreatedAt).ToList();
+                    break;
+            }
+
+            // Calculate total pages
+            int totalEvents = events.Count;
+            int totalPages = (int)Math.Ceiling(totalEvents / (double)pageSize);
+
+            // Ensure page is within valid range
+            page = Math.Max(1, Math.Min(page, totalPages == 0 ? 1 : totalPages));
+
+            // Apply pagination
+            events = events.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            var userEventBriefCards = (await _eventService.EventsToBriefCardArray(events)).ToList();
+
+            var userViewModel = new UserViewModel
+            {
+                UserId = user.UserId,
+                Email = user.Email,
+                Username = user.Username,
+                ProfileImageUrl = user.ProfileImageUrl,
+                DisplayName = user.DisplayName,
+                UserBio = user.UserBio,
+                TotalEvents = totalEvents,
+                FollowingCount = followingCount,
+                FollowersCount = followersCount,
+                IsCurrentUser = isCurrentUser,
+                IsAdmin = isAdmin,
+                IsFollowing = isFollowing,
+                UserEvents = userEventBriefCards
+            };
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.Filter = filter;
+            ViewBag.Sort = sort;
+
+            return View(userViewModel);
         }
-
-        // Calculate total pages
-        int totalEvents = events.Count;
-        int totalPages = (int)Math.Ceiling(totalEvents / (double)pageSize);
-
-        // Ensure page is within valid range
-        page = Math.Max(1, Math.Min(page, totalPages == 0 ? 1 : totalPages));
-
-        // Apply pagination
-        events = events.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-        var userEventBriefCards = (await _eventService.EventsToBriefCardArray(events)).ToList();
-
-        var userViewModel = new UserViewModel
+        catch (System.Exception)
         {
-            UserId = user.UserId,
-            Email = user.Email,
-            Username = user.Username,
-            ProfileImageUrl = user.ProfileImageUrl,
-            DisplayName = user.DisplayName,
-            UserBio = user.UserBio,
-            FollowingCount = followingCount,
-            FollowersCount = followersCount,
-            IsCurrentUser = isCurrentUser,
-            IsAdmin = isAdmin,
-            IsFollowing = isFollowing,
-            UserEvents = userEventBriefCards
-        };
 
-        ViewBag.CurrentPage = page;
-        ViewBag.TotalPages = totalPages;
-        ViewBag.Filter = filter;
-        ViewBag.Sort = sort;
-
-        return View(userViewModel);
+            throw;
+        }
     }
 
     [HttpPost("edit")]

@@ -73,6 +73,7 @@ public class UserOnboardingDto : User
 
 public class UserViewModel : User
 {
+        public int TotalEvents { get; set; }
         public int FollowingCount { get; set; }
         public int FollowersCount { get; set; }
         public bool IsCurrentUser { get; set; }
