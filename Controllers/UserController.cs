@@ -260,10 +260,9 @@ public class UserController : Controller
 
             return View(userViewModel);
         }
-        catch (System.Exception)
+        catch (Exception exc)
         {
-
-            throw;
+            TempData["Error"] = exc.Message;
         }
     }
 
