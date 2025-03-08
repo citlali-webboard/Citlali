@@ -1,16 +1,44 @@
 @{
-    var accessToken = Context.Request.Cookies["accessToken"];
-    var refreshToken = Context.Request.Cookies["refreshToken"];
-    var profileImageUrl = Context.Request.Cookies["profileImageUrl"];
+  var accessToken = Context.Request.Cookies["accessToken"];
+  var refreshToken = Context.Request.Cookies["refreshToken"];
+  var profileImageUrl = Context.Request.Cookies["profileImageUrl"];
 
-    bool IsAuthenticated = !string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken);
+  bool IsAuthenticated = !string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken);
+  bool IsAdmin = false;
+  if (!string.IsNullOrEmpty(accessToken)) {
+    try {
+      var dataSection = accessToken.Split(".", 3);
+      if (dataSection.Length >= 2)
+      {
+        // Add padding to make the base64 string valid
+        string payload = dataSection[1];
+        string padded = payload.PadRight(payload.Length + (4 - payload.Length % 4) % 4, '=');
 
-    if (string.IsNullOrEmpty(profileImageUrl))
-    {
-        profileImageUrl = "https://citlali-supabase.code4.dad/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.webp";
+        // Replace URL-safe characters with regular base64 characters
+        padded = padded.Replace('-', '+').Replace('_', '/');
+
+        var jsonBytes = System.Convert.FromBase64String(padded);
+        var jsonString = System.Text.Encoding.UTF8.GetString(jsonBytes);
+        var jsonObject = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonDocument>(jsonString);
+
+        if (jsonObject?.RootElement.TryGetProperty("app_metadata", out var metadataProperty) == true)
+        {
+          if (metadataProperty.TryGetProperty("app_role", out var roleProperty))
+          {
+            IsAdmin = roleProperty.GetString() == "admin";
+          }
+        }
+      }
     }
-    var timestamp = DateTime.Now.Ticks;
-    profileImageUrl = $"{profileImageUrl}?v={timestamp}";
+    catch {}
+  }
+
+  if (string.IsNullOrEmpty(profileImageUrl))
+  {
+    profileImageUrl = "https://citlali-supabase.code4.dad/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.webp";
+  }
+  var timestamp = DateTime.Now.Ticks;
+  profileImageUrl = $"{profileImageUrl}?v={timestamp}";
 }
 
 <link rel="stylesheet" href="~/css/NavBar.css" asp-append-version="true" />
@@ -39,6 +67,12 @@
         @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Home>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
         <p>Home</p>
       </a>
+      @if (IsAdmin) {
+        <a href="/admin" class="nav-item" >
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Crown>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+          <span>Admin console</span>
+        </a>
+      }
       @if (IsAuthenticated)
       {
         <a href="/event/followed" class="nav-item">
@@ -126,7 +160,7 @@
     // Function to handle mobile element positioning
     function handleMobileLayout() {
       const windowWidth = window.innerWidth;
-      
+
       // Mobile breakpoint
       if (windowWidth <= 1000 && !isMobile) {
         // Move auth section after about link in mobile view
@@ -134,7 +168,7 @@
           navLinks.insertBefore(authSection, aboutLink.nextSibling);
         }
         isMobile = true;
-      } 
+      }
       // Desktop breakpoint
       else if (windowWidth > 1000 && isMobile) {
         // Move auth section back to original position
