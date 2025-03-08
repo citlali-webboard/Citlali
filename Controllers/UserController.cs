@@ -162,6 +162,7 @@ public class UserController : Controller
 
         var currentUser = _userService.CurrentSession.User;
         var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
+        var isAdmin = _userService.IsUserAdmin();
         var followingCount = await _userService.GetFollowingCount(user.UserId);
         var followersCount = await _userService.GetFollowersCount(user.UserId);
         var isFollowing = currentUser != null && await _userService.IsFollowing(Guid.Parse(currentUser.Id ?? string.Empty), user.UserId);
@@ -230,6 +231,7 @@ public class UserController : Controller
             FollowingCount = followingCount,
             FollowersCount = followersCount,
             IsCurrentUser = isCurrentUser,
+            IsAdmin = isAdmin,
             IsFollowing = isFollowing,
             UserEvents = userEventBriefCards
         };
