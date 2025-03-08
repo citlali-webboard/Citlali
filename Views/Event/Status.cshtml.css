@@ -2,7 +2,7 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    
+
     min-height: calc(100vh - var(--navbar-size));
     margin-top: var(--navbar-size);
     width: 100%;
@@ -50,7 +50,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    
+
     width: 150px;
     max-width: 80vh;
     max-height: auto;
@@ -59,7 +59,7 @@
     margin-bottom: 2rem;
 }
 
-.status-symbol svg {
+.status-symbol-size-limiter {
     width: 50%;
     height: 50%;
 }
@@ -76,7 +76,7 @@
     background-color: #22bb33;
 }
 
-.status-symbol.rejected-invitation, 
+.status-symbol.rejected-invitation,
 .status-symbol.rejected  {
     background-color: #bb2124;
 }
@@ -87,13 +87,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.5rem; 
-    
-    padding: 0.3rem 2rem; 
-    
+    gap: 0.5rem;
+
+    padding: 0.3rem 2rem;
+
     border: 1px solid #000;
     border-radius: 20px;
-    
+
     font-size: 0.8rem;
     text-decoration: none;
     color: #000;

@@ -268,22 +268,29 @@ function createEmptyState(type) {
     return emptyState;
 }
 
+// Also update filterUsersandTags with the same approach
 function filterUsersandTags() {
     const searchInput = document.getElementById('searchInput').value.toLowerCase();
     
-    const followItems = document.querySelectorAll('.follow-item');
+    // Only filter items in the currently active tab
+    const followingTab = document.getElementById('following-tab');
+    if (!followingTab.classList.contains('active')) {
+        return; // Exit if this tab is not active
+    }
+    
+    const followItems = followingTab.querySelectorAll('.follow-item');
     
     let visibleUsers = 0;
     let visibleTags = 0;
+    let totalItems = followItems.length;
     
-    const sectionHeaders = document.querySelectorAll('.section-header');
+    const sectionHeaders = followingTab.querySelectorAll('.section-header');
     let usersHeader, tagsHeader;
     
     if (sectionHeaders.length >= 2) {
         usersHeader = sectionHeaders[0];
         tagsHeader = sectionHeaders[1];
     } else if (sectionHeaders.length === 1) {
-        // Determine if the only header is for users or tags
         const headerText = sectionHeaders[0].querySelector('h2').textContent.toLowerCase();
         if (headerText.includes('people')) {
             usersHeader = sectionHeaders[0];
@@ -309,60 +316,102 @@ function filterUsersandTags() {
     
     // Handle section visibility
     if (usersHeader) {
-        usersHeader.style.display = (searchInput && visibleUsers === 0) ? 'none' : 'block';
+        usersHeader.style.display = (searchInput.length > 0 && visibleUsers === 0) ? 'none' : 'block';
     }
     
     if (tagsHeader) {
-        tagsHeader.style.display = (searchInput && visibleTags === 0) ? 'none' : 'block';
+        tagsHeader.style.display = (searchInput.length > 0 && visibleTags === 0) ? 'none' : 'block';
     }
     
-    const followList = document.getElementById('followingList');
+    const followingList = document.getElementById('followingList');
+    
+    if (!followingList) {
+        return;
+    }
     
     // Remove existing "no results" message if any
-    const existingNoResults = followList.querySelector('.no-results-message');
+    const existingNoResults = followingList.querySelector('.no-results-message');
     if (existingNoResults) {
-        followList.removeChild(existingNoResults);
+        followingList.removeChild(existingNoResults);
     }
     
-    // Show "no results" message if needed
-    if (searchInput && visibleUsers === 0 && visibleTags === 0) {
+    // Check for empty state
+    const hasEmptyState = followingList.querySelector('.empty-state') !== null;
+    
+    // Only show "no results" message if:
+    // 1. There's a search term 
+    // 2. We have items to filter
+    // 3. No items match the filter
+    // 4. There's not already an empty state
+    if (searchInput.length > 0 && totalItems > 0 && visibleUsers === 0 && visibleTags === 0 && !hasEmptyState) {
         const noResultsMessage = document.createElement('div');
         noResultsMessage.className = 'no-results-message';
-        noResultsMessage.textContent = 'No users or tags found matching your search.';
-        followList.appendChild(noResultsMessage);
+        noResultsMessage.innerHTML = '<div class="empty-icon">🔍</div><h3>No results found</h3>';
+
+        // Force style to ensure visibility
+        noResultsMessage.style.display = 'block';
+        noResultsMessage.style.textAlign = 'center';
+        noResultsMessage.style.padding = '2rem';
+        
+        followingList.appendChild(noResultsMessage);
     }
 }
 
-// Add the filterUsers function that was missing
 function filterUsers() {
     const searchInput = document.getElementById('searchInput').value.toLowerCase();
-    const followItems = document.querySelectorAll('.follow-item');
+    
+    // Only filter items in the currently active tab
+    const followersTab = document.getElementById('followers-tab');
+    if (!followersTab.classList.contains('active')) {
+        return; // Exit if this tab is not active
+    }
+    
+    const followItems = followersTab.querySelectorAll('.follow-item');
     
     let visibleCount = 0;
+    const totalItems = followItems.length;
     
     followItems.forEach(item => {
-        const displayName = item.querySelector('.follow-info h2').textContent.toLowerCase();
-        const username = item.querySelector('.follow-info p').textContent.toLowerCase();
+        const displayName = item.querySelector('.follow-info h2')?.textContent?.toLowerCase() || '';
+        const username = item.querySelector('.follow-info p')?.textContent?.toLowerCase() || '';
         const shouldShow = displayName.includes(searchInput) || username.includes(searchInput);
         
         item.style.display = shouldShow ? 'flex' : 'none';
         if (shouldShow) visibleCount++;
     });
     
-    const followList = document.getElementById('followList');
+    // Get the followers list element
+    const followersList = document.getElementById('followersList');
     
-    // Remove existing no results message if any
-    const existingNoResults = followList.querySelector('.no-results-message');
-    if (existingNoResults) {
-        followList.removeChild(existingNoResults);
+    if (!followersList) {
+        return;
     }
     
-    // Add no results message if needed
-    if (searchInput && visibleCount === 0) {
+    // Remove existing no results message if any
+    const existingNoResults = followersList.querySelector('.no-results-message');
+    if (existingNoResults) {
+        followersList.removeChild(existingNoResults);
+    }
+    
+    // Check for empty state
+    const hasEmptyState = followersList.querySelector('.empty-state') !== null;
+    
+    // Only show "no results" message if:
+    // 1. There's a search term
+    // 2. We have items to filter
+    // 3. No items match the filter
+    // 4. There's not already an empty state
+    if (searchInput.length > 0 && totalItems > 0 && visibleCount === 0 && !hasEmptyState) {
         const noResultsMessage = document.createElement('div');
         noResultsMessage.className = 'no-results-message';
-        noResultsMessage.textContent = 'No users found matching your search.';
-        followList.appendChild(noResultsMessage);
+        noResultsMessage.innerHTML = '<div class="empty-icon">👤</div><h3>No results found</h3>';
+
+        // Force style to ensure visibility
+        noResultsMessage.style.display = 'block';
+        noResultsMessage.style.textAlign = 'center';
+        noResultsMessage.style.padding = '2rem';
+        
+        followersList.appendChild(noResultsMessage);
     }
 }
 

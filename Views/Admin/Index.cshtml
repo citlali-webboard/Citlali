@@ -7,18 +7,13 @@
 
         <header class="admin-header">
             <h1>Admin Console 👑</h1>
-            <p>This is admin console. Add some text here.</p>
+            <p>All the tools for your tags creation and deletion!</p>
         </header>
 
         <div class="dashboard-grid">
             <a href="/admin/categories" class="dashboard-card">
                 <div class="card-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 5C4 4.44772 4.44772 4 5 4H9C9.55228 4 10 4.44772 10 5V9C10 9.55228 9.55228 10 9 10H5C4.44772 10 4 9.55228 4 9V5Z" fill="currentColor"/>
-                        <path d="M14 5C14 4.44772 14.4477 4 15 4H19C19.5523 4 20 4.44772 20 5V9C20 9.55228 19.5523 10 19 10H15C14.4477 10 14 9.55228 14 9V5Z" fill="currentColor"/>
-                        <path d="M4 15C4 14.4477 4.44772 14 5 14H9C9.55228 14 10 14.4477 10 15V19C10 19.5523 9.55228 20 9 20H5C4.44772 20 4 19.5523 4 19V15Z" fill="currentColor"/>
-                        <path d="M14 15C14 14.4477 14.4477 14 15 14H19C19.5523 14 20 14.4477 20 15V19C20 19.5523 19.5523 20 19 20H15C14.4477 20 14 19.5523 14 19V15Z" fill="currentColor"/>
-                    </svg>
+                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Tag>>(RenderMode.ServerPrerendered, new { Color = Color.Fill }))
                 </div>
                 <div class="card-content">
                     <h2>Category Tags</h2>
@@ -28,9 +23,7 @@
 
             <a href="/admin/locations" class="dashboard-card">
                 <div class="card-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z" fill="currentColor"/>
-                    </svg>
+                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Location>>(RenderMode.ServerPrerendered, new { Color = Color.Fill }))
                 </div>
                 <div class="card-content">
                     <h2>Locations</h2>

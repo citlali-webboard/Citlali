@@ -34,6 +34,20 @@ function setting_desktop() {
     });
 }
 
+
+function setting_mobile() {
+
+    var notificationCards = document.querySelectorAll(".notification-card");
+
+    notificationCards.forEach(function (card) {
+        // Remove any previous event listener
+        card.removeEventListener("click", handleDesktopClick);
+        card.removeEventListener("click", handleMobileClick);
+
+        card.addEventListener("click", handleMobileClick);
+    });
+}
+
 function handleDeleteClick() {
     if(window.confirm("Are you sure you want to delete this notification?")){
         deleteNotification();
@@ -47,15 +61,15 @@ function handleDesktopClick() {
     let CardId = Card.getAttribute("data-id");
 
     // Create new XMLHttpRequest object
-    let xmlhttp = new XMLHttpRequest();
+    let xhr = new XMLHttpRequest();
     let URL = window.location.href + "/detail/" + CardId;
 
-    xmlhttp.open("GET", URL, true);
+    xhr.open("GET", URL, true);
 
-    xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
 
-            var data = JSON.parse(xmlhttp.responseText);
+            var data = JSON.parse(xhr.responseText);
 
             // Set details
             // Safe DOM manipulation without innerHTML
@@ -92,7 +106,7 @@ function handleDesktopClick() {
             // Mark the card as read and disable hover
             Card.classList.add("read");
 
-            let url = window.location.href;
+            // let url = window.location.href;
             let root_url = window.location.origin;
             let preview_url = root_url + data.url;
 
@@ -117,7 +131,7 @@ function handleDesktopClick() {
 
                     let appNameElement = document.createElement("p");
                     appNameElement.classList.add("app-name");
-                    appNameElement.textContent = "Citlali 🩷";
+                    appNameElement.textContent = "Citlali 🩷"; // eslint-disable-line
 
                     let previewCardTopicElement = document.createElement("div");
                     previewCardTopicElement.classList.add("preview-card-topic");
@@ -138,7 +152,7 @@ function handleDesktopClick() {
                     imageContainerElement.style.marginTop = "10px";
 
                     let imageElement = document.createElement("img");
-                    imageElement.src = (data.urlImage);  // ใส่ URL รูปภาพ
+                    imageElement.src = (data.urlImage);  
                     imageElement.style.maxWidth = "100%";
                     imageElement.style.height = "auto";
 
@@ -210,172 +224,9 @@ function handleDesktopClick() {
             document.querySelector("#default-notification").classList.add("hidden");
         }
     };
-    xmlhttp.send();
+    xhr.send();
 
 }
-
-function setting_mobile() {
-
-    var notificationCards = document.querySelectorAll(".notification-card");
-
-    notificationCards.forEach(function (card) {
-        // Remove any previous event listener
-        card.removeEventListener("click", handleDesktopClick);
-        card.removeEventListener("click", handleMobileClick);
-
-        card.addEventListener("click", handleMobileClick);
-    });
-}
-
-function handleMobileClick() {
-    let Card = this;
-    let CardId = Card.getAttribute("data-id");
-
-
-    if (Card.getAttribute("name") == "clicked") {
-        Card.nextElementSibling.classList.toggle("hidden");
-        Card.style.borderRadius = "8px"; // Reset to default
-        Card.removeAttribute("name");
-        return;
-    }
-
-    Card.classList.add("read");
-
-    // Create new XMLHttpRequest object
-    let xmlhttp = new XMLHttpRequest();
-    let URL = window.location.href + "/detail/" + CardId;
-    xmlhttp.open("GET", URL, true);
-
-    xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            var data = JSON.parse(xmlhttp.responseText);
-
-            let url = window.location.href;
-            let root_url = window.location.origin;
-            let preview_url = root_url + data.url;
-            
-            Card.setAttribute("name", "clicked");
-            Card.style.borderRadius = "8px 8px 0 0";
-            decrementUnreadNotification();
- 
-            let container_detail_mobile = document.createElement("div");
-            container_detail_mobile.classList.add("container-detail-mobile");
-            container_detail_mobile.setAttribute("container-id", data.id);
-
-            let boxtitleElement = document.createElement("div");
-            boxtitleElement.classList.add("box-title-over-card");
-
-            let textBox = document.createElement("div");
-            textBox.classList.add("txt-in-box");
-            
-            let titleElement = document.createElement("p");
-            titleElement.classList.add("title-over-card");
-            titleElement.textContent = escapeHTML(data.title);
-            
-            let messageElement = document.createElement("p");
-            messageElement.classList.add("txt-over-card");
-            messageElement.textContent = escapeHTML(data.message);
-            
-            textBox.appendChild(titleElement);
-            textBox.appendChild(messageElement);
-
-            let deleteButton = document.createElement("button");
-            deleteButton.classList.add("delete-button-mobile");
-            deleteButton.setAttribute("id", data.id);
-            deleteButton.addEventListener("click", function () {
-                deleteNotificationMobile(data.id);
-            });
-
-            // Add FluentIcon inside the delete button
-            deleteButton.innerHTML = `
-                <svg width="20px" height="20px" viewBox="0 0 24.00 24.00" version="1.1" 
-                    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-                    fill="#666" transform="rotate(0)matrix(1, 0, 0, 1, 0, 0)" stroke="#666">
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.72"></g>
-                    <g id="SVGRepo_iconCarrier">
-                        <title>delete_2_line</title>
-                        <g id="页面-1" stroke-width="0.00024000000000000003" fill="none" fill-rule="evenodd">
-                            <g id="System" transform="translate(-576.000000, -192.000000)" fill-rule="nonzero">
-                                <g id="delete_2_line" transform="translate(576.000000, 192.000000)">
-                                    <path d="M24,0 L24,24 L0,24 L0,0 L24,0 Z M12.5934901,23.257841 L12.5819402,23.2595131 L12.5108777,23.2950439 L12.4918791,23.2987469 
-                                        L12.4918791,23.2987469 L12.4767152,23.2950439 L12.4056548,23.2595131 C12.3958229,23.2563662 12.3870493,23.2590235 12.3821421,23.2649074 
-                                        L12.3780323,23.275831 L12.360941,23.7031097 L12.3658947,23.7234994 L12.3769048,23.7357139 L12.4804777,23.8096931 
-                                        L12.4953491,23.8136134 L12.4953491,23.8136134 L12.5071152,23.8096931 L12.6106902,23.7357139 L12.6232938,23.7196733 
-                                        L12.6232938,23.7196733 L12.6266527,23.7031097 L12.609561,23.275831 C12.6075724,23.2657013 12.6010112,23.2592993 12.5934901,23.257841 
-                                        L12.5934901,23.257841 Z" fill-rule="nonzero"></path>
-                                    <path d="M14.2792,2 C15.1401,2 15.9044,2.55086 16.1766,3.36754 L16.7208,5 L20,5 C20.5523,5 21,5.44772 21,6 C21,6.55227 20.5523,6.99998 
-                                        20,7 L19.9975,7.07125 L19.9975,7.07125 L19.1301,19.2137 C19.018,20.7837 17.7117,22 16.1378,22 L7.86224,22 C6.28832,22 4.982,20.7837 
-                                        4.86986,19.2137 L4.00254,7.07125 C4.00083,7.04735 3.99998,7.02359 3.99996,7 C3.44769,6.99998 3,6.55227 3,6 C3,5.44772 3.44772,5 4,5 
-                                        L7.27924,5 L7.82339,3.36754 C8.09562,2.55086 8.8599,2 9.72076,2 L14.2792,2 Z M17.9975,7 L6.00255,7 L6.86478,19.0712 
-                                        C6.90216,19.5946 7.3376,20 7.86224,20 L16.1378,20 C16.6624,20 17.0978,19.5946 17.1352,19.0712 L17.9975,7 Z M10,10 
-                                        C10.51285,10 10.9355092,10.386027 10.9932725,10.8833761 L11,11 L11,16 C11,16.5523 10.5523,17 10,17 C9.48715929,17 9.06449214,16.613973 
-                                        9.00672766,16.1166239 L9,16 L9,11 C9,10.4477 9.44771,10 10,10 Z M14,10 C14.5523,10 15,10.4477 15,11 L15,16 C15,16.5523 14.5523,17 
-                                        14,17 C13.4477,17 13,16.5523 13,16 L13,11 C13,10.4477 13.4477,10 14,10 Z M14.2792,4 L9.72076,4 L9.38743,5 L14.6126,5 L14.2792,4 Z" 
-                                        fill="#666"></path>
-                                </g>
-                            </g>
-                        </g>
-                    </g>
-                </svg>
-            `;
-
-            boxtitleElement.appendChild(textBox);
-            boxtitleElement.appendChild(deleteButton);
-
-            let linkElement = document.createElement("a");
-            linkElement.classList.add("link-over-card");
-            linkElement.href = escapeHTML(preview_url);
-
-            let previewCardElement = document.createElement("div");
-            previewCardElement.classList.add("preview-card-mobile");
-
-            let appNameElement = document.createElement("p");
-            appNameElement.classList.add("app-name");
-            appNameElement.textContent = "Citlali 🩷";
-
-            let previewCardTopicElement = document.createElement("div");
-            previewCardTopicElement.classList.add("preview-card-topic-mobile");
-
-            let urlTitleElement = document.createElement("h1");
-            urlTitleElement.textContent = escapeHTML(data.urlTitle);
-
-            let urlDescriptionElement = document.createElement("p");
-            urlDescriptionElement.textContent = escapeHTML(data.urlDescription);
-
-            previewCardTopicElement.appendChild(urlTitleElement);
-            previewCardTopicElement.appendChild(urlDescriptionElement);
-            previewCardElement.appendChild(appNameElement);
-            previewCardElement.appendChild(previewCardTopicElement);
-
-            let imageContainerElement = document.createElement("div");
-            imageContainerElement.style.borderRadius = "8px";
-            imageContainerElement.style.overflow = "hidden";
-            imageContainerElement.style.marginTop = "10px";
-
-            if (data.urlImage) {
-                let imageElement = document.createElement("img");
-                imageElement.src = escapeHTML(data.urlImage);
-                imageElement.style.maxWidth = "100%";
-                imageElement.style.height = "auto";
-
-                imageContainerElement.appendChild(imageElement);
-                previewCardElement.appendChild(imageContainerElement);
-            }
-
-            linkElement.appendChild(previewCardElement);
-            container_detail_mobile.appendChild(boxtitleElement);
-            container_detail_mobile.appendChild(linkElement);
-
-            // Add the new content after the card
-            Card.after(container_detail_mobile);
-
-        }
-    };
-
-    xmlhttp.send();
-}
-
 
 //set delete-all-btn when load page
 document.addEventListener("DOMContentLoaded", function () {
@@ -393,23 +244,289 @@ if (isMobile) {
     setting_desktop();
 }
 
-// ✅ ป้องกัน XSS โดย Escape HTML
-function escapeHTML(str) {
-    return str 
+function handleMobileClick() {
+    let card = this;
+    let cardId = card.getAttribute("data-id");
+    
+    // Handle toggle case when already clicked
+    if (card.getAttribute("name") === "clicked") {
+        card.nextElementSibling.classList.toggle("hidden");
+        card.style.borderRadius = card.nextElementSibling.classList.contains("hidden") ? "8px" : "8px 8px 0 0";
+        return;
+    }
+    
+    // Check if already processing - prevent multiple clicks
+    if (card.hasAttribute("data-processing")) {
+        return;
+    }
+    
+    // Set processing flag
+    card.setAttribute("data-processing", "true");
+    
+    // Mark as read immediately to provide user feedback
+    card.classList.add("read");
+    decrementUnreadNotification();
+    
+    // Show loading indicator
+    const loadingIndicator = document.createElement("div");
+    loadingIndicator.className = "loading-indicator";
+    loadingIndicator.textContent = "Loading...";
+    card.appendChild(loadingIndicator);
+    
+    // Fetch notification details
+    fetchNotificationDetails(cardId)
+        .then(data => {
+            // Remove loading indicator
+            card.removeChild(loadingIndicator);
+            
+            // Check if a container already exists for this card
+            const existingContainer = card.nextElementSibling;
+            if (existingContainer && existingContainer.getAttribute("container-id") === data.id) {
+                existingContainer.classList.remove("hidden");
+                card.setAttribute("name", "clicked");
+                card.style.borderRadius = "8px 8px 0 0";
+                return;
+            }
+            
+            // Create container for details
+            const detailContainer = createDetailContainer(data);
+            
+            // Add to DOM
+            card.after(detailContainer);
+            card.setAttribute("name", "clicked");
+            card.style.borderRadius = "8px 8px 0 0";
+        })
+        .catch(error => {
+            console.error("Error fetching notification details:", error);
+            card.removeChild(loadingIndicator);
+            
+            // Show error message
+            const errorMsg = document.createElement("div");
+            errorMsg.className = "error-message";
+            errorMsg.textContent = "Failed to load notification details";
+            errorMsg.style.color = "red";
+            errorMsg.style.padding = "10px";
+            card.appendChild(errorMsg);
+            
+            // Remove error message after 3 seconds
+            setTimeout(() => {
+                card.removeChild(errorMsg);
+            }, 3000);
+        })
+        .finally(() => {
+            // Remove processing flag
+            card.removeAttribute("data-processing");
+        });
 }
 
-function encodeURL(url) {
-    return url.replace(/[\s<>"'&]/g, function (match) {
-        return {
-            " ": "%20",
-            "<": "%3C",
-            ">": "%3E",
-            '"': "%22",
-            "'": "%27",
-            "&": "%26"
-        }[match];
+// Helper function to fetch notification details
+function fetchNotificationDetails(cardId) {
+    return new Promise((resolve, reject) => {
+        let xmlhttp = new XMLHttpRequest();
+        let url = window.location.href + "/detail/" + cardId;
+        
+        xmlhttp.open("GET", url, true);
+        xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState === 4) {
+                if (xmlhttp.status === 200) {
+                    try {
+                        const data = JSON.parse(xmlhttp.responseText);
+                        resolve(data);
+                    } catch (e) {
+                        reject(new Error("Invalid JSON response"));
+                    }
+                } else {
+                    reject(new Error(`Server returned status ${xmlhttp.status}`));
+                }
+            }
+        };
+        xmlhttp.onerror = () => reject(new Error("Network error"));
+        xmlhttp.send();
     });
 }
+
+// Helper function to create detail container
+function createDetailContainer(data) {
+    const rootUrl = window.location.origin;
+    const previewUrl = rootUrl + data.url;
+    
+    // Create container
+    const container = document.createElement("div");
+    container.classList.add("container-detail-mobile");
+    container.setAttribute("container-id", data.id);
+    
+    // Create title box
+    const boxTitle = document.createElement("div");
+    boxTitle.classList.add("box-title-over-card");
+    
+    // Create text content
+    const textBox = document.createElement("div");
+    textBox.classList.add("txt-in-box");
+    
+    const title = document.createElement("p");
+    title.classList.add("title-over-card");
+    title.textContent = escapeHTML(data.title);
+    
+    const message = document.createElement("p");
+    message.classList.add("txt-over-card");
+    message.textContent = escapeHTML(data.message);
+    
+    textBox.appendChild(title);
+    textBox.appendChild(message);
+    
+    // Create delete button
+    const deleteButton = document.createElement("button");
+    deleteButton.classList.add("delete-button-mobile");
+    deleteButton.setAttribute("id", data.id);
+    
+    // Use createElement for SVG instead of innerHTML
+    const svgElem = createSafeSvgElement();
+    deleteButton.appendChild(svgElem);
+    
+    // Add event listener with debounce to prevent multiple clicks
+    let isProcessing = false;
+    deleteButton.addEventListener("click", function(e) {
+        e.stopPropagation(); // Prevent event bubbling
+        if (isProcessing) return;
+        isProcessing = true;
+        
+        deleteNotificationMobile(data.id);
+        setTimeout(() => { isProcessing = false; }, 500);
+    });
+    
+    boxTitle.appendChild(textBox);
+    boxTitle.appendChild(deleteButton);
+    
+    // Create preview link if URL exists
+    if (data.url) {
+        const link = document.createElement("a");
+        link.classList.add("link-over-card");
+        link.href = escapeHTML(previewUrl);
+        
+        const previewCard = createPreviewCard(data);
+        link.appendChild(previewCard);
+        
+        container.appendChild(boxTitle);
+        container.appendChild(link);
+    } else {
+        container.appendChild(boxTitle);
+    }
+    
+    return container;
+}
+
+// Helper function to create preview card
+function createPreviewCard(data) {
+    const previewCard = document.createElement("div");
+    previewCard.classList.add("preview-card-mobile");
+    
+    const appName = document.createElement("p");
+    appName.classList.add("app-name");
+    appName.textContent = "Citlali 🩷";
+    
+    const topicContainer = document.createElement("div");
+    topicContainer.classList.add("preview-card-topic-mobile");
+    
+    const urlTitle = document.createElement("h1");
+    urlTitle.textContent = escapeHTML(data.urlTitle);
+    
+    const urlDescription = document.createElement("p");
+    urlDescription.textContent = escapeHTML(data.urlDescription);
+    
+    topicContainer.appendChild(urlTitle);
+    topicContainer.appendChild(urlDescription);
+    previewCard.appendChild(appName);
+    previewCard.appendChild(topicContainer);
+    
+    // Add image if available
+    if (data.urlImage) {
+        const imageContainer = document.createElement("div");
+        imageContainer.style.borderRadius = "8px";
+        imageContainer.style.overflow = "hidden";
+        imageContainer.style.marginTop = "10px";
+        
+        const image = document.createElement("img");
+        image.src = escapeHTML(data.urlImage);
+        image.style.maxWidth = "100%";
+        image.style.height = "auto";
+        
+        imageContainer.appendChild(image);
+        previewCard.appendChild(imageContainer);
+    }
+    
+    return previewCard;
+}
+
+// Create SVG element safely without innerHTML
+function createSafeSvgElement() {
+    // Create SVG element
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "20px");
+    svg.setAttribute("height", "20px");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("version", "1.1");
+    svg.setAttribute("fill", "#666");
+    
+    // Create groups and paths
+    const g1 = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    g1.setAttribute("id", "SVGRepo_bgCarrier");
+    g1.setAttribute("stroke-width", "0");
+    
+    const g2 = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    g2.setAttribute("id", "SVGRepo_tracerCarrier");
+    g2.setAttribute("stroke-linecap", "round");
+    g2.setAttribute("stroke-linejoin", "round");
+    g2.setAttribute("stroke", "#CCCCCC");
+    g2.setAttribute("stroke-width", "0.72");
+    
+    const g3 = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    g3.setAttribute("id", "SVGRepo_iconCarrier");
+    
+    const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+    title.textContent = "delete_2_line";
+    
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", "M14.2792,2 C15.1401,2 15.9044,2.55086 16.1766,3.36754 L16.7208,5 L20,5 C20.5523,5 21,5.44772 21,6 C21,6.55227 20.5523,6.99998 20,7 L19.9975,7.07125 L19.1301,19.2137 C19.018,20.7837 17.7117,22 16.1378,22 L7.86224,22 C6.28832,22 4.982,20.7837 4.86986,19.2137 L4.00254,7.07125 C4.00083,7.04735 3.99998,7.02359 3.99996,7 C3.44769,6.99998 3,6.55227 3,6 C3,5.44772 3.44772,5 4,5 L7.27924,5 L7.82339,3.36754 C8.09562,2.55086 8.8599,2 9.72076,2 L14.2792,2 Z M17.9975,7 L6.00255,7 L6.86478,19.0712 C6.90216,19.5946 7.3376,20 7.86224,20 L16.1378,20 C16.6624,20 17.0978,19.5946 17.1352,19.0712 L17.9975,7 Z M10,10 C10.51285,10 10.9355092,10.386027 10.9932725,10.8833761 L11,11 L11,16 C11,16.5523 10.5523,17 10,17 C9.48715929,17 9.06449214,16.613973 9.00672766,16.1166239 L9,16 L9,11 C9,10.4477 9.44771,10 10,10 Z M14,10 C14.5523,10 15,10.4477 15,11 L15,16 C15,16.5523 14.5523,17 14,17 C13.4477,17 13,16.5523 13,16 L13,11 C13,10.4477 13.4477,10 14,10 Z M14.2792,4 L9.72076,4 L9.38743,5 L14.6126,5 L14.2792,4 Z");
+    path.setAttribute("fill", "#666");
+    
+    // Assemble the SVG hierarchy
+    g3.appendChild(title);
+    g3.appendChild(path);
+    
+    svg.appendChild(g1);
+    svg.appendChild(g2);
+    svg.appendChild(g3);
+    
+    return svg;
+}
+
+// Make sure escapeHTML function is properly implemented
+function escapeHTML(str) {
+    return String(str)
+    // if (!str) return "";
+    // return String(str)
+    //     .replace(/&/g, '&amp;')
+    //     .replace(/</g, '&lt;')
+    //     .replace(/>/g, '&gt;')
+    //     .replace(/"/g, '&quot;')
+    //     .replace(/'/g, '&#039;');
+}
+
+
+
+
+// function encodeURL(url) {
+//     return url.replace(/[\s<>"'&]/g, function (match) {
+//         return {
+//             " ": "%20",
+//             "<": "%3C",
+//             ">": "%3E",
+//             '"': "%22",
+//             "'": "%27",
+//             "&": "%26"
+//         }[match];
+//     });
+// }
 
 
 function deleteNotification(){

@@ -73,14 +73,16 @@ public class UserOnboardingDto : User
 
 public class UserViewModel : User
 {
+        public int TotalEvents { get; set; }
         public int FollowingCount { get; set; }
         public int FollowersCount { get; set; }
         public bool IsCurrentUser { get; set; }
+        public bool IsAdmin { get; set; }
         public bool IsFollowing { get; set; }
         public List<EventBriefCardData> UserEvents { get; set; } = new List<EventBriefCardData>();
 }
 
-public class BriefUser 
+public class BriefUser
 {
         public Guid UserId { get; set; } = new();
         public string Username { get; set; } = "";

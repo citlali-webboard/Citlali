@@ -2,7 +2,7 @@
 
 @section head {
     <link rel="stylesheet" href="~/css/Event/Create.css" asp-append-version="true" />
-    <script src="~/js/Event/Create.js"></script>
+    <script src="~/js/Event/Create.js" asp-append-version="true"></script>
 }
 
 @{
@@ -32,7 +32,7 @@
                             <option value="" disabled selected>🎯 Select event category tag</option>
                             @foreach (var tag in Model.Tags)
                             {
-                                <option value="@tag.TagId">@tag.TagName @tag.TagEmoji</option>
+                                <option value="@tag.TagId">@tag.TagEmoji @tag.TagName</option>
                             }
                     </select>
                     <span asp-validation-for="EventCategoryTagId" class="text-danger"></span>

@@ -342,6 +342,7 @@ public class EventController : Controller
             var popularTagsTask = _eventService.GetPopularTags();
             var superstarsTask = _userService.GetSuperstars();
             var locationsTask =  _eventService.GetLocationTags();
+            var sliderImagesTask =  _eventService.GetExploreSliderImages();
 
             await Task.WhenAll(eventsTask, eventsCountTask, tagsTask, eventsTrendingTask,  popularTagsTask, superstarsTask);
 
@@ -352,6 +353,7 @@ public class EventController : Controller
             var popularTags = (await popularTagsTask).ToArray();
             var superstars = (await superstarsTask).ToArray();
             var locations = (await locationsTask).ToArray();
+            var sliderImages = await sliderImagesTask;
 
             var briefCardDatas = await _eventService.EventsToBriefCardArray(events);
 
@@ -364,7 +366,8 @@ public class EventController : Controller
                 TotalPage = (int)Math.Ceiling(eventsCount / (double)pageSize),
                 TrendingEvents = eventsTrending,
                 PopularTags = popularTags,
-                Superstars = superstars
+                Superstars = superstars,
+                SliderImages = sliderImages,
             };
 
             return View(model);
@@ -439,7 +442,7 @@ public class EventController : Controller
 
             var paginatedEvents = events.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
 
-            var eventDataTasks = new Task<EventBriefCardData>[paginatedEvents.Length];
+            var eventDataTasks = new Task<EventBriefCardData?>[paginatedEvents.Length];
 
             for (int i = 0; i < paginatedEvents.Length; i++)
             {
@@ -449,6 +452,12 @@ public class EventController : Controller
 
             // Wait for all event processing to complete
             var paginatedEventsCardData = await Task.WhenAll(eventDataTasks);
+
+            // Filter out nulls and convert to non-nullable array
+            var validPaginatedEventCardData = paginatedEventsCardData
+                .Where(card => card != null)
+                .Select(card => card!)
+                .ToArray();
 
             // Check if current user is following the tag
             bool isFollowing = false;
@@ -469,7 +478,7 @@ public class EventController : Controller
                 IsFollowing = isFollowing,
                 Tags = tags,
                 Locations = locations,
-                EventBriefCardDatas = paginatedEventsCardData,
+                EventBriefCardDatas = validPaginatedEventCardData,
                 CurrentPage = page,
                 TotalPage = (int)Math.Ceiling(events.Count() / (double)pageSize)
             };
@@ -541,7 +550,7 @@ public class EventController : Controller
 
             var paginatedEvents = events.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
 
-            var eventDataTasks = new Task<EventBriefCardData>[paginatedEvents.Length];
+            var eventDataTasks = new Task<EventBriefCardData?>[paginatedEvents.Length];
 
             for (int i = 0; i < paginatedEvents.Length; i++)
             {
@@ -552,6 +561,11 @@ public class EventController : Controller
             // Wait for all event processing to complete
             var paginatedEventsCardData = await Task.WhenAll(eventDataTasks);
 
+            var validPaginatedEventCardData = paginatedEventsCardData
+                .Where(card => card != null)
+                .Select(card => card!)
+                .ToArray();
+
             // Create and return the view model using LocationEventExploreViewModel
             var model = new LocationEventExploreViewModel
             {
@@ -560,7 +574,7 @@ public class EventController : Controller
                 EventCount = eventCount,
                 Tags = tags,
                 Locations = locations.ToList(),
-                EventBriefCardDatas = paginatedEventsCardData,
+                EventBriefCardDatas = validPaginatedEventCardData,
                 CurrentPage = page,
                 TotalPage = (int)Math.Ceiling(events.Count() / (double)pageSize)
             };

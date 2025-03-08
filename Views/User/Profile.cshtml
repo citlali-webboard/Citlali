@@ -107,20 +107,20 @@
       <div class="profile-image">
         <img src="@Model.ProfileImageUrl" alt="Profile Image" />
       </div>
-      
+
       <div class="user-info">
         <h1>@Model.DisplayName</h1>
-        
+
         <div class="username">
           <span>
             @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.ContactCard>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
           </span>
           <span>@Model.Username</span>
         </div>
-        
+
         <div class="meta-data">
           <div class="data">
-            <h3>@Model.UserEvents.Count</h3>
+            <h3>@Model.TotalEvents</h3>
             <p>Events</p>
           </div>
           <a href="/user/follows/@Model.Username">
@@ -140,11 +140,11 @@
             </div>
           </a>
         </div>
-        
+
         <div class="user-bio">
           <p>@Model.UserBio</p>
         </div>
-        
+
         <div class="button-group">
           @if (@Model.IsCurrentUser) {
             <a class="action-button" id="edit-button" onclick="openDialog()">
@@ -153,6 +153,15 @@
               </span>
               <span>Edit profile</span>
             </a>
+
+            @if (@Model.IsAdmin) {
+              <a class="action-button" id="edit-button" href="/admin">
+                <span>
+                  @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Crown>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                </span>
+                <span>Admin console</span>
+              </a>
+            }
           }
           else {
             <button class="action-button follow-btn @(Model.IsFollowing ? "following" : "")" onclick="toggleFollow('@Model.Username', @(Model.IsFollowing ? "false" : "true"))" id="follow-button">
@@ -180,33 +189,33 @@
         <h1>@Model.DisplayName's Events 🎉</h1>
         <p>Here you can find all the events that @Model.DisplayName has created.</p>
       </div>
-      
+
       <div class="filters-section">
         <div class="filters-dropdown">
           <button class="filter-button" id="filterToggle">
             <span>
               @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Filter>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
             </span>
-            <span>Filter</span> 
+            <span>Filter</span>
             @if (!string.IsNullOrEmpty(ViewBag.Filter))
             {
               <span class="filter-badge">@ViewBag.Filter</span>
             }
           </button>
-          
+
           <div class="filters-menu" id="filtersMenu">
             <div class="filter-group">
               <h4>Status</h4>
-              <a href="@Url.Action("Profile", new { username = Model.Username, filter = "all", sort = ViewBag.Sort, page = 1 })" 
+              <a href="@Url.Action("Profile", new { username = Model.Username, filter = "all", sort = ViewBag.Sort, page = 1 })"
                 class="filter-option @(ViewBag.Filter == "all" || ViewBag.Filter == null ? "active" : "")">All Events</a>
-              <a href="@Url.Action("Profile", new { username = Model.Username, filter = "active", sort = ViewBag.Sort, page = 1 })" 
+              <a href="@Url.Action("Profile", new { username = Model.Username, filter = "active", sort = ViewBag.Sort, page = 1 })"
                 class="filter-option @(ViewBag.Filter == "active" ? "active" : "")">Active</a>
-              <a href="@Url.Action("Profile", new { username = Model.Username, filter = "closed", sort = ViewBag.Sort, page = 1 })" 
+              <a href="@Url.Action("Profile", new { username = Model.Username, filter = "closed", sort = ViewBag.Sort, page = 1 })"
                 class="filter-option @(ViewBag.Filter == "closed" ? "active" : "")">Closed / Expired</a>
             </div>
           </div>
         </div>
-        
+
         <div class="sort-dropdown">
           <button class="sort-button" id="sortToggle">
             <span>
@@ -214,19 +223,19 @@
             </span>
             <span>Sort: @(ViewBag.Sort ?? "newest")</span>
           </button>
-          
+
           <div class="sort-menu" id="sortMenu">
-            <a href="@Url.Action("Profile", new { username = Model.Username, filter = ViewBag.Filter, sort = "newest", page = 1 })" 
+            <a href="@Url.Action("Profile", new { username = Model.Username, filter = ViewBag.Filter, sort = "newest", page = 1 })"
               class="sort-option @(ViewBag.Sort == "newest" || ViewBag.Sort == null ? "active" : "")">Newest first</a>
-            <a href="@Url.Action("Profile", new { username = Model.Username, filter = ViewBag.Filter, sort = "oldest", page = 1 })" 
+            <a href="@Url.Action("Profile", new { username = Model.Username, filter = ViewBag.Filter, sort = "oldest", page = 1 })"
               class="sort-option @(ViewBag.Sort == "oldest" ? "active" : "")">Oldest first</a>
-            <a href="@Url.Action("Profile", new { username = Model.Username, filter = ViewBag.Filter, sort = "popular", page = 1 })" 
+            <a href="@Url.Action("Profile", new { username = Model.Username, filter = ViewBag.Filter, sort = "popular", page = 1 })"
               class="sort-option @(ViewBag.Sort == "popular" ? "active" : "")">Most popular</a>
           </div>
         </div>
       </div>
     </div>
-    
+
     <div class="events-list">
       @if(Model.UserEvents.Count > 0) {
         @foreach (var userEvent in Model.UserEvents)
@@ -256,7 +265,7 @@
 
         @for (var i = 1; i <= totalPages; i++)
         {
-          <a href="@Url.Action("Profile", new { username = Model.Username, page = i, filter = ViewBag.Filter, sort = ViewBag.Sort })" 
+          <a href="@Url.Action("Profile", new { username = Model.Username, page = i, filter = ViewBag.Filter, sort = ViewBag.Sort })"
             class="@(i == currentPage ? "pagination-current-page" : "pagination-link")">@i</a>
         }
 
