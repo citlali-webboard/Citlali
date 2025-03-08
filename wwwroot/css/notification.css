@@ -201,6 +201,7 @@ main .notification-container{
     align-items: flex-start;
     column-gap: 0.5rem;
     width: 100%;
+    flex-wrap: wrap;
 }
 
 .delete-all-btn {
