@@ -162,29 +162,34 @@ public class UserController : Controller
                 return Content("User not found.");
             }
 
-            var currentUser = _userService.CurrentSession.User ?? throw new GetUserException();
+            var currentUser = _userService.CurrentSession.User;
             var isCurrentUser = currentUser != null && currentUser.Id == user.UserId.ToString();
+            var isFollowingTask = Task.FromResult(false);
+            if (currentUser != null) {
+                isFollowingTask = _userService.IsFollowing(Guid.Parse(currentUser.Id ?? throw new GetUserException()), user.UserId);
+
+                if (isCurrentUser) {
+                    HttpContext.Response.Cookies.Append("ProfileImageUrl", user.ProfileImageUrl, new CookieOptions
+                    {
+                        HttpOnly = false,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTime.UtcNow.AddDays(30)
+                    });
+                }
+            }
+
             var isAdmin = _userService.IsUserAdmin();
             var followingCountTask = _userService.GetFollowingCount(user.UserId);
             var followersCountTask = _userService.GetFollowersCount(user.UserId);
-            var isFollowingTask = _userService.IsFollowing(Guid.Parse(currentUser?.Id ?? string.Empty), user.UserId);
             var eventsTask = _eventService.GetEventsByUserId(user.UserId);
 
-            await Task.WhenAll(followingCountTask, followersCountTask, isFollowingTask);
+            await Task.WhenAll(followingCountTask, followersCountTask);
             var followingCount = await followingCountTask;
             var followersCount = await followersCountTask;
             var isFollowing = await isFollowingTask;
             var events = await eventsTask;
 
-            if (isCurrentUser) {
-                HttpContext.Response.Cookies.Append("ProfileImageUrl", user.ProfileImageUrl, new CookieOptions
-                {
-                    HttpOnly = false,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.UtcNow.AddDays(30)
-                });
-            }
 
             if (!string.IsNullOrEmpty(filter))
             {
