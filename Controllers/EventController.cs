@@ -342,6 +342,7 @@ public class EventController : Controller
             var popularTagsTask = _eventService.GetPopularTags();
             var superstarsTask = _userService.GetSuperstars();
             var locationsTask =  _eventService.GetLocationTags();
+            var sliderImagesTask =  _eventService.GetExploreSliderImages();
 
             await Task.WhenAll(eventsTask, eventsCountTask, tagsTask, eventsTrendingTask,  popularTagsTask, superstarsTask);
 
@@ -352,6 +353,7 @@ public class EventController : Controller
             var popularTags = (await popularTagsTask).ToArray();
             var superstars = (await superstarsTask).ToArray();
             var locations = (await locationsTask).ToArray();
+            var sliderImages = await sliderImagesTask;
 
             var briefCardDatas = await _eventService.EventsToBriefCardArray(events);
 
@@ -364,7 +366,8 @@ public class EventController : Controller
                 TotalPage = (int)Math.Ceiling(eventsCount / (double)pageSize),
                 TrendingEvents = eventsTrending,
                 PopularTags = popularTags,
-                Superstars = superstars
+                Superstars = superstars,
+                SliderImages = sliderImages,
             };
 
             return View(model);
