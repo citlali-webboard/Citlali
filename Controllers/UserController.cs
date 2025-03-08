@@ -228,6 +228,7 @@ public class UserController : Controller
             ProfileImageUrl = user.ProfileImageUrl,
             DisplayName = user.DisplayName,
             UserBio = user.UserBio,
+            TotalEvents = totalEvents,
             FollowingCount = followingCount,
             FollowersCount = followersCount,
             IsCurrentUser = isCurrentUser,
