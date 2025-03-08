@@ -263,6 +263,7 @@ public class UserController : Controller
         catch (Exception exc)
         {
             TempData["Error"] = exc.Message;
+            return View("Explore", "Event");
         }
     }
 
