@@ -442,7 +442,7 @@ public class EventController : Controller
 
             var paginatedEvents = events.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
 
-            var eventDataTasks = new Task<EventBriefCardData>[paginatedEvents.Length];
+            var eventDataTasks = new Task<EventBriefCardData?>[paginatedEvents.Length];
 
             for (int i = 0; i < paginatedEvents.Length; i++)
             {
@@ -452,6 +452,12 @@ public class EventController : Controller
 
             // Wait for all event processing to complete
             var paginatedEventsCardData = await Task.WhenAll(eventDataTasks);
+
+            // Filter out nulls and convert to non-nullable array
+            var validPaginatedEventCardData = paginatedEventsCardData
+                .Where(card => card != null)
+                .Select(card => card!)
+                .ToArray();
 
             // Check if current user is following the tag
             bool isFollowing = false;
@@ -472,7 +478,7 @@ public class EventController : Controller
                 IsFollowing = isFollowing,
                 Tags = tags,
                 Locations = locations,
-                EventBriefCardDatas = paginatedEventsCardData,
+                EventBriefCardDatas = validPaginatedEventCardData,
                 CurrentPage = page,
                 TotalPage = (int)Math.Ceiling(events.Count() / (double)pageSize)
             };
@@ -544,7 +550,7 @@ public class EventController : Controller
 
             var paginatedEvents = events.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
 
-            var eventDataTasks = new Task<EventBriefCardData>[paginatedEvents.Length];
+            var eventDataTasks = new Task<EventBriefCardData?>[paginatedEvents.Length];
 
             for (int i = 0; i < paginatedEvents.Length; i++)
             {
@@ -555,6 +561,11 @@ public class EventController : Controller
             // Wait for all event processing to complete
             var paginatedEventsCardData = await Task.WhenAll(eventDataTasks);
 
+            var validPaginatedEventCardData = paginatedEventsCardData
+                .Where(card => card != null)
+                .Select(card => card!)
+                .ToArray();
+
             // Create and return the view model using LocationEventExploreViewModel
             var model = new LocationEventExploreViewModel
             {
@@ -563,7 +574,7 @@ public class EventController : Controller
                 EventCount = eventCount,
                 Tags = tags,
                 Locations = locations.ToList(),
-                EventBriefCardDatas = paginatedEventsCardData,
+                EventBriefCardDatas = validPaginatedEventCardData,
                 CurrentPage = page,
                 TotalPage = (int)Math.Ceiling(events.Count() / (double)pageSize)
             };

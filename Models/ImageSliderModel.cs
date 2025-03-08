@@ -2,7 +2,7 @@ namespace Citlali.Models;
 
 public class ImageSliderModel
 {
-    public ImageSliderItem[]? Images { get; set; }
+    public ImageSliderItem[] Images { get; set; } = [];
 }
 
 public class ImageSliderItem

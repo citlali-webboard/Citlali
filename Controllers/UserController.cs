@@ -150,7 +150,7 @@ public class UserController : Controller
 
     [HttpGet("{username}")]
     [ServiceFilter(typeof(OnboardingFilter))]
-    public async Task<IActionResult> Profile(string username, int page = 1, string filter = null, string sort = "newest")
+    public async Task<IActionResult> Profile(string username, int page = 1, string? filter = null, string sort = "newest")
     {
         try
         {

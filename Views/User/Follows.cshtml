@@ -17,10 +17,10 @@
     <div class="content">
         <div class="follows-container">
             <div class="follows-header">
-                <a href="/user/@Model.User.Username">
+                <a href="/user/@Model.User?.Username">
                     <div class="user-profile">
-                        <img src="@Model.User.ProfileImageUrl" alt="@Model.User.DisplayName" class="profile-image" />
-                        <h1>@Model.User.DisplayName <span id="username">(@Model.User.Username)</span></h1>
+                        <img src="@Model.User?.ProfileImageUrl" alt="@Model.User?.DisplayName" class="profile-image" />
+                        <h1>@Model.User?.DisplayName <span id="username">(@Model.User?.Username)</span></h1>
                     </div>
                 </a>
                 <button class="close-btn" onclick="closeFollowPopup('@(Model.User?.Username ?? "unknown")')">&times;</button>
@@ -76,7 +76,7 @@
                         <div class="empty-state">
                             <div class="empty-icon">👤</div>
                             <h3>No followers yet</h3>
-                            <p>When people follow @(isCurrentUserProfile ? "you" : Model.User.DisplayName), they'll appear here.</p>
+                            <p>When people follow @(isCurrentUserProfile ? "you" : Model.User?.DisplayName), they'll appear here.</p>
                         </div>
                     }
                 </div>
@@ -157,7 +157,7 @@
                         <div class="empty-state">
                             <div class="empty-icon">🔍</div>
                             <h3>Not following anyone</h3>
-                            <p>@(isCurrentUserProfile ? "You aren't" : Model.User.DisplayName + " isn't") following anyone or any tags yet.</p>
+                            <p>@(isCurrentUserProfile ? "You aren't" : Model.User?.DisplayName + " isn't") following anyone or any tags yet.</p>
                         </div>
                     }
                 </div>

@@ -364,7 +364,7 @@ public class PopularTag : EventCategoryTag
 public class LocationEventExploreViewModel
 {
     public Guid LocationId { get; set; }
-    public string LocationName { get; set; }
+    public string LocationName { get; set; } = "";
     public int EventCount { get; set; }
     public List<Tag> Tags { get; set; } = new();
     public List<Location> Locations { get; set; } = new();
