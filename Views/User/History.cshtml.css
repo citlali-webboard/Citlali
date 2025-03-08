@@ -327,7 +327,8 @@
     }
 
     .status-symbol {
-        max-height: 30px;
+        height: 2rem;
+        width: 2rem;
         margin: 0;
     }
 
