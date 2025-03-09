@@ -398,6 +398,7 @@
   .main-content {
     order: 1;
     width: 100%;
+    flex: 0 1 auto;
   }
   
   .controls-row {
