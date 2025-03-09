@@ -278,11 +278,16 @@ CREATE TABLE IF NOT EXISTS "public"."EVENTS" (
     "PostExpiryDate" timestamp with time zone,
     "CreatedAt" timestamp with time zone DEFAULT "now"() NOT NULL,
     "Deleted" boolean DEFAULT false NOT NULL,
-    "Status" "text" DEFAULT 'active'::"text" NOT NULL
+    "Status" "text" DEFAULT 'active'::"text" NOT NULL,
+    "FirstComeFirstServed" boolean DEFAULT false NOT NULL
 );
 
 
 -- ALTER TABLE "public"."EVENTS" OWNER TO "supabase_admin";
+
+
+COMMENT ON COLUMN "public"."EVENTS"."FirstComeFirstServed" IS 'first come first serve';
+
 
 
 CREATE TABLE IF NOT EXISTS "public"."EVENT_CATEGORY_TAG" (
@@ -338,11 +343,16 @@ CREATE TABLE IF NOT EXISTS "public"."REGISTRATION" (
     "UserId" "uuid" NOT NULL,
     "EventId" "uuid" NOT NULL,
     "Status" "text",
-    "CreatedAt" timestamp with time zone DEFAULT "now"() NOT NULL
+    "CreatedAt" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "UpdatedAt" timestamp with time zone DEFAULT "now"() NOT NULL
 );
 
 
 -- ALTER TABLE "public"."REGISTRATION" OWNER TO "supabase_admin";
+
+
+COMMENT ON COLUMN "public"."REGISTRATION"."UpdatedAt" IS 'Timestamp when updated';
+
 
 
 CREATE TABLE IF NOT EXISTS "public"."REGISTRATION_ANSWER" (
@@ -597,6 +607,14 @@ CREATE POLICY "Enable delete for authenticated users based on UserId" ON "public
 
 
 
+CREATE POLICY "Enable insert for authenticated admin" ON "public"."EVENT_CATEGORY_TAG" FOR INSERT TO "authenticated" WITH CHECK (("public"."get_my_claim"('app_role'::"text") = '"admin"'::"jsonb"));
+
+
+
+CREATE POLICY "Enable insert for authenticated admin" ON "public"."LOCATION_TAG" FOR INSERT TO "authenticated" WITH CHECK (("public"."get_my_claim"('app_role'::"text") = '"admin"'::"jsonb"));
+
+
+
 CREATE POLICY "Enable insert for authenticated user based on CreatorUserId" ON "public"."EVENT_QUESTION" FOR INSERT TO "authenticated" WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."EVENTS" "e"
   WHERE (("e"."EventId" = "EVENT_QUESTION"."EventId") AND ("e"."CreatorUserId" = "auth"."uid"())))));
@@ -686,6 +704,20 @@ CREATE POLICY "Enable select for authenticated users based on FromUserId" ON "pu
 
 
 
+CREATE POLICY "Enable update for authed event creator to edit registration" ON "public"."REGISTRATION" FOR UPDATE TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."EVENTS" "e"
+  WHERE (("e"."EventId" = "REGISTRATION"."EventId") AND ("e"."CreatorUserId" = "auth"."uid"())))));
+
+
+
+CREATE POLICY "Enable update for authenticated admin" ON "public"."EVENT_CATEGORY_TAG" FOR UPDATE TO "authenticated" USING (("public"."get_my_claim"('app_role'::"text") = '"admin"'::"jsonb"));
+
+
+
+CREATE POLICY "Enable update for authenticated admin" ON "public"."LOCATION_TAG" FOR UPDATE TO "authenticated" USING (("public"."get_my_claim"('app_role'::"text") = '"admin"'::"jsonb"));
+
+
+
 CREATE POLICY "Enable update for authenticated user based on CreatorUserId" ON "public"."EVENT_QUESTION" FOR UPDATE TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "public"."EVENTS" "e"
   WHERE (("e"."EventId" = "EVENT_QUESTION"."EventId") AND ("e"."CreatorUserId" = "auth"."uid"()))))) WITH CHECK ((EXISTS ( SELECT 1
@@ -712,7 +744,7 @@ CREATE POLICY "Enable update for authenticated users based on UserId" ON "public
 
 
 
-CREATE POLICY "Enable update for authentication users based on UserId" ON "public"."REGISTRATION" FOR UPDATE TO "authenticated" USING (((EXISTS ( SELECT 1
+CREATE POLICY "Enable update for authenticated users to edit their own" ON "public"."REGISTRATION" FOR UPDATE TO "authenticated" USING (((EXISTS ( SELECT 1
    FROM "public"."EVENTS" "e"
   WHERE ("e"."CreatorUserId" <> "auth"."uid"()))) AND (( SELECT "auth"."uid"() AS "uid") = "UserId"))) WITH CHECK (((EXISTS ( SELECT 1
    FROM "public"."EVENTS" "e"
@@ -742,6 +774,9 @@ ALTER TABLE "public"."LOCATION_TAG" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."NOTIFICATIONS" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "public"."REGISTRATION" ENABLE ROW LEVEL SECURITY;
+
+
 ALTER TABLE "public"."REGISTRATION_ANSWER" ENABLE ROW LEVEL SECURITY;
 
 
@@ -749,6 +784,9 @@ ALTER TABLE "public"."USERS" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."USER_FEEDBACK" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."USER_FOLLOWED_CATEGORY" ENABLE ROW LEVEL SECURITY;
 
 
 
@@ -771,15 +809,6 @@ GRANT USAGE ON SCHEMA "public" TO "postgres";
 GRANT USAGE ON SCHEMA "public" TO "anon";
 GRANT USAGE ON SCHEMA "public" TO "authenticated";
 GRANT USAGE ON SCHEMA "public" TO "service_role";
-
-
-
-
-
-
-
-
-
 
 
 
