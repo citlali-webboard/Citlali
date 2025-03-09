@@ -41,6 +41,24 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         return tags;
     }
 
+    public async Task<Tag?> GetSingleTagEvenIfDeleted(Guid tagId)
+    {
+        var response = await _supabaseClient
+            .From<EventCategoryTag>()
+            .Select("*")
+            .Where(x => x.EventCategoryTagId == tagId)
+            .Single();
+
+        if (response == null) return null;
+
+        return new Tag
+        {
+            TagId = response.EventCategoryTagId,
+            TagEmoji = response.EventCategoryTagEmoji,
+            TagName = response.EventCategoryTagName
+        };
+    }
+
     public async Task<List<Location>> GetLocationTags()
     {
         var response = await _supabaseClient
@@ -1075,9 +1093,9 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
             GetTagById(ev.EventCategoryTagId),
             GetLocationTags(),
             GetTags(),
+            GetSingleTagEvenIfDeleted(ev.EventCategoryTagId),
             GetQuestionsByEventId(eventId),
             GetRegistrationCountByEventId(eventId)
-
         };
 
         await Task.WhenAll(tasks);
@@ -1086,8 +1104,13 @@ public class EventService(Client supabaseClient, UserService userService, Notifi
         var categoryTag = await (Task<EventCategoryTag?>)tasks[2] ?? new EventCategoryTag();
         var locationTags = await (Task<List<Location>>)tasks[3];
         var categoryTags = await (Task<List<Tag>>)tasks[4];
-        var questions = await (Task<List<QuestionViewModel>>)tasks[5];
-        var currentParticipant = await (Task<int>)tasks[6];
+        var selectedTag = await (Task<Tag>)tasks[5];
+        var questions = await (Task<List<QuestionViewModel>>)tasks[6];
+        var currentParticipant = await (Task<int>)tasks[7];
+
+        if (!categoryTags.ConvertAll(x => x.TagId).Contains(selectedTag.TagId)) {
+            categoryTags.Add(selectedTag);
+        }
 
         return new EditEventViewModel
         {

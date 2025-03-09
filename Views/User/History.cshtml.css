@@ -186,7 +186,7 @@
     margin-bottom: 0.5rem;
 }
 
-.status-symbol svg {
+.status-symbol-size-limiter {
     width: 50%;
     height: 50%;
 }
@@ -204,7 +204,7 @@
 }
 
 .status-symbol.rejected-invitation,
-.status-symbol.rejected {
+.status-symbol.rejected  {
     background-color: #bb2124;
 }
 
@@ -217,6 +217,7 @@
 #status-text {
     font-size: 1rem;
     font-weight: bold;
+    text-align: center;
 }
 
 #registration-time {
@@ -329,7 +330,8 @@
     }
 
     .status-symbol {
-        max-height: 30px;
+        height: 2rem;
+        width: 2rem;
         margin: 0;
     }
 
