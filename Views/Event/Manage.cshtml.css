@@ -244,7 +244,18 @@ ul {
 
 .form-group textarea {
     field-sizing: content;
-    padding: 0.5rem;
+    padding: 0.8rem !important;
+    border: 1px solid #000;
+    border-radius: 5px;
+
+    text-wrap: wrap;
+    resize: none;
+
+    font-size: 1rem;
+}
+
+.form-group input {
+    padding: 0.8rem !important;
     border: 1px solid #000;
     border-radius: 5px;
 
