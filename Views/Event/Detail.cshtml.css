@@ -3,15 +3,18 @@
   min-height: calc(100dvh - var(--navbar-size));
   margin-left: auto;
   margin-right: auto;
-  margin-top: 4rem;
-  margin-bottom: 2rem;
+  margin-top: var(--navbar-size);
+  padding-bottom: 2rem;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  background-color: #f0f0f0;
 }
 
 .detail-main-container {
+  margin-top: 2rem;
   width: 80%;
   /* max-width: 768px; */
   display: flex;
@@ -27,9 +30,9 @@
   flex: 0 0 40%
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1150px) {
   .detail-main-container {
-    width: 90%;
+    width: 95%;
     flex-direction: column;
   }
 

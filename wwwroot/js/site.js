@@ -76,5 +76,3 @@ document.addEventListener("DOMContentLoaded", function () {
         hideTimeout = setTimeout(hideDropdown, 200);
     }
 });
-
-

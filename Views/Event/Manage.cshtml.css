@@ -2,14 +2,15 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    margin-top: 4rem;
     align-items: center;
-    min-height: 100vh;
-    margin-bottom: 2rem;
+    min-height: calc(100vh - var(--navbar-size));
+    margin-top: var(--navbar-size);
     width: 100%;
+    /* background-color: #f0f0f0; */
 }
 
 .content {
+    margin-top: 2rem;
     width: 90%;
     max-width: 1200px;
 }
@@ -19,11 +20,13 @@
     margin-top: 1rem;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     /* justify-content: flex-end; */
     gap: 1rem;
 }
 
 .action-button{
+    background-color: #fefefe;
     width: fit-content;
     height: fit-content;
     display: flex;
@@ -94,12 +97,13 @@
 }
 
 ul {
-    list-style-type: square;
-    padding-left: 1rem;
+    all: unset !important;
+    list-style-type: square !important;
 }
 
 .question-container {
-    padding: 1rem;
+    background-color: #fefefe;
+    padding: 1rem 2rem;
     border: 1px solid #ccc;
     border-radius: 8px;
 }
@@ -143,7 +147,12 @@ ul {
 }
 
 .selected-participants {
+    background-color: #fefefe;
+    padding: 2rem;
+    border-radius: 15px;
+    border: 1px solid #ccc;
     flex: 0 0 30%;
+    height: fit-content;
     display: flex;
     flex-direction: column;
 }
@@ -175,6 +184,7 @@ ul {
 }
 
 .registrant-header {
+    background-color: #fefefe;
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -363,6 +373,389 @@ ul {
     margin-bottom: 1rem;
 }
 
+.confirm-text-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.broadcast-popup {
+    display: none;
+}
+
+/* Broadcast Popup */
+.broadcast-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    width: 90%;
+    max-width: 768px;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 2rem;
+    margin: 2rem auto;
+
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.popup-navigation {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.popup-left-space {
+    width: 40px; /* Same width as close button to balance the centering */
+}
+
+
+.popup-navigation h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.popup-action-button {
+    all: unset;
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem; 
+    
+    padding: 0.3rem 1rem; 
+
+    font-size: 0.8rem;
+    text-decoration: none;
+    color: #000;
+    white-space: nowrap;
+}
+
+.popup-action-button:hover {
+    cursor: pointer;
+}
+
+.popup-action-button svg {
+    height: 2rem;
+    flex-shrink: 0;
+}
+
+.popup-action-button svg:hover {
+    cursor: pointer;
+}
+
+.popup-body {
+    display: flex;
+    flex-direction: column;
+
+    padding: 0 2rem 2rem 2rem; 
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    color: #555;
+}
+
+.popup-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.disabled-input {
+    background-color: #e0e0e0 !important;
+    color: #666 !important;
+    cursor: not-allowed; 
+    opacity: 0.7;
+}
+
+.form-group input,textarea {
+    padding: 1rem;
+    border: 1px solid #000;
+    border-radius: 5px;
+
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    resize: none;
+}
+
+.popup-title {
+    flex-grow: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.popup-title description {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.broadcast-button {
+    width: 100%;
+    padding: 1rem;
+    background-color: #000;
+    color: #fff;
+    fill: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.broadcast-button:hover {
+    background-color: #333;
+}
+
+.popup-confirmed-participants-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.popup-confirmed-participants h3 {
+    margin-top: 1rem;
+    padding: 0;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.popup-confirmed-participants description {
+    margin: 0;
+    padding: 0;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+
+
+.popup-each-confirmed-participant {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    height: 80px;
+    width: 80px;
+
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.popup-each-confirmed-participant img {
+    margin: 0 !important;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+
+.popup-each-confirmed-participant span {
+    width: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #666;
+    overflow: hidden;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* Participant controls container */
+.participant-controls {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1rem 0;
+    justify-content: flex-end;
+    align-items: center;
+    border-radius: 8px;
+    position: relative;
+}
+
+/* Search container */
+.search-container {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    min-width: 200px;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 0.6rem 1rem 0.6rem 2.5rem;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.search-container input:focus {
+    outline: none;
+    border-color: #333;
+}
+
+.search-icon {
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+.participant-control-button-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/* Filter and sort containers */
+.participant-filter,
+.participant-sort {
+    position: relative;
+}
+
+/* Buttons for filter and sort */
+.filter-button,
+.sort-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--bg-color, #f0f0f0);
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-primary, #333);
+}
+
+.filter-button:hover,
+.sort-button:hover {
+    background-color: #e0e0e0;
+}
+
+.filter-button svg,
+.sort-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Dropdown menus */
+.filter-menu,
+.sort-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    display: none;
+    z-index: 1000;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 0.75rem;
+    min-width: 200px;
+    margin-top: 0.5rem;
+}
+
+/* Filter option group */
+.filter-group h4 {
+    font-size: 0.85rem;
+    margin: 0 0 8px 0;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Filter and sort options */
+.filter-option,
+.sort-option {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    text-align: left;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+.filter-option:hover,
+.sort-option:hover {
+    background-color: #f5f5f5;
+}
+
+.filter-option.active,
+.sort-option.active {
+    background-color: #f8f8f8;
+    color: #000;
+    font-weight: 600;
+}
+
+/* No results message */
+.no-results {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.no-results p {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* Search result highlighting */
+.highlight-search {
+    background-color: rgba(253, 0, 227, 0.05);
+    transition: background-color 0.3s ease;
+}
+
+/* Hide elements */
+.hidden {
+    display: none !important;
+}
+
 @media (max-width: 768px) {
     .registrants {
         display: flex;
@@ -376,5 +769,105 @@ ul {
 
     .registrants * description {
         font-size: 0.8rem;
+    }
+
+    .popup-content {
+        width: 100%;
+        height: 100%;
+        max-height: 100vh;
+        margin: 0;
+        padding: 0;
+        z-index: 9999;
+        border-radius: 0;
+    }
+    
+    .popup-navigation {
+        position: sticky;
+        top: 0;
+        background-color: white; 
+        z-index: 10; 
+        padding: 1rem; 
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+
+    .popup-navigation h1 {
+        font-size: 1.5rem;
+    }
+    
+    .popup-body {
+        margin: 0;
+        padding: 0;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        row-gap: 2rem;
+    }
+
+    .popup-confirmed-participants,
+    .popup-info {
+        width: 90% !important;
+        align-self: center;
+    }
+
+    .event-status {
+        width: 100%;
+    }
+
+    .participant-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-container {
+        max-width: none;
+        flex: 1 1 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .participant-filter,
+    .participant-sort {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+    
+    .filter-button,
+    .sort-button {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .filter-menu,
+    .sort-menu {
+        width: 100%;
+        right: 0;
+    }
+    
+    .registrant-card {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .participant-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .participant-filter,
+    .participant-sort {
+        width: 100%;
+    }
+    
+    .filter-button,
+    .sort-button {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .filter-menu,
+    .sort-menu {
+        width: 100%;
+        right: 0;
     }
 }

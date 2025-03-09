@@ -1,100 +1,193 @@
-
 @{
-    var accessToken = Context.Request.Cookies["accessToken"];
-    var refreshToken = Context.Request.Cookies["refreshToken"];
-    var profileImageUrl = Context.Request.Cookies["profileImageUrl"];
+  var accessToken = Context.Request.Cookies["accessToken"];
+  var refreshToken = Context.Request.Cookies["refreshToken"];
+  var profileImageUrl = Context.Request.Cookies["profileImageUrl"];
 
-    bool IsAuthenticated = !string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken);
+  bool IsAuthenticated = !string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken);
+  bool IsAdmin = false;
+  if (!string.IsNullOrEmpty(accessToken)) {
+    try {
+      var dataSection = accessToken.Split(".", 3);
+      if (dataSection.Length >= 2)
+      {
+        // Add padding to make the base64 string valid
+        string payload = dataSection[1];
+        string padded = payload.PadRight(payload.Length + (4 - payload.Length % 4) % 4, '=');
 
-    if (string.IsNullOrEmpty(profileImageUrl))
-    {
-        profileImageUrl = ViewData["DefaultProfileImage"] as string;
+        // Replace URL-safe characters with regular base64 characters
+        padded = padded.Replace('-', '+').Replace('_', '/');
+
+        var jsonBytes = System.Convert.FromBase64String(padded);
+        var jsonString = System.Text.Encoding.UTF8.GetString(jsonBytes);
+        var jsonObject = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonDocument>(jsonString);
+
+        if (jsonObject?.RootElement.TryGetProperty("app_metadata", out var metadataProperty) == true)
+        {
+          if (metadataProperty.TryGetProperty("app_role", out var roleProperty))
+          {
+            IsAdmin = roleProperty.GetString() == "admin";
+          }
+        }
+      }
     }
-    var timestamp = DateTime.Now.Ticks;
-    profileImageUrl = $"{profileImageUrl}?v={timestamp}";
+    catch {}
+  }
+
+  if (string.IsNullOrEmpty(profileImageUrl))
+  {
+    profileImageUrl = "https://citlali-supabase.code4.dad/storage/v1/object/public/CITLALI_USER_PROFILE_PICTURE/public/citlali-drunk.webp";
+  }
 }
 
+<link rel="stylesheet" href="~/css/NavBar.css" asp-append-version="true" />
+
 <nav>
+  <div class="mobile-nav-toggle-container">
+    <div class="mobile-nav-toggle" id="mobile-nav-toggle">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </div>
+  </div>
+
   <ul>
     <div class="nav-group">
-      <a href="/Home/Index">
-        <li class="logo">
-          @* Logo *@
-          <span>
-            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.DocumentEdit>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
-          </span>
+      <a href="/">
+        <div class="logo">
+          <img src="~/citlali.webp" alt="Logo" class="website-logo">
           <p>Citlali</p>
-        </li>
+        </div>
       </a>
     </div>
 
-    <div class="nav-group">
-      <a href="/Event/Create">
-        <li class="tooltip">
-          @* Create Event *@
-          <span>
-            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.AddCircle>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
-          </span>
-          <span class="tooltip-text">Create Event</span>
-        </li>
+    <div class="nav-group" id="navigation-links">
+      <a href="/event/explore" class="nav-item">
+        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Home>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+        <p>Home</p>
       </a>
-
-      <a href="/user/history">
-        <li class="tooltip">
-          @* History *@
-          <span>
-            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.History>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
-          </span>
-          <p class="tooltip-text">History</p>
-        </li>
+      @if (IsAdmin) {
+        <a href="/admin" class="nav-item" >
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Crown>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+          <span>Admin console</span>
+        </a>
+      }
+      @if (IsAuthenticated)
+      {
+        <a href="/event/followed" class="nav-item">
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Star>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          <p>Following</p>
+        </a>
+        <a href="/user/history" class="nav-item">
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.History>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          <p>Registration History</p>
+        </a>
+        <a href="/notification" class="nav-item">
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          <p id="notification-icon">Notification</p>
+        </a>
+      }
+      <a href="/about" class="nav-item">
+        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Info>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+        <p>About</p>
       </a>
-
-      <a href="#">
-        @* Notification *@
-        <li class="tooltip">
-          <span>
-            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
-          </span>
-          <p class="tooltip-text">Notification</p>
-        </li>
-      </a>
-
-      <a href="#">
-        @* Follow Heart *@
-        <li class="tooltip">
-          <span>
-            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size24.Heart>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
-          </span>
-          <p class="tooltip-text">Followed</p>
-        </li>
-      </a>
-
-      <div class="profile-container">
-        @if (IsAuthenticated)
-        {
-          @* Profile *@
-          <li>
-            <div class="profile-placeholder">
-              <img src=@profileImageUrl alt="">
-            </div>
-
-            @* Dropdown *@
-            <div class="profile-dropdown">
-              <a href="/user" class="dropdown-item">User Profile</a>
-              <form asp-controller="Auth" asp-action="SignOut" method="post">
-                <button type="submit" class="dropdown-item">Sign Out</button>
-              </form>
-            </div>
-          </li>
-        }
-        else
-        {
-          <li>
-            <a href="/Auth/SignIn" class="signin-btn">Sign In</a>
-          </li>
-        }
-      </div>
-
     </div>
+    <div class="nav-group" id="auth-section">
+      @if (IsAuthenticated)
+      {
+        <div class="profile-dropdown-container">
+          <div class="profile-placeholder" id="profile-dropdown-toggle">
+            <img src="@profileImageUrl" alt="Profile">
+          </div>
+          <div class="profile-dropdown" id="profile-dropdown-menu">
+            <a href="/user" class="dropdown-item">
+              @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Person>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+              <span>Profile</span>
+            </a>
+            <form class="dropdown-item" asp-action="signout" asp-controller="auth" method="post">
+              <button type="submit" class="signout-btn">
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.SignOut>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+                Sign out
+              </button>
+            </form>
+          </div>
+        </div>
+      }
+      else
+      {
+        <a href="/auth/signin" class="signin-btn">
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Person>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+          Sign in
+        </a>
+      }
+    </div>
+
   </ul>
 </nav>
+
+<script>
+
+  // I know this is real shit
+  // But CSS fucks me hard
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Profile dropdown functionality
+    const toggleButton = document.getElementById('profile-dropdown-toggle');
+    const dropdown = document.getElementById('profile-dropdown-menu');
+
+    if (toggleButton && dropdown) {
+      toggleButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdown.classList.toggle('show');
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!dropdown.contains(e.target) && !toggleButton.contains(e.target)) {
+          dropdown.classList.remove('show');
+        }
+      });
+    }
+
+    // Mobile menu functionality
+    const mobileToggle = document.getElementById('mobile-nav-toggle');
+    const navLinks = document.getElementById('navigation-links');
+    const authSection = document.getElementById('auth-section');
+    const aboutLink = document.querySelector('a[href="/about"]');
+    const navUl = document.querySelector('nav > ul');
+    let isMobile = false;
+
+    // Function to handle mobile element positioning
+    function handleMobileLayout() {
+      const windowWidth = window.innerWidth;
+
+      // Mobile breakpoint
+      if (windowWidth <= 1000 && !isMobile) {
+        // Move auth section after about link in mobile view
+        if (aboutLink && navLinks && authSection) {
+          navLinks.insertBefore(authSection, aboutLink.nextSibling);
+        }
+        isMobile = true;
+      }
+      // Desktop breakpoint
+      else if (windowWidth > 1000 && isMobile) {
+        // Move auth section back to original position
+        if (navUl && authSection) {
+          navUl.appendChild(authSection);
+        }
+        isMobile = false;
+      }
+    }
+
+    // Initial check
+    handleMobileLayout();
+
+    // Listen for window resize
+    window.addEventListener('resize', handleMobileLayout);
+
+    // Toggle menu functionality
+    mobileToggle.addEventListener('click', function() {
+      this.classList.toggle('active');
+      document.body.classList.toggle('menu-open');
+      navLinks.classList.toggle('show-mobile');
+    });
+  });
+</script>

@@ -2,22 +2,15 @@
 
 @section head {
   <link rel="stylesheet" href="~/css/Confirm.css" asp-append-version="true" />
-  <script src="~/js/Confirm.js" defer></script>
+  <script src="~/js/Confirm.js" defer asp-append-version="true"></script>
   <title>Verify OTP</title>
 }
 
 @{
   Layout= "_LayoutBase";
+  ViewData["Title"] = "Verify your email";
 }
 
-@if (TempData["Error"] != null)
-{
-  <script>
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-  </script>
-}
 
 <div class="form-container">
   <div class="form-content">
@@ -26,6 +19,7 @@
     </span>
     <h2>Verification Needed</h2>
     <h3>Please enter the token that was sent to @Model.Email</h3>
+    <p>Note that the email might be sent to your spam inbox.</p>
     <form asp-action="Confirm" method="post" enctype="multipart/form-data">
       <div class="form-group" style="display: none;">
         <label for="Email">Email</label>

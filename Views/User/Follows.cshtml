@@ -1,0 +1,210 @@
+@model Citlali.Models.FollowViewModel
+@using Microsoft.AspNetCore.Http
+@using System
+
+@{
+    ViewData["Title"] = "Follows";
+
+    var isCurrentUserProfile = Model.IsCurrentUser;
+    var activeTab = ViewData["ActiveTab"] as string ?? "followers";
+}
+
+@section head {
+    <script src="~/js/Follow.js" asp-append-version="true"></script>
+}
+
+<div class="center-wrapper">
+    <div class="content">
+        <div class="follows-container">
+            <div class="follows-header">
+                <a href="/user/@Model.User?.Username">
+                    <div class="user-profile">
+                        <img src="@Model.User?.ProfileImageUrl" alt="@Model.User?.DisplayName" class="profile-image" />
+                        <h1>@Model.User?.DisplayName <span id="username">(@Model.User?.Username)</span></h1>
+                    </div>
+                </a>
+                <button class="close-btn" onclick="closeFollowPopup('@(Model.User?.Username ?? "unknown")')">&times;</button>
+            </div>
+
+            <!-- Tab navigation -->
+            <div class="tabs">
+                <button class="tab-button @(activeTab == "followers" ? "active" : "")" onclick="switchTab('followers')">
+                    Followers <span class="count">@Model.Followers.Count</span>
+                </button>
+                <button class="tab-button @(activeTab == "following" ? "active" : "")" onclick="switchTab('following')">
+                    Following <span class="count">@(Model.Following.FollowingUsers.Count + Model.Following.FollowedTags.Count)</span>
+                </button>
+            </div>
+
+            <div class="search-box">
+                <input type="text" placeholder="Search" id="searchInput" />
+            </div>
+
+            <!-- Followers tab content -->
+            <div id="followers-tab" class="tab-content @(activeTab == "followers" ? "active" : "")">
+                <div class="follow-list" id="followersList">
+                    @if (Model.Followers.Any())
+                    {
+                        @foreach (var user in Model.Followers)
+                        {
+                            <div class="follow-item" data-name="@user.DisplayName.ToLower() @user.Username.ToLower()">
+                                <div class="follow-info">
+                                    <a href="/user/@user.Username">
+                                        <img src="@user.ProfileImageUrl" alt="@user.DisplayName" class="profile-image" />
+                                    </a>
+                                    <a href="/user/@user.Username">
+                                        <div>
+                                            <p>@user.Username</p>
+                                            <h2>@user.DisplayName</h2>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                @if (isCurrentUserProfile)
+                                {
+                                    <button class="follow-btn" onclick="toggleUnFollow('@user.Username')">Remove</button>
+                                }
+                                else
+                                {
+                                    <a href="/user/@user.Username" class="follow-btn view-profile-btn">View Profile</a>
+                                }
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <div class="empty-icon">👤</div>
+                            <h3>No followers yet</h3>
+                            <p>When people follow @(isCurrentUserProfile ? "you" : Model.User?.DisplayName), they'll appear here.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Following tab content -->
+            <div id="following-tab" class="tab-content @(activeTab == "following" ? "active" : "")">
+                <div class="follow-list" id="followingList">
+                    @if (Model.Following.FollowingUsers.Any() || Model.Following.FollowedTags.Any())
+                    {
+                        @if (Model.Following.FollowingUsers.Any())
+                        {
+                            <div class="section-header">
+                                <h2>People</h2>
+                            </div>
+
+                            @foreach (var user in Model.Following.FollowingUsers)
+                            {
+                                <div class="follow-item" data-name="@user.DisplayName.ToLower() @user.Username.ToLower()" data-type="user">
+                                    <div class="follow-info">
+                                        <a href="/user/@user.Username">
+                                            <img src="@user.ProfileImageUrl" alt="@user.DisplayName" class="profile-image" />
+                                        </a>
+                                        <a href="/user/@user.Username">
+                                            <div>
+                                                <p>@user.Username</p>
+                                                <h2>@user.DisplayName</h2>
+                                            </div>
+                                        </a>
+                                    </div>
+
+                                    @if (isCurrentUserProfile)
+                                    {
+                                        <button class="follow-btn" onclick="toggleFollow('@user.Username', false)">Unfollow</button>
+                                    }
+                                    else
+                                    {
+                                        <a href="/user/@user.Username" class="follow-btn view-profile-btn">View Profile</a>
+                                    }
+                                </div>
+                            }
+                        }
+
+                        @if (Model.Following.FollowedTags.Any())
+                        {
+                            <div class="section-header">
+                                <h2>Tags</h2>
+                            </div>
+
+                            @foreach (var tag in Model.Following.FollowedTags)
+                            {
+                                <div class="follow-item" data-name="@tag.TagName.ToLower()" data-type="tag">
+                                    <div class="follow-info">
+                                        <a href="/event/tag/@tag.TagId">
+                                            <div class="tag-emoji">@tag.TagEmoji</div>
+                                        </a>
+                                        <a href="/event/tag/@tag.TagId">
+                                            <div>
+                                                <h2>@tag.TagName</h2>
+                                            </div>
+                                        </a>
+                                    </div>
+
+                                    @if (isCurrentUserProfile)
+                                    {
+                                        <button class="follow-btn" onclick="toggleFollowTag('@tag.TagId', false)">Unfollow</button>
+                                    }
+                                    else
+                                    {
+                                        <a href="/event/tag/@tag.TagId" class="follow-btn view-profile-btn">View Tags</a>
+                                    }
+                                </div>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <div class="empty-icon">🔍</div>
+                            <h3>Not following anyone</h3>
+                            <p>@(isCurrentUserProfile ? "You aren't" : Model.User?.DisplayName + " isn't") following anyone or any tags yet.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function switchTab(tabName) {
+            // Update active tab button
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.tab-button:nth-child(${tabName === 'followers' ? '1' : '2'})`).classList.add('active');
+
+            // Update active tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+
+            // Update search functionality based on active tab
+            setupSearch(tabName);
+        }
+
+        function setupSearch(tabName) {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.value = ''; // Clear search when switching tabs
+
+            if (tabName === 'followers') {
+                searchInput.onkeyup = filterUsers;
+                filterUsers(); // Apply initial filter
+            } else {
+                searchInput.onkeyup = filterUsersandTags;
+                filterUsersandTags(); // Apply initial filter
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up initial search based on active tab
+            const activeTab = document.querySelector('.tab-button.active');
+            if (activeTab) {
+                setupSearch(activeTab.textContent.trim().toLowerCase().includes('follower') ? 'followers' : 'following');
+            }
+        });
+    </script>
+}

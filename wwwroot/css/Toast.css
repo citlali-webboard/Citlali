@@ -1,0 +1,79 @@
+#toasts {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  padding: 0.5rem;
+
+  width: 100%;
+  max-width: 480px;
+  z-index: 999;
+}
+
+.toast {
+  position: relative;
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+}
+
+.toast > div {
+  width: 100%;
+  overflow: hidden;
+}
+
+.toast-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: inline-block;
+
+  width: calc(100% - 16px);
+}
+
+.toast-close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.toast-style-destructive .toast-description {
+  white-space: unset;
+}
+
+.toast-description {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+
+  width: 100%;
+}
+
+.toast-style-neutral {
+  background-color: var(--color-muted);
+  color: white;
+}
+
+.toast-style-destructive {
+  background-color: var(--color-destructive);
+  color: white;
+}
+
+.toast-style-notification {
+  background-color: var(--color-muted);
+  color: white;
+
+  width: 100%;
+  display: flex;
+  column-gap: 1rem;
+  align-items: center;
+  border-radius: 8px;
+  position: relative;
+}
+
+.toast-style-notification img {
+  height: auto;
+  width: 3rem;
+  border-radius: 50%;
+}

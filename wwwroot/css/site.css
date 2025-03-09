@@ -20,7 +20,7 @@
   --max-text-width: 65ch;
   /* --max-screen-width: 786px; */
   --max-screen-width: 1024px;
-  --navbar-size: 3rem;
+  --navbar-size: 5rem;
 }
 
 .error-popup {
@@ -56,4 +56,37 @@
 .main-container {
   min-height: 100dvh;
   width: 100dvw;
+}
+
+.count-notifications {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  right: -1rem;
+  background-color: red;
+  border-radius: 50%;
+  height: 15px;
+  width: 15px;
+  font-size: 10px;
+  font-weight: 800;
+  color: white;
+  margin-top: -5px;
+  margin-right: -8px;
+}
+
+.scaling-svg-container {
+  position: relative;
+  height: 0;
+  width: 100%;
+  padding: 0;
+  padding-bottom: 100%;
+}
+.scaling-svg-container svg {
+  position: absolute;
+  height: 100% !important;
+  width: 100% !important;
+  left: 0;
+  top: 0;
 }

@@ -8,6 +8,7 @@ public class Configuration
     public required SupabaseConfig Supabase { get; set; }
     public required UserConfig User { get; set; }
     public required JwtConfig Jwt { get; set; }
+    public required MailConfig Mail  { get; set; }
 }
 
 public class AppConfig
@@ -38,4 +39,19 @@ public class JwtConfig
     public required string RefreshCookie { get; set; }
     public required string Audience { get; set; }
     public required string Secret { get; set; }
+}
+
+public enum MailNotificationLevel {
+    AllNotifications,
+    ImportantOnly
+}
+
+public class MailConfig{
+    public required string SendAddress { get; set; }
+    public required string SendDisplayName { get; set; }
+    public required string SmtpServer { get; set; }
+    public required int SmtpPort { get; set; }
+    public required string SmtpUsername { get; set; }
+    public required string SmtpPassword { get; set; }
+    public required MailNotificationLevel NotificationLevel { get; set; }
 }

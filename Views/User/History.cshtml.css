@@ -3,8 +3,11 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    min-height: 100vh;
-    margin-bottom: 2rem;
+
+    min-height: calc(100vh - var(--navbar-size));
+    margin-top: var(--navbar-size);
+
+    /* background-color: #f0f0f0; */
     width: 100%;
 }
 
@@ -49,6 +52,7 @@
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     justify-content: space-between;
+    background-color: #fefefe;
 }
 
 .history-card:hover {
@@ -78,7 +82,7 @@
     max-height: 35px;
     display: flex;
     flex-direction: row;
-    gap: 0.5rem; 
+    gap: 0.5rem;
     align-items: center;
 }
 
@@ -172,7 +176,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    
+
     height: 50%;
     max-height: 100px;
     aspect-ratio: 1/1;
@@ -180,7 +184,7 @@
     margin-bottom: 0.5rem;
 }
 
-.status-symbol svg {
+.status-symbol-size-limiter {
     width: 50%;
     height: 50%;
 }
@@ -197,7 +201,7 @@
     background-color: #22bb33;
 }
 
-.status-symbol.rejected-invitation, 
+.status-symbol.rejected-invitation,
 .status-symbol.rejected  {
     background-color: #bb2124;
 }
@@ -211,11 +215,101 @@
 #status-text {
     font-size: 1rem;
     font-weight: bold;
+    text-align: center;
 }
 
 #registration-time {
     font-size: 0.7rem;
     color: #666;
+}
+
+.filter-controls {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.status-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-filter label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #555;
+}
+
+.status-filter select {
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    min-width: 200px;
+}
+
+.status-filter select:focus {
+    border-color: #666;
+    outline: none;
+}
+
+.status-filter select option {
+    padding: 10px;
+}
+
+.empty-history {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 3rem 1rem;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    margin-top: 1rem;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.empty-history h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.empty-history p {
+    font-size: 1rem;
+    color: #666;
+    max-width: 500px;
+    margin-bottom: 1.5rem;
+}
+
+.explore-btn {
+    padding: 0.8rem 1.5rem;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.explore-btn:hover {
+    background-color: #444;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 @media screen and (max-width: 768px) {
@@ -234,7 +328,8 @@
     }
 
     .status-symbol {
-        max-height: 30px;
+        height: 2rem;
+        width: 2rem;
         margin: 0;
     }
 
@@ -303,5 +398,30 @@
 
     .location {
         font-size: 0.6rem;
+    }
+
+    .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0.75rem;
+    }
+
+    .status-filter {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .status-filter select {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .empty-history h2 {
+        font-size: 1.2rem;
+    }
+
+    .empty-history p {
+        font-size: 0.9rem;
     }
 }

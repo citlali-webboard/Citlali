@@ -8,19 +8,41 @@
 
 .event-form {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
+  background-color: #ffffff;  /* White background */
+  border-radius: 1rem;
+  border: 1px solid #ccc;
+  padding: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  height: fit-content;
 }
 
-.tags-container > .tags > .tag {
-  display: inline-block;
-  margin: 3px;
-  padding: 4px 8px 4px 8px;
-  background-color: var(--pink-color);
-  border: 2px solid var(--pink-color);
-  border-radius: 30px;
-  cursor: default;
-  width: fit-content;
+/* Form group styling */
+.form-group {
+  margin-bottom: 1.25rem;
+  width: 100%;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #000;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #000;
 }
 
 .form-submit{
@@ -54,11 +76,20 @@
 form h1 {
   font-size: 1.5rem;
   font-weight: bold;
+  color: #000;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
 }
 
 form p {
   font-size: 1rem;
+  margin-top: 0;
   margin-bottom: 1.5rem;
+  color: #616161;
+}
+
+.form-data {
+  width: 100%;
 }
 
 input:disabled {
@@ -66,4 +97,53 @@ input:disabled {
   background-color: #e0e0e0 !important;
   color: #666 !important;
   opacity: 0.7;
+}
+
+
+/* Responsive styles */
+@media screen and (max-width: 968px) {
+  .event-form {
+    padding: 1rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  form h1 {
+    font-size: 1.25rem;
+  }
+  
+  form p {
+    font-size: 0.9375rem;
+    margin-bottom: 1.25rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .event-form {
+    padding: 0.875rem;
+  }
+  
+  form h1 {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  form p {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-control {
+    padding: 0.625rem;
+    font-size: 0.9375rem;
+  }
+  
+  .form-submit {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9375rem;
+  }
 }

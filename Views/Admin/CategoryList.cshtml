@@ -1,0 +1,138 @@
+@model Citlali.Models.AdminCategoriesViewModel;
+
+@section head {
+  <link rel="stylesheet" href="~/css/Admin/CategoryList.css"asp-append-version="true"/>
+  <script src="~/js/Admin/categoryList.js" defer asp-append-version="true"></script>
+}
+
+@{
+  ViewData["Title"] = "Manage Categories";
+}
+
+<div class="center-wrapper">
+  <div class="content">
+    <a href="/admin" class="back-btn">Back</a>
+    <div class="admin-header">
+      <h1>Category Management</h1>
+      <p>Manage event categories and tags that users can select when creating events.</p>
+    </div>
+    <div class="admin-card">
+      <div class="card-header">
+        <h2>Create New Category</h2>
+      </div>
+
+      <form asp-action="CategoryCreate" method="post" class="create-form">
+        <div class="form-input-group">
+          <div class="form-group tag-emoji-group">
+            <label asp-for="CreateDto.TagEmoji">Emoji</label>
+            <input asp-for="CreateDto.TagEmoji" class="form-control" name="tagEmoji" placeholder="" required />
+            <span asp-validation-for="CreateDto.TagEmoji" class="text-danger"></span>
+          </div>
+
+          <div class="form-group tag-name-group">
+            <label asp-for="CreateDto.TagName">Tag Name</label>
+            <input asp-for="CreateDto.TagName" class="form-control" name="tagName" placeholder="" required />
+            <span asp-validation-for="CreateDto.TagName" class="text-danger"></span>
+          </div>
+        </div>
+
+        <button type="submit" class="create-btn">
+          @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Add>>(RenderMode.ServerPrerendered, new { Color = Color.Fill }))
+          Create
+        </button>
+      </form>
+    </div>
+
+    <div class="admin-card">
+      <div class="card-header">
+        <h2>Existing Categories</h2>
+        <span class="tag-count">@Model.Tags.Count() categories</span>
+      </div>
+
+      <div class="tags-container">
+        @foreach (var tag in Model.Tags)
+        {
+          <div class="tag-item" data-tag-id="@tag.TagId">
+            <div class="tag-content">
+              <div class="tag-emoji">@tag.TagEmoji</div>
+              <div class="tag-name">@tag.TagName</div>
+            </div>
+            <form asp-action="CategoryDelete" method="post" class="delete-form">
+              <input asp-for="DeleteDto.TagId" name="tagId" type="hidden" value="@tag.TagId" />
+              <button type="button" class="delete-btn" onclick="confirmDelete(this)">
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+              </button>
+            </form>
+          </div>
+        }
+      </div>
+    </div>
+
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+      <div class="modal-content">
+        <h3>Confirm Deletion</h3>
+        <p>Are you sure you want to delete this category? This action cannot be undone.</p>
+        <div class="modal-actions">
+          <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+          <button class="confirm-delete-btn" onclick="submitDelete()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentForm = null;
+
+function confirmDelete(button) {
+    // Store reference to the form
+    currentForm = button.closest('form');
+
+    // Get tag details to show in modal
+    const tagItem = button.closest('.tag-item');
+    const tagName = tagItem.querySelector('.tag-name').textContent;
+    const tagEmoji = tagItem.querySelector('.tag-emoji').textContent;
+
+    // Update modal content
+    const modal = document.getElementById('deleteModal');
+    const modalMessage = modal.querySelector('p');
+    modalMessage.innerHTML = `Are you sure you want to delete the <strong>${tagEmoji} ${tagName}</strong> category? This action cannot be undone.`;
+
+    // Show modal
+    modal.style.display = 'flex';
+
+    // Focus confirm button
+    setTimeout(() => {
+        modal.querySelector('.confirm-delete-btn').focus();
+    }, 100);
+}
+
+function closeModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+    currentForm = null;
+}
+
+function submitDelete() {
+    if (currentForm) {
+        currentForm.submit();
+    }
+    closeModal();
+}
+
+// Close modal if user clicks outside
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('deleteModal');
+    if (event.target === modal) {
+        closeModal();
+    }
+});
+
+// Close modal with ESC key
+window.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeModal();
+    }
+});
+</script>

@@ -1,0 +1,154 @@
+@model Citlali.Models.NotificationViewModel;
+
+@{
+    ViewData["Title"] = "Notification";
+}
+
+@functions{
+    public string GetPastRelativeTime(DateTime date){
+        const int SECOND = 1;
+        const int MINUTE = 60 * SECOND;
+        const int HOUR = 60 * MINUTE;
+        const int DAY = 24 * HOUR;
+        const int MONTH = 30 * DAY;
+
+        var diff = DateTime.Now - date;
+        var timeSpan = Math.Floor(diff.TotalSeconds);
+
+        if(timeSpan <= 0){
+            throw new InvalidDataException();
+        }
+
+        if (timeSpan < 1 * MINUTE)
+            return "a few seconds ago";
+        if (timeSpan < 2 * MINUTE)
+            return "a minute ago";
+        if (timeSpan < 1 * HOUR)
+            return $"{Math.Floor(timeSpan / MINUTE)} minutes ago";
+        if (timeSpan < 2 * HOUR)
+            return "an hour ago";
+        if (timeSpan < 1 * DAY)
+            return $"{Math.Floor(timeSpan / HOUR)} hours ago";
+        if (timeSpan < 2 * DAY)
+            return "yesterday";
+        if (timeSpan < 1 * MONTH)
+            return $"{Math.Floor(timeSpan / DAY)} days ago";
+
+
+        return date.ToString("MMM dd, yyyy");
+    }
+}
+
+@section head {
+    <link rel="stylesheet" href="~/css/notification.css" asp-append-version="true" />
+}
+
+<div class="center-wrapper">
+
+    @if(Model.Notifications.Count == 0 ){
+        <div class="no-noti-container">
+            <div class="no-noti-icon">
+                <div class="scaling-svg-container">
+                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size28.AlertOff>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+                </div>
+            </div>
+            <div class="no-noti-text">
+                <h1>All clear! ✅</h1>
+                <p>No new notifications at the moment. Check back later! 😊</p>
+            </div>
+        </div>
+
+    }else{
+        <div class="container">
+            <header>
+                <h1>Notification 🔔</h1>
+                <p>Stay updated with important news and alerts. Don't miss out on the latest updates! 📢</p>
+            </header>
+            <div class="active-btn-container">
+                <button class="read-all-btn" id="read-all-btn">
+                    <span>
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.MailRead>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                    </span>
+                    <span>
+                        Read all notifications
+                    </span>
+                </button>
+                <button class="delete-all-btn" id="delete-all-btn">
+                    <span>
+                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                    </span>
+                    <span>
+                        Clear all read notifications
+                    </span>
+                </button>
+
+            </div>
+            <main>
+                <div class="notification-container">
+                    @for (var i = 0; i < Model.Notifications.Count; i++)
+                    {
+                        @if(Model.Notifications[i].Read){
+                            <div class="notification-card read" data-id="@Model.Notifications[i].NotificationId">
+                                <div class="notification-card-source-user">
+                                    <img src="@Model.Notifications[i].SourceProfileImageUrl" alt="">
+                                    <div>
+                                        <div id="title">@Model.Notifications[i].Title</div>
+                                        <div id="display-name">@Model.Notifications[i].SourceDisplayName</div>
+                                    </div>
+                                </div>
+                                <div class="notification-time"> @GetPastRelativeTime(Model.Notifications[i].CreatedAt)</div>
+                            </div>
+                        }
+                        else{
+                            <div class="notification-card" data-id="@Model.Notifications[i].NotificationId">
+                                <div class="notification-card-source-user">
+                                    <img src="@Model.Notifications[i].SourceProfileImageUrl" alt="">
+                                    <div>
+                                        <div id="title">@Model.Notifications[i].Title</div>
+                                        <div id="display-name">@Model.Notifications[i].SourceDisplayName</div>
+                                    </div>
+                                </div>
+                                <div class="notification-time"> @GetPastRelativeTime(Model.Notifications[i].CreatedAt)</div>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <div id="default-notification" class="default-notification">
+                    <div class="no-noti-icon">
+                        <div class="scaling-svg-container">
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size48.Alert>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+                        </div>
+                    </div>
+                    <div class="default-notification-text">Click on notification to check messages !</div>
+                </div>
+
+                <div id="notification-detail" class="notification-detail hidden">
+                    <div class="header">
+                        <div class="source-img">
+                            <img  id="source-img" src="" alt="SourceProfileImage">
+                        </div>
+                        <div class="source-info">
+                            <div id="source-name" class="source-name"></div>
+                            <div id="create-at" class="create-at"></div>
+                        </div>
+                        <button class="delete-btn" id="delete-btn">
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.Delete>>(RenderMode.ServerPrerendered, new { Color = Color.Info }))
+                        </button>
+                    </div>
+                    <hr>
+                    <div class="content">
+                        <div id="content-title" class="content-title"></div>
+                        <div id="content-body" class="content-body"></div>
+                    </div>
+                </div>
+            </main>
+
+        </div>
+    }
+</div>
+
+
+@section Scripts {
+    <script src="~/js/Notification/notification.js"></script>
+}

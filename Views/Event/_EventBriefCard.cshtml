@@ -44,35 +44,89 @@
     }
 }
 
-<div class="card space-y-4">
-    <a href="../../event/detail/@Model.EventId">
+<div class="card">
+    <div class="card-content">
         <div class="header-data">
-            <span class="creator">
-                <img src="@Model.CreatorProfileImageUrl" alt="Creator" />
-                <span>@Model.CreatorDisplayName</span>
-                <span class="created-time">@Model.CreatedAt.ToString("t") • @Model.CreatedAt.ToString("d")</span>
-                <span class="location">
-                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Location>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
-                    @Model.LocationTag.LocationTagName
-                </span>
-            </span>
-            <span class="participant">
-                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.PeopleTeam>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
-                @Model.CurrentParticipant/@Model.MaxParticipant
-            </span>
+            <div class="creator">
+                <a href="/user/@Model.CreatorUsername" class="creator-profile">
+                    <img src="@Model.CreatorProfileImageUrl" alt="@Model.CreatorDisplayName" />
+                    <span class="creator-name">@Model.CreatorDisplayName</span>
+                </a>
+                <div class="meta-info">
+                    <span class="created-time">@Model.CreatedAt.ToString("dd/MM/yy • h:mm tt")</span>
+                    <a href="/event/location/@Model.LocationTag.LocationTagId">
+                        <span class="location">
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Location>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                            @Model.LocationTag.LocationTagName
+                        </span>
+                    </a>
+                </div>
+
+
+                @* Mobile *@
+                <div class="meta-container">
+                    <div class="participant">
+                        @if (Model.FirstComeFirstServed)
+                        {
+                            <span title="First-come-first-served event. Register early to secure your spot!">
+                                <div class="participants-icon-limiter ">
+                                    <div class="scaling-svg-container">
+                                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.PersonRunning>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+                                    </div>
+                                </div>
+                            </span>
+                        }
+                        else
+                        {
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.PeopleTeam>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                        }
+                        <span>@Model.CurrentParticipant/@Model.MaxParticipant</span>
+                    </div>
+
+                    <a href="/event/tag/@Model.EventCategoryTag.EventCategoryTagId">
+                        <div class="tag">
+                            <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
+                            <span>@Model.EventCategoryTag.EventCategoryTagName</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            @* Desktop *@
+            <div class="participant">
+                @if (Model.FirstComeFirstServed)
+                {
+                    <span title="First-come-first-served event. Register early to secure your spot!">
+                        <div class="participants-icon-limiter ">
+                            <div class="scaling-svg-container">
+                                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size20.PersonRunning>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral }))
+                            </div>
+                        </div>
+                    </span>
+                }
+                else
+                {
+                    @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.PeopleTeam>>(RenderMode.ServerPrerendered, new { Color = Color.Neutral}))
+                }
+                <span>@Model.CurrentParticipant/@Model.MaxParticipant</span>
+            </div>
         </div>
 
         <div class="card-title">
-            <span class="event-title">@Model.EventTitle</span>
-            <span class="tag">
-                <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
-                <span>@Model.EventCategoryTag.EventCategoryTagName</span>
-            </span>
+            <h3 class="event-title">@Model.EventTitle</h3>
+            <a href="/event/tag/@Model.EventCategoryTag.EventCategoryTagId">
+                <div class="tag">
+                    <span>@Model.EventCategoryTag.EventCategoryTagEmoji</span>
+                    <span>@Model.EventCategoryTag.EventCategoryTagName</span>
+                </div>
+            </a>
         </div>
 
         <div class="footer">
-            <span class="description">@Model.EventDescription</span>
+            <p class="description">@Model.EventDescription</p>
             <span class="@(expired ? "expired" : "active")">@relativeTime</span>
         </div>
-    </a>
+    </div>
+
+    <a href="/event/detail/@Model.EventId" class="card-link-overlay" aria-label="View details for @Model.EventTitle"></a>
 </div>

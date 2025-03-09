@@ -1,7 +1,7 @@
 @model Citlali.Models.EventStatusViewModel
 
 @{
-    ViewData["Title"] = "Event Status";
+    ViewData["Title"] = $"Status of {Model.EventDetailCardData.EventTitle}";
     var eventStatus = Model.Status.ToLower();
 
     // Use this for debugging
@@ -37,69 +37,77 @@
     var registrationTime = Model.RegistrationTime.ToString("dd MMMM yyyy HH:mm:ss");
 
 }
+<div class="center-wrapper">
 
-<div class="status-page">
-    <a href="/event/explore" id="back-button">
-        <button class="action-button back-button">
-            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.ArrowLeft>>(RenderMode.ServerPrerendered, new { Color = Color.Success }))
-            Explore
-        </button>
-    </a>
-    <div class="status">
-        <div class="status-symbol @eventStatus">
-            @if (eventStatus == "pending")
-            {
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12 3C7.85113 3 4 5.73396 4 10C4 11.5704 4.38842 12.7289 5.08252 13.6554C5.79002 14.5998 6.87746 15.3863 8.41627 16.0908L9.23259 16.4645L8.94868 17.3162C8.54129 18.5384 7.84997 19.6611 7.15155 20.5844C8.35158 20.2074 9.73434 19.7279 11.0954 19.1583C11.2077 19.833 11.4166 20.475 11.7072 21.0697C9.69758 21.9006 7.70002 22.5276 6.29772 22.9281C5.48665 23.1597 4.84055 22.6838 4.56243 22.1881C4.28848 21.6998 4.22087 20.9454 4.74413 20.3614C5.44439 19.5798 6.21203 18.5732 6.72616 17.4871C5.40034 16.7841 4.29326 15.9376 3.48189 14.8545C2.48785 13.5277 2 11.9296 2 10C2 4.26604 7.14887 1 12 1C16.8511 1 22 4.26604 22 10C22 10.7354 21.9438 11.4357 21.7949 12.1169C21.2214 11.7463 20.5903 11.4571 19.9179 11.266C19.9754 10.8721 20 10.454 20 10C20 5.73396 16.1489 3 12 3Z" fill="#ffffff"></path> <path d="M18 15C17.4477 15 17 15.4477 17 16V18C17 18.0197 17.0006 18.0393 17.0017 18.0588C16.9857 18.3338 17.0828 18.6142 17.2929 18.8243L18.4659 19.9973C18.8564 20.3878 19.4896 20.3878 19.8801 19.9973C20.2706 19.6067 20.2706 18.9736 19.8801 18.583L19 17.703V16C19 15.4477 18.5523 15 18 15Z" fill="#ffffff"></path> <path fill-rule="evenodd" clip-rule="evenodd" d="M18 24C21.3137 24 24 21.3137 24 18C24 14.6863 21.3137 12 18 12C14.6863 12 12 14.6863 12 18C12 21.3137 14.6863 24 18 24ZM18 22.0181C15.7809 22.0181 13.9819 20.2191 13.9819 18C13.9819 15.7809 15.7809 13.9819 18 13.9819C20.2191 13.9819 22.0181 15.7809 22.0181 18C22.0181 20.2191 20.2191 22.0181 18 22.0181Z" fill="#ffffff"></path> </g></svg>
-            }
-            else if (eventStatus == "awaiting-confirmation")
-            {
-                <svg viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>invite_line</title> <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="Contact" transform="translate(-864.000000, 0.000000)"> <g id="invite_line" transform="translate(864.000000, 0.000000)"> <path d="M24,0 L24,24 L0,24 L0,0 L24,0 Z M12.5934901,23.257841 L12.5819402,23.2595131 L12.5108777,23.2950439 L12.4918791,23.2987469 L12.4918791,23.2987469 L12.4767152,23.2950439 L12.4056548,23.2595131 C12.3958229,23.2563662 12.3870493,23.2590235 12.3821421,23.2649074 L12.3780323,23.275831 L12.360941,23.7031097 L12.3658947,23.7234994 L12.3769048,23.7357139 L12.4804777,23.8096931 L12.4953491,23.8136134 L12.4953491,23.8136134 L12.5071152,23.8096931 L12.6106902,23.7357139 L12.6232938,23.7196733 L12.6232938,23.7196733 L12.6266527,23.7031097 L12.609561,23.275831 C12.6075724,23.2657013 12.6010112,23.2592993 12.5934901,23.257841 L12.5934901,23.257841 Z M12.8583906,23.1452862 L12.8445485,23.1473072 L12.6598443,23.2396597 L12.6498822,23.2499052 L12.6498822,23.2499052 L12.6471943,23.2611114 L12.6650943,23.6906389 L12.6699349,23.7034178 L12.6699349,23.7034178 L12.678386,23.7104931 L12.8793402,23.8032389 C12.8914285,23.8068999 12.9022333,23.8029875 12.9078286,23.7952264 L12.9118235,23.7811639 L12.8776777,23.1665331 C12.8752882,23.1545897 12.8674102,23.1470016 12.8583906,23.1452862 L12.8583906,23.1452862 Z M12.1430473,23.1473072 C12.1332178,23.1423925 12.1221763,23.1452606 12.1156365,23.1525954 L12.1099173,23.1665331 L12.0757714,23.7811639 C12.0751323,23.7926639 12.0828099,23.8018602 12.0926481,23.8045676 L12.108256,23.8032389 L12.3092106,23.7104931 L12.3186497,23.7024347 L12.3186497,23.7024347 L12.3225043,23.6906389 L12.340401,23.2611114 L12.337245,23.2485176 L12.337245,23.2485176 L12.3277531,23.2396597 L12.1430473,23.1473072 Z" id="MingCute" fill-rule="nonzero"> </path> <path d="M17,3 C18.597725,3 19.903664,4.24892392 19.9949075,5.82372764 L20,6 L20,10.3501 L20.5939,10.0862 C21.2076,9.813435 21.9162954,10.2366962 21.9931452,10.8836127 L22,11 L22,19 C22,20.0543909 21.18415,20.9181678 20.1492661,20.9945144 L20,21 L4,21 C2.94563773,21 2.08183483,20.18415 2.00548573,19.1492661 L2,19 L2,11 C2,10.3284056 2.6746366,9.85267997 3.29700147,10.045194 L3.40614,10.0862 L4,10.3501 L4,6 C4,4.40232321 5.24892392,3.09633941 6.82372764,3.00509271 L7,3 L17,3 Z M20,12.5388 L12.8123,15.7333 C12.2951,15.9631 11.7049,15.9631 11.1877,15.7333 L4,12.5388 L4,19 L20,19 L20,12.5388 Z M17,5 L7,5 C6.44772,5 6,5.44772 6,6 L6,11.239 L12,13.9057 L18,11.239 L18,6 C18,5.44772 17.5523,5 17,5 Z M12,8 C12.5523,8 13,8.44772 13,9 C13,9.51283143 12.613973,9.93550653 12.1166239,9.9932722 L12,10 L10,10 C9.44772,10 9,9.55228 9,9 C9,8.48716857 9.38604429,8.06449347 9.88337975,8.0067278 L10,8 L12,8 Z" id="形状" fill="#ffffff"> </path> </g> </g> </g> </g></svg>
-            }
-            else if (eventStatus == "rejected" || eventStatus == "rejected-invitation")
-            {
-                <svg viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>cross-circle</title> <desc>Created with Sketch Beta.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage"> <g id="Icon-Set" sketch:type="MSLayerGroup" transform="translate(-568.000000, -1087.000000)" fill="#ffffff"> <path d="M584,1117 C576.268,1117 570,1110.73 570,1103 C570,1095.27 576.268,1089 584,1089 C591.732,1089 598,1095.27 598,1103 C598,1110.73 591.732,1117 584,1117 L584,1117 Z M584,1087 C575.163,1087 568,1094.16 568,1103 C568,1111.84 575.163,1119 584,1119 C592.837,1119 600,1111.84 600,1103 C600,1094.16 592.837,1087 584,1087 L584,1087 Z M589.717,1097.28 C589.323,1096.89 588.686,1096.89 588.292,1097.28 L583.994,1101.58 L579.758,1097.34 C579.367,1096.95 578.733,1096.95 578.344,1097.34 C577.953,1097.73 577.953,1098.37 578.344,1098.76 L582.58,1102.99 L578.314,1107.26 C577.921,1107.65 577.921,1108.29 578.314,1108.69 C578.708,1109.08 579.346,1109.08 579.74,1108.69 L584.006,1104.42 L588.242,1108.66 C588.633,1109.05 589.267,1109.05 589.657,1108.66 C590.048,1108.27 590.048,1107.63 589.657,1107.24 L585.42,1103.01 L589.717,1098.71 C590.11,1098.31 590.11,1097.68 589.717,1097.28 L589.717,1097.28 Z" id="cross-circle" sketch:type="MSShapeGroup"> </path> </g> </g> </g></svg>
-            }
-            else if (eventStatus == "confirmed")
-            {
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12.6111L8.92308 17.5L20 6.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
-            }
+    <div class="status-page">
+        <a href="/event/explore" id="back-button">
+            <button class="action-button back-button">
+                @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.ArrowLeft>>(RenderMode.ServerPrerendered, new { Color = Color.Success }))
+                Explore
+            </button>
+        </a>
+        <div class="status">
+            <div class="status-symbol @eventStatus">
+                <div class="status-symbol-size-limiter">
+                    <div class="scaling-svg-container">
+                        @if (eventStatus == "pending")
+                        {
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size32.ChatArrowBackDown>>(RenderMode.ServerPrerendered, new { Color = Color.Fill }))
+                        }
+                        else if (eventStatus == "awaiting-confirmation")
+                        {
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size32.ChatMultiple>>(RenderMode.ServerPrerendered, new { Color = Color.Fill }))
+
+                        }
+                        else if (eventStatus == "rejected" || eventStatus == "rejected-invitation")
+                        {
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size32.Dismiss>>(RenderMode.ServerPrerendered, new { Color = Color.Fill }))
+
+                        }
+                        else if (eventStatus == "confirmed")
+                        {
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size32.Checkmark>>(RenderMode.ServerPrerendered, new { Color = Color.Fill }))
+                        }
+                    </div>
+                </div>
+            </div>
+            <h1 class="status-title">@statusTitle</h1>
+            <p class="status-description">@statusDescription</p>
+            <div class="button-group">
+                @if (eventStatus == "awaiting-confirmation")
+                {
+                    <form asp-action="RejectedInvitation" asp-controller="Event" method="post" onsubmit="return confirm('Are you sure to reject this invitation?');">
+                        <input type="hidden" name="eventId" value="@Model.EventDetailCardData.EventId" />
+                        <button type="submit" class="action-button cancel-button">
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.CalendarCancel>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                            Reject Invitation
+                        </button>
+                    </form>
+                    <form asp-action="Confirmed" asp-controller="Event" method="post">
+                        <input type="hidden" name="eventId" value="@Model.EventDetailCardData.EventId" />
+                        <button type="submit" class="action-button confirm-button">
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Checkmark>>(RenderMode.ServerPrerendered, new { Color = Color.Success }))
+                            Confirm Invitation
+                        </button>
+                    </form>
+                }
+                @if (eventStatus == "pending")
+                {
+                    <form asp-action="CancelRegistration" asp-controller="Event" method="post" onsubmit="return confirm('Are you sure you want to cancel your request?');">
+                        <input type="hidden" name="eventId" value="@Model.EventDetailCardData.EventId" />
+                        <button type="submit" class="action-button cancel-button">
+                            @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.CalendarCancel>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
+                            Cancel Request
+                        </button>
+                    </form>
+                }
+            </div>
         </div>
-        <h1 class="status-title">@statusTitle</h1>
-        <p class="status-description">@statusDescription</p>
-        <div class="button-group">
-            @if (eventStatus == "awaiting-confirmation")
-            {
-                <form asp-action="RejectedInvitation" asp-controller="Event" method="post" onsubmit="return confirm('Are you sure to reject this invitation?');">
-                    <input type="hidden" name="eventId" value="@Model.EventDetailCardData.EventId" />
-                    <button type="submit" class="action-button cancel-button">
-                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.CalendarCancel>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
-                        Reject Invitation
-                    </button>
-                </form>
-                <form asp-action="Confirmed" asp-controller="Event" method="post">
-                    <input type="hidden" name="eventId" value="@Model.EventDetailCardData.EventId" />
-                    <button type="submit" class="action-button confirm-button">
-                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.Checkmark>>(RenderMode.ServerPrerendered, new { Color = Color.Success }))
-                        Confirm Invitation
-                    </button>
-                </form>
-            }
-            @if (eventStatus == "pending")
-            {
-                <form asp-action="CancelRegistration" asp-controller="Event" method="post" onsubmit="return confirm('Are you sure you want to cancel your request?');">
-                    <input type="hidden" name="eventId" value="@Model.EventDetailCardData.EventId" />
-                    <button type="submit" class="action-button cancel-button">
-                        @(await Html.RenderComponentAsync<FluentIcon<Icons.Regular.Size16.CalendarCancel>>(RenderMode.ServerPrerendered, new { Color = Color.Warning }))
-                        Cancel Request
-                    </button>
-                </form>
-            }
+        <div class="event-wrapper">
+            <partial name="_EventDetailCard" model=@Model.EventDetailCardData />
         </div>
-    </div>
-    <div class="event-wrapper">
-        <partial name="_EventDetailCard" model=@Model.EventDetailCardData />
-    </div>
-    <div class="join-time">
-        <h3>You have requested to join at <strong>@registrationTime</strong></h3>
+        <div class="join-time">
+            <h3>You have requested to join at <strong>@registrationTime</strong></h3>
+        </div>
     </div>
 </div>
