@@ -381,8 +381,7 @@
 @media (max-width: 900px) {
   .center-wrapper {
     flex-direction: column;
-    /* padding: 1rem;
-    padding-top: calc(var(--navbar-size) + 1rem); */
+    padding: 1rem;
   }
 
   .main-content {
@@ -399,6 +398,7 @@
   .main-content {
     order: 1;
     width: 100%;
+    flex: 0 1 auto;
   }
   
   .controls-row {

@@ -610,6 +610,7 @@ public class EventController : Controller
             EventId = ev.EventId,
             EventTitle = ev.EventTitle,
             EventDescription = ev.EventDescription,
+            CreatorUsername = creator.Username,
             CreatorDisplayName = creator.DisplayName,
             CreatorProfileImageUrl = creator.ProfileImageUrl,
             LocationTag = locationTag,
@@ -1001,11 +1002,13 @@ public class EventController : Controller
                 var cardTask = Task.WhenAll(creatorTask, locationTagTask, categoryTagTask, participantCountTask)
                     .ContinueWith(_ => {
                         // Get results with null handling
-                        var creator = creatorTask.Result ?? new User
+
+                        if (creatorTask.Result == null)
                         {
-                            DisplayName = "Unknown User",
-                            ProfileImageUrl = "/images/default-profile.png"
-                        };
+                            return;
+                        }
+
+                        var creator = creatorTask.Result;
 
                         var locationTag = locationTagTask.Result ?? new LocationTag();
                         var categoryTag = categoryTagTask.Result ?? new EventCategoryTag();
@@ -1017,6 +1020,7 @@ public class EventController : Controller
                             EventId = ev.EventId,
                             EventTitle = ev.EventTitle,
                             EventDescription = ev.EventDescription,
+                            CreatorUsername = creator.Username,
                             CreatorDisplayName = creator.DisplayName,
                             CreatorProfileImageUrl = creator.ProfileImageUrl,
                             LocationTag = locationTag,

@@ -398,19 +398,17 @@
     justify-content: flex-start !important;
   }
 
-  .main-content {
-    overflow: visible !important;
-  }
-
   .sidebar-left {
     order: 2;
     flex: 0 0 auto;
     width: 100%;
   }
-
+  
   .main-content {
+    overflow: visible !important;
     order: 1;
     width: 100%;
+    flex: 0 1 auto;
   }
 
   .controls-row {
