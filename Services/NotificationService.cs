@@ -6,6 +6,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Net.Mail;
 
 // using Supabase.Gotrue;
 
@@ -201,13 +202,21 @@ public class NotificationService(Client supabaseClient, UserService userService,
 
         var emailTask = Task.Run(async () =>
         {
-            if (_configuration.Mail.NotificationLevel == MailNotificationLevel.ImportantOnly && level == NotificationLevel.Important)
+            try
             {
-                await SendNotificationEmail(title, message, url, fromUserId, toUserId);
+                if (_configuration.Mail.NotificationLevel == MailNotificationLevel.ImportantOnly && level == NotificationLevel.Important)
+                {
+                    await SendNotificationEmail(title, message, url, fromUserId, toUserId);
+                }
+                else
+                {
+                    await SendNotificationEmail(title, message, url, fromUserId, toUserId);
+                }
             }
-            else
+            // TODO: Better exception handling
+            catch (SmtpException smtpException)
             {
-                await SendNotificationEmail(title, message, url, fromUserId, toUserId);
+                Console.WriteLine($"SmtpException occured at CreateNotification: {smtpException.Message}");
             }
         });
 
